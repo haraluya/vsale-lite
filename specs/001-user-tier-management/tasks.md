@@ -55,8 +55,8 @@
 
 ### 2.1 Supabase 設定
 
-- [ ] T009 建立 Supabase 專案並取得 API Keys
-- [ ] T010 配置 .env.local 環境變數 (SUPABASE_URL, SUPABASE_ANON_KEY)
+- [X] T009 建立 Supabase 專案並取得 API Keys
+- [X] T010 配置 .env.local 環境變數 (SUPABASE_URL, SUPABASE_ANON_KEY)
 - [ ] T011 執行 SQL Migration 建立資料庫 Schema (supabase/migrations/20260101_initial_schema.sql)
 - [ ] T012 插入預設會員等級資料 (零售、批發、經銷商)
 - [ ] T013 建立測試管理員帳號 (admin@test.com)
@@ -64,28 +64,28 @@
 
 ### 2.2 Supabase Client 工具
 
-- [ ] T015 [P] 實作 Supabase Browser Client (lib/supabase/client.ts)
-- [ ] T016 [P] 實作 Supabase Server Client (lib/supabase/server.ts)
-- [ ] T017 [P] 實作 Supabase Middleware Client (lib/supabase/middleware.ts)
-- [ ] T018 [P] 建立工具函式 cn() (lib/utils.ts)
+- [X] T015 [P] 實作 Supabase Browser Client (lib/supabase/client.ts)
+- [X] T016 [P] 實作 Supabase Server Client (lib/supabase/server.ts)
+- [X] T017 [P] 實作 Supabase Middleware Client (lib/supabase/middleware.ts)
+- [X] T018 [P] 建立工具函式 cn() (lib/utils.ts)
 
 ### 2.3 基礎 UI 元件 (Neo-Brutalism)
 
-- [ ] T019 [P] 建立 Button 元件 (components/ui/button.tsx)
-- [ ] T020 [P] 建立 Input 元件 (components/ui/input.tsx)
-- [ ] T021 [P] 建立 Card 元件 (components/ui/card.tsx)
-- [ ] T022 [P] 建立 Label 元件 (components/ui/label.tsx)
-- [ ] T023 [P] 更新 globals.css (Neo-Brutalism 樣式類別)
+- [X] T019 [P] 建立 Button 元件 (components/ui/button.tsx)
+- [X] T020 [P] 建立 Input 元件 (components/ui/input.tsx)
+- [X] T021 [P] 建立 Card 元件 (components/ui/card.tsx)
+- [X] T022 [P] 建立 Label 元件 (components/ui/label.tsx)
+- [X] T023 [P] 更新 globals.css (Neo-Brutalism 樣式類別)
 
 ### 2.4 驗證 Schema (Zod)
 
-- [ ] T024 [P] 建立登入驗證 Schema (lib/validations/auth.schema.ts)
-- [ ] T025 [P] 建立會員等級驗證 Schema (lib/validations/tier.schema.ts)
-- [ ] T026 [P] 建立客戶驗證 Schema (lib/validations/user.schema.ts)
+- [X] T024 [P] 建立登入驗證 Schema (lib/validations/auth.schema.ts)
+- [X] T025 [P] 建立會員等級驗證 Schema (lib/validations/tier.schema.ts)
+- [X] T026 [P] 建立客戶驗證 Schema (lib/validations/user.schema.ts)
 
 ### 2.5 型別定義
 
-- [ ] T027 建立共用型別定義 (types/index.ts) - Tier, Profile, AuthContext, ActionResult
+- [X] T027 建立共用型別定義 (types/index.ts) - Tier, Profile, AuthContext, ActionResult
 
 **Checkpoint**: 基礎建設完成 ✅ 使用者故事實作可開始平行進行
 
