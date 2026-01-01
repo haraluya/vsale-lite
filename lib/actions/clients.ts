@@ -64,12 +64,14 @@ export async function createClient(
     // 4. 產生隨機密碼
     const password = generatePassword()
 
-    // 5. 建立 Auth 使用者 (使用手機號碼)
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // 5. 建立 Auth 使用者 (使用 signUp,不需要 service role)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       phone: validatedFields.data.phone,
       password,
-      user_metadata: {
-        role: 'client',
+      options: {
+        data: {
+          role: 'client',
+        },
       },
     })
 
@@ -77,7 +79,7 @@ export async function createClient(
       console.error('建立 Auth 使用者失敗:', authError)
       return {
         success: false,
-        message: '建立失敗,請稍後再試',
+        message: authError?.message || '建立失敗,請稍後再試',
       }
     }
 
