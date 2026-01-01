@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { loginWithPhoneSchema, loginWithEmailSchema } from '@/lib/validations/auth.schema'
+import { withRetry } from '@/lib/supabase/retry'
 import type { ActionResult } from '@/types'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
@@ -30,11 +31,14 @@ export async function loginWithEmail(
 
     const supabase = await createClient()
 
-    // 2. 呼叫 Supabase Auth 登入
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: validatedFields.data.email,
-      password: validatedFields.data.password,
-    })
+    // 2. 呼叫 Supabase Auth 登入（帶重試機制）
+    const { data: authData, error: authError } = await withRetry(
+      () => supabase.auth.signInWithPassword({
+        email: validatedFields.data.email,
+        password: validatedFields.data.password,
+      }),
+      { maxRetries: 2, delayMs: 500 }
+    )
 
     if (authError || !authData.user) {
       console.error('Supabase auth error:', authError)
@@ -110,12 +114,15 @@ export async function loginWithPhone(
 
     const supabase = await createClient()
 
-    // 2. 呼叫 Supabase Auth 登入 (使用 Email 格式: phone@temp.local)
+    // 2. 呼叫 Supabase Auth 登入（使用 Email 格式: phone@temp.local，帶重試機制）
     const tempEmail = `${validatedFields.data.phone}@temp.local`
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      email: tempEmail,
-      password: validatedFields.data.password,
-    })
+    const { data: authData, error: authError } = await withRetry(
+      () => supabase.auth.signInWithPassword({
+        email: tempEmail,
+        password: validatedFields.data.password,
+      }),
+      { maxRetries: 2, delayMs: 500 }
+    )
 
     console.log('loginWithPhone - 登入結果:', { email: tempEmail, userId: authData?.user?.id, error: authError?.message })
 

@@ -30,9 +30,24 @@ export async function middleware(request: NextRequest) {
   )
 
   // 更新 session (重要:確保 cookie 正確設置)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch (error) {
+    // 網路錯誤時,允許請求繼續但不進行認證檢查
+    console.error('[Middleware] Auth error:', error)
+    // 如果是網路錯誤且不是受保護路由,放行
+    const pathname = request.nextUrl.pathname
+    const publicPaths = ['/', '/login', '/admin/login']
+    if (publicPaths.includes(pathname)) {
+      return supabaseResponse
+    }
+    // 受保護路由則導向登入頁
+    const url = request.nextUrl.clone()
+    url.pathname = pathname.startsWith('/admin') ? '/admin/login' : '/login'
+    return NextResponse.redirect(url)
+  }
 
   const { pathname } = request.nextUrl
 
