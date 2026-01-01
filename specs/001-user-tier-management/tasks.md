@@ -34,14 +34,14 @@
 
 **Purpose**: 建立專案基礎結構與依賴套件
 
-- [ ] T001 初始化 Next.js 15 專案,使用 TypeScript、Tailwind CSS、App Router
-- [ ] T002 [P] 安裝核心依賴: @supabase/supabase-js, @supabase/ssr, zod, zustand
-- [ ] T003 [P] 安裝 UI 依賴: lucide-react, class-variance-authority, clsx, tailwind-merge
-- [ ] T004 [P] 配置 Vitest 測試環境 (vitest.config.ts, vitest.setup.ts)
-- [ ] T005 配置 Tailwind CSS (tailwind.config.ts) 實作 Neo-Brutalism 設計系統
-- [ ] T006 [P] 建立專案目錄結構 (app/, components/, lib/, types/)
-- [ ] T007 [P] 設定環境變數範本 (.env.local.example)
-- [ ] T008 更新 package.json scripts (dev, build, test, type-check)
+- [X] T001 初始化 Next.js 15 專案,使用 TypeScript、Tailwind CSS、App Router
+- [X] T002 [P] 安裝核心依賴: @supabase/supabase-js, @supabase/ssr, zod, zustand
+- [X] T003 [P] 安裝 UI 依賴: lucide-react, class-variance-authority, clsx, tailwind-merge
+- [X] T004 [P] 配置 Vitest 測試環境 (vitest.config.ts, vitest.setup.ts)
+- [X] T005 配置 Tailwind CSS (tailwind.config.ts) 實作 Neo-Brutalism 設計系統
+- [X] T006 [P] 建立專案目錄結構 (app/, components/, lib/, types/)
+- [X] T007 [P] 設定環境變數範本 (.env.local.example)
+- [X] T008 更新 package.json scripts (dev, build, test, type-check)
 
 **Checkpoint**: 專案結構已建立,依賴已安裝,可開始基礎建設
 
