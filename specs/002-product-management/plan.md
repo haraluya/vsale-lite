@@ -208,11 +208,12 @@ supabase/migrations/         # SQL Migration 檔案
 
 ### API 合約設計
 
-**Categories CRUD** (4 個 Actions):
+**Categories CRUD** (5 個 Actions):
 - `getCategories()` - 查詢所有分類
 - `createCategory(data)` - 建立分類
 - `updateCategory(id, data)` - 更新分類
 - `deleteCategory(id)` - 刪除分類 (含保護檢查)
+- `migrateCategoryProducts(fromId, toId)` - 遷移商品至其他分類 (FR-009-A)
 
 **Products CRUD** (5 個 Actions):
 - `getProducts(params)` - 查詢商品列表 (含搜尋、篩選、分頁)
@@ -329,14 +330,33 @@ supabase/migrations/         # SQL Migration 檔案
 
 ---
 
+## Terminology *(術語規範)*
+
+**中英文對照**: 本專案採用「中文優先，程式碼用英文」策略
+
+| 中文術語 | 英文術語 (程式碼) | 說明 |
+|---------|------------------|------|
+| 商品編號 | code | 商品的唯一識別碼，建立後不可修改 |
+| 商品名稱 | name | 商品的顯示名稱，可重複 |
+| 分類 | category | 商品分類 |
+| 庫存 | stock | 可為負數，支援預購 |
+| 商品 | product | 商品實體 |
+| 單位 | unit | 計量單位 (包、箱、瓶等) |
+
+**使用原則**:
+- 文件 (spec.md, plan.md, tasks.md) 使用中文術語
+- 程式碼、資料庫欄位、API 參數使用英文術語
+- 註解與 commit message 使用繁體中文
+
 ## Next Steps
 
 1. **執行 Migration**: 依照 `quickstart.md` 建立資料庫表與測試資料
-2. **產生任務清單**: 執行 `/speckit.tasks` 指令產生 `tasks.md`
+2. **產生任務清單**: ✅ 已完成 (tasks.md)
 3. **開始實作**: 依任務優先級開始開發 (建議從 Categories Management 開始)
 
 **預估開發時間**:
 - MVP (US1-3): 3-5 工作天
-- 完整功能 (US1-6): 5-7 工作天
+- 完整功能 (US1-6): 6-8 工作天 (含分類遷移與分頁配置功能)
 
 **規劃完成日期**: 2026-01-02
+**規格最後更新**: 2026-01-02 (Edge Cases 決策完成)

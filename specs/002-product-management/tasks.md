@@ -82,6 +82,8 @@
 - [ ] T018 [US2] 建立新增分類頁面 (app/(admin)/admin/categories/new/page.tsx)
 - [ ] T019 [US2] 建立編輯分類頁面 (app/(admin)/admin/categories/[id]/edit/page.tsx)
 - [ ] T020 [US2] 實作刪除分類保護邏輯 (檢查是否有商品使用)
+- [ ] T020-A [US2] 實作分類遷移功能 (Server Action: migrateCategoryProducts) - 批量更新商品分類後刪除 (FR-009-A)
+- [ ] T020-B [US2] 建立分類刪除確認對話框 - 若有商品則顯示遷移選項
 - [ ] T021 [US2] 更新後台導航選單 (app/(admin)/admin/layout.tsx) - 新增「分類管理」連結
 
 **Checkpoint**: 管理員可完整管理商品分類 (CRUD),可展示與驗證
@@ -106,7 +108,7 @@
 - [ ] T029 [P] [US1] 建立 ProductForm 元件 (components/admin/product-form.tsx)
 - [ ] T030 [US1] 建立新增商品頁面 (app/(admin)/admin/products/new/page.tsx)
 - [ ] T031 [US1] 建立編輯商品頁面 (app/(admin)/admin/products/[id]/edit/page.tsx)
-- [ ] T032 [US1] 實作商品編號唯一性驗證
+- [ ] T032 [US1] 實作商品編號唯一性與格式驗證 (Zod: `/^[A-Za-z0-9-_]+$/`) - FR-002
 - [ ] T033 [US1] 實作負庫存支援驗證 (庫存可為負數)
 - [ ] T034 [US1] 更新後台導航選單 (app/(admin)/admin/layout.tsx) - 新增「商品管理」連結
 
@@ -168,8 +170,8 @@
 - [ ] T050 [P] [US5] 建立 CategoryFilter 元件 (components/admin/category-filter.tsx)
 - [ ] T051 [US5] 實作依分類篩選商品
 - [ ] T052 [US5] 實作搜尋與篩選組合查詢
-- [ ] T053 [US5] 實作商品列表分頁功能 (每頁 20 筆)
-- [ ] T054 [P] [US5] 建立 Pagination 元件 (components/admin/pagination.tsx)
+- [ ] T053 [US5] 實作商品列表分頁功能 (支援 20/50/100 筆可選) - FR-020
+- [ ] T054 [P] [US5] 建立 Pagination 元件 (components/admin/pagination.tsx) - 含每頁筆數選擇器
 - [ ] T055 [US5] 整合搜尋、篩選、分頁至商品列表頁面
 
 **Checkpoint**: 管理員可高效搜尋與篩選商品,分頁功能完整
@@ -219,15 +221,18 @@
 
 ### 8.3 Data Integrity
 
-- [ ] T072 實作商品刪除保護邏輯 (檢查是否有訂單記錄) - 預留介面
+- [ ] T072 實作商品刪除保護邏輯 (檢查是否有訂單記錄) - 預留介面 (實際邏輯在 004-shopping-cart 實作)
+- [ ] T072-A [P] 實作非管理員操作阻擋前端驗證 (UI 層隱藏操作按鈕) - FR-027
+- [ ] T072-B [P] 實作非管理員操作阻擋後端驗證 (Server Actions 權限檢查) - FR-027
 - [ ] T073 實作圖片刪除錯誤處理 (圖片可能不存在)
+- [ ] T074-A 在 Out of Scope 文件中說明訂單快照機制 (FR-028，將在 004 實作)
 
 ### 8.4 Final Validation
 
-- [ ] T074 [P] TypeScript 型別檢查 (pnpm type-check)
-- [ ] T075 執行 pnpm build 驗證編譯成功
-- [ ] T076 [P] 程式碼格式化與 Linting 檢查
-- [ ] T077 更新 README.md (新增商品管理功能說明)
+- [ ] T075 [P] TypeScript 型別檢查 (pnpm type-check)
+- [ ] T076 執行 pnpm build 驗證編譯成功
+- [ ] T077 [P] 程式碼格式化與 Linting 檢查
+- [ ] T078 更新 README.md (新增商品管理功能說明)
 
 **Checkpoint**: 功能完整,可進行 Demo 或部署
 
@@ -413,29 +418,29 @@ Task: "建立 ImageUpload UI 元件 (components/ui/image-upload.tsx)"
 
 ## Task Summary
 
-### Total Tasks: 79
+### Total Tasks: 85
 
 **Phase Breakdown**:
 - Phase 1 (Foundational): 10 tasks
-- Phase 2 (US2 - 分類管理): 11 tasks
+- Phase 2 (US2 - 分類管理): 13 tasks (+2: 分類遷移功能)
 - Phase 3 (US1 - 商品 CRUD): 13 tasks
 - Phase 4 (US3 - 商品編輯): 4 tasks
 - Phase 5 (US4 - 圖片上傳): 9 tasks
 - Phase 6 (US5 - 搜尋篩選): 8 tasks
 - Phase 7 (US6 - 前台展示): 8 tasks
-- Phase 8 (Polish): 16 tasks
+- Phase 8 (Polish): 20 tasks (+4: 權限驗證、訂單快照說明)
 
 **Parallelizable Tasks**: 38 tasks (標記 [P])
 
 **User Story Distribution**:
-- US2 (分類管理): 11 tasks
+- US2 (分類管理): 13 tasks (+2: 遷移功能)
 - US1 (商品 CRUD): 13 tasks
 - US3 (商品編輯): 4 tasks
 - US4 (圖片上傳): 9 tasks
 - US5 (搜尋篩選): 8 tasks
 - US6 (前台展示): 8 tasks
 
-**MVP Scope**: 38 tasks (Phase 1 + Phase 2 + Phase 3 + Phase 4)
+**MVP Scope**: 40 tasks (Phase 1 + Phase 2 + Phase 3 + Phase 4)
 
 ---
 
