@@ -7,7 +7,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useTransition } from 'react'
-import { Edit, Search, Trash2 } from 'lucide-react'
+import { Edit, Search, Trash2, Key } from 'lucide-react'
 import { deleteClient } from '@/lib/actions/clients'
 
 type ClientTableProps = {
@@ -190,6 +190,12 @@ export function ClientTable({
                           <Button size="sm" variant="secondary">
                             <Edit className="h-3 w-3 mr-1" />
                             編輯
+                          </Button>
+                        </Link>
+                        <Link href={`/admin/clients/${client.id}/password`}>
+                          <Button size="sm" variant="secondary">
+                            <Key className="h-3 w-3 mr-1" />
+                            改密碼
                           </Button>
                         </Link>
                         <Button

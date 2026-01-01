@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient as createSupabaseClient } from '@/lib/supabase/server'
-import { createClientSchema, updateClientSchema } from '@/lib/validations/user.schema'
+import { createClientSchema, updateClientSchema, updatePasswordSchema } from '@/lib/validations/user.schema'
 import type { ActionResult, Client } from '@/types'
 import { checkAuth } from './helpers'
 import { revalidatePath } from 'next/cache'
@@ -339,7 +339,18 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       }
     }
 
-    // 3. 刪除 profile 資料
+    // 3. 先刪除 Auth 使用者 (確保電話號碼可重新註冊)
+    const { error: authError } = await supabase.auth.admin.deleteUser(id)
+
+    if (authError) {
+      console.error('刪除 Auth 使用者失敗:', authError)
+      return {
+        success: false,
+        message: `刪除失敗: ${authError.message}. 請確認 Supabase 設定中已啟用 Service Role 權限`,
+      }
+    }
+
+    // 4. 再刪除 profile 資料 (cascade delete)
     const { error: profileError } = await supabase
       .from('profiles')
       .delete()
@@ -347,19 +358,8 @@ export async function deleteClient(id: string): Promise<ActionResult> {
 
     if (profileError) {
       console.error('刪除客戶資料失敗:', profileError)
-      return {
-        success: false,
-        message: '刪除失敗,請稍後再試',
-      }
-    }
-
-    // 4. 刪除 Auth 使用者 (需要 admin 權限)
-    const { error: authError } = await supabase.auth.admin.deleteUser(id)
-
-    if (authError) {
-      console.error('刪除 Auth 使用者失敗:', authError)
-      // Profile 已刪除,Auth 失敗時記錄錯誤但仍返回成功
-      console.warn(`客戶 ${existingClient.phone} 的 profile 已刪除,但 auth 刪除失敗`)
+      // Auth 已刪除,Profile 失敗時記錄錯誤
+      console.warn(`客戶 ${existingClient.phone} 的 auth 已刪除,但 profile 刪除失敗`)
     }
 
     // 5. Revalidate
@@ -374,6 +374,81 @@ export async function deleteClient(id: string): Promise<ActionResult> {
     return {
       success: false,
       message: error instanceof Error ? error.message : '刪除失敗',
+    }
+  }
+}
+
+/**
+ * 修改客戶密碼
+ */
+export async function updateClientPassword(
+  id: string,
+  prevState: any,
+  formData: FormData
+): Promise<ActionResult> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 驗證輸入
+    const validatedFields = updatePasswordSchema.safeParse({
+      newPassword: formData.get('newPassword'),
+      confirmPassword: formData.get('confirmPassword'),
+    })
+
+    if (!validatedFields.success) {
+      return {
+        success: false,
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: '驗證失敗',
+      }
+    }
+
+    const supabase = await createSupabaseClient()
+
+    // 3. 檢查客戶是否存在
+    const { data: existingClient } = await supabase
+      .from('profiles')
+      .select('id, role')
+      .eq('id', id)
+      .single()
+
+    if (!existingClient) {
+      return {
+        success: false,
+        message: '客戶不存在',
+      }
+    }
+
+    if (existingClient.role !== 'client') {
+      return {
+        success: false,
+        message: '此帳號不是客戶',
+      }
+    }
+
+    // 4. 使用 Admin API 更新密碼
+    const { error } = await supabase.auth.admin.updateUserById(id, {
+      password: validatedFields.data.newPassword,
+    })
+
+    if (error) {
+      console.error('更新密碼失敗:', error)
+      return {
+        success: false,
+        message: `更新密碼失敗: ${error.message}`,
+      }
+    }
+
+    return {
+      success: true,
+      message: '密碼更新成功',
+    }
+  } catch (error) {
+    console.error('updateClientPassword error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '更新密碼失敗',
     }
   }
 }

@@ -17,5 +17,17 @@ export const updateClientSchema = z.object({
   notes: z.string().max(500, '備註最多 500 字').optional(),
 })
 
+// 修改密碼 Schema
+export const updatePasswordSchema = z.object({
+  newPassword: z.string()
+    .min(6, '密碼至少 6 個字元')
+    .max(50, '密碼最多 50 個字元'),
+  confirmPassword: z.string(),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: '兩次輸入的密碼不一致',
+  path: ['confirmPassword'],
+})
+
 export type CreateClientInput = z.infer<typeof createClientSchema>
 export type UpdateClientInput = z.infer<typeof updateClientSchema>
+export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>

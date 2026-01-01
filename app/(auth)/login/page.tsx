@@ -11,7 +11,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="card-neo bg-white">
+        <div className="card-neo bg-white p-8">
           <ClientLoginForm />
         </div>
 
