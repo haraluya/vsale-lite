@@ -3,10 +3,12 @@
 import { Client, Tier } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useTransition } from 'react'
-import { Edit, Search } from 'lucide-react'
+import { Edit, Search, Trash2 } from 'lucide-react'
+import { deleteClient } from '@/lib/actions/clients'
 
 type ClientTableProps = {
   clients: Client[]
@@ -29,6 +31,9 @@ export function ClientTable({
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const [search, setSearch] = useState(initialSearch)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const limit = 20
   const totalPages = Math.ceil(total / limit)
@@ -66,6 +71,33 @@ export function ClientTable({
     startTransition(() => {
       router.push(`/admin/clients?${params.toString()}`)
     })
+  }
+
+  const handleDeleteClick = (client: Client) => {
+    setClientToDelete(client)
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!clientToDelete) return
+
+    setIsDeleting(true)
+    try {
+      const result = await deleteClient(clientToDelete.id)
+
+      if (result.success) {
+        alert(result.message)
+        router.refresh()
+      } else {
+        alert(result.message)
+      }
+    } catch (error) {
+      alert('刪除失敗，請稍後再試')
+    } finally {
+      setIsDeleting(false)
+      setDeleteDialogOpen(false)
+      setClientToDelete(null)
+    }
   }
 
   return (
@@ -153,12 +185,24 @@ export function ClientTable({
                       {new Date(client.created_at).toLocaleDateString('zh-TW')}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Link href={`/admin/clients/${client.id}/edit`}>
-                        <Button size="sm" variant="secondary">
-                          <Edit className="h-3 w-3 mr-1" />
-                          編輯
+                      <div className="flex justify-end gap-2">
+                        <Link href={`/admin/clients/${client.id}/edit`}>
+                          <Button size="sm" variant="secondary">
+                            <Edit className="h-3 w-3 mr-1" />
+                            編輯
+                          </Button>
+                        </Link>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleDeleteClick(client)}
+                          disabled={isDeleting}
+                          className="border-3 border-black bg-red-500 text-white hover:bg-red-600"
+                        >
+                          <Trash2 className="h-3 w-3 mr-1" />
+                          刪除
                         </Button>
-                      </Link>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -194,6 +238,21 @@ export function ClientTable({
           </div>
         </div>
       )}
+
+      {/* 刪除確認對話框 */}
+      <ConfirmDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false)
+          setClientToDelete(null)
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="刪除客戶"
+        description={`確定要刪除客戶「${clientToDelete?.display_name || clientToDelete?.phone}」嗎？此操作無法復原。`}
+        confirmText="刪除"
+        cancelText="取消"
+        variant="danger"
+      />
     </div>
   )
 }

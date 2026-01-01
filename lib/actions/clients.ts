@@ -307,3 +307,73 @@ export async function getClients(params?: {
     limit,
   }
 }
+
+/**
+ * 刪除客戶
+ */
+export async function deleteClient(id: string): Promise<ActionResult> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    const supabase = await createSupabaseClient()
+
+    // 2. 檢查客戶是否存在
+    const { data: existingClient } = await supabase
+      .from('profiles')
+      .select('id, role, phone')
+      .eq('id', id)
+      .single()
+
+    if (!existingClient) {
+      return {
+        success: false,
+        message: '客戶不存在',
+      }
+    }
+
+    if (existingClient.role !== 'client') {
+      return {
+        success: false,
+        message: '此帳號不是客戶',
+      }
+    }
+
+    // 3. 刪除 profile 資料
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', id)
+
+    if (profileError) {
+      console.error('刪除客戶資料失敗:', profileError)
+      return {
+        success: false,
+        message: '刪除失敗,請稍後再試',
+      }
+    }
+
+    // 4. 刪除 Auth 使用者 (需要 admin 權限)
+    const { error: authError } = await supabase.auth.admin.deleteUser(id)
+
+    if (authError) {
+      console.error('刪除 Auth 使用者失敗:', authError)
+      // Profile 已刪除,Auth 失敗時記錄錯誤但仍返回成功
+      console.warn(`客戶 ${existingClient.phone} 的 profile 已刪除,但 auth 刪除失敗`)
+    }
+
+    // 5. Revalidate
+    revalidatePath('/admin/clients')
+
+    return {
+      success: true,
+      message: '客戶刪除成功',
+    }
+  } catch (error) {
+    console.error('deleteClient error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '刪除失敗',
+    }
+  }
+}
