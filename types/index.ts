@@ -43,10 +43,13 @@ export type Profile = {
 export type Client = {
   id: string
   phone: string
-  tier_id: string
-  tier_name: string
+  display_name?: string | null
+  role: 'client' | 'admin'
+  tier_id: string | null
+  tier_name?: string | null
+  notes?: string | null
   created_at: string
-  notes?: string
+  updated_at: string
 }
 
 // ===================================
