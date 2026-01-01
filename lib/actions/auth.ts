@@ -37,9 +37,10 @@ export async function loginWithEmail(
     })
 
     if (authError || !authData.user) {
+      console.error('Supabase auth error:', authError)
       return {
         success: false,
-        message: 'Email 或密碼錯誤',
+        message: authError?.message || 'Email 或密碼錯誤',
       }
     }
 
@@ -52,19 +53,22 @@ export async function loginWithEmail(
 
     if (profileError || !profile) {
       // 如果找不到 profile,登出並返回錯誤
+      console.error('Profile query error:', profileError)
+      console.log('User ID:', authData.user.id)
       await supabase.auth.signOut()
       return {
         success: false,
-        message: '找不到使用者資料',
+        message: `找不到使用者資料 (ID: ${authData.user.id})`,
       }
     }
 
     // 4. 驗證角色必須是 admin
+    console.log('Profile role:', profile.role)
     if (profile.role !== 'admin') {
       await supabase.auth.signOut()
       return {
         success: false,
-        message: '此帳號無法使用後台登入',
+        message: `此帳號無法使用後台登入 (角色: ${profile.role})`,
       }
     }
 
