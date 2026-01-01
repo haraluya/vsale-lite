@@ -12,6 +12,7 @@ import { Edit, Trash2, Search, Check, X } from 'lucide-react'
 import { deleteProduct, updateProductStock } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Pagination } from '@/components/admin/pagination'
 import type { Product, Category } from '@/types'
 
 interface ProductTableProps {
@@ -19,6 +20,7 @@ interface ProductTableProps {
   categories: Category[]
   total: number
   currentPage: number
+  pageSize?: number
   searchQuery: string
   selectedCategory: string
 }
@@ -28,6 +30,7 @@ export function ProductTable({
   categories,
   total,
   currentPage,
+  pageSize = 20,
   searchQuery,
   selectedCategory,
 }: ProductTableProps) {
@@ -219,10 +222,12 @@ export function ProductTable({
         </table>
       </div>
 
-      {/* Pagination Info */}
-      <div className="mt-4 text-sm text-gray-600">
-        顯示 {products.length} 筆,共 {total} 筆商品
-      </div>
+      {/* Pagination */}
+      {total > 0 && (
+        <div className="mt-6">
+          <Pagination total={total} currentPage={currentPage} pageSize={pageSize} />
+        </div>
+      )}
     </div>
   )
 }

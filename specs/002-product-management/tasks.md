@@ -164,14 +164,14 @@
 
 ### Implementation for US5
 
-- [ ] T048 [P] [US5] 建立 SearchInput 元件 (components/admin/search-input.tsx)
-- [ ] T049 [US5] 實作商品列表即時搜尋 (商品名稱或編號關鍵字)
-- [ ] T050 [P] [US5] 建立 CategoryFilter 元件 (components/admin/category-filter.tsx)
-- [ ] T051 [US5] 實作依分類篩選商品
-- [ ] T052 [US5] 實作搜尋與篩選組合查詢
-- [ ] T053 [US5] 實作商品列表分頁功能 (支援 20/50/100 筆可選) - FR-020
-- [ ] T054 [P] [US5] 建立 Pagination 元件 (components/admin/pagination.tsx) - 含每頁筆數選擇器
-- [ ] T055 [US5] 整合搜尋、篩選、分頁至商品列表頁面
+- [X] T048 [P] [US5] 建立 SearchInput 元件 (已整合在 ProductTable 中)
+- [X] T049 [US5] 實作商品列表即時搜尋 (商品名稱或編號關鍵字)
+- [X] T050 [P] [US5] 建立 CategoryFilter 元件 (已整合在 ProductTable 中)
+- [X] T051 [US5] 實作依分類篩選商品
+- [X] T052 [US5] 實作搜尋與篩選組合查詢
+- [X] T053 [US5] 實作商品列表分頁功能 (支援 20/50/100 筆可選) - FR-020
+- [X] T054 [P] [US5] 建立 Pagination 元件 (components/admin/pagination.tsx) - 含每頁筆數選擇器
+- [X] T055 [US5] 整合搜尋、篩選、分頁至商品列表頁面
 
 **Checkpoint**: 管理員可高效搜尋與篩選商品,分頁功能完整
 

@@ -8,12 +8,13 @@ import { Button } from '@/components/ui/button'
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; category?: string; page?: string }>
+  searchParams: Promise<{ search?: string; category?: string; page?: string; limit?: string }>
 }) {
   const params = await searchParams
   const search = params.search || ''
   const category_id = params.category || ''
   const page = parseInt(params.page || '1')
+  const limit = parseInt(params.limit || '20')
 
   // 取得商品列表與分類
   const { products, total } = await getProducts({
@@ -21,7 +22,7 @@ export default async function ProductsPage({
     category_id,
     status: 'all', // 管理員可看所有狀態
     page,
-    limit: 20,
+    limit,
   })
 
   const categories = await getCategories()
@@ -49,6 +50,7 @@ export default async function ProductsPage({
         categories={categories}
         total={total}
         currentPage={page}
+        pageSize={limit}
         searchQuery={search}
         selectedCategory={category_id}
       />
