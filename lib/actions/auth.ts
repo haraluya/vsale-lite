@@ -110,11 +110,14 @@ export async function loginWithPhone(
 
     const supabase = await createClient()
 
-    // 2. 呼叫 Supabase Auth 登入 (使用 phone)
+    // 2. 呼叫 Supabase Auth 登入 (使用 Email 格式: phone@temp.local)
+    const tempEmail = `${validatedFields.data.phone}@temp.local`
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-      phone: validatedFields.data.phone,
+      email: tempEmail,
       password: validatedFields.data.password,
     })
+
+    console.log('loginWithPhone - 登入結果:', { email: tempEmail, userId: authData?.user?.id, error: authError?.message })
 
     if (authError || !authData.user) {
       return {

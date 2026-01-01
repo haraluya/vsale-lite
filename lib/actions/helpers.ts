@@ -18,6 +18,8 @@ export async function checkAuth(requiredRole?: 'admin' | 'client'): Promise<Auth
     error: authError,
   } = await supabase.auth.getUser()
 
+  console.log('checkAuth - getUser 結果:', { userId: user?.id, error: authError?.message })
+
   if (authError || !user) {
     throw new Error('未登入,請先登入')
   }
@@ -29,12 +31,15 @@ export async function checkAuth(requiredRole?: 'admin' | 'client'): Promise<Auth
     .eq('id', user.id)
     .single()
 
+  console.log('checkAuth - profile 查詢:', { profile, error: profileError?.message })
+
   if (profileError || !profile) {
     throw new Error('找不到使用者資料')
   }
 
   // 檢查角色權限
   if (requiredRole && profile.role !== requiredRole) {
+    console.log('checkAuth - 權限檢查失敗:', { requiredRole, actualRole: profile.role })
     throw new Error('權限不足,無法執行此操作')
   }
 

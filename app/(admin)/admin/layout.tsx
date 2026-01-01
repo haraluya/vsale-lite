@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { LayoutDashboard, Users, Tag, LogOut } from 'lucide-react'
+import { LayoutDashboard, Users, Tag } from 'lucide-react'
+import { LogoutButton } from '@/components/admin/logout-button'
 
 export default function AdminLayout({
   children,
@@ -42,10 +43,7 @@ export default function AdminLayout({
         </nav>
 
         <div className="mt-auto pt-8">
-          <button className="flex w-full items-center gap-3 rounded-none border-3 border-black bg-red-500 px-4 py-3 font-bold text-white transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm">
-            <LogOut className="h-5 w-5" />
-            <span>登出</span>
-          </button>
+          <LogoutButton />
         </div>
       </aside>
 
