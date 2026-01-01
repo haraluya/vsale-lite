@@ -104,7 +104,7 @@ export async function updateTier(
   id: string,
   prevState: any,
   formData: FormData
-): Promise<ActionResult> {
+): Promise<ActionResult<{ id: string }>> {
   try {
     // 1. 驗證權限
     await checkAuth('admin')
@@ -175,6 +175,7 @@ export async function updateTier(
 
     return {
       success: true,
+      data: { id },
       message: '等級更新成功',
     }
   } catch (error) {

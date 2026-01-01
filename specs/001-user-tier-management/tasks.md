@@ -99,17 +99,17 @@
 
 ### Implementation for US1
 
-- [ ] T028 [P] [US1] 建立 Server Action: getTiers() (lib/actions/tiers.ts)
-- [ ] T029 [P] [US1] 建立 Server Action: createTier() (lib/actions/tiers.ts)
-- [ ] T030 [P] [US1] 建立 Server Action: updateTier() (lib/actions/tiers.ts)
-- [ ] T031 [P] [US1] 建立 Server Action: deleteTier() (lib/actions/tiers.ts)
-- [ ] T032 [US1] 建立會員等級列表頁面 (app/(admin)/admin/tiers/page.tsx)
-- [ ] T033 [P] [US1] 建立 TierTable 元件 (components/admin/tier-table.tsx)
-- [ ] T034 [P] [US1] 建立 TierForm 元件 (components/admin/tier-form.tsx)
-- [ ] T035 [US1] 建立新增等級頁面 (app/(admin)/admin/tiers/new/page.tsx)
-- [ ] T036 [US1] 建立編輯等級頁面 (app/(admin)/admin/tiers/[id]/edit/page.tsx)
-- [ ] T037 [US1] 實作刪除等級保護邏輯 (檢查是否有客戶使用)
-- [ ] T038 [US1] 實作等級排序拖曳功能 (選用,可改為手動輸入 rank)
+- [X] T028 [P] [US1] 建立 Server Action: getTiers() (lib/actions/tiers.ts)
+- [X] T029 [P] [US1] 建立 Server Action: createTier() (lib/actions/tiers.ts)
+- [X] T030 [P] [US1] 建立 Server Action: updateTier() (lib/actions/tiers.ts)
+- [X] T031 [P] [US1] 建立 Server Action: deleteTier() (lib/actions/tiers.ts)
+- [X] T032 [US1] 建立會員等級列表頁面 (app/(admin)/admin/tiers/page.tsx)
+- [X] T033 [P] [US1] 建立 TierTable 元件 (components/admin/tier-table.tsx)
+- [X] T034 [P] [US1] 建立 TierForm 元件 (components/admin/tier-form.tsx)
+- [X] T035 [US1] 建立新增等級頁面 (app/(admin)/admin/tiers/new/page.tsx)
+- [X] T036 [US1] 建立編輯等級頁面 (app/(admin)/admin/tiers/[id]/edit/page.tsx)
+- [X] T037 [US1] 實作刪除等級保護邏輯 (檢查是否有客戶使用)
+- [X] T038 [US1] 實作等級排序拖曳功能 (選用,可改為手動輸入 rank)
 
 **Checkpoint**: 管理員可完整管理會員等級 (CRUD),可展示與驗證
 

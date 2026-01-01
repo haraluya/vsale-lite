@@ -5,7 +5,7 @@ import { createTier, updateTier } from '@/lib/actions/tiers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Tier } from '@/types'
+import { Tier, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
@@ -18,8 +18,10 @@ export function TierForm({ tier, mode }: TierFormProps) {
   const router = useRouter()
   const isEdit = mode === 'edit'
 
-  const action = isEdit && tier ? updateTier.bind(null, tier.id) : createTier
-  const [state, formAction, pending] = useActionState(action, null)
+  const [state, formAction, pending] = useActionState<ActionResult<{ id: string }> | null, FormData>(
+    isEdit && tier ? updateTier.bind(null, tier.id) : createTier,
+    null
+  )
 
   useEffect(() => {
     if (state?.success) {
@@ -41,7 +43,7 @@ export function TierForm({ tier, mode }: TierFormProps) {
           required
           className="mt-2"
         />
-        {state?.errors?.name && (
+        {state && 'errors' in state && state.errors?.name && (
           <p className="mt-2 text-sm text-red-500">{state.errors.name[0]}</p>
         )}
       </div>
@@ -58,7 +60,7 @@ export function TierForm({ tier, mode }: TierFormProps) {
           min="1"
           className="mt-2"
         />
-        {state?.errors?.rank && (
+        {state && 'errors' in state && state.errors?.rank && (
           <p className="mt-2 text-sm text-red-500">{state.errors.rank[0]}</p>
         )}
       </div>
