@@ -427,3 +427,75 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     }
   }
 }
+
+/**
+ * 快速更新商品庫存
+ * 用於在商品列表頁面直接調整庫存數量
+ */
+export async function updateProductStock(
+  id: string,
+  stock: number
+): Promise<ActionResult> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 驗證庫存數量為整數
+    if (!Number.isInteger(stock)) {
+      return {
+        success: false,
+        message: '庫存必須為整數',
+      }
+    }
+
+    const supabase = await createClient()
+
+    // 3. 檢查商品是否存在
+    const { data: existingProduct } = await supabase
+      .from('products')
+      .select('id')
+      .eq('id', id)
+      .single()
+
+    if (!existingProduct) {
+      return {
+        success: false,
+        message: '商品不存在',
+      }
+    }
+
+    // 4. 更新庫存
+    const { error } = await supabase
+      .from('products')
+      .update({ stock })
+      .eq('id', id)
+
+    if (error) {
+      console.error('updateProductStock error:', error)
+      return {
+        success: false,
+        message: '更新庫存失敗',
+      }
+    }
+
+    // 5. 重新驗證快取
+    revalidatePath('/admin/products')
+
+    return {
+      success: true,
+      message: '庫存更新成功',
+    }
+  } catch (error: unknown) {
+    console.error('updateProductStock error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '更新庫存失敗',
+    }
+  }
+}

@@ -8,8 +8,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Edit, Trash2, Search } from 'lucide-react'
-import { deleteProduct } from '@/lib/actions/products'
+import { Edit, Trash2, Search, Check, X } from 'lucide-react'
+import { deleteProduct, updateProductStock } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { Product, Category } from '@/types'
@@ -34,6 +34,8 @@ export function ProductTable({
   const router = useRouter()
   const [search, setSearch] = useState(searchQuery)
   const [categoryFilter, setCategoryFilter] = useState(selectedCategory)
+  const [editingStockId, setEditingStockId] = useState<string | null>(null)
+  const [stockValue, setStockValue] = useState<number>(0)
 
   const handleSearch = () => {
     const params = new URLSearchParams()
@@ -54,6 +56,25 @@ export function ProductTable({
     } else {
       alert(`刪除失敗: ${result.message}`)
     }
+  }
+
+  const handleEditStock = (productId: string, currentStock: number) => {
+    setEditingStockId(productId)
+    setStockValue(currentStock)
+  }
+
+  const handleSaveStock = async (productId: string) => {
+    const result = await updateProductStock(productId, stockValue)
+    if (result.success) {
+      setEditingStockId(null)
+      router.refresh()
+    } else {
+      alert(`更新失敗: ${result.message}`)
+    }
+  }
+
+  const handleCancelEditStock = () => {
+    setEditingStockId(null)
   }
 
   return (
@@ -123,16 +144,46 @@ export function ProductTable({
                   <td className="px-4 py-3 font-mono text-sm">{product.code}</td>
                   <td className="px-4 py-3 font-medium">{product.name}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{product.category_name}</td>
-                  <td
-                    className={`px-4 py-3 text-right font-mono ${
-                      product.stock < 0
-                        ? 'text-orange-600'
-                        : product.stock === 0
-                          ? 'text-gray-500'
-                          : 'text-green-600'
-                    }`}
-                  >
-                    {product.stock}
+                  <td className="px-4 py-3 text-right">
+                    {editingStockId === product.id ? (
+                      <div className="flex items-center justify-end gap-2">
+                        <input
+                          type="number"
+                          value={stockValue}
+                          onChange={(e) => setStockValue(parseInt(e.target.value) || 0)}
+                          className="w-20 rounded-none border-2 border-black px-2 py-1 text-right font-mono text-sm"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => handleSaveStock(product.id)}
+                          className="rounded-none border-2 border-black bg-green-100 p-1 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
+                          title="儲存"
+                        >
+                          <Check className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={handleCancelEditStock}
+                          className="rounded-none border-2 border-black bg-gray-100 p-1 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
+                          title="取消"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleEditStock(product.id, product.stock)}
+                        className={`font-mono hover:underline ${
+                          product.stock < 0
+                            ? 'text-orange-600'
+                            : product.stock === 0
+                              ? 'text-gray-500'
+                              : 'text-green-600'
+                        }`}
+                        title="點擊快速編輯庫存"
+                      >
+                        {product.stock}
+                      </button>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm">{product.unit}</td>
                   <td className="px-4 py-3">
