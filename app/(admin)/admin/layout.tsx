@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { LayoutDashboard, Users, Tag } from 'lucide-react'
+import { LayoutDashboard, Users, Tag, FolderTree } from 'lucide-react'
 import { LogoutButton } from '@/components/admin/logout-button'
 
 export default function AdminLayout({
@@ -39,6 +39,14 @@ export default function AdminLayout({
           >
             <Users className="h-5 w-5" />
             <span>客戶管理</span>
+          </Link>
+
+          <Link
+            href="/admin/categories"
+            className="flex items-center gap-3 rounded-none border-3 border-black bg-white px-4 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm"
+          >
+            <FolderTree className="h-5 w-5" />
+            <span>分類管理</span>
           </Link>
         </nav>
 
