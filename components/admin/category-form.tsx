@@ -21,10 +21,11 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
   const router = useRouter()
   const isEdit = mode === 'edit'
 
-  const [state, formAction, pending] = useActionState<ActionResult<{ id: string }> | null, FormData>(
-    isEdit && category ? updateCategory.bind(null, category.id) : createCategory,
-    null
-  )
+  const action = isEdit && category
+    ? (prev: any, formData: FormData) => updateCategory(category.id, prev, formData)
+    : createCategory
+
+  const [state, formAction, pending] = useActionState<any>(action as any, null)
 
   useEffect(() => {
     if (state?.success) {

@@ -97,19 +97,19 @@
 
 ### Implementation for US1
 
-- [ ] T022 [P] [US1] 建立 Server Action: getProducts() (lib/actions/products.ts)
-- [ ] T023 [P] [US1] 建立 Server Action: getProduct() (lib/actions/products.ts)
-- [ ] T024 [P] [US1] 建立 Server Action: createProduct() (lib/actions/products.ts)
-- [ ] T025 [P] [US1] 建立 Server Action: updateProduct() (lib/actions/products.ts)
-- [ ] T026 [P] [US1] 建立 Server Action: deleteProduct() (lib/actions/products.ts)
-- [ ] T027 [US1] 建立商品列表頁面 (app/(admin)/admin/products/page.tsx)
-- [ ] T028 [P] [US1] 建立 ProductTable 元件 (components/admin/product-table.tsx)
-- [ ] T029 [P] [US1] 建立 ProductForm 元件 (components/admin/product-form.tsx)
-- [ ] T030 [US1] 建立新增商品頁面 (app/(admin)/admin/products/new/page.tsx)
-- [ ] T031 [US1] 建立編輯商品頁面 (app/(admin)/admin/products/[id]/edit/page.tsx)
-- [ ] T032 [US1] 實作商品編號唯一性與格式驗證 (Zod: `/^[A-Za-z0-9-_]+$/`) - FR-002
-- [ ] T033 [US1] 實作負庫存支援驗證 (庫存可為負數)
-- [ ] T034 [US1] 更新後台導航選單 (app/(admin)/admin/layout.tsx) - 新增「商品管理」連結
+- [X] T022 [P] [US1] 建立 Server Action: getProducts() (lib/actions/products.ts)
+- [X] T023 [P] [US1] 建立 Server Action: getProduct() (lib/actions/products.ts)
+- [X] T024 [P] [US1] 建立 Server Action: createProduct() (lib/actions/products.ts)
+- [X] T025 [P] [US1] 建立 Server Action: updateProduct() (lib/actions/products.ts)
+- [X] T026 [P] [US1] 建立 Server Action: deleteProduct() (lib/actions/products.ts)
+- [X] T027 [US1] 建立商品列表頁面 (app/(admin)/admin/products/page.tsx)
+- [X] T028 [P] [US1] 建立 ProductTable 元件 (components/admin/product-table.tsx)
+- [X] T029 [P] [US1] 建立 ProductForm 元件 (components/admin/product-form.tsx)
+- [X] T030 [US1] 建立新增商品頁面 (app/(admin)/admin/products/new/page.tsx)
+- [X] T031 [US1] 建立編輯商品頁面 (app/(admin)/admin/products/[id]/edit/page.tsx)
+- [X] T032 [US1] 實作商品編號唯一性與格式驗證 (Zod: `/^[A-Za-z0-9-_]+$/`) - FR-002
+- [X] T033 [US1] 實作負庫存支援驗證 (庫存可為負數)
+- [X] T034 [US1] 更新後台導航選單 (app/(admin)/admin/layout.tsx) - 新增「商品管理」連結
 
 **Checkpoint**: 管理員可完整管理商品基本資料 (CRUD),支援負庫存
 

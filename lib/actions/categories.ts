@@ -328,11 +328,13 @@ export async function migrateCategoryProducts(
     }
 
     // 4. 批量更新商品分類
-    const { count, error } = await supabase
+    const { data, error } = await supabase
       .from('products')
       .update({ category_id: toCategoryId })
       .eq('category_id', fromCategoryId)
-      .select('*', { count: 'exact', head: true })
+      .select()
+
+    const count = data?.length || 0
 
     if (error) {
       console.error('migrateCategoryProducts error:', error)
@@ -346,13 +348,11 @@ export async function migrateCategoryProducts(
     revalidatePath('/admin/categories')
     revalidatePath('/admin/products')
 
-    const productCount = count || 0
-
     return {
       success: true,
-      data: { count: productCount },
-      message: productCount > 0
-        ? `已成功將 ${productCount} 個商品從「${fromCategory.data.name}」遷移至「${toCategory.data.name}」`
+      data: { count },
+      message: count > 0
+        ? `已成功將 ${count} 個商品從「${fromCategory.data.name}」遷移至「${toCategory.data.name}」`
         : '此分類沒有商品需要遷移',
     }
   } catch (error: unknown) {
