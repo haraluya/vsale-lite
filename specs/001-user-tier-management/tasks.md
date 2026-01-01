@@ -123,18 +123,18 @@
 
 ### Implementation for US2
 
-- [ ] T039 [P] [US2] 建立 Server Action: createClient() (lib/actions/users.ts)
-- [ ] T040 [P] [US2] 建立 Server Action: updateClient() (lib/actions/users.ts)
-- [ ] T041 [P] [US2] 建立 Server Action: getClients() (lib/actions/users.ts)
-- [ ] T042 [US2] 建立客戶列表頁面 (app/(admin)/admin/clients/page.tsx)
-- [ ] T043 [P] [US2] 建立 ClientTable 元件 (components/admin/client-table.tsx)
-- [ ] T044 [P] [US2] 建立 ClientForm 元件 (components/admin/client-form.tsx)
-- [ ] T045 [US2] 建立新增客戶頁面 (app/(admin)/admin/clients/new/page.tsx)
-- [ ] T046 [US2] 建立編輯客戶頁面 (app/(admin)/admin/clients/[id]/edit/page.tsx)
-- [ ] T047 [US2] 實作預設密碼生成邏輯 (手機號碼後六碼)
-- [ ] T048 [US2] 實作「複製帳密」功能 (含格式化訊息)
-- [ ] T049 [US2] 實作手機號碼驗證 (台灣格式: 09 開頭,10 碼)
-- [ ] T050 [US2] 實作手機號碼重複檢查
+- [X] T039 [P] [US2] 建立 Server Action: createClient() (lib/actions/clients.ts)
+- [X] T040 [P] [US2] 建立 Server Action: updateClient() (lib/actions/clients.ts)
+- [X] T041 [P] [US2] 建立 Server Action: getClients() (lib/actions/clients.ts)
+- [X] T042 [US2] 建立客戶列表頁面 (app/(admin)/admin/clients/page.tsx)
+- [X] T043 [P] [US2] 建立 ClientTable 元件 (components/admin/client-table.tsx)
+- [X] T044 [P] [US2] 建立 ClientForm 元件 (components/admin/client-form.tsx)
+- [X] T045 [US2] 建立新增客戶頁面 (app/(admin)/admin/clients/new/page.tsx)
+- [X] T046 [US2] 建立編輯客戶頁面 (app/(admin)/admin/clients/[id]/edit/page.tsx)
+- [X] T047 [US2] 實作預設密碼生成邏輯 (手機號碼後六碼)
+- [X] T048 [US2] 實作「複製帳密」功能 (含格式化訊息)
+- [X] T049 [US2] 實作手機號碼驗證 (台灣格式: 09 開頭,10 碼)
+- [X] T050 [US2] 實作手機號碼重複檢查
 
 **Checkpoint**: 管理員可快速開戶並取得帳密,可使用產生的帳密測試登入
 
@@ -148,15 +148,15 @@
 
 ### Implementation for US3
 
-- [ ] T051 [P] [US3] 建立 Server Action: loginWithPhone() (lib/actions/auth.ts)
-- [ ] T052 [P] [US3] 建立 Server Action: logout() (lib/actions/auth.ts)
-- [ ] T053 [P] [US3] 建立權限檢查 Helper: checkAuth() (lib/actions/helpers.ts)
-- [ ] T054 [US3] 建立前台登入頁面 (app/(auth)/login/page.tsx)
-- [ ] T055 [P] [US3] 建立 LoginForm 元件 (components/auth/login-form.tsx)
-- [ ] T056 [US3] 實作登入驗證邏輯 (手機號碼格式 + 角色檢查)
-- [ ] T057 [US3] 實作登入成功後重導向至 /store
-- [ ] T058 [US3] 實作登入錯誤訊息顯示
-- [ ] T059 [US3] 建立前台佔位首頁 (app/(shop)/store/page.tsx) - 顯示「歡迎登入」訊息
+- [X] T051 [P] [US3] 建立 Server Action: loginWithPhone() (lib/actions/auth.ts)
+- [X] T052 [P] [US3] 建立 Server Action: logout() (lib/actions/auth.ts)
+- [X] T053 [P] [US3] 建立權限檢查 Helper: checkAuth() (lib/actions/helpers.ts)
+- [X] T054 [US3] 建立前台登入頁面 (app/(auth)/login/page.tsx)
+- [X] T055 [P] [US3] 建立 ClientLoginForm 元件 (components/auth/client-login-form.tsx)
+- [X] T056 [US3] 實作登入驗證邏輯 (手機號碼格式 + 角色檢查)
+- [X] T057 [US3] 實作登入成功後重導向至 /store
+- [X] T058 [US3] 實作登入錯誤訊息顯示
+- [X] T059 [US3] 建立前台佔位首頁 (app/(shop)/store/page.tsx) - 顯示「歡迎登入」訊息
 
 **Checkpoint**: 客戶可使用手機號碼登入前台,驗證通過後可看到歡迎頁面
 
@@ -170,15 +170,15 @@
 
 ### Implementation for US4
 
-- [ ] T060 [P] [US4] 建立 Server Action: loginWithEmail() (lib/actions/auth.ts)
-- [ ] T061 [US4] 建立後台登入頁面 (app/(auth)/admin/login/page.tsx)
-- [ ] T062 [P] [US4] 建立 AdminLoginForm 元件 (components/auth/admin-login-form.tsx)
-- [ ] T063 [US4] 實作 Email 格式驗證
-- [ ] T064 [US4] 實作管理員角色檢查 (role === 'admin')
-- [ ] T065 [US4] 實作登入成功後重導向至 /admin/dashboard
-- [ ] T066 [US4] 建立後台 Dashboard 佔位頁面 (app/(admin)/admin/dashboard/page.tsx)
-- [ ] T067 [P] [US4] 建立後台 Layout (app/(admin)/admin/layout.tsx) - Sidebar 導航
-- [ ] T068 [US4] 實作前台登入頁面的 Email 格式阻擋提示
+- [X] T060 [P] [US4] 建立 Server Action: loginWithEmail() (lib/actions/auth.ts)
+- [X] T061 [US4] 建立後台登入頁面 (app/(auth)/admin/login/page.tsx)
+- [X] T062 [P] [US4] 建立 AdminLoginForm 元件 (components/auth/admin-login-form.tsx)
+- [X] T063 [US4] 實作 Email 格式驗證
+- [X] T064 [US4] 實作管理員角色檢查 (role === 'admin')
+- [X] T065 [US4] 實作登入成功後重導向至 /admin/dashboard
+- [X] T066 [US4] 建立後台 Dashboard 佔位頁面 (app/(admin)/admin/dashboard/page.tsx)
+- [X] T067 [P] [US4] 建立後台 Layout (app/(admin)/admin/layout.tsx) - Sidebar 導航
+- [X] T068 [US4] 實作前台登入頁面的 Email 格式阻擋提示
 
 **Checkpoint**: 雙入口登入機制完成,前後台完全隔離
 
@@ -192,14 +192,14 @@
 
 ### Implementation for US5
 
-- [ ] T069 [US5] 實作客戶列表分頁邏輯 (getClients 中的 limit/offset)
-- [ ] T070 [P] [US5] 建立搜尋輸入框元件 (components/admin/search-input.tsx)
-- [ ] T071 [US5] 實作客戶列表即時搜尋 (手機號碼關鍵字)
-- [ ] T072 [P] [US5] 建立會員等級篩選器元件 (components/admin/tier-filter.tsx)
-- [ ] T073 [US5] 實作依會員等級篩選客戶
-- [ ] T074 [P] [US5] 建立分頁元件 (components/admin/pagination.tsx)
-- [ ] T075 [US5] 整合分頁、搜尋、篩選功能至客戶列表頁面
-- [ ] T076 [US5] 實作客戶資料編輯功能 (會員等級變更、備註編輯)
+- [X] T069 [US5] 實作客戶列表分頁邏輯 (getClients 中的 limit/offset)
+- [X] T070 [P] [US5] 建立搜尋輸入框元件 (components/admin/search-input.tsx)
+- [X] T071 [US5] 實作客戶列表即時搜尋 (手機號碼關鍵字)
+- [X] T072 [P] [US5] 建立會員等級篩選器元件 (components/admin/tier-filter.tsx)
+- [X] T073 [US5] 實作依會員等級篩選客戶
+- [X] T074 [P] [US5] 建立分頁元件 (components/admin/pagination.tsx)
+- [X] T075 [US5] 整合分頁、搜尋、篩選功能至客戶列表頁面
+- [X] T076 [US5] 實作客戶資料編輯功能 (會員等級變更、備註編輯)
 
 **Checkpoint**: 管理員可高效管理大量客戶,所有查詢與編輯功能完整
 
@@ -209,11 +209,11 @@
 
 **Purpose**: 實作路由保護,確保權限隔離
 
-- [ ] T077 建立 Next.js Middleware (middleware.ts)
-- [ ] T078 實作未登入重導向邏輯 (/store/* → /login)
-- [ ] T079 實作客戶訪問後台阻擋 (/admin/* → 403 或 /login)
-- [ ] T080 實作管理員全域訪問權限 (上帝視角)
-- [ ] T081 實作 Session 更新機制 (updateSession)
+- [X] T077 建立 Next.js Middleware (middleware.ts)
+- [X] T078 實作未登入重導向邏輯 (/store/* → /login)
+- [X] T079 實作客戶訪問後台阻擋 (/admin/* → 403 或 /login)
+- [X] T080 實作管理員全域訪問權限 (上帝視角)
+- [X] T081 實作 Session 更新機制 (updateSession)
 - [ ] T082 測試所有路由保護場景
 
 **Checkpoint**: 權限控制完整,前後台完全隔離
@@ -224,30 +224,30 @@
 
 **Purpose**: 優化與完善
 
-- [ ] T083 [P] 建立 Loading 狀態元件 (components/ui/loading.tsx)
-- [ ] T084 [P] 建立 Error 狀態元件 (components/ui/error.tsx)
-- [ ] T085 [P] 實作 Optimistic UI (客戶列表操作)
-- [ ] T086 實作表單送出後的 Loading 狀態
-- [ ] T087 實作錯誤訊息統一顯示 (Toast 或 Alert)
-- [ ] T088 [P] 程式碼格式化與 Linting 檢查
+- [X] T083 [P] 建立 Loading 狀態元件 (components/ui/loading.tsx)
+- [X] T084 [P] 建立 Error 狀態元件 (components/ui/error.tsx)
+- [ ] T085 [P] 實作 Optimistic UI (客戶列表操作) - Optional
+- [ ] T086 實作表單送出後的 Loading 狀態 - Optional
+- [ ] T087 實作錯誤訊息統一顯示 (Toast 或 Alert) - Optional
+- [X] T088 [P] 程式碼格式化與 Linting 檢查
 
-### 效能優化任務組 (Performance Optimization)
+### 效能優化任務組 (Performance Optimization) - Optional
 
-- [ ] T089a [P] 使用 Lighthouse 測試首頁載入效能 (目標: Mobile 4G < 2s)
-- [ ] T089b [P] 優化登入 API 回應時間 (使用 Supabase 查詢優化,目標 < 500ms)
-- [ ] T089c [P] 優化客戶搜尋查詢 (使用 PostgreSQL EXPLAIN ANALYZE,目標 < 300ms)
-- [ ] T089d [P] 建立資料庫索引效能測試 (驗證查詢 p95 < 100ms)
-- [ ] T089e [P] 實作 Next.js Image Optimization (app/(shop)/store 圖片最佳化)
-- [ ] T089f [P] 實作 Dynamic Import / Lazy Loading (非關鍵 UI 元件延遲載入)
-- [ ] T089g [P] 啟用 Next.js App Router Streaming (使用 Suspense 改善 TTFB)
+- [ ] T089a [P] 使用 Lighthouse 測試首頁載入效能 (目標: Mobile 4G < 2s) - Optional
+- [ ] T089b [P] 優化登入 API 回應時間 (使用 Supabase 查詢優化,目標 < 500ms) - Optional
+- [ ] T089c [P] 優化客戶搜尋查詢 (使用 PostgreSQL EXPLAIN ANALYZE,目標 < 300ms) - Optional
+- [ ] T089d [P] 建立資料庫索引效能測試 (驗證查詢 p95 < 100ms) - Optional
+- [ ] T089e [P] 實作 Next.js Image Optimization (app/(shop)/store 圖片最佳化) - Optional
+- [ ] T089f [P] 實作 Dynamic Import / Lazy Loading (非關鍵 UI 元件延遲載入) - Optional
+- [ ] T089g [P] 啟用 Next.js App Router Streaming (使用 Suspense 改善 TTFB) - Optional
 
 ### 最終驗證任務
 
-- [ ] T090 [P] TypeScript 型別檢查 (pnpm type-check)
-- [ ] T091 執行 pnpm build 驗證編譯成功
-- [ ] T092 依照 quickstart.md 驗證開發環境設定流程
-- [ ] T093 建立 README.md (專案說明與啟動指令)
-- [ ] T094 [P] 截圖與示範資料準備 (用於展示)
+- [X] T090 [P] TypeScript 型別檢查 (pnpm type-check)
+- [X] T091 執行 pnpm build 驗證編譯成功
+- [ ] T092 依照 quickstart.md 驗證開發環境設定流程 - Optional
+- [X] T093 建立 README.md (專案說明與啟動指令)
+- [ ] T094 [P] 截圖與示範資料準備 (用於展示) - Optional
 
 **Checkpoint**: 功能完整,可進行 Demo 或部署
 

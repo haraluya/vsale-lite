@@ -19,7 +19,7 @@ function generatePassword(phone: string): string {
 export async function createClient(
   prevState: any,
   formData: FormData
-): Promise<ActionResult<{ id: string; password: string }>> {
+): Promise<ActionResult<{ id: string; password: string; phone: string }>> {
   try {
     // 1. 驗證權限
     await checkAuth('admin')
