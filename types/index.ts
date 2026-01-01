@@ -69,3 +69,50 @@ export type GetClientsResponse = {
   data: Client[]
   total: number
 }
+
+// ===================================
+// 商品管理型別 (Feature 002)
+// ===================================
+
+// 商品分類
+export type Category = {
+  id: string
+  name: string
+  description: string | null
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+// 商品
+export type Product = {
+  id: string
+  code: string
+  name: string
+  category_id: string
+  category_name?: string  // JOIN 查詢時包含
+  description: string | null
+  stock: number
+  unit: string
+  image_url: string | null
+  status: 'active' | 'inactive'
+  created_at: string
+  updated_at: string
+}
+
+// 商品列表查詢參數
+export type GetProductsParams = {
+  search?: string         // 商品編號或名稱關鍵字
+  category_id?: string    // 分類篩選
+  status?: 'active' | 'inactive' | 'all'  // 狀態篩選 (Admin only)
+  page?: number           // 頁碼 (預設 1)
+  limit?: number          // 每頁筆數 (預設 20)
+}
+
+// 商品列表回應
+export type GetProductsResponse = {
+  products: Product[]
+  total: number
+  page: number
+  limit: number
+}

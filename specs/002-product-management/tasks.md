@@ -38,25 +38,25 @@
 
 ### 1.1 Database Setup
 
-- [ ] T001 建立 SQL Migration 檔案 (supabase/migrations/20260102_products_and_categories.sql)
-- [ ] T002 執行 Migration 建立 categories 與 products 資料表
-- [ ] T003 建立 Supabase Storage Bucket: products
-- [ ] T004 設定 Storage RLS 策略 (管理員可寫,公開可讀)
-- [ ] T005 插入預設分類測試資料 (飲料、零食、日用品)
+- [X] T001 建立 SQL Migration 檔案 (supabase/migrations/20260102_products_and_categories.sql)
+- [ ] T002 執行 Migration 建立 categories 與 products 資料表 **⚠️ 需要使用者手動執行**
+- [ ] T003 建立 Supabase Storage Bucket: products **⚠️ Migration 中已包含**
+- [ ] T004 設定 Storage RLS 策略 (管理員可寫,公開可讀) **⚠️ Migration 中已包含**
+- [ ] T005 插入預設分類測試資料 (飲料、零食、日用品) **⚠️ Migration 中已包含**
 
 ### 1.2 TypeScript Types
 
-- [ ] T006 [P] 更新資料庫型別定義 (types/database.types.ts) - 新增 Category, Product
-- [ ] T007 [P] 更新共用型別定義 (types/index.ts) - 匯出 Category, Product
+- [X] T006 [P] 更新資料庫型別定義 (types/database.types.ts) - 新增 Category, Product
+- [X] T007 [P] 更新共用型別定義 (types/index.ts) - 匯出 Category, Product
 
 ### 1.3 Validation Schemas
 
-- [ ] T008 [P] 建立分類驗證 Schema (lib/validations/category.schema.ts)
-- [ ] T009 [P] 建立商品驗證 Schema (lib/validations/product.schema.ts)
+- [X] T008 [P] 建立分類驗證 Schema (lib/validations/category.schema.ts)
+- [X] T009 [P] 建立商品驗證 Schema (lib/validations/product.schema.ts)
 
 ### 1.4 Storage Helper
 
-- [ ] T010 建立 Supabase Storage 工具函式 (lib/supabase/storage.ts)
+- [X] T010 建立 Supabase Storage 工具函式 (lib/supabase/storage.ts)
 
 **Checkpoint**: 資料庫建立完成,型別與驗證架構就緒 ✅ 使用者故事實作可開始
 
@@ -72,17 +72,16 @@
 
 ### Implementation for US2
 
-- [ ] T011 [P] [US2] 建立 Server Action: getCategories() (lib/actions/categories.ts)
-- [ ] T012 [P] [US2] 建立 Server Action: createCategory() (lib/actions/categories.ts)
-- [ ] T013 [P] [US2] 建立 Server Action: updateCategory() (lib/actions/categories.ts)
-- [ ] T014 [P] [US2] 建立 Server Action: deleteCategory() (lib/actions/categories.ts)
+- [X] T011 [P] [US2] 建立 Server Action: getCategories() (lib/actions/categories.ts)
+- [X] T012 [P] [US2] 建立 Server Action: createCategory() (lib/actions/categories.ts)
+- [X] T013 [P] [US2] 建立 Server Action: updateCategory() (lib/actions/categories.ts)
+- [X] T014 [P] [US2] 建立 Server Action: deleteCategory() (lib/actions/categories.ts)
+- [X] T020-A [US2] 實作分類遷移功能 (Server Action: migrateCategoryProducts) - 批量更新商品分類後刪除 (FR-009-A)
 - [ ] T015 [US2] 建立分類列表頁面 (app/(admin)/admin/categories/page.tsx)
 - [ ] T016 [P] [US2] 建立 CategoryTable 元件 (components/admin/category-table.tsx)
 - [ ] T017 [P] [US2] 建立 CategoryForm 元件 (components/admin/category-form.tsx)
 - [ ] T018 [US2] 建立新增分類頁面 (app/(admin)/admin/categories/new/page.tsx)
 - [ ] T019 [US2] 建立編輯分類頁面 (app/(admin)/admin/categories/[id]/edit/page.tsx)
-- [ ] T020 [US2] 實作刪除分類保護邏輯 (檢查是否有商品使用)
-- [ ] T020-A [US2] 實作分類遷移功能 (Server Action: migrateCategoryProducts) - 批量更新商品分類後刪除 (FR-009-A)
 - [ ] T020-B [US2] 建立分類刪除確認對話框 - 若有商品則顯示遷移選項
 - [ ] T021 [US2] 更新後台導航選單 (app/(admin)/admin/layout.tsx) - 新增「分類管理」連結
 
