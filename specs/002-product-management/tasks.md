@@ -125,7 +125,7 @@
 ### Implementation for US3
 
 - [ ] T035 [US3] 實作商品編輯表單預填邏輯 (app/(admin)/admin/products/[id]/edit/page.tsx)
-- [ ] T036 [US3] 實作商品編號重複檢查 (排除自身)
+- [ ] T036 [US3] 實作商品編號欄位唯讀保護 (禁止編輯，UI 顯示為唯讀或禁用狀態)
 - [ ] T037 [US3] 實作分類變更驗證 (檢查新分類是否存在)
 - [ ] T038 [US3] 實作庫存快速調整功能 (在列表頁直接輸入庫存)
 
@@ -214,6 +214,8 @@
 - [ ] T069 [P] 實作商品列表 Skeleton Loading
 - [ ] T070 [P] 啟用 Supabase Storage 快取 (cacheControl: 3600)
 - [ ] T071 [P] 驗證商品搜尋查詢效能 (目標 < 200ms)
+- [ ] T071-A [P] 建立圖片上傳效能測試腳本 (tests/performance/image-upload.spec.ts) - 驗證 SC-003
+- [ ] T071-B [P] 建立搜尋功能效能基準測試 (tests/performance/search-benchmark.spec.ts) - 驗證 SC-004
 
 ### 8.3 Data Integrity
 
@@ -411,7 +413,7 @@ Task: "建立 ImageUpload UI 元件 (components/ui/image-upload.tsx)"
 
 ## Task Summary
 
-### Total Tasks: 77
+### Total Tasks: 79
 
 **Phase Breakdown**:
 - Phase 1 (Foundational): 10 tasks
@@ -421,7 +423,7 @@ Task: "建立 ImageUpload UI 元件 (components/ui/image-upload.tsx)"
 - Phase 5 (US4 - 圖片上傳): 9 tasks
 - Phase 6 (US5 - 搜尋篩選): 8 tasks
 - Phase 7 (US6 - 前台展示): 8 tasks
-- Phase 8 (Polish): 14 tasks
+- Phase 8 (Polish): 16 tasks
 
 **Parallelizable Tasks**: 38 tasks (標記 [P])
 
