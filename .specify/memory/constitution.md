@@ -1,50 +1,228 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report
+==================
+Version Change: Initial → 1.0.0
+Modified Principles: N/A (Initial creation)
+Added Sections: All sections created from template
+Removed Sections: None
+Templates Status:
+  ✅ plan-template.md - Reviewed, aligned with constitution principles
+  ✅ spec-template.md - Reviewed, aligned with user story requirements
+  ✅ tasks-template.md - Reviewed, aligned with user story-driven development
+Follow-up TODOs: None
+-->
 
-## Core Principles
+# Vsale-lite 專案憲章
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+## 核心原則
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### I. 使用者角色優先 (User Role First)
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**核心原則**:
+- 系統 **必須** 以使用者角色為設計核心,嚴格區分「客戶 (Client)」與「管理員 (Admin)」的操作環境與權限。
+- **必須** 提供雙入口設計:前台客戶入口與後台管理入口,不可混淆。
+- 每個功能的設計 **必須** 優先考慮目標使用者的裝置與使用情境。
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**實施要求**:
+- 客戶端 **必須** 優化行動裝置體驗,支援單手操作與大觸控熱區。
+- 管理端 **必須** 優化桌面裝置體驗,支援高密度資料顯示與批量操作。
+- 跨角色功能 **禁止** 共用同一介面,必須依角色需求分別設計。
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+**理由**: 批發業務的買賣雙方有截然不同的需求與工作場景,混合設計會導致兩邊體驗都不佳。
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+---
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### II. 等級綁定價格 (Tier-Based Pricing)
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**核心原則**:
+- 系統 **必須** 強制執行「不同人看不同價」的價格隔離機制。
+- 價格資料 **必須** 以正規化方式儲存 (tier_id + product_id),確保可擴充性。
+- 未設定價格的商品 **必須** 顯示 "N/A" 並禁用加入購物車功能。
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**實施要求**:
+- 資料庫設計 **必須** 包含獨立的 `tiers` 表與 `prices` 表。
+- 新增會員等級時 **禁止** 修改程式碼,僅需在資料庫新增等級與對應價格。
+- 前端顯示價格時 **必須** 查詢當前使用者的 tier_id,不可顯示其他等級價格。
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+**理由**: 批發業務的核心競爭力在於靈活的分級定價策略,硬編碼或混合儲存會限制業務擴展。
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+---
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+### III. 使用者故事驅動開發 (User Story Driven Development)
+
+**核心原則**:
+- 所有功能 **必須** 從使用者故事 (User Story) 開始設計。
+- 每個使用者故事 **必須** 可獨立測試、獨立交付。
+- 使用者故事 **必須** 依優先級 (P0/P1/P2) 排序,P0 為核心 MVP。
+
+**實施要求**:
+- Spec 文件 **必須** 包含明確的使用者情境與驗收標準。
+- 任務拆分 **必須** 以使用者故事為單位,避免技術導向的垂直拆分。
+- 每個使用者故事完成後 **必須** 可獨立展示與驗證價值。
+
+**理由**: 確保開發焦點在交付業務價值,而非技術架構,避免過度工程化。
+
+---
+
+### IV. API 模組化與職責分離 (API Modularization)
+
+**核心原則**:
+- UI 元件 **僅** 負責顯示與呼叫 API,**禁止** 包含業務邏輯。
+- API/Server Actions **必須** 負責驗證 (Zod)、權限檢查 (Auth) 與資料庫操作。
+- 所有表單提交 **必須** 使用 Server Actions 處理。
+
+**實施要求**:
+- **禁止** 在客戶端元件中直接操作資料庫或執行業務邏輯。
+- 所有 API 端點 **必須** 包含輸入驗證與錯誤處理。
+- 狀態管理:購物車使用 Zustand (客戶端),訂單狀態由 Server 管理。
+
+**理由**: 確保資料安全、降低客戶端複雜度,並支援 SSR/SSG 優化。
+
+---
+
+### V. 設計系統一致性 (Design System Consistency)
+
+**核心原則**:
+- 專案 **必須** 遵循 Neo-Brutalism 設計風格,建立強烈的品牌識別。
+- 所有互動元件 **必須** 使用一致的視覺語言與行為模式。
+- **禁止** 混用多種設計風格或未經審核的外部元件庫。
+
+**實施要求**:
+- 所有卡片、按鈕、輸入框 **必須** 使用 2-3px 實心黑邊框。
+- 陰影 **必須** 使用硬邊陰影 (無模糊),格式為 `shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`。
+- 點擊狀態 **必須** 包含位移效果 (`translate-x-[2px] translate-y-[2px] shadow-none`)。
+
+**理由**: 一致的設計語言能提升使用者信任感與品牌記憶度。
+
+---
+
+### VI. 負庫存支援 (Negative Stock Support)
+
+**核心原則**:
+- 系統 **必須** 支援負庫存下單,不檢查 `Stock > 0`。
+- 庫存可為負數,表示欠貨或預購狀態。
+
+**實施要求**:
+- 下單流程 **禁止** 阻擋庫存不足的情況。
+- 庫存顯示 **應該** 向管理員顯示負值,向客戶顯示「可預購」等友善訊息。
+
+**理由**: 批發業務常需處理預購與欠貨補發,強制庫存檢查會阻礙業務靈活性。
+
+---
+
+## 技術規範
+
+### 開發框架與工具
+
+**強制技術棧**:
+- **前端框架**: Next.js 15 (App Router)
+- **UI 元件庫**: React 18+ with TypeScript
+- **狀態管理**: Zustand (僅限購物車),Server State (訂單)
+- **資料庫**: Supabase (PostgreSQL)
+- **部署平台**: Firebase App Hosting
+- **樣式工具**: Tailwind CSS
+
+**技術決策理由**:
+- Next.js 15: 支援 Server Actions 與 SSR,降低客戶端負擔。
+- Supabase: 提供完整的 SQL 能力與即時訂閱,適合複雜業務邏輯。
+- Firebase: 提供全球 CDN 與快速部署,適合台灣與東南亞市場。
+
+---
+
+### 部署與最小化策略
+
+**部署原則**:
+- **必須** 以最小上傳大小部署 Firebase,僅部署有修改的文件。
+- **必須** 在部署前執行 Build 檢查,確保無型別錯誤。
+- **禁止** 全量重新部署,除非架構重大變更或除錯需求。
+
+**實施要求**:
+- 使用 Firebase CLI 的增量部署功能。
+- 每次部署前 **必須** 執行 `npm run build` 與 `npm run type-check`。
+
+---
+
+## 資料庫規範
+
+### 核心資料表設計
+
+**必須包含的資料表**:
+
+| 表名 | 關鍵欄位 | 約束 |
+|------|---------|------|
+| `tiers` | id, name, rank | 會員等級主表 |
+| `users` | id, phone, tier_id (FK), role | 使用者表,role 限定為 'client' 或 'admin' |
+| `series` | id, name, default_image_url, is_active | 產品系列 |
+| `products` | id, series_id (FK), name, tags, stock, specific_image_url | 產品單項 |
+| `prices` | id, tier_id (FK), product_id (FK), amount | **必須** 有 Unique (tier_id, product_id) 約束 |
+| `orders` | id, user_id, status, total_amount, created_at | 訂單主表 |
+| `order_items` | id, order_id, product_id, quantity, deal_price | 訂單明細,**必須** 記錄 deal_price |
+| `order_timelines` | id, order_id, type, content, created_at | 操作紀錄 |
+
+**正規化要求**:
+- **禁止** 在 `products` 表中直接儲存價格。
+- **禁止** 在 `order_items` 中使用即時價格,**必須** 記錄成交時的 `deal_price`。
+
+---
+
+## 開發工作流程
+
+### Git Commit 規範
+
+**Commit 訊息格式**:
+- **必須** 使用繁體中文撰寫 commit message。
+- **必須** 在每次功能完成或重要變更後執行 commit。
+- 格式範例: `feat: 新增客戶端購物車功能` 或 `fix: 修復價格顯示錯誤`
+
+**自動化要求**:
+- AI 助手在完成變更後 **必須** 自動執行 `git add` 與 `git commit`。
+
+---
+
+### 測試與驗證
+
+**測試策略**:
+- **P0 功能** 必須包含整合測試 (Integration Test)。
+- **P1 功能** 應該包含單元測試 (Unit Test)。
+- **P2 功能** 可選擇性測試,依時間與資源決定。
+
+**驗證標準**:
+- 每個使用者故事完成後 **必須** 可獨立驗證功能正確性。
+- **禁止** 在未驗證的情況下合併至主分支。
+
+---
+
+## 治理規則
+
+### 憲章權威性
+
+本憲章 **優於** 所有其他開發實踐文件。當開發決策與憲章衝突時,**必須** 優先遵循憲章。
+
+### 修訂程序
+
+**修訂要求**:
+- 憲章修訂 **必須** 經過文件化、審核與遷移計畫。
+- 修訂後 **必須** 更新 `LAST_AMENDED_DATE` 與 `CONSTITUTION_VERSION`。
+- **必須** 在修訂報告中說明變更理由與影響範圍。
+
+**版本規則** (語義化版本):
+- **MAJOR**: 移除或重新定義核心原則,向後不相容變更。
+- **MINOR**: 新增原則或擴充重要指導方針。
+- **PATCH**: 文字修正、釐清說明,非語義性變更。
+
+### 合規性審查
+
+**審查要求**:
+- 所有 Pull Request **必須** 驗證是否符合憲章原則。
+- 複雜度增加 **必須** 提供合理說明,並在 Plan 文件中記錄。
+- **禁止** 未經審核的架構變更或設計風格偏離。
+
+### 執行指引
+
+**開發指引**:
+- 執行階段開發指引請參考專案 README.md 與 `.specify/templates/` 中的模板文件。
+- 各模板文件 (spec-template.md, plan-template.md, tasks-template.md) 提供具體執行細節。
+
+---
+
+**Version**: 1.0.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-01
