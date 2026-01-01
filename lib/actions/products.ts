@@ -499,3 +499,179 @@ export async function updateProductStock(
     }
   }
 }
+
+/**
+ * 上傳商品圖片
+ * Feature: 002-product-management (US4)
+ */
+export async function uploadProductImage(
+  productId: string,
+  file: File
+): Promise<ActionResult<{ url: string }>> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 驗證檔案格式
+    const validFormats = ['image/jpeg', 'image/png', 'image/webp']
+    if (!validFormats.includes(file.type)) {
+      return {
+        success: false,
+        message: '僅支援 JPG, PNG, WebP 格式',
+      }
+    }
+
+    // 3. 驗證檔案大小 (5MB)
+    const maxSize = 5 * 1024 * 1024
+    if (file.size > maxSize) {
+      return {
+        success: false,
+        message: '檔案大小不可超過 5MB',
+      }
+    }
+
+    const supabase = await createClient()
+
+    // 4. 檢查商品是否存在
+    const { data: product } = await supabase
+      .from('products')
+      .select('id')
+      .eq('id', productId)
+      .single()
+
+    if (!product) {
+      return {
+        success: false,
+        message: '商品不存在',
+      }
+    }
+
+    // 5. 上傳到 Storage (覆寫模式)
+    const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
+    const filePath = `${productId}/main.${ext}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('products')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true, // 覆寫舊檔案
+      })
+
+    if (uploadError) {
+      console.error('uploadProductImage storage error:', uploadError)
+      return {
+        success: false,
+        message: '圖片上傳失敗',
+      }
+    }
+
+    // 6. 取得公開 URL
+    const { data: urlData } = supabase.storage.from('products').getPublicUrl(filePath)
+
+    // 7. 更新商品的 image_url
+    const { error: updateError } = await supabase
+      .from('products')
+      .update({ image_url: urlData.publicUrl })
+      .eq('id', productId)
+
+    if (updateError) {
+      console.error('uploadProductImage update error:', updateError)
+      return {
+        success: false,
+        message: '更新商品圖片欄位失敗',
+      }
+    }
+
+    // 8. 重新驗證快取
+    revalidatePath('/admin/products')
+    revalidatePath(`/admin/products/${productId}`)
+
+    return {
+      success: true,
+      data: { url: urlData.publicUrl },
+      message: '圖片上傳成功',
+    }
+  } catch (error: unknown) {
+    console.error('uploadProductImage error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '圖片上傳失敗',
+    }
+  }
+}
+
+/**
+ * 刪除商品圖片
+ * Feature: 002-product-management (US4)
+ */
+export async function deleteProductImage(productId: string): Promise<ActionResult> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    const supabase = await createClient()
+
+    // 2. 檢查商品是否存在
+    const { data: product } = await supabase
+      .from('products')
+      .select('id, image_url')
+      .eq('id', productId)
+      .single()
+
+    if (!product) {
+      return {
+        success: false,
+        message: '商品不存在',
+      }
+    }
+
+    // 3. 刪除 Storage 圖片 (所有可能的副檔名)
+    // 註: 不檢查錯誤,因為圖片可能不存在
+    await supabase.storage.from('products').remove([
+      `${productId}/main.jpg`,
+      `${productId}/main.png`,
+      `${productId}/main.webp`,
+    ])
+
+    // 4. 更新商品的 image_url 為 NULL
+    const { error: updateError } = await supabase
+      .from('products')
+      .update({ image_url: null })
+      .eq('id', productId)
+
+    if (updateError) {
+      console.error('deleteProductImage error:', updateError)
+      return {
+        success: false,
+        message: '刪除商品圖片欄位失敗',
+      }
+    }
+
+    // 5. 重新驗證快取
+    revalidatePath('/admin/products')
+    revalidatePath(`/admin/products/${productId}`)
+
+    return {
+      success: true,
+      message: '圖片刪除成功',
+    }
+  } catch (error: unknown) {
+    console.error('deleteProductImage error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '圖片刪除失敗',
+    }
+  }
+}

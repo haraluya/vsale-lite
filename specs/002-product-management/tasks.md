@@ -142,15 +142,15 @@
 
 ### Implementation for US4
 
-- [ ] T039 [P] [US4] 建立 Server Action: uploadProductImage() (lib/actions/products.ts)
-- [ ] T040 [P] [US4] 建立 Server Action: deleteProductImage() (lib/actions/products.ts)
-- [ ] T041 [P] [US4] 建立 ImageUpload UI 元件 (components/ui/image-upload.tsx)
-- [ ] T042 [US4] 整合圖片上傳至商品表單 (components/admin/product-form.tsx)
-- [ ] T043 [US4] 實作圖片格式驗證 (僅支援 JPG, PNG, WebP)
-- [ ] T044 [US4] 實作圖片大小驗證 (限制 5MB)
-- [ ] T045 [US4] 實作圖片替換邏輯 (覆寫舊圖片)
-- [ ] T046 [US4] 實作圖片刪除邏輯 (清理 Storage 檔案)
-- [ ] T047 [US4] 實作圖片預覽功能 (顯示上傳後的圖片)
+- [X] T039 [P] [US4] 建立 Server Action: uploadProductImage() (lib/actions/products.ts)
+- [X] T040 [P] [US4] 建立 Server Action: deleteProductImage() (lib/actions/products.ts)
+- [X] T041 [P] [US4] 建立 ImageUpload UI 元件 (components/ui/image-upload.tsx)
+- [X] T042 [US4] 整合圖片上傳至商品表單 (components/admin/product-form.tsx)
+- [X] T043 [US4] 實作圖片格式驗證 (僅支援 JPG, PNG, WebP)
+- [X] T044 [US4] 實作圖片大小驗證 (限制 5MB)
+- [X] T045 [US4] 實作圖片替換邏輯 (覆寫舊圖片)
+- [X] T046 [US4] 實作圖片刪除邏輯 (清理 Storage 檔案)
+- [X] T047 [US4] 實作圖片預覽功能 (顯示上傳後的圖片)
 
 **Checkpoint**: 管理員可完整管理商品圖片,上傳、替換、刪除功能完整
 

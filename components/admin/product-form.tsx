@@ -12,6 +12,7 @@ import { createProduct, updateProduct } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ErrorInline } from '@/components/ui/error-inline'
+import { ImageUpload } from '@/components/ui/image-upload'
 import type { Product, Category } from '@/types'
 
 interface ProductFormProps {
@@ -151,6 +152,23 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
             </select>
             <p className="mt-1 text-xs text-gray-600">停用的商品不會顯示在前台</p>
             <ErrorInline message={state?.errors?.status?.[0]} />
+          </div>
+        )}
+
+        {/* 商品圖片 (僅編輯時顯示) */}
+        {mode === 'edit' && product && (
+          <div>
+            <label className="mb-2 block font-bold">商品圖片</label>
+            <ImageUpload
+              productId={product.id}
+              currentImageUrl={product.image_url}
+              onUploadSuccess={() => {
+                router.refresh()
+              }}
+              onDeleteSuccess={() => {
+                router.refresh()
+              }}
+            />
           </div>
         )}
 
