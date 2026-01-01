@@ -57,10 +57,10 @@
 
 - [X] T009 建立 Supabase 專案並取得 API Keys
 - [X] T010 配置 .env.local 環境變數 (SUPABASE_URL, SUPABASE_ANON_KEY)
-- [ ] T011 執行 SQL Migration 建立資料庫 Schema (supabase/migrations/20260101_initial_schema.sql)
-- [ ] T012 插入預設會員等級資料 (零售、批發、經銷商)
-- [ ] T013 建立測試管理員帳號 (admin@test.com)
-- [ ] T014 產生 TypeScript 型別定義 (types/database.types.ts)
+- [X] T011 執行 SQL Migration 建立資料庫 Schema (supabase/migrations/20260101_initial_schema.sql)
+- [X] T012 插入預設會員等級資料 (零售、批發、經銷商)
+- [X] T013 建立測試管理員帳號 (admin@test.com)
+- [X] T014 產生 TypeScript 型別定義 (types/database.types.ts)
 
 ### 2.2 Supabase Client 工具
 

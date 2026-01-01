@@ -26,14 +26,35 @@ CREATE TABLE IF NOT EXISTS profiles (
 );
 
 -- 3. 建立約束條件
-ALTER TABLE profiles ADD CONSTRAINT IF NOT EXISTS client_must_have_phone
-  CHECK (role != 'client' OR (phone IS NOT NULL AND tier_id IS NOT NULL));
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'client_must_have_phone'
+  ) THEN
+    ALTER TABLE profiles ADD CONSTRAINT client_must_have_phone
+      CHECK (role != 'client' OR (phone IS NOT NULL AND tier_id IS NOT NULL));
+  END IF;
+END $$;
 
-ALTER TABLE profiles ADD CONSTRAINT IF NOT EXISTS admin_must_have_email
-  CHECK (role != 'admin' OR email IS NOT NULL);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'admin_must_have_email'
+  ) THEN
+    ALTER TABLE profiles ADD CONSTRAINT admin_must_have_email
+      CHECK (role != 'admin' OR email IS NOT NULL);
+  END IF;
+END $$;
 
-ALTER TABLE profiles ADD CONSTRAINT IF NOT EXISTS must_have_identifier
-  CHECK (phone IS NOT NULL OR email IS NOT NULL);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'must_have_identifier'
+  ) THEN
+    ALTER TABLE profiles ADD CONSTRAINT must_have_identifier
+      CHECK (phone IS NOT NULL OR email IS NOT NULL);
+  END IF;
+END $$;
 
 -- 4. 建立索引
 CREATE INDEX IF NOT EXISTS idx_tiers_rank ON tiers(rank);
@@ -51,7 +72,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER IF NOT EXISTS update_tiers_updated_at
+DROP TRIGGER IF EXISTS update_tiers_updated_at ON tiers;
+CREATE TRIGGER update_tiers_updated_at
 BEFORE UPDATE ON tiers
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
