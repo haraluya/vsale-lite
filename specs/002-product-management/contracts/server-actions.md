@@ -2,7 +2,7 @@
 
 **Feature**: 002-product-management
 **Date**: 2026-01-02
-**Version**: 1.0.0
+**Version**: 1.1.0 (Edge Cases 決策完成)
 
 ## 概述
 
@@ -225,7 +225,7 @@ async function deleteCategory(id: string): Promise<ActionResult>
 **業務邏輯**:
 1. 驗證 Admin 權限
 2. 查詢 `products` 表計算使用此分類的商品數量
-3. 若 `count > 0`,回傳錯誤訊息並附上商品數量
+3. 若 `count > 0`,回傳錯誤訊息並附上商品數量（建議使用 migrateCategoryProducts 遷移後再刪除）
 4. 若 `count === 0`,執行硬刪除
 5. `revalidatePath('/admin/categories')`
 
@@ -244,6 +244,121 @@ if (count && count > 0) {
   }
 }
 ```
+
+---
+
+### 1.5 migrateCategoryProducts
+
+**用途**: 將某分類的所有商品批量遷移至其他分類 (用於刪除前的資料遷移)
+
+**權限要求**: 僅 Admin
+
+**函式簽章**:
+```typescript
+async function migrateCategoryProducts(
+  fromCategoryId: string,
+  toCategoryId: string
+): Promise<ActionResult<{ count: number }>>
+```
+
+**輸入參數**:
+| 欄位 | 型別 | 必填 | 說明 |
+|------|------|------|------|
+| `fromCategoryId` | string | ✅ | 來源分類 ID (要刪除的分類) |
+| `toCategoryId` | string | ✅ | 目標分類 ID (遷移目的地) |
+
+**回應範例**:
+```typescript
+// 成功
+{
+  success: true,
+  data: { count: 15 },
+  message: '已成功將 15 個商品從「飲料」遷移至「食品」'
+}
+
+// 失敗 - 來源分類不存在
+{ success: false, message: '來源分類不存在' }
+
+// 失敗 - 目標分類不存在
+{ success: false, message: '目標分類不存在' }
+
+// 失敗 - 相同分類
+{ success: false, message: '來源分類與目標分類不可相同' }
+
+// 成功但無商品
+{
+  success: true,
+  data: { count: 0 },
+  message: '此分類沒有商品需要遷移'
+}
+```
+
+**業務邏輯**:
+1. 驗證 Admin 權限
+2. 驗證 `fromCategoryId` 與 `toCategoryId` 不可相同
+3. 查詢來源分類與目標分類是否存在:
+   ```typescript
+   const [fromCategory, toCategory] = await Promise.all([
+     supabase.from('categories').select('id, name').eq('id', fromCategoryId).single(),
+     supabase.from('categories').select('id, name').eq('id', toCategoryId).single()
+   ])
+
+   if (!fromCategory.data) {
+     return { success: false, message: '來源分類不存在' }
+   }
+   if (!toCategory.data) {
+     return { success: false, message: '目標分類不存在' }
+   }
+   ```
+4. 批量更新商品分類:
+   ```typescript
+   const { count } = await supabase
+     .from('products')
+     .update({ category_id: toCategoryId })
+     .eq('category_id', fromCategoryId)
+     .select('*', { count: 'exact', head: true })
+   ```
+5. `revalidatePath('/admin/categories')`
+6. `revalidatePath('/admin/products')`
+7. 回傳成功訊息與遷移商品數量
+
+**使用場景**:
+```typescript
+// 前端流程範例
+async function handleDeleteCategory(categoryId: string) {
+  // 1. 檢查是否有商品使用
+  const { count } = await checkCategoryUsage(categoryId)
+
+  if (count > 0) {
+    // 2. 顯示遷移對話框
+    const targetCategoryId = await showMigrationDialog(categoryId)
+
+    // 3. 執行遷移
+    const migrateResult = await migrateCategoryProducts(categoryId, targetCategoryId)
+
+    if (!migrateResult.success) {
+      alert(migrateResult.message)
+      return
+    }
+  }
+
+  // 4. 刪除分類
+  const deleteResult = await deleteCategory(categoryId)
+
+  if (deleteResult.success) {
+    alert('分類刪除成功')
+  }
+}
+```
+
+**效能考量**:
+- 使用單一 UPDATE 查詢批量更新,避免逐筆操作
+- 適用於商品數量 < 10,000 的情況
+- 若商品數量過多,可考慮使用背景任務處理
+
+**交易安全**:
+- Supabase PostgreSQL 保證 UPDATE 操作的原子性
+- 若更新失敗,所有變更會自動回滾
 
 ---
 
@@ -511,7 +626,7 @@ async function updateProduct(
 **輸入驗證 Schema**:
 ```typescript
 export const updateProductSchema = z.object({
-  code: z.string().min(1).max(50).regex(/^[A-Za-z0-9-_]+$/).optional(),
+  // 注意: code 欄位不應出現在更新 Schema 中 (建立後不可修改)
   name: z.string().min(1).max(200).optional(),
   category_id: z.string().uuid().optional(),
   description: z.string().max(1000).optional(),
@@ -525,13 +640,14 @@ export const updateProductSchema = z.object({
 | 欄位 | 型別 | 必填 | 說明 |
 |------|------|------|------|
 | `id` | string | ✅ | 商品 ID (URL 參數) |
-| `code` | string | ❌ | 新的商品編號 |
 | `name` | string | ❌ | 新的商品名稱 |
 | `category_id` | string | ❌ | 新的分類 ID |
 | `description` | string | ❌ | 新的描述 |
 | `stock` | number | ❌ | 新的庫存數量 |
 | `unit` | string | ❌ | 新的單位 |
 | `status` | string | ❌ | 新的狀態 |
+
+**注意**: 商品編號 (code) **建立後不可修改**,不接受此參數。
 
 **回應範例**:
 ```typescript
@@ -541,18 +657,17 @@ export const updateProductSchema = z.object({
 // 失敗 - 商品不存在
 { success: false, message: '商品不存在' }
 
-// 失敗 - 商品編號重複
-{ success: false, message: '此商品編號已被使用' }
+// 失敗 - 分類不存在
+{ success: false, message: '選擇的分類不存在' }
 ```
 
 **業務邏輯**:
 1. 驗證 Admin 權限
 2. 檢查商品是否存在
-3. 若修改 `code`,檢查是否與其他商品重複
-4. 若修改 `category_id`,驗證新分類是否存在
-5. 更新 `products` 表
-6. `revalidatePath('/admin/products')`
-7. `revalidatePath(\`/admin/products/\${id}\`)`
+3. 若修改 `category_id`,驗證新分類是否存在
+4. 更新 `products` 表（不包含 `code` 欄位）
+5. `revalidatePath('/admin/products')`
+6. `revalidatePath(\`/admin/products/\${id}\`)`
 
 ---
 
@@ -1011,7 +1126,7 @@ export function ImageUpload({ productId }: { productId: string }) {
 ## 總結
 
 本 API Contracts 定義涵蓋:
-- ✅ 4 個分類管理 Actions (查詢、建立、更新、刪除)
+- ✅ **5 個分類管理 Actions** (查詢、建立、更新、刪除、**遷移**)
 - ✅ 5 個商品管理 Actions (查詢列表、查詢單筆、建立、更新、刪除)
 - ✅ 2 個圖片管理 Actions (上傳、刪除)
 - ✅ 統一的錯誤處理與回應格式
@@ -1020,5 +1135,13 @@ export function ImageUpload({ productId }: { productId: string }) {
 - ✅ Supabase Storage 整合
 - ✅ 負庫存支援
 - ✅ 軟刪除/硬刪除混合策略
+- ✅ 商品編號建立後不可修改
 
-**下一步**: 建立 quickstart.md (開發環境設定指南)
+**新增功能** (v1.1):
+- ✅ `migrateCategoryProducts`: 批量遷移商品分類 (FR-009-A)
+- ✅ 圖片格式支援 WebP
+- ✅ 商品編號強制格式驗證 (`/^[A-Za-z0-9-_]+$/`)
+
+**版本**: 1.1.0
+**最後更新**: 2026-01-02
+**下一步**: 開始實作 Phase 1 (Database Setup)
