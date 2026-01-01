@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient as createSupabaseClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { createClientSchema, updateClientSchema, updatePasswordSchema } from '@/lib/validations/user.schema'
 import type { ActionResult, Client } from '@/types'
 import { checkAuth } from './helpers'
@@ -59,11 +59,12 @@ export async function createClient(
     // 4. 產生預設密碼 (電話後6碼)
     const password = generatePassword(validatedFields.data.phone)
 
-    // 5. 使用 Admin API 建立 Auth 使用者 (避免自動登入)
+    // 5. 使用 Admin Client 建立 Auth 使用者 (避免自動登入)
+    const adminClient = createAdminClient()
     const tempEmail = `${validatedFields.data.phone}@temp.local`
     console.log('嘗試建立使用者:', { tempEmail, phone: validatedFields.data.phone })
 
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
       email: tempEmail,
       password,
       email_confirm: true, // 自動確認 Email (跳過驗證流程)
@@ -336,14 +337,15 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       }
     }
 
-    // 3. 先刪除 Auth 使用者 (確保電話號碼可重新註冊)
-    const { error: authError } = await supabase.auth.admin.deleteUser(id)
+    // 3. 使用 Admin Client 刪除 Auth 使用者 (確保電話號碼可重新註冊)
+    const adminClient = createAdminClient()
+    const { error: authError } = await adminClient.auth.admin.deleteUser(id)
 
     if (authError) {
       console.error('刪除 Auth 使用者失敗:', authError)
       return {
         success: false,
-        message: `刪除失敗: ${authError.message}. 請確認 Supabase 設定中已啟用 Service Role 權限`,
+        message: `刪除失敗: ${authError.message}`,
       }
     }
 
@@ -424,8 +426,9 @@ export async function updateClientPassword(
       }
     }
 
-    // 4. 使用 Admin API 更新密碼
-    const { error } = await supabase.auth.admin.updateUserById(id, {
+    // 4. 使用 Admin Client 更新密碼
+    const adminClient = createAdminClient()
+    const { error } = await adminClient.auth.admin.updateUserById(id, {
       password: validatedFields.data.newPassword,
     })
 
