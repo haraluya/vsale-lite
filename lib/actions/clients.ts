@@ -7,15 +7,10 @@ import { checkAuth } from './helpers'
 import { revalidatePath } from 'next/cache'
 
 /**
- * 產生隨機密碼 (8 碼英數混合)
+ * 產生預設密碼 (使用電話號碼後6碼)
  */
-function generatePassword(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789'
-  let password = ''
-  for (let i = 0; i < 8; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return password
+function generatePassword(phone: string): string {
+  return phone.slice(-6)
 }
 
 /**
@@ -61,23 +56,27 @@ export async function createClient(
       }
     }
 
-    // 4. 產生隨機密碼
-    const password = generatePassword()
+    // 4. 產生預設密碼 (電話後6碼)
+    const password = generatePassword(validatedFields.data.phone)
 
     // 5. 建立 Auth 使用者
     // 使用 Email 註冊 (手機號碼@temp.local)
     const tempEmail = `${validatedFields.data.phone}@temp.local`
+    console.log('嘗試建立使用者:', { tempEmail, phone: validatedFields.data.phone })
+
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: tempEmail,
       password,
-      phone: validatedFields.data.phone,
       options: {
         data: {
           role: 'client',
+          phone: validatedFields.data.phone, // 將手機號碼放在 metadata 中
         },
         emailRedirectTo: undefined,
       },
     })
+
+    console.log('Auth 註冊結果:', { user: authData?.user?.id, error: authError })
 
     // 如果錯誤是因為 Email 已存在 (表示手機號碼重複)
     if (authError?.message?.includes('already registered')) {
@@ -95,22 +94,51 @@ export async function createClient(
       }
     }
 
-    // 6. 更新 profiles (由 trigger 自動建立,這裡只更新額外資訊)
-    const { error: updateError } = await supabase
+    // 6. 手動建立 profile (不依賴 trigger,因為我們用 Email 註冊,phone 欄位會是 null)
+    const { error: insertError } = await supabase
       .from('profiles')
-      .update({
+      .insert({
+        id: authData.user.id,
+        phone: validatedFields.data.phone,
+        role: 'client',
         tier_id: validatedFields.data.tier_id,
         display_name: validatedFields.data.display_name,
         notes: validatedFields.data.notes,
       })
-      .eq('id', authData.user.id)
 
-    if (updateError) {
-      console.error('更新 profile 失敗:', updateError)
-      // 不返回錯誤,因為使用者已建立成功
+    if (insertError) {
+      console.error('建立 profile 失敗:', insertError)
+      // 如果是重複建立,改用 update
+      if (insertError.code === '23505') {
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({
+            phone: validatedFields.data.phone,
+            role: 'client',
+            tier_id: validatedFields.data.tier_id,
+            display_name: validatedFields.data.display_name,
+            notes: validatedFields.data.notes,
+          })
+          .eq('id', authData.user.id)
+
+        if (updateError) {
+          console.error('更新 profile 失敗:', updateError)
+          return {
+            success: false,
+            message: `使用者已建立但資料更新失敗: ${updateError.message}`,
+          }
+        }
+      } else {
+        return {
+          success: false,
+          message: `建立客戶資料失敗: ${insertError.message}`,
+        }
+      }
     }
 
-    // 7. Revalidate
+    console.log('Profile 建立成功:', authData.user.id)
+
+    // 9. Revalidate
     revalidatePath('/admin/clients')
 
     return {
@@ -118,6 +146,7 @@ export async function createClient(
       data: {
         id: authData.user.id,
         password, // 返回密碼供管理員複製
+        phone: validatedFields.data.phone, // 返回手機號碼
       },
       message: '客戶建立成功',
     }

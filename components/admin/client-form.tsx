@@ -22,7 +22,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   const [copied, setCopied] = useState(false)
 
   const [state, formAction, pending] = useActionState<
-    ActionResult<{ id: string; password?: string }> | null,
+    ActionResult<{ id: string; password?: string; phone?: string }> | null,
     FormData
   >(isEdit && client ? updateClient.bind(null, client.id) : createClient, null)
 
@@ -42,6 +42,25 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
 
   // 如果剛建立成功,顯示密碼複製介面
   if (state?.success && state.data?.password) {
+    const loginUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login'
+    const phone = state.data.phone || ''
+    const password = state.data.password
+
+    // 完整的登入指引文字
+    const fullGuide = `【Vsale 訂貨系統 - 登入資訊】
+
+前台網址: ${loginUrl}
+登入電話: ${phone}
+登入密碼: ${password}
+
+請使用以上資訊登入系統進行下單。`
+
+    const handleCopyGuide = () => {
+      navigator.clipboard.writeText(fullGuide)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+
     return (
       <div className="space-y-6">
         <div className="rounded-none border-3 border-green-500 bg-green-50 p-6">
@@ -53,35 +72,51 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
               <p className="text-sm font-medium text-gray-700 mb-2">
                 請將以下登入資訊提供給客戶:
               </p>
-              <div className="bg-white border-2 border-green-500 p-4 space-y-2">
+              <div className="bg-white border-2 border-green-500 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">手機號碼:</span>
-                  <code className="font-mono font-bold">
-                    {(state as any).phone || '(查看客戶列表)'}
+                  <span className="text-sm text-gray-600">前台網址:</span>
+                  <a
+                    href={loginUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-blue-600 hover:underline font-mono"
+                  >
+                    {loginUrl}
+                  </a>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">登入電話:</span>
+                  <code className="font-mono font-bold text-lg">
+                    {phone}
                   </code>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">預設密碼:</span>
-                  <div className="flex items-center gap-2">
-                    <code className="font-mono font-bold text-lg">
-                      {state.data.password}
-                    </code>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleCopy(state.data!.password!)}
-                    >
-                      {copied ? (
-                        <Check className="h-4 w-4" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
+                  <span className="text-sm text-gray-600">登入密碼:</span>
+                  <code className="font-mono font-bold text-lg text-green-700">
+                    {password}
+                  </code>
                 </div>
               </div>
             </div>
+
+            <Button
+              type="button"
+              onClick={handleCopyGuide}
+              className="w-full"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 mr-2" />
+                  已複製完整登入指引!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4 mr-2" />
+                  複製完整登入指引 (含網址、電話、密碼)
+                </>
+              )}
+            </Button>
+
             <p className="text-xs text-gray-600">
               ⚠️ 此密碼僅顯示一次,請務必記錄或立即提供給客戶
             </p>
@@ -96,7 +131,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
             variant="secondary"
             onClick={() => router.push('/admin/clients')}
           >
-            返回客戶列表
+            返回客戶列表 (查看客戶列表)
           </Button>
         </div>
       </div>
