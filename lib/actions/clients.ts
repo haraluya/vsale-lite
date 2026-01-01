@@ -65,8 +65,7 @@ export async function createClient(
     const password = generatePassword()
 
     // 5. 建立 Auth 使用者
-    // 暫時使用 Email 註冊 (手機號碼@temp.local)
-    // TODO: 等 Supabase Phone Auth 設定完成後改回使用 phone
+    // 使用 Email 註冊 (手機號碼@temp.local)
     const tempEmail = `${validatedFields.data.phone}@temp.local`
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: tempEmail,
@@ -76,9 +75,17 @@ export async function createClient(
         data: {
           role: 'client',
         },
-        emailRedirectTo: undefined, // 不發送確認信
+        emailRedirectTo: undefined,
       },
     })
+
+    // 如果錯誤是因為 Email 已存在 (表示手機號碼重複)
+    if (authError?.message?.includes('already registered')) {
+      return {
+        success: false,
+        message: '此手機號碼已被使用',
+      }
+    }
 
     if (authError || !authData.user) {
       console.error('建立 Auth 使用者失敗:', authError)
