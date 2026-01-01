@@ -64,14 +64,19 @@ export async function createClient(
     // 4. 產生隨機密碼
     const password = generatePassword()
 
-    // 5. 建立 Auth 使用者 (使用 signUp,不需要 service role)
+    // 5. 建立 Auth 使用者
+    // 暫時使用 Email 註冊 (手機號碼@temp.local)
+    // TODO: 等 Supabase Phone Auth 設定完成後改回使用 phone
+    const tempEmail = `${validatedFields.data.phone}@temp.local`
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      phone: validatedFields.data.phone,
+      email: tempEmail,
       password,
+      phone: validatedFields.data.phone,
       options: {
         data: {
           role: 'client',
         },
+        emailRedirectTo: undefined, // 不發送確認信
       },
     })
 
