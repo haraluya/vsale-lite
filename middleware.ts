@@ -97,25 +97,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // 3. 客戶嘗試訪問管理員路由 → 阻擋並導向前台登入
-  if (profile.role === 'client' && isAdminRoute) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
-
-  // 4. 管理員可以訪問所有路由 (上帝視角)
-  if (profile.role === 'admin') {
-    return supabaseResponse
-  }
-
-  // 5. 客戶訪問客戶路由 → 放行
-  if (profile.role === 'client' && isClientRoute) {
-    return supabaseResponse
-  }
-
-  // 6. 已登入訪問登入頁 → 導向對應首頁
+  // 3. 已登入訪問登入頁處理 (允許切換角色)
   if (isPublicPath && pathname !== '/') {
+    // 客戶訪問後台登入頁 → 允許 (需要先登出才能以管理員身份登入)
+    if (profile.role === 'client' && pathname === '/admin/login') {
+      return supabaseResponse
+    }
+
+    // 管理員訪問前台登入頁 → 允許 (需要先登出才能以客戶身份登入)
+    if (profile.role === 'admin' && pathname === '/login') {
+      return supabaseResponse
+    }
+
+    // 訪問當前角色的登入頁 → 導向對應首頁
     const url = request.nextUrl.clone()
     if (profile.role === 'admin') {
       url.pathname = '/admin/dashboard'
@@ -123,6 +117,23 @@ export async function middleware(request: NextRequest) {
       url.pathname = '/store'
     }
     return NextResponse.redirect(url)
+  }
+
+  // 4. 客戶嘗試訪問管理員路由 → 阻擋並導向前台商店
+  if (profile.role === 'client' && isAdminRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/store'
+    return NextResponse.redirect(url)
+  }
+
+  // 5. 管理員可以訪問所有路由 (上帝視角)
+  if (profile.role === 'admin') {
+    return supabaseResponse
+  }
+
+  // 6. 客戶訪問客戶路由 → 放行
+  if (profile.role === 'client' && isClientRoute) {
+    return supabaseResponse
   }
 
   return supabaseResponse
