@@ -5,6 +5,8 @@ import { createTier, updateTier } from '@/lib/actions/tiers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ErrorInline } from '@/components/ui/error'
+import { LoadingSpinner } from '@/components/ui/loading'
 import { Tier, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -66,13 +68,12 @@ export function TierForm({ tier, mode }: TierFormProps) {
       </div>
 
       {state?.message && !state.success && (
-        <div className="rounded-none border-3 border-red-500 bg-red-50 p-4">
-          <p className="text-sm font-bold text-red-500">{state.message}</p>
-        </div>
+        <ErrorInline message={state.message} />
       )}
 
       <div className="flex gap-4">
         <Button type="submit" disabled={pending}>
+          {pending && <LoadingSpinner className="mr-2" />}
           {pending ? '儲存中...' : isEdit ? '更新等級' : '建立等級'}
         </Button>
         <Button

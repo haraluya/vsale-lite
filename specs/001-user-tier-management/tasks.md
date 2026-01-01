@@ -226,9 +226,9 @@
 
 - [X] T083 [P] 建立 Loading 狀態元件 (components/ui/loading.tsx)
 - [X] T084 [P] 建立 Error 狀態元件 (components/ui/error.tsx)
-- [ ] T085 [P] 實作 Optimistic UI (客戶列表操作) - Optional
-- [ ] T086 實作表單送出後的 Loading 狀態 - Optional
-- [ ] T087 實作錯誤訊息統一顯示 (Toast 或 Alert) - Optional
+- [X] T085 [P] 實作 Optimistic UI (客戶列表操作 - 使用 useTransition)
+- [X] T086 實作表單送出後的 Loading 狀態 (LoadingSpinner in buttons)
+- [X] T087 實作錯誤訊息統一顯示 (使用 ErrorInline 元件)
 - [X] T088 [P] 程式碼格式化與 Linting 檢查
 
 ### 效能優化任務組 (Performance Optimization) - Optional

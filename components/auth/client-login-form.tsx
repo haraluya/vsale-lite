@@ -5,6 +5,8 @@ import { loginWithPhone } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ErrorInline } from '@/components/ui/error'
+import { LoadingSpinner } from '@/components/ui/loading'
 import type { ActionResult } from '@/types'
 
 export function ClientLoginForm() {
@@ -48,12 +50,11 @@ export function ClientLoginForm() {
       </div>
 
       {state?.message && !state.success && (
-        <div className="rounded-none border-3 border-red-500 bg-red-50 p-4">
-          <p className="text-sm font-bold text-red-500">{state.message}</p>
-        </div>
+        <ErrorInline message={state.message} />
       )}
 
       <Button type="submit" disabled={pending} className="w-full">
+        {pending && <LoadingSpinner className="mr-2" />}
         {pending ? '登入中...' : '登入'}
       </Button>
     </form>

@@ -5,6 +5,8 @@ import { createClient, updateClient } from '@/lib/actions/clients'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ErrorInline } from '@/components/ui/error'
+import { LoadingSpinner } from '@/components/ui/loading'
 import { Tier, Client, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -213,13 +215,12 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
       </div>
 
       {state?.message && !state.success && (
-        <div className="rounded-none border-3 border-red-500 bg-red-50 p-4">
-          <p className="text-sm font-bold text-red-500">{state.message}</p>
-        </div>
+        <ErrorInline message={state.message} />
       )}
 
       <div className="flex gap-4">
         <Button type="submit" disabled={pending}>
+          {pending && <LoadingSpinner className="mr-2" />}
           {pending
             ? isEdit
               ? '更新中...'
