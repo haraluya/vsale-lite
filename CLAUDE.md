@@ -1,4 +1,4 @@
-# Vsale-lite - Claude Code Context
+﻿# Vsale-lite - Claude Code Context
 
 **專案名稱**: Vsale-lite
 **專案類型**: B2B 批發訂貨系統
