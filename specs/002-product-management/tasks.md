@@ -39,10 +39,10 @@
 ### 1.1 Database Setup
 
 - [X] T001 建立 SQL Migration 檔案 (supabase/migrations/20260102_products_and_categories.sql)
-- [ ] T002 執行 Migration 建立 categories 與 products 資料表 **⚠️ 需要使用者手動執行**
-- [ ] T003 建立 Supabase Storage Bucket: products **⚠️ Migration 中已包含**
-- [ ] T004 設定 Storage RLS 策略 (管理員可寫,公開可讀) **⚠️ Migration 中已包含**
-- [ ] T005 插入預設分類測試資料 (飲料、零食、日用品) **⚠️ Migration 中已包含**
+- [X] T002 執行 Migration 建立 categories 與 products 資料表 **✅ 使用者已在 Supabase 執行**
+- [X] T003 建立 Supabase Storage Bucket: products **✅ Migration 中已包含並執行**
+- [X] T004 設定 Storage RLS 策略 (管理員可寫,公開可讀) **✅ Migration 中已包含並執行**
+- [X] T005 插入預設分類測試資料 (飲料、零食、日用品) **✅ Migration 中已包含並執行**
 
 ### 1.2 TypeScript Types
 
@@ -77,13 +77,13 @@
 - [X] T013 [P] [US2] 建立 Server Action: updateCategory() (lib/actions/categories.ts)
 - [X] T014 [P] [US2] 建立 Server Action: deleteCategory() (lib/actions/categories.ts)
 - [X] T020-A [US2] 實作分類遷移功能 (Server Action: migrateCategoryProducts) - 批量更新商品分類後刪除 (FR-009-A)
-- [ ] T015 [US2] 建立分類列表頁面 (app/(admin)/admin/categories/page.tsx)
-- [ ] T016 [P] [US2] 建立 CategoryTable 元件 (components/admin/category-table.tsx)
-- [ ] T017 [P] [US2] 建立 CategoryForm 元件 (components/admin/category-form.tsx)
-- [ ] T018 [US2] 建立新增分類頁面 (app/(admin)/admin/categories/new/page.tsx)
-- [ ] T019 [US2] 建立編輯分類頁面 (app/(admin)/admin/categories/[id]/edit/page.tsx)
-- [ ] T020-B [US2] 建立分類刪除確認對話框 - 若有商品則顯示遷移選項
-- [ ] T021 [US2] 更新後台導航選單 (app/(admin)/admin/layout.tsx) - 新增「分類管理」連結
+- [X] T015 [US2] 建立分類列表頁面 (app/(admin)/admin/categories/page.tsx)
+- [X] T016 [P] [US2] 建立 CategoryTable 元件 (components/admin/category-table.tsx)
+- [X] T017 [P] [US2] 建立 CategoryForm 元件 (components/admin/category-form.tsx)
+- [X] T018 [US2] 建立新增分類頁面 (app/(admin)/admin/categories/new/page.tsx)
+- [X] T019 [US2] 建立編輯分類頁面 (app/(admin)/admin/categories/[id]/edit/page.tsx)
+- [X] T020-B [US2] 建立分類刪除確認對話框 - 若有商品則顯示遷移選項 (已整合在 CategoryTable 中)
+- [X] T021 [US2] 更新後台導航選單 (app/(admin)/admin/layout.tsx) - 新增「分類管理」連結
 
 **Checkpoint**: 管理員可完整管理商品分類 (CRUD),可展示與驗證
 
