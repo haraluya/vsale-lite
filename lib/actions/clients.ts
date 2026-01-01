@@ -59,27 +59,24 @@ export async function createClient(
     // 4. 產生預設密碼 (電話後6碼)
     const password = generatePassword(validatedFields.data.phone)
 
-    // 5. 建立 Auth 使用者
-    // 使用 Email 註冊 (手機號碼@temp.local)
+    // 5. 使用 Admin API 建立 Auth 使用者 (避免自動登入)
     const tempEmail = `${validatedFields.data.phone}@temp.local`
     console.log('嘗試建立使用者:', { tempEmail, phone: validatedFields.data.phone })
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
       email: tempEmail,
       password,
-      options: {
-        data: {
-          role: 'client',
-          phone: validatedFields.data.phone, // 將手機號碼放在 metadata 中
-        },
-        emailRedirectTo: undefined,
+      email_confirm: true, // 自動確認 Email (跳過驗證流程)
+      user_metadata: {
+        role: 'client',
+        phone: validatedFields.data.phone,
       },
     })
 
     console.log('Auth 註冊結果:', { user: authData?.user?.id, error: authError })
 
     // 如果錯誤是因為 Email 已存在 (表示手機號碼重複)
-    if (authError?.message?.includes('already registered')) {
+    if (authError?.message?.includes('already registered') || authError?.code === '23505') {
       return {
         success: false,
         message: '此手機號碼已被使用',
