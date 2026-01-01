@@ -126,11 +126,11 @@
 - [ ] T039 [P] [US2] 建立 Server Action: createClient() (lib/actions/users.ts)
 - [ ] T040 [P] [US2] 建立 Server Action: updateClient() (lib/actions/users.ts)
 - [ ] T041 [P] [US2] 建立 Server Action: getClients() (lib/actions/users.ts)
-- [ ] T042 [US2] 建立客戶列表頁面 (app/(admin)/admin/users/page.tsx)
-- [ ] T043 [P] [US2] 建立 UserTable 元件 (components/admin/user-table.tsx)
-- [ ] T044 [P] [US2] 建立 UserForm 元件 (components/admin/user-form.tsx)
-- [ ] T045 [US2] 建立新增客戶頁面 (app/(admin)/admin/users/new/page.tsx)
-- [ ] T046 [US2] 建立編輯客戶頁面 (app/(admin)/admin/users/[id]/edit/page.tsx)
+- [ ] T042 [US2] 建立客戶列表頁面 (app/(admin)/admin/clients/page.tsx)
+- [ ] T043 [P] [US2] 建立 ClientTable 元件 (components/admin/client-table.tsx)
+- [ ] T044 [P] [US2] 建立 ClientForm 元件 (components/admin/client-form.tsx)
+- [ ] T045 [US2] 建立新增客戶頁面 (app/(admin)/admin/clients/new/page.tsx)
+- [ ] T046 [US2] 建立編輯客戶頁面 (app/(admin)/admin/clients/[id]/edit/page.tsx)
 - [ ] T047 [US2] 實作預設密碼生成邏輯 (手機號碼後六碼)
 - [ ] T048 [US2] 實作「複製帳密」功能 (含格式化訊息)
 - [ ] T049 [US2] 實作手機號碼驗證 (台灣格式: 09 開頭,10 碼)
@@ -230,11 +230,24 @@
 - [ ] T086 實作表單送出後的 Loading 狀態
 - [ ] T087 實作錯誤訊息統一顯示 (Toast 或 Alert)
 - [ ] T088 [P] 程式碼格式化與 Linting 檢查
-- [ ] T089 [P] TypeScript 型別檢查 (pnpm type-check)
-- [ ] T090 執行 pnpm build 驗證編譯成功
-- [ ] T091 依照 quickstart.md 驗證開發環境設定流程
-- [ ] T092 建立 README.md (專案說明與啟動指令)
-- [ ] T093 [P] 截圖與示範資料準備 (用於展示)
+
+### 效能優化任務組 (Performance Optimization)
+
+- [ ] T089a [P] 使用 Lighthouse 測試首頁載入效能 (目標: Mobile 4G < 2s)
+- [ ] T089b [P] 優化登入 API 回應時間 (使用 Supabase 查詢優化,目標 < 500ms)
+- [ ] T089c [P] 優化客戶搜尋查詢 (使用 PostgreSQL EXPLAIN ANALYZE,目標 < 300ms)
+- [ ] T089d [P] 建立資料庫索引效能測試 (驗證查詢 p95 < 100ms)
+- [ ] T089e [P] 實作 Next.js Image Optimization (app/(shop)/store 圖片最佳化)
+- [ ] T089f [P] 實作 Dynamic Import / Lazy Loading (非關鍵 UI 元件延遲載入)
+- [ ] T089g [P] 啟用 Next.js App Router Streaming (使用 Suspense 改善 TTFB)
+
+### 最終驗證任務
+
+- [ ] T090 [P] TypeScript 型別檢查 (pnpm type-check)
+- [ ] T091 執行 pnpm build 驗證編譯成功
+- [ ] T092 依照 quickstart.md 驗證開發環境設定流程
+- [ ] T093 建立 README.md (專案說明與啟動指令)
+- [ ] T094 [P] 截圖與示範資料準備 (用於展示)
 
 **Checkpoint**: 功能完整,可進行 Demo 或部署
 
@@ -416,7 +429,7 @@ Task: "建立 TierForm 元件 (components/admin/tier-form.tsx)"
 
 ## Task Summary
 
-### Total Tasks: 93
+### Total Tasks: 99
 
 **Phase Breakdown**:
 - Phase 1 (Setup): 8 tasks
@@ -427,9 +440,10 @@ Task: "建立 TierForm 元件 (components/admin/tier-form.tsx)"
 - Phase 6 (US4): 9 tasks
 - Phase 7 (US5): 8 tasks
 - Phase 8 (Middleware): 6 tasks
-- Phase 9 (Polish): 11 tasks
+- Phase 9 (Polish): 17 tasks
+  - 效能優化子組: 7 tasks (T089a-g)
 
-**Parallelizable Tasks**: 45 tasks (標記 [P])
+**Parallelizable Tasks**: 51 tasks (標記 [P])
 
 **User Story Distribution**:
 - US1: 11 tasks (會員等級管理)
