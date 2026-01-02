@@ -13,37 +13,37 @@ import { deleteProduct, updateProductStock } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/admin/pagination'
-import type { Product, Category } from '@/types'
+import type { Product, Series } from '@/types'
 
 interface ProductTableProps {
   products: Product[]
-  categories: Category[]
+  series: Series[]  // 🔄 Feature 003: 改為系列列表
   total: number
   currentPage: number
   pageSize?: number
   searchQuery: string
-  selectedCategory: string
+  selectedSeries: string  // 🔄 Feature 003: 改為系列 ID
 }
 
 export function ProductTable({
   products,
-  categories,
+  series,
   total,
   currentPage,
   pageSize = 20,
   searchQuery,
-  selectedCategory,
+  selectedSeries,
 }: ProductTableProps) {
   const router = useRouter()
   const [search, setSearch] = useState(searchQuery)
-  const [categoryFilter, setCategoryFilter] = useState(selectedCategory)
+  const [seriesFilter, setSeriesFilter] = useState(selectedSeries)
   const [editingStockId, setEditingStockId] = useState<string | null>(null)
   const [stockValue, setStockValue] = useState<number>(0)
 
   const handleSearch = () => {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
-    if (categoryFilter) params.set('category', categoryFilter)
+    if (seriesFilter) params.set('series', seriesFilter)
     router.push(`/admin/products?${params.toString()}`)
   }
 
@@ -95,19 +95,19 @@ export function ProductTable({
 
         <select
           className="rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm"
-          value={categoryFilter}
+          value={seriesFilter}
           onChange={(e) => {
-            setCategoryFilter(e.target.value)
+            setSeriesFilter(e.target.value)
             const params = new URLSearchParams()
             if (search) params.set('search', search)
-            if (e.target.value) params.set('category', e.target.value)
+            if (e.target.value) params.set('series', e.target.value)
             router.push(`/admin/products?${params.toString()}`)
           }}
         >
-          <option value="">所有分類</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
+          <option value="">所有系列</option>
+          {series.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
             </option>
           ))}
         </select>
@@ -136,7 +136,7 @@ export function ProductTable({
             {products.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                  {searchQuery || selectedCategory
+                  {searchQuery || selectedSeries
                     ? '找不到符合條件的商品'
                     : '尚未建立任何商品'}
                 </td>
@@ -146,7 +146,7 @@ export function ProductTable({
                 <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
                   <td className="px-4 py-3 font-mono text-sm">{product.code}</td>
                   <td className="px-4 py-3 font-medium">{product.name}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{product.category_name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{product.series_name}</td>
                   <td className="px-4 py-3 text-right">
                     {editingStockId === product.id ? (
                       <div className="flex items-center justify-end gap-2">

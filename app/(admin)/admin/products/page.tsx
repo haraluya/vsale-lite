@@ -8,24 +8,26 @@ import { Button } from '@/components/ui/button'
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; category?: string; page?: string; limit?: string }>
+  searchParams: Promise<{ search?: string; series?: string; page?: string; limit?: string }>
 }) {
   const params = await searchParams
   const search = params.search || ''
-  const category_id = params.category || ''
+  const series_id = params.series || ''  // 🔄 Feature 003: 改為 series_id
   const page = parseInt(params.page || '1')
   const limit = parseInt(params.limit || '20')
 
-  // 取得商品列表與分類
+  // 取得商品列表與系列
   const { products, total } = await getProducts({
     search,
-    category_id,
+    series_id,  // 🔄 Feature 003: 改為 series_id
     status: 'all', // 管理員可看所有狀態
     page,
     limit,
   })
 
-  const categories = await getCategories()
+  const { getSeries } = await import('@/lib/actions/series')
+  const seriesResult = await getSeries()
+  const series = (seriesResult.success ? seriesResult.data : []) || []
 
   return (
     <div>
@@ -47,12 +49,12 @@ export default async function ProductsPage({
       {/* Products Table */}
       <ProductTable
         products={products}
-        categories={categories}
+        series={series}
         total={total}
         currentPage={page}
         pageSize={limit}
         searchQuery={search}
-        selectedCategory={category_id}
+        selectedSeries={series_id}
       />
     </div>
   )

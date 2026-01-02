@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getProduct } from '@/lib/actions/products'
-import { getCategories } from '@/lib/actions/categories'
+import { getSeries } from '@/lib/actions/series'
 import { ProductForm } from '@/components/admin/product-form'
 
 export default async function EditProductPage({
@@ -10,7 +10,9 @@ export default async function EditProductPage({
 }) {
   const { id } = await params
 
-  const [product, categories] = await Promise.all([getProduct(id), getCategories()])
+  const [product, seriesResult] = await Promise.all([getProduct(id), getSeries()])
+
+  const series = (seriesResult.success ? seriesResult.data : []) || []
 
   if (!product) {
     notFound()
@@ -25,7 +27,7 @@ export default async function EditProductPage({
         </p>
       </div>
 
-      <ProductForm product={product} categories={categories} mode="edit" />
+      <ProductForm product={product} series={series} mode="edit" />
     </div>
   )
 }

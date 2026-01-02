@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { createTierSchema, updateTierSchema } from '@/lib/validations/tier.schema'
 import type { ActionResult, Tier } from '@/types'
 import { checkAuth } from './helpers'
@@ -10,9 +10,10 @@ import { revalidatePath } from 'next/cache'
  * 查詢所有會員等級 (依 rank 排序)
  */
 export async function getTiers(): Promise<Tier[]> {
-  const supabase = await createClient()
+  // 使用 Admin Client 繞過 RLS
+  const adminClient = createAdminClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await adminClient
     .from('tiers')
     .select('*')
     .order('rank', { ascending: true })
@@ -50,9 +51,9 @@ export async function createTier(
       }
     }
 
-    // 3. 檢查名稱是否重複
-    const supabase = await createClient()
-    const { data: existingTier } = await supabase
+    // 3. 檢查名稱是否重複（使用 Admin Client）
+    const adminClient = createAdminClient()
+    const { data: existingTier } = await adminClient
       .from('tiers')
       .select('id')
       .eq('name', validatedFields.data.name)
@@ -66,7 +67,7 @@ export async function createTier(
     }
 
     // 4. 建立等級
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('tiers')
       .insert(validatedFields.data)
       .select('id')
@@ -123,10 +124,10 @@ export async function updateTier(
       }
     }
 
-    const supabase = await createClient()
+    const adminClient = createAdminClient()
 
     // 3. 檢查等級是否存在
-    const { data: existingTier } = await supabase
+    const { data: existingTier } = await adminClient
       .from('tiers')
       .select('id')
       .eq('id', id)
@@ -141,7 +142,7 @@ export async function updateTier(
 
     // 4. 若修改 name,檢查是否與其他等級重複
     if (validatedFields.data.name) {
-      const { data: duplicateTier } = await supabase
+      const { data: duplicateTier } = await adminClient
         .from('tiers')
         .select('id')
         .eq('name', validatedFields.data.name)
@@ -157,7 +158,7 @@ export async function updateTier(
     }
 
     // 5. 更新等級
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('tiers')
       .update(validatedFields.data)
       .eq('id', id)
@@ -195,10 +196,24 @@ export async function deleteTier(id: string): Promise<ActionResult> {
     // 1. 驗證權限
     await checkAuth('admin')
 
-    const supabase = await createClient()
+    const adminClient = createAdminClient()
 
-    // 2. 檢查是否有客戶使用此等級
-    const { count, error: countError } = await supabase
+    // 2. 檢查是否為受保護等級 (Feature 003 Enhancement)
+    const { data: tier } = await adminClient
+      .from('tiers')
+      .select('is_protected, name')
+      .eq('id', id)
+      .single()
+
+    if (tier?.is_protected) {
+      return {
+        success: false,
+        message: `「${tier.name}」是系統預設等級,不可刪除`,
+      }
+    }
+
+    // 3. 檢查是否有客戶使用此等級
+    const { count, error: countError } = await adminClient
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .eq('tier_id', id)
@@ -218,8 +233,8 @@ export async function deleteTier(id: string): Promise<ActionResult> {
       }
     }
 
-    // 3. 刪除等級
-    const { error } = await supabase.from('tiers').delete().eq('id', id)
+    // 4. 刪除等級
+    const { error } = await adminClient.from('tiers').delete().eq('id', id)
 
     if (error) {
       console.error('刪除等級失敗:', error)
@@ -229,7 +244,7 @@ export async function deleteTier(id: string): Promise<ActionResult> {
       }
     }
 
-    // 4. Revalidate
+    // 5. Revalidate
     revalidatePath('/admin/tiers')
 
     return {

@@ -2,10 +2,10 @@
 
 /**
  * Products Management Server Actions
- * Feature: 002-product-management
+ * Feature: 002-product-management & 003-series-and-pricing
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { checkAuth } from './helpers'
 import { createProductSchema, updateProductSchema } from '@/lib/validations/product.schema'
@@ -13,10 +13,11 @@ import type { ActionResult, Product } from '@/types'
 
 /**
  * 查詢商品列表 (含搜尋、篩選、分頁)
+ * Feature 003 修改: 改為 series_id 篩選 (取代 category_id)
  */
 export async function getProducts(params?: {
   search?: string
-  category_id?: string
+  series_id?: string  // 🔄 Feature 003: 改為系列篩選 (取代 category_id)
   status?: 'active' | 'inactive' | 'all'
   page?: number
   limit?: number
@@ -27,13 +28,14 @@ export async function getProducts(params?: {
   limit: number
 }> {
   try {
-    const { search = '', category_id, status = 'active', page = 1, limit = 20 } = params || {}
+    const { search = '', series_id, status = 'active', page = 1, limit = 20 } = params || {}
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-    let query = supabase
+    let query = adminClient
       .from('products')
-      .select('*, categories(name)', { count: 'exact' })
+      .select('*, series(name)', { count: 'exact' })  // 🔄 Feature 003: JOIN series 表 (取代 categories)
       .order('created_at', { ascending: false })
 
     // 搜尋條件 (商品編號或名稱)
@@ -41,9 +43,9 @@ export async function getProducts(params?: {
       query = query.or(`code.ilike.%${search}%,name.ilike.%${search}%`)
     }
 
-    // 分類篩選
-    if (category_id) {
-      query = query.eq('category_id', category_id)
+    // 系列篩選 (Feature 003)
+    if (series_id) {
+      query = query.eq('series_id', series_id)
     }
 
     // 狀態篩選
@@ -67,10 +69,12 @@ export async function getProducts(params?: {
       id: item.id,
       code: item.code,
       name: item.name,
-      category_id: item.category_id,
-      category_name: item.categories?.name,
+      series_id: item.series_id,  // 🔄 Feature 003: 改為 series_id
+      series_name: item.series?.name,  // 🔄 Feature 003: 改為 series_name
       description: item.description,
+      retail_price: item.retail_price,  // 🆕 Feature 003: 原價
       stock: item.stock,
+      stock_status: item.stock_status,  // 🆕 Feature 003: 庫存狀態
       unit: item.unit,
       image_url: item.image_url,
       status: item.status,
@@ -92,14 +96,16 @@ export async function getProducts(params?: {
 
 /**
  * 取得單一商品詳細資料
+ * Feature 003 修改: 改為 JOIN series 表 (取代 categories)
  */
 export async function getProduct(id: string): Promise<Product | null> {
   try {
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('products')
-      .select('*, categories(name)')
+      .select('*, series(name)')  // 🔄 Feature 003: JOIN series 表
       .eq('id', id)
       .single()
 
@@ -112,10 +118,12 @@ export async function getProduct(id: string): Promise<Product | null> {
       id: data.id,
       code: data.code,
       name: data.name,
-      category_id: data.category_id,
-      category_name: data.categories?.name,
+      series_id: data.series_id,  // 🔄 Feature 003: 改為 series_id
+      series_name: data.series?.name,  // 🔄 Feature 003: 改為 series_name
       description: data.description,
+      retail_price: data.retail_price,  // 🆕 Feature 003: 原價
       stock: data.stock,
+      stock_status: data.stock_status,  // 🆕 Feature 003: 庫存狀態
       unit: data.unit,
       image_url: data.image_url,
       status: data.status,
@@ -130,6 +138,7 @@ export async function getProduct(id: string): Promise<Product | null> {
 
 /**
  * 建立新商品
+ * Feature 003 修改: 改用 series_id, 移除 code 欄位 (自動產生), 新增 retail_price 與 stock_status
  */
 export async function createProduct(
   prevState: unknown,
@@ -141,13 +150,15 @@ export async function createProduct(
 
     // 2. 解析表單資料
     const rawData = {
-      code: formData.get('code'),
+      series_id: formData.get('series_id'),  // 🔄 Feature 003: 改為 series_id
       name: formData.get('name'),
-      category_id: formData.get('category_id'),
       description: formData.get('description') || '',
+      retail_price: formData.get('retail_price') || null,  // 🆕 Feature 003: 原價
       stock: formData.get('stock') || '0',
+      stock_status: formData.get('stock_status') || 'sufficient',  // 🆕 Feature 003: 庫存狀態
       unit: formData.get('unit') || '件',
       status: formData.get('status') || 'active',
+      // 🔄 Feature 003: code 欄位移除 (由 PostgreSQL Trigger 自動產生)
     }
 
     // 3. 驗證輸入
@@ -164,47 +175,36 @@ export async function createProduct(
 
     const data = validationResult.data
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-    // 4. 檢查商品編號是否重複
-    const { data: existingProduct } = await supabase
-      .from('products')
+    // 4. 驗證系列是否存在 (Feature 003)
+    const { data: series } = await adminClient
+      .from('series')
       .select('id')
-      .eq('code', data.code)
+      .eq('id', data.series_id)
       .single()
 
-    if (existingProduct) {
+    if (!series) {
       return {
         success: false,
-        message: '此商品編號已存在',
+        message: '選擇的系列不存在',
       }
     }
 
-    // 5. 驗證分類是否存在
-    const { data: category } = await supabase
-      .from('categories')
-      .select('id')
-      .eq('id', data.category_id)
-      .single()
-
-    if (!category) {
-      return {
-        success: false,
-        message: '選擇的分類不存在',
-      }
-    }
-
-    // 6. 寫入資料庫
-    const { data: newProduct, error } = await supabase
+    // 5. 寫入資料庫 (商品編號由 Trigger 自動產生)
+    const { data: newProduct, error } = await adminClient
       .from('products')
       .insert({
-        code: data.code,
+        series_id: data.series_id,  // 🔄 Feature 003: 改為 series_id
         name: data.name,
-        category_id: data.category_id,
         description: data.description || null,
+        retail_price: data.retail_price,  // 🆕 Feature 003: 原價
         stock: data.stock,
+        stock_status: data.stock_status,  // 🆕 Feature 003: 庫存狀態
         unit: data.unit,
         status: data.status,
+        // code 欄位由 PostgreSQL Trigger 自動產生
       })
       .select('id')
       .single()
@@ -217,8 +217,33 @@ export async function createProduct(
       }
     }
 
+    // 6. 自動建立零售價格記錄 (Feature 003 Enhancement)
+    try {
+      // 查詢零售等級 ID (is_protected = true)
+      const { data: retailTier } = await adminClient
+        .from('tiers')
+        .select('id')
+        .eq('is_protected', true)
+        .single()
+
+      if (retailTier) {
+        // 建立零售價格記錄
+        await adminClient
+          .from('tier_prices')
+          .insert({
+            product_id: newProduct.id,
+            tier_id: retailTier.id,
+            price: data.retail_price,
+          })
+      }
+    } catch (tierPriceError) {
+      console.warn('建立零售價格記錄失敗 (非致命錯誤):', tierPriceError)
+      // 不中斷商品建立流程
+    }
+
     // 7. 重新驗證快取
     revalidatePath('/admin/products')
+    revalidatePath('/store')
 
     return {
       success: true,
@@ -242,6 +267,7 @@ export async function createProduct(
 
 /**
  * 更新商品資料
+ * Feature 003 修改: 改用 series_id, 新增 retail_price 與 stock_status
  */
 export async function updateProduct(
   id: string,
@@ -254,10 +280,12 @@ export async function updateProduct(
 
     // 2. 解析表單資料 (注意: code 不可修改)
     const rawData = {
+      series_id: formData.get('series_id'),  // 🔄 Feature 003: 改為 series_id
       name: formData.get('name'),
-      category_id: formData.get('category_id'),
       description: formData.get('description') || '',
+      retail_price: formData.get('retail_price') || null,  // 🆕 Feature 003: 原價
       stock: formData.get('stock'),
+      stock_status: formData.get('stock_status'),  // 🆕 Feature 003: 庫存狀態
       unit: formData.get('unit'),
       status: formData.get('status'),
     }
@@ -276,10 +304,11 @@ export async function updateProduct(
 
     const data = validationResult.data
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 4. 檢查商品是否存在
-    const { data: existingProduct } = await supabase
+    const { data: existingProduct } = await adminClient
       .from('products')
       .select('id')
       .eq('id', id)
@@ -292,24 +321,24 @@ export async function updateProduct(
       }
     }
 
-    // 5. 若修改分類,驗證新分類是否存在
-    if (data.category_id) {
-      const { data: category } = await supabase
-        .from('categories')
+    // 5. 若修改系列,驗證新系列是否存在 (Feature 003)
+    if (data.series_id) {
+      const { data: series } = await adminClient
+        .from('series')
         .select('id')
-        .eq('id', data.category_id)
+        .eq('id', data.series_id)
         .single()
 
-      if (!category) {
+      if (!series) {
         return {
           success: false,
-          message: '選擇的分類不存在',
+          message: '選擇的系列不存在',
         }
       }
     }
 
     // 6. 更新資料庫
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('products')
       .update(data)
       .eq('id', id)
@@ -353,10 +382,11 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     // 1. 驗證權限
     await checkAuth('admin')
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 2. 檢查是否已有訂單記錄 (未來實作訂單功能時)
-    // const { count } = await supabase
+    // const { count } = await adminClient
     //   .from('order_items')
     //   .select('*', { count: 'exact', head: true })
     //   .eq('product_id', id)
@@ -366,7 +396,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
 
     if (count && count > 0) {
       // 軟刪除 (改為 inactive)
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('products')
         .update({ status: 'inactive' })
         .eq('id', id)
@@ -388,7 +418,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     } else {
       // 硬刪除
       // 1. 刪除圖片 (所有可能的副檔名)
-      await supabase.storage.from('products').remove([
+      await adminClient.storage.from('products').remove([
         `${id}/main.jpg`,
         `${id}/main.png`,
         `${id}/main.webp`,
@@ -396,7 +426,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
       // 註: 不檢查錯誤,因為圖片可能不存在
 
       // 2. 刪除商品記錄
-      const { error } = await supabase.from('products').delete().eq('id', id)
+      const { error } = await adminClient.from('products').delete().eq('id', id)
 
       if (error) {
         console.error('deleteProduct (hard) error:', error)
@@ -448,10 +478,11 @@ export async function updateProductStock(
       }
     }
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 3. 檢查商品是否存在
-    const { data: existingProduct } = await supabase
+    const { data: existingProduct } = await adminClient
       .from('products')
       .select('id')
       .eq('id', id)
@@ -465,7 +496,7 @@ export async function updateProductStock(
     }
 
     // 4. 更新庫存
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('products')
       .update({ stock })
       .eq('id', id)
@@ -530,10 +561,11 @@ export async function uploadProductImage(
       }
     }
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 4. 檢查商品是否存在
-    const { data: product } = await supabase
+    const { data: product } = await adminClient
       .from('products')
       .select('id')
       .eq('id', productId)
@@ -550,7 +582,7 @@ export async function uploadProductImage(
     const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `${productId}/main.${ext}`
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await adminClient.storage
       .from('products')
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -566,10 +598,10 @@ export async function uploadProductImage(
     }
 
     // 6. 取得公開 URL
-    const { data: urlData } = supabase.storage.from('products').getPublicUrl(filePath)
+    const { data: urlData } = adminClient.storage.from('products').getPublicUrl(filePath)
 
     // 7. 更新商品的 image_url
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from('products')
       .update({ image_url: urlData.publicUrl })
       .eq('id', productId)
@@ -615,10 +647,11 @@ export async function deleteProductImage(productId: string): Promise<ActionResul
     // 1. 驗證權限
     await checkAuth('admin')
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 2. 檢查商品是否存在
-    const { data: product } = await supabase
+    const { data: product } = await adminClient
       .from('products')
       .select('id, image_url')
       .eq('id', productId)
@@ -633,14 +666,14 @@ export async function deleteProductImage(productId: string): Promise<ActionResul
 
     // 3. 刪除 Storage 圖片 (所有可能的副檔名)
     // 註: 不檢查錯誤,因為圖片可能不存在
-    await supabase.storage.from('products').remove([
+    await adminClient.storage.from('products').remove([
       `${productId}/main.jpg`,
       `${productId}/main.png`,
       `${productId}/main.webp`,
     ])
 
     // 4. 更新商品的 image_url 為 NULL
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from('products')
       .update({ image_url: null })
       .eq('id', productId)

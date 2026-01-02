@@ -1,8 +1,9 @@
-import { getCategories } from '@/lib/actions/categories'
+import { getSeries } from '@/lib/actions/series'
 import { ProductForm } from '@/components/admin/product-form'
 
 export default async function NewProductPage() {
-  const categories = await getCategories()
+  const seriesResult = await getSeries()
+  const series = (seriesResult.success ? seriesResult.data : []) || []
 
   return (
     <div>
@@ -11,7 +12,7 @@ export default async function NewProductPage() {
         <p className="mt-2 text-gray-600">建立新的商品資料</p>
       </div>
 
-      <ProductForm categories={categories} mode="create" />
+      <ProductForm series={series} mode="create" />
     </div>
   )
 }

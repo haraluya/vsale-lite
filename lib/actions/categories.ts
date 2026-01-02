@@ -5,7 +5,7 @@
  * Feature: 002-product-management
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { checkAuth } from './helpers'
 import { createCategorySchema, updateCategorySchema } from '@/lib/validations/category.schema'
@@ -16,9 +16,10 @@ import type { ActionResult, Category } from '@/types'
  */
 export async function getCategories(): Promise<Category[]> {
   try {
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('categories')
       .select('*')
       .order('sort_order', { ascending: true })
@@ -49,6 +50,7 @@ export async function createCategory(
     // 2. 解析表單資料
     const rawData = {
       name: formData.get('name'),
+      code: formData.get('code'),
       description: formData.get('description') || '',
       sort_order: formData.get('sort_order') || '0',
     }
@@ -67,10 +69,10 @@ export async function createCategory(
 
     const data = validationResult.data
 
-    // 4. 檢查分類名稱是否重複
-    const supabase = await createClient()
+    // 4. 檢查分類名稱與代碼是否重複（使用 Admin Client）
+    const adminClient = createAdminClient()
 
-    const { data: existingCategory } = await supabase
+    const { data: existingCategory } = await adminClient
       .from('categories')
       .select('id')
       .eq('name', data.name)
@@ -83,11 +85,25 @@ export async function createCategory(
       }
     }
 
+    const { data: existingCode } = await adminClient
+      .from('categories')
+      .select('id')
+      .eq('code', data.code)
+      .single()
+
+    if (existingCode) {
+      return {
+        success: false,
+        message: '此分類代碼已存在',
+      }
+    }
+
     // 5. 寫入資料庫
-    const { data: newCategory, error } = await supabase
+    const { data: newCategory, error } = await adminClient
       .from('categories')
       .insert({
         name: data.name,
+        code: data.code,
         description: data.description || null,
         sort_order: data.sort_order,
       })
@@ -140,6 +156,7 @@ export async function updateCategory(
     // 2. 解析表單資料
     const rawData = {
       name: formData.get('name'),
+      code: formData.get('code'),
       description: formData.get('description') || '',
       sort_order: formData.get('sort_order'),
     }
@@ -158,10 +175,10 @@ export async function updateCategory(
 
     const data = validationResult.data
 
-    // 4. 檢查分類是否存在
-    const supabase = await createClient()
+    // 4. 檢查分類是否存在（使用 Admin Client）
+    const adminClient = createAdminClient()
 
-    const { data: existingCategory } = await supabase
+    const { data: existingCategory } = await adminClient
       .from('categories')
       .select('id')
       .eq('id', id)
@@ -176,7 +193,7 @@ export async function updateCategory(
 
     // 5. 若修改 name,檢查是否與其他分類重複
     if (data.name) {
-      const { data: duplicateCategory } = await supabase
+      const { data: duplicateCategory } = await adminClient
         .from('categories')
         .select('id')
         .eq('name', data.name)
@@ -191,8 +208,25 @@ export async function updateCategory(
       }
     }
 
+    // 5.5 若修改 code,檢查是否與其他分類重複
+    if (data.code) {
+      const { data: duplicateCode } = await adminClient
+        .from('categories')
+        .select('id')
+        .eq('code', data.code)
+        .neq('id', id)
+        .single()
+
+      if (duplicateCode) {
+        return {
+          success: false,
+          message: '此分類代碼已存在',
+        }
+      }
+    }
+
     // 6. 更新資料庫
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('categories')
       .update(data)
       .eq('id', id)
@@ -235,23 +269,23 @@ export async function deleteCategory(id: string): Promise<ActionResult> {
     // 1. 驗證權限
     await checkAuth('admin')
 
-    const supabase = await createClient()
+    const adminClient = createAdminClient()
 
-    // 2. 檢查是否有商品使用此分類
-    const { count } = await supabase
-      .from('products')
+    // 2. 檢查是否有系列使用此分類 (Feature 003: 商品改為關聯系列)
+    const { count } = await adminClient
+      .from('series')
       .select('*', { count: 'exact', head: true })
       .eq('category_id', id)
 
     if (count && count > 0) {
       return {
         success: false,
-        message: `此分類已有 ${count} 個商品使用,請先將商品遷移至其他分類後再刪除`,
+        message: `此分類已有 ${count} 個系列使用,請先將系列遷移至其他分類後再刪除`,
       }
     }
 
     // 3. 執行硬刪除
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('categories')
       .delete()
       .eq('id', id)
@@ -305,12 +339,12 @@ export async function migrateCategoryProducts(
       }
     }
 
-    const supabase = await createClient()
+    const adminClient = createAdminClient()
 
     // 3. 驗證來源分類與目標分類是否存在
     const [fromCategory, toCategory] = await Promise.all([
-      supabase.from('categories').select('id, name').eq('id', fromCategoryId).single(),
-      supabase.from('categories').select('id, name').eq('id', toCategoryId).single(),
+      adminClient.from('categories').select('id, name').eq('id', fromCategoryId).single(),
+      adminClient.from('categories').select('id, name').eq('id', toCategoryId).single(),
     ])
 
     if (!fromCategory.data) {
@@ -328,7 +362,7 @@ export async function migrateCategoryProducts(
     }
 
     // 4. 批量更新商品分類
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('products')
       .update({ category_id: toCategoryId })
       .eq('category_id', fromCategoryId)

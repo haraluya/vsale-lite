@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import type { AuthContext } from '@/types'
 
 /**
@@ -24,8 +24,9 @@ export async function checkAuth(requiredRole?: 'admin' | 'client'): Promise<Auth
     throw new Error('未登入,請先登入')
   }
 
-  // 查詢 profiles 取得角色資訊
-  const { data: profile, error: profileError } = await supabase
+  // 查詢 profiles 取得角色資訊（使用 Admin Client 繞過 RLS）
+  const adminClient = createAdminClient()
+  const { data: profile, error: profileError } = await adminClient
     .from('profiles')
     .select('role, tier_id')
     .eq('id', user.id)
