@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import { createSeries, updateSeries, uploadSeriesImage } from '@/lib/actions/series'
 import type { Series, Category } from '@/types'
 import { Button } from '@/components/ui/button'
-import { Upload } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 
 interface SeriesFormProps {
   series?: Series
@@ -51,6 +51,16 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
       setImageFile(file)
       setImagePreview(URL.createObjectURL(file))
       setError(null)
+    }
+  }
+
+  const handleRemoveImage = () => {
+    setImageFile(null)
+    setImagePreview(null)
+    // 清空 file input
+    const fileInput = document.getElementById('image') as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = ''
     }
   }
 
@@ -211,12 +221,20 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
         <div className="space-y-4">
           {/* 圖片預覽 */}
           {imagePreview && (
-            <div className="rounded-none border-2 border-black p-4">
+            <div className="relative rounded-none border-2 border-black p-4">
               <img
                 src={imagePreview}
                 alt="系列圖片預覽"
                 className="h-64 w-full object-contain"
               />
+              <button
+                type="button"
+                onClick={handleRemoveImage}
+                className="absolute right-2 top-2 rounded-none border-2 border-black bg-red-500 p-2 font-bold text-white shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                title="移除圖片"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
           )}
 
@@ -227,7 +245,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               className="inline-flex cursor-pointer items-center gap-2 rounded-none border-2 border-black bg-yellow-300 px-4 py-2 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
             >
               <Upload className="h-5 w-5" />
-              選擇圖片
+              {imagePreview ? '更換圖片' : '選擇圖片'}
             </label>
             <input
               type="file"
