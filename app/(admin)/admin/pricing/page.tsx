@@ -10,6 +10,7 @@
 import { getProducts } from '@/lib/actions/products'
 import { getAllTiersWithPrices } from '@/lib/actions/tier-prices'
 import { TierPriceTable } from '@/components/admin/tier-price-table'
+import { ProductSelector } from '@/components/admin/product-selector'
 import { Suspense } from 'react'
 
 interface PricingPageProps {
@@ -48,29 +49,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
       </div>
 
       {/* 商品選擇 */}
-      <div className="mb-6 rounded-none border-3 border-black bg-white p-6 shadow-neo">
-        <h2 className="mb-4 text-xl font-bold">選擇商品</h2>
-
-        <form method="GET" className="flex gap-4">
-          <select
-            name="product_id"
-            defaultValue={productId || ''}
-            onChange={(e) => {
-              if (e.target.value) {
-                window.location.href = `/admin/pricing?product_id=${e.target.value}`
-              }
-            }}
-            className="flex-1 rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">請選擇商品...</option>
-            {products.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.code} - {product.name} {product.series_name && `(${product.series_name})`}
-              </option>
-            ))}
-          </select>
-        </form>
-      </div>
+      <ProductSelector products={products} selectedProductId={productId} />
 
       {/* 等級價格設定表格 */}
       {selectedProduct && tiersWithPrices.length > 0 ? (
