@@ -32,11 +32,22 @@ export async function middleware(request: NextRequest) {
   // 更新 session (重要:確保 cookie 正確設置)
   let user = null
   try {
-    const { data } = await supabase.auth.getUser()
-    user = data.user
+    const { data, error } = await supabase.auth.getUser()
+    if (error) {
+      // Token 過期或無效,清除 session
+      console.warn('[Middleware] Auth token error:', error.message)
+      user = null
+    } else {
+      user = data.user
+    }
   } catch (error) {
     // 網路錯誤時,允許請求繼續但不進行認證檢查
-    console.error('[Middleware] Auth error:', error)
+    if (error instanceof Error && error.message.includes('fetch failed')) {
+      console.warn('[Middleware] Network error, skipping auth check')
+    } else {
+      console.error('[Middleware] Unexpected auth error:', error)
+    }
+
     // 如果是網路錯誤且不是受保護路由,放行
     const pathname = request.nextUrl.pathname
     const publicPaths = ['/', '/login', '/admin/login']
