@@ -120,11 +120,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   <p className="font-mono text-lg">{product.code}</p>
                 </div>
 
-                {/* 分類 */}
-                {product.category_name && (
+                {/* 系列 */}
+                {product.series_name && (
                   <div className="rounded-none border-2 border-black bg-gray-50 p-3">
-                    <p className="text-sm font-bold text-gray-600">商品分類</p>
-                    <p className="text-lg">{product.category_name}</p>
+                    <p className="text-sm font-bold text-gray-600">商品系列</p>
+                    <p className="text-lg">{product.series_name}</p>
                   </div>
                 )}
 

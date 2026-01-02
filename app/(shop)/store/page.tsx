@@ -1,29 +1,19 @@
 /**
- * Store Page (前台商品列表頁)
- * Feature: 002-product-management (US6 - 前台客戶瀏覽商品列表)
+ * Store Page (前台商品系列列表頁)
+ * Feature: 003-series-and-pricing (US1 - 客戶瀏覽系列)
  *
- * 客戶端商品列表頁面
- * - 顯示所有啟用的商品
- * - 支援分類篩選
- * - 不顯示價格 (FR-024)
- * - 顯示庫存狀態 (包含負庫存)
+ * 客戶端系列列表頁面
+ * - 顯示所有啟用的系列
+ * - 點擊系列進入商品列表
+ * - Neo-Brutalism 設計風格
  */
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { getProducts } from '@/lib/actions/products'
-import { getCategories } from '@/lib/actions/categories'
-import { ProductList } from '@/components/shop/product-list'
-import { CategoryFilter } from '@/components/shop/category-filter'
-import { Suspense } from 'react'
+import { getActiveSeries } from '@/lib/actions/shop'
+import { SeriesCard } from '@/components/shop/series-card'
 
-interface StorePageProps {
-  searchParams: Promise<{
-    category?: string
-  }>
-}
-
-export default async function StorePage({ searchParams }: StorePageProps) {
+export default async function StorePage() {
   const supabase = await createClient()
 
   const {
@@ -41,26 +31,16 @@ export default async function StorePage({ searchParams }: StorePageProps) {
     .eq('id', user.id)
     .single()
 
-  // 解析 searchParams
-  const params = await searchParams
-  const categoryId = params.category
-
-  // 查詢商品列表 (僅顯示啟用的商品)
-  const { products } = await getProducts({
-    category_id: categoryId,
-    status: 'active',
-    limit: 100, // 前台一次顯示更多商品
-  })
-
-  // 查詢所有分類
-  const categories = await getCategories()
+  // 查詢所有啟用的系列 (Feature 003)
+  const seriesResult = await getActiveSeries()
+  const series = seriesResult.success ? seriesResult.data : []
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 rounded-none border-3 border-black bg-white p-6 shadow-neo">
-          <h1 className="mb-2 text-3xl font-bold">商品列表</h1>
+          <h1 className="mb-2 text-3xl font-bold">商品系列</h1>
           <p className="text-gray-600">
             {profile?.display_name || profile?.phone} 您好!
           </p>
@@ -71,15 +51,18 @@ export default async function StorePage({ searchParams }: StorePageProps) {
           )}
         </div>
 
-        {/* Category Filter */}
-        <Suspense fallback={<div>載入中...</div>}>
-          <div className="mb-6">
-            <CategoryFilter categories={categories} />
+        {/* Series Grid */}
+        {!series || series.length === 0 ? (
+          <div className="rounded-none border-3 border-black bg-white p-12 text-center shadow-neo">
+            <p className="text-lg text-gray-500">目前沒有可用的商品系列</p>
           </div>
-        </Suspense>
-
-        {/* Product List */}
-        <ProductList products={products} />
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {series?.map((s) => (
+              <SeriesCard key={s.id} series={s} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

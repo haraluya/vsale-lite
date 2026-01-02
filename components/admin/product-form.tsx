@@ -14,15 +14,15 @@ import { Input } from '@/components/ui/input'
 import { ErrorInline } from '@/components/ui/error-inline'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { Loading } from '@/components/ui/loading'
-import type { Product, Category } from '@/types'
+import type { Product, Series } from '@/types'
 
 interface ProductFormProps {
   product?: Product
-  categories: Category[]
+  series: Series[]  // 🔄 Feature 003: 改為系列列表 (取代 categories)
   mode: 'create' | 'edit'
 }
 
-export function ProductForm({ product, categories, mode }: ProductFormProps) {
+export function ProductForm({ product, series, mode }: ProductFormProps) {
   const router = useRouter()
 
   const action = mode === 'create'
@@ -73,25 +73,25 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
           <ErrorInline message={state?.errors?.name?.[0]} />
         </div>
 
-        {/* 商品分類 */}
+        {/* 商品系列 */}
         <div>
-          <label htmlFor="category_id" className="mb-2 block font-bold">
-            商品分類 <span className="text-red-600">*</span>
+          <label htmlFor="series_id" className="mb-2 block font-bold">
+            商品系列 <span className="text-red-600">*</span>
           </label>
           <select
-            id="category_id"
-            name="category_id"
-            defaultValue={product?.category_id}
+            id="series_id"
+            name="series_id"
+            defaultValue={product?.series_id}
             className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
-            <option value="">請選擇分類</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
+            <option value="">請選擇系列</option>
+            {series.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
               </option>
             ))}
           </select>
-          <ErrorInline message={state?.errors?.category_id?.[0]} />
+          <ErrorInline message={state?.errors?.series_id?.[0]} />
         </div>
 
         {/* 商品描述 */}

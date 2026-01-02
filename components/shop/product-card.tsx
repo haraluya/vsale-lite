@@ -82,10 +82,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
         <p className="text-sm text-gray-600">編號: {product.code}</p>
 
-        {/* 分類標籤 */}
-        {product.category_name && (
+        {/* 系列標籤 */}
+        {product.series_name && (
           <div className="inline-block rounded-none border-2 border-black bg-yellow-100 px-2 py-1 text-xs font-bold">
-            {product.category_name}
+            {product.series_name}
           </div>
         )}
 

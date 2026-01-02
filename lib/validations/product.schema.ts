@@ -1,64 +1,75 @@
 /**
  * Product Validation Schemas
- * Feature: 002-product-management
+ * Feature: 002-product-management & 003-series-and-pricing
  */
 
 import { z } from 'zod'
 
 /**
  * 商品編號格式驗證
- * - 僅允許英數字、連字號、底線
- * - 範例: A001, DRINK-001, SKU_12345
+ * - Feature 003: 改為自動產生,格式為 {分類代碼}-{流水號} (如 DRK-0001)
+ * - 範例: DRK-0001, SNK-0042
  */
-const productCodeRegex = /^[A-Za-z0-9-_]+$/
+const productCodeRegex = /^[A-Z]{3,10}-\d{4}$/
 
 /**
  * 建立商品驗證 Schema
+ * Feature 003 修改: 改用 series_id, 新增 retail_price 與 stock_status
  */
 export const createProductSchema = z.object({
-  code: z.string()
-    .min(1, '商品編號不可為空')
-    .max(50, '商品編號最多 50 字元')
-    .regex(productCodeRegex, '商品編號僅可包含英數字、連字號、底線'),
+  series_id: z.string()
+    .uuid('請選擇系列'),  // 🔄 Feature 003: 改為系列 ID (取代 category_id)
   name: z.string()
     .min(1, '商品名稱不可為空')
     .max(200, '商品名稱最多 200 字元'),
-  category_id: z.string()
-    .uuid('請選擇商品分類'),
   description: z.string()
     .max(1000, '描述最多 1000 字')
     .optional()
     .or(z.literal('')),
+  retail_price: z.coerce.number()
+    .min(0, '原價不可為負數')
+    .nullable()
+    .optional(),  // 🆕 Feature 003: 原價/建議售價
   stock: z.coerce.number()
     .int('庫存必須為整數')
-    .default(0),
+    .default(0),  // 支援負庫存 (憲章 VI)
+  stock_status: z.enum(['sufficient', 'low', 'out_of_stock'])
+    .default('sufficient'),  // 🆕 Feature 003: 庫存狀態
   unit: z.string()
     .min(1, '單位不可為空')
     .max(20, '單位最多 20 字元')
     .default('件'),
   status: z.enum(['active', 'inactive'])
     .default('active'),
+  // 🔄 Feature 003: code 欄位移除,改為自動產生
 })
 
 /**
  * 更新商品驗證 Schema
  * 注意: code 欄位不可修改 (建立後不可變更)
+ * Feature 003 修改: 改用 series_id, 新增 retail_price 與 stock_status
  */
 export const updateProductSchema = z.object({
+  series_id: z.string()
+    .uuid('請選擇系列')
+    .optional(),  // 🔄 Feature 003: 改為系列 ID (取代 category_id)
   name: z.string()
     .min(1, '商品名稱不可為空')
     .max(200, '商品名稱最多 200 字元')
-    .optional(),
-  category_id: z.string()
-    .uuid('請選擇商品分類')
     .optional(),
   description: z.string()
     .max(1000, '描述最多 1000 字')
     .optional()
     .or(z.literal('')),
+  retail_price: z.coerce.number()
+    .min(0, '原價不可為負數')
+    .nullable()
+    .optional(),  // 🆕 Feature 003: 原價/建議售價
   stock: z.coerce.number()
     .int('庫存必須為整數')
-    .optional(),
+    .optional(),  // 支援負庫存 (憲章 VI)
+  stock_status: z.enum(['sufficient', 'low', 'out_of_stock'])
+    .optional(),  // 🆕 Feature 003: 庫存狀態
   unit: z.string()
     .min(1, '單位不可為空')
     .max(20, '單位最多 20 字元')
