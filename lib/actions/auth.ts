@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { loginWithPhoneSchema, loginWithEmailSchema } from '@/lib/validations/auth.schema'
 import { withRetry } from '@/lib/supabase/retry'
 import type { ActionResult } from '@/types'
@@ -48,8 +48,9 @@ export async function loginWithEmail(
       }
     }
 
-    // 3. 查詢 profiles 驗證角色
-    const { data: profile, error: profileError } = await supabase
+    // 3. 查詢 profiles 驗證角色（使用 Admin Client 繞過 RLS）
+    const adminClient = createAdminClient()
+    const { data: profile, error: profileError } = await adminClient
       .from('profiles')
       .select('role')
       .eq('id', authData.user.id)
