@@ -130,6 +130,21 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
         <h2 className="mb-4 text-xl font-bold">基本資訊</h2>
 
         <div className="space-y-4">
+          {/* 系列名稱 */}
+          <div>
+            <label htmlFor="name" className="mb-2 block font-bold">
+              系列名稱 <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              defaultValue={series?.name}
+              required
+              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
           {/* 系列代碼 */}
           <div>
             <label htmlFor="code" className="mb-2 block font-bold">
@@ -149,21 +164,6 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
             <p className="mt-1 text-sm text-gray-500">
               3-10 個大寫英文字母,用於組成商品編號 (如: DRK-TEA-01)
             </p>
-          </div>
-
-          {/* 系列名稱 */}
-          <div>
-            <label htmlFor="name" className="mb-2 block font-bold">
-              系列名稱 <span className="text-red-600">*</span>
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              defaultValue={series?.name}
-              required
-              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
           </div>
 
           {/* 分類選擇 */}

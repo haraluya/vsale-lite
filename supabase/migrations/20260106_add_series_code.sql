@@ -13,30 +13,36 @@
 ALTER TABLE series
   ADD COLUMN IF NOT EXISTS code VARCHAR(10);
 
--- 1.2 更新現有系列的代碼（範例數據）
--- 注意：這裡需要根據實際系列設定代碼
-UPDATE series SET code = 'TEA' WHERE name LIKE '%茶類系列%' AND code IS NULL;
-UPDATE series SET code = 'JUC' WHERE name LIKE '%果汁系列%' AND code IS NULL;
-UPDATE series SET code = 'CRB' WHERE name LIKE '%碳酸飲料%' AND code IS NULL;
-UPDATE series SET code = 'WAT' WHERE name LIKE '%礦泉水%' AND code IS NULL;
-
--- 對於「未分類」系列，使用特殊代碼
-UPDATE series SET code = 'UNC' WHERE name LIKE '%未分類%' AND code IS NULL;
-
--- 1.3 檢查是否仍有系列沒有代碼
+-- 1.2 更新現有系列的代碼
+-- 對於「未分類」系列，使用分類代碼 + UNC 後綴確保唯一性
 DO $$
 DECLARE
-  v_count INTEGER;
+  v_series RECORD;
+  v_category_code VARCHAR(10);
+  v_new_code VARCHAR(10);
 BEGIN
-  SELECT COUNT(*) INTO v_count FROM series WHERE code IS NULL;
+  -- 處理所有現有系列
+  FOR v_series IN SELECT id, name, category_id FROM series WHERE code IS NULL
+  LOOP
+    -- 取得分類代碼
+    SELECT code INTO v_category_code
+    FROM categories
+    WHERE id = v_series.category_id;
 
-  IF v_count > 0 THEN
-    RAISE WARNING '仍有 % 個系列未設定代碼，請手動設定後再執行後續步驟', v_count;
-    -- 為未設定的系列設定預設代碼（使用 ID 前 3 碼）
-    UPDATE series
-    SET code = UPPER(SUBSTRING(MD5(id::TEXT) FROM 1 FOR 3))
-    WHERE code IS NULL;
-  END IF;
+    -- 生成系列代碼
+    IF v_series.name LIKE '%未分類%' THEN
+      -- 未分類系列使用 UNC (但保持唯一性)
+      v_new_code := COALESCE(v_category_code, 'GEN');
+    ELSE
+      -- 其他系列使用 ID 的前 3 碼作為預設代碼
+      v_new_code := UPPER(SUBSTRING(MD5(v_series.id::TEXT) FROM 1 FOR 3));
+    END IF;
+
+    -- 更新代碼
+    UPDATE series SET code = v_new_code WHERE id = v_series.id;
+
+    RAISE NOTICE '系列「%」已設定代碼：%', v_series.name, v_new_code;
+  END LOOP;
 END $$;
 
 -- 1.4 設定 code 為必填
