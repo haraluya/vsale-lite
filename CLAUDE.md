@@ -190,6 +190,200 @@ vsale/
 
 ---
 
-**最後更新**: 2026-01-01
+---
+
+## 常用開發指令
+
+### 開發與建置
+```bash
+pnpm dev              # 啟動開發伺服器 (http://localhost:3000)
+pnpm build            # 建置生產環境
+pnpm start            # 啟動生產伺服器
+pnpm type-check       # TypeScript 型別檢查 (建置前必須執行)
+pnpm lint             # ESLint 檢查
+```
+
+### 測試
+```bash
+pnpm test             # 執行所有測試 (Vitest)
+pnpm test:ui          # 啟動 Vitest UI 介面
+```
+
+### Supabase Migration
+```bash
+# 在 Supabase SQL Editor 中執行 Migration 檔案
+# 檔案位置: supabase/migrations/*.sql
+# 執行順序: 依檔案名稱時間戳排序 (20260101, 20260102...)
+```
+
+---
+
+## 架構設計要點
+
+### Server Actions 模式
+所有資料操作必須透過 Server Actions，不直接在 Client Component 呼叫 Supabase：
+
+```typescript
+// ✅ 正確：在 Server Action 中操作資料庫
+// lib/actions/products.ts
+export async function getProducts() {
+  const supabase = await createClient() // Server Client
+  const { data } = await supabase.from('products').select()
+  return data
+}
+
+// ❌ 錯誤：在 Client Component 直接呼叫
+'use client'
+const supabase = createClient() // 不應該在客戶端直接操作
+```
+
+**Server Actions 必備步驟**:
+1. 使用 `'use server'` 標記
+2. 呼叫 `checkAuth()` 進行權限驗證（lib/actions/helpers.ts）
+3. 使用 Zod Schema 驗證輸入（lib/validations/）
+4. 回傳 `ActionResult<T>` 型別
+5. 成功後執行 `revalidatePath()` 更新快取
+
+### Supabase Client 使用規則
+- **Server Component / Server Action**: 使用 `createClient()` from `lib/supabase/server.ts`
+- **Client Component**: 使用 `createClient()` from `lib/supabase/client.ts`（僅用於認證，不直接操作資料）
+- **Middleware**: 使用 `createServerClient()` from `@supabase/ssr`
+
+### 路由保護機制
+Middleware (middleware.ts) 自動檢查：
+- `/admin/*` 路由：必須是 `role = 'admin'`
+- `/store/*` 路由：必須已登入（任何角色）
+- 管理員可訪問所有路由（「上帝視角」）
+- 未登入自動導向對應的登入頁
+
+### 認證流程
+**前台登入** (`/login`):
+- 使用手機號碼 + 密碼
+- Server Action: `loginWithPhone(phone, password)`
+- 成功後導向 `/store`
+
+**後台登入** (`/admin/login`):
+- 使用 Email + 密碼
+- Server Action: `loginWithEmail(email, password)`
+- 成功後導向 `/admin/dashboard`
+
+### 資料庫關聯規則
+- **刪除保護**: 使用 `ON DELETE RESTRICT`（如 categories → products）
+- **級聯刪除**: 使用 `ON DELETE CASCADE`（如 tiers → tier_prices）
+- **軟刪除**: 使用 `status` 欄位（active/inactive），不實際刪除記錄
+
+### 圖片上傳流程
+1. 使用 `uploadProductImage(product_id, file)` Server Action
+2. 檔案驗證：格式（JPG/PNG/WebP）、大小（5MB）
+3. 上傳至 Supabase Storage: `products/{product_id}/main.{ext}`
+4. 覆寫模式（`upsert: true`）
+5. 更新 `products.image_url` 欄位
+
+### RLS (Row Level Security) 策略
+所有資料表都啟用 RLS，策略如下：
+- **客戶**: 僅能讀取 `status = 'active'` 的資料
+- **管理員**: 可讀取所有資料、可執行所有操作
+- **價格表**: 所有已認證用戶可讀，Server Action 負責過濾等級
+
+---
+
+## 型別定義規範
+
+### ActionResult 回傳格式
+```typescript
+// 成功
+{ success: true, data?: T, message?: string }
+
+// 失敗
+{ success: false, errors?: Record<string, string[]>, message: string }
+```
+
+### 資料庫實體型別
+所有資料表型別定義於 `types/index.ts`：
+- `Tier`: 會員等級
+- `Profile`: 使用者業務資料
+- `Client`: 客戶（含等級資訊）
+- `Category`: 商品分類
+- `Product`: 商品
+- `Series`: 系列（003 新增）
+- `TierPrice`: 等級價格（003 新增）
+
+### Zod Schema 位置
+所有驗證 Schema 位於 `lib/validations/`：
+- `user.schema.ts`: 使用者相關（登入、開戶）
+- `tier.schema.ts`: 會員等級
+- `category.schema.ts`: 分類
+- `product.schema.ts`: 商品
+
+---
+
+## 當前開發狀態
+
+### 已完成功能（已合併到 master）
+1. ✅ **001-user-tier-management**: 會員等級與客戶管理
+   - 雙入口登入、快速開戶、客戶列表、等級 CRUD
+2. ✅ **002-product-management**: 商品與分類管理
+   - 分類 CRUD、商品 CRUD、圖片上傳、前台商品瀏覽
+
+### 進行中功能（003-series-and-pricing 分支）
+**狀態**: 規劃完成，開始實作
+**目標**: 三層階層架構（分類 > 系列 > 產品）+ 等級價格機制
+
+**核心變更**:
+1. 新增 `series` 表（系列），商品改為關聯系列而非直接關聯分類
+2. 新增 `tier_prices` 表（等級價格），儲存每個商品 × 每個等級的價格
+3. 商品新增 `retail_price`（原價）與 `stock_status`（庫存狀態）欄位
+4. 商品編號自動產生（分類代碼 + 流水號，如 DRK-0001）
+5. 前台根據用戶等級顯示對應價格
+
+**規格文件**: `specs/003-series-and-pricing/spec.md`
+
+---
+
+## 重要開發注意事項
+
+### 負庫存處理
+- **必須** 支援負庫存（憲章 VI）
+- 驗證時不檢查 `stock >= 0`
+- 前台顯示邏輯：
+  - `stock > 0`: 顯示「庫存: X」（綠色）
+  - `stock === 0`: 顯示「缺貨中」（黃色）
+  - `stock < 0`: 顯示「欠貨: X（可預購）」（紅色）
+
+### 價格機制（003 實作中）
+- 商品有「原價」（retail_price）用於顯示折扣力度
+- 每個商品 × 每個等級 = 一個價格（tier_prices 表）
+- 前台顯示：「原價 $60  您的價格 $30（批發）」
+- 若未設定該等級價格，顯示「價格未設定」並禁用加入購物車
+
+### Neo-Brutalism 設計實作
+所有 UI 元件必須遵循：
+```tsx
+// 卡片樣式
+className="rounded-none border-3 border-black bg-white shadow-neo"
+
+// 陰影定義（tailwind.config.ts）
+shadow-neo: '4px 4px 0px 0px rgba(0,0,0,1)'
+
+// 點擊效果
+hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+```
+
+### Git Commit 規範
+```bash
+# 必須使用繁體中文
+feat: 新增商品系列管理功能
+fix: 修復價格顯示錯誤
+docs: 更新資料庫 Migration 文件
+refactor: 重構等級價格查詢邏輯
+
+# Commit 結尾（Claude Code 自動產生）
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
+```
+
+---
+
+**最後更新**: 2026-01-02
 **憲章版本**: 1.0.0
-**當前功能**: 001-user-tier-management (規劃完成)
+**當前分支**: 003-series-and-pricing (進行中)
