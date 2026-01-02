@@ -6,7 +6,7 @@
  * Updated: Feature 003-series-and-pricing (US6 - 商品編號自動產生)
  */
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, X } from 'lucide-react'
 import { createProduct, updateProduct } from '@/lib/actions/products'
@@ -25,6 +25,16 @@ interface ProductFormProps {
 
 export function ProductForm({ product, series, mode }: ProductFormProps) {
   const router = useRouter()
+
+  // 使用受控元件來保留使用者輸入
+  const [formData, setFormData] = useState({
+    name: product?.name || '',
+    series_id: product?.series_id || '',
+    description: product?.description || '',
+    stock: product?.stock?.toString() || '0',
+    unit: product?.unit || '件',
+    status: product?.status || 'active',
+  })
 
   const action = mode === 'create'
     ? createProduct
@@ -66,7 +76,8 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
           <Input
             id="name"
             name="name"
-            defaultValue={product?.name}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             placeholder="例如: 可口可樂 350ml"
           />
           <ErrorInline message={state?.errors?.name?.[0]} />
@@ -80,7 +91,8 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
           <select
             id="series_id"
             name="series_id"
-            defaultValue={product?.series_id}
+            value={formData.series_id}
+            onChange={(e) => setFormData({ ...formData, series_id: e.target.value })}
             className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">請選擇系列</option>
@@ -101,7 +113,8 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
           <textarea
             id="description"
             name="description"
-            defaultValue={product?.description || ''}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="輸入商品描述..."
             rows={4}
             className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
@@ -119,7 +132,8 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
               id="stock"
               name="stock"
               type="number"
-              defaultValue={product?.stock ?? 0}
+              value={formData.stock}
+              onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
               placeholder="0"
             />
             <p className="mt-1 text-xs text-gray-600">可輸入負數 (欠貨/預購)</p>
@@ -130,7 +144,13 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             <label htmlFor="unit" className="mb-2 block font-bold">
               單位 <span className="text-red-600">*</span>
             </label>
-            <Input id="unit" name="unit" defaultValue={product?.unit || '件'} placeholder="件" />
+            <Input
+              id="unit"
+              name="unit"
+              value={formData.unit}
+              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              placeholder="件"
+            />
             <ErrorInline message={state?.errors?.unit?.[0]} />
           </div>
         </div>
@@ -144,7 +164,8 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             <select
               id="status"
               name="status"
-              defaultValue={product?.status}
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
               className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="active">啟用</option>

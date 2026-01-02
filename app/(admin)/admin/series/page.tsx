@@ -9,9 +9,10 @@
  */
 
 import Link from 'next/link'
-import { Plus, Edit, Trash2 } from 'lucide-react'
+import { Plus, Edit } from 'lucide-react'
 import { getSeries } from '@/lib/actions/series'
 import { Button } from '@/components/ui/button'
+import { SeriesDeleteButton } from '@/components/admin/series-delete-button'
 import Image from 'next/image'
 
 export default async function SeriesPage() {
@@ -102,6 +103,9 @@ export default async function SeriesPage() {
                       編輯
                     </Button>
                   </Link>
+                  <div className="flex-1">
+                    <SeriesDeleteButton seriesId={s.id} seriesName={s.name} />
+                  </div>
                 </div>
               </div>
             </div>
