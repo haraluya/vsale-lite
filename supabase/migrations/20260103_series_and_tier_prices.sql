@@ -9,25 +9,33 @@
 -- Phase 1: 新增資料表與欄位
 -- ================================================
 
--- 1.1 修改 categories 表：新增分類代碼欄位
+-- 1.1 修改 categories 表：新增分類代碼與狀態欄位
 ALTER TABLE categories
-  ADD COLUMN code VARCHAR(10) UNIQUE;
+  ADD COLUMN IF NOT EXISTS code VARCHAR(10) UNIQUE,
+  ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive'));
 
 -- 更新現有資料（設定預設代碼）
-UPDATE categories SET code = 'DRK' WHERE name = '飲料';
-UPDATE categories SET code = 'SNK' WHERE name = '零食';
-UPDATE categories SET code = 'DAI' WHERE name = '日用品';
+UPDATE categories SET code = 'DRK' WHERE name = '飲料' AND code IS NULL;
+UPDATE categories SET code = 'SNK' WHERE name = '零食' AND code IS NULL;
+UPDATE categories SET code = 'DAI' WHERE name = '日用品' AND code IS NULL;
 
 -- 設為必填
 ALTER TABLE categories
   ALTER COLUMN code SET NOT NULL;
 
--- 新增約束與索引
-ALTER TABLE categories
-  ADD CONSTRAINT check_code_format
-  CHECK (code ~ '^[A-Z]{3,10}$');
+-- 新增約束與索引（使用 IF NOT EXISTS）
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'check_code_format'
+  ) THEN
+    ALTER TABLE categories ADD CONSTRAINT check_code_format
+      CHECK (code ~ '^[A-Z]{3,10}$');
+  END IF;
+END $$;
 
-CREATE UNIQUE INDEX idx_categories_code ON categories(code);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_categories_code ON categories(code);
+CREATE INDEX IF NOT EXISTS idx_categories_status ON categories(status);
 
 -- 1.2 建立 series 表（系列）
 CREATE TABLE series (
@@ -168,7 +176,7 @@ BEGIN
 
   -- 2. 查詢該分類下已存在的最大流水號
   SELECT COALESCE(
-    MAX(CAST(SUBSTRING(code FROM '\d+') AS INTEGER)),
+    MAX(CAST(SUBSTRING(p.code FROM '\d+') AS INTEGER)),
     0
   ) INTO v_max_number
   FROM products p

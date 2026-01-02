@@ -27,9 +27,7 @@ export const createProductSchema = z.object({
     .optional()
     .or(z.literal('')),
   retail_price: z.coerce.number()
-    .min(0, '原價不可為負數')
-    .nullable()
-    .optional(),  // 🆕 Feature 003: 原價/建議售價
+    .min(0, '零售價格不可為負數'),  // 🆕 Feature 003 Enhancement: 零售價格改為必填
   stock: z.coerce.number()
     .int('庫存必須為整數')
     .default(0),  // 支援負庫存 (憲章 VI)

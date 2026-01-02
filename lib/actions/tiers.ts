@@ -198,7 +198,21 @@ export async function deleteTier(id: string): Promise<ActionResult> {
 
     const adminClient = createAdminClient()
 
-    // 2. 檢查是否有客戶使用此等級
+    // 2. 檢查是否為受保護等級 (Feature 003 Enhancement)
+    const { data: tier } = await adminClient
+      .from('tiers')
+      .select('is_protected, name')
+      .eq('id', id)
+      .single()
+
+    if (tier?.is_protected) {
+      return {
+        success: false,
+        message: `「${tier.name}」是系統預設等級,不可刪除`,
+      }
+    }
+
+    // 3. 檢查是否有客戶使用此等級
     const { count, error: countError } = await adminClient
       .from('profiles')
       .select('*', { count: 'exact', head: true })
@@ -219,7 +233,7 @@ export async function deleteTier(id: string): Promise<ActionResult> {
       }
     }
 
-    // 3. 刪除等級
+    // 4. 刪除等級
     const { error } = await adminClient.from('tiers').delete().eq('id', id)
 
     if (error) {
@@ -230,7 +244,7 @@ export async function deleteTier(id: string): Promise<ActionResult> {
       }
     }
 
-    // 4. Revalidate
+    // 5. Revalidate
     revalidatePath('/admin/tiers')
 
     return {

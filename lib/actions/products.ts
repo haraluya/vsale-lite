@@ -217,8 +217,33 @@ export async function createProduct(
       }
     }
 
-    // 6. 重新驗證快取
+    // 6. 自動建立零售價格記錄 (Feature 003 Enhancement)
+    try {
+      // 查詢零售等級 ID (is_protected = true)
+      const { data: retailTier } = await adminClient
+        .from('tiers')
+        .select('id')
+        .eq('is_protected', true)
+        .single()
+
+      if (retailTier) {
+        // 建立零售價格記錄
+        await adminClient
+          .from('tier_prices')
+          .insert({
+            product_id: newProduct.id,
+            tier_id: retailTier.id,
+            price: data.retail_price,
+          })
+      }
+    } catch (tierPriceError) {
+      console.warn('建立零售價格記錄失敗 (非致命錯誤):', tierPriceError)
+      // 不中斷商品建立流程
+    }
+
+    // 7. 重新驗證快取
     revalidatePath('/admin/products')
+    revalidatePath('/store')
 
     return {
       success: true,

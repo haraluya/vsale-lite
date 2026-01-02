@@ -23,6 +23,7 @@ export type Tier = {
   id: string
   name: string
   rank: number
+  is_protected?: boolean  // 🆕 Feature 003 Enhancement: 系統預設等級保護
   created_at: string
   updated_at: string
 }
@@ -149,6 +150,17 @@ export type TierWithPrice = {
   tier_rank: number
   price: number | null
   price_id: string | null
+}
+
+// 商品含所有等級價格 (系列批量價格設定使用, Feature 003 Enhancement)
+export type ProductWithAllTierPrices = Product & {
+  tier_prices: {
+    tier_id: string
+    tier_name: string
+    tier_rank: number
+    price: number | null
+    is_protected?: boolean  // 標記零售等級
+  }[]
 }
 
 // 商品列表查詢參數

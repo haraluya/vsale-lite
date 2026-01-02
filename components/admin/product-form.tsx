@@ -31,7 +31,9 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
     name: product?.name || '',
     series_id: product?.series_id || '',
     description: product?.description || '',
+    retail_price: product?.retail_price?.toString() || '',  // 🆕 Feature 003 Enhancement: 零售價格必填
     stock: product?.stock?.toString() || '0',
+    stock_status: product?.stock_status || 'sufficient',  // 🆕 Feature 003: 庫存狀態
     unit: product?.unit || '件',
     status: product?.status || 'active',
   })
@@ -122,8 +124,29 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
           <ErrorInline message={state?.errors?.description?.[0]} />
         </div>
 
-        {/* 庫存與單位 */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* 零售價格 (必填) */}
+        <div>
+          <label htmlFor="retail_price" className="mb-2 block font-bold">
+            零售價格 <span className="text-red-600">*</span>
+          </label>
+          <Input
+            id="retail_price"
+            name="retail_price"
+            type="number"
+            min="0"
+            step="0.01"
+            value={formData.retail_price}
+            onChange={(e) => setFormData({ ...formData, retail_price: e.target.value })}
+            placeholder="0.00"
+          />
+          <p className="mt-1 text-xs text-gray-600">
+            零售價格是商品的基準價格,用於顯示折扣力度與自動建立零售等級價格
+          </p>
+          <ErrorInline message={state?.errors?.retail_price?.[0]} />
+        </div>
+
+        {/* 庫存數量、狀態與單位 */}
+        <div className="grid grid-cols-3 gap-4">
           <div>
             <label htmlFor="stock" className="mb-2 block font-bold">
               庫存數量 <span className="text-red-600">*</span>
@@ -138,6 +161,29 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             />
             <p className="mt-1 text-xs text-gray-600">可輸入負數 (欠貨/預購)</p>
             <ErrorInline message={state?.errors?.stock?.[0]} />
+          </div>
+
+          <div>
+            <label htmlFor="stock_status" className="mb-2 block font-bold">
+              庫存狀態
+            </label>
+            <select
+              id="stock_status"
+              name="stock_status"
+              value={formData.stock_status}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  stock_status: e.target.value as 'sufficient' | 'low' | 'out_of_stock',
+                })
+              }
+              className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="sufficient">充足</option>
+              <option value="low">緊張</option>
+              <option value="out_of_stock">缺貨</option>
+            </select>
+            <ErrorInline message={state?.errors?.stock_status?.[0]} />
           </div>
 
           <div>
