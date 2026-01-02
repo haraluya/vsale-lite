@@ -28,12 +28,12 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  // 初始化價格狀態 (key: "product_id-tier_id", value: price)
+  // 初始化價格狀態 (key: "product_id_tier_id", value: price)
   const [prices, setPrices] = useState<Record<string, number | null>>(() => {
     const initialPrices: Record<string, number | null> = {}
     products.forEach((product) => {
       product.tier_prices.forEach((tierPrice) => {
-        const key = `${product.id}-${tierPrice.tier_id}`
+        const key = `${product.id}_${tierPrice.tier_id}`
         initialPrices[key] = tierPrice.price
       })
     })
@@ -41,7 +41,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
   })
 
   const handlePriceChange = (productId: string, tierId: string, value: string) => {
-    const key = `${productId}-${tierId}`
+    const key = `${productId}_${tierId}`
     const numValue = value === '' ? null : parseFloat(value)
     setPrices((prev) => ({ ...prev, [key]: numValue }))
   }
@@ -59,13 +59,13 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
           // 檢查價格是否為有效數字
           if (price === null || price === undefined || isNaN(price)) return false
           // 檢查是否為零售等級 (零售等級價格不允許手動設定)
-          const [productId, tierId] = key.split('-')
+          const [productId, tierId] = key.split('_')
           const product = products.find((p) => p.id === productId)
           const tierPrice = product?.tier_prices.find((tp) => tp.tier_id === tierId)
           return !tierPrice?.is_protected
         })
         .map(([key, price]) => {
-          const [product_id, tier_id] = key.split('-')
+          const [product_id, tier_id] = key.split('_')
           return { product_id, tier_id, price: Number(price) }
         })
 
@@ -186,7 +186,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
 
                   {/* 各等級價格 */}
                   {tiers.map((tier) => {
-                    const key = `${product.id}-${tier.tier_id}`
+                    const key = `${product.id}_${tier.tier_id}`
                     const currentPrice = prices[key]
                     const isRetail = tier.is_protected
 
