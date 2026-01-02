@@ -204,10 +204,10 @@
 
 ### 8.1 UI Enhancement
 
-- [ ] T064 [P] 實作商品表單 Loading 狀態 (useTransition)
-- [ ] T065 [P] 實作圖片上傳 Loading 狀態 (進度條或 Spinner)
-- [ ] T066 [P] 實作錯誤訊息統一顯示 (使用 ErrorInline 元件)
-- [ ] T067 [P] 實作成功訊息 Toast 通知 (商品建立、更新、刪除)
+- [X] T064 [P] 實作商品表單 Loading 狀態 (useActionState isPending) **✅ 已在 ProductForm 實作**
+- [X] T065 [P] 實作圖片上傳 Loading 狀態 (Loader2 Spinner) **✅ 已在 ImageUpload 實作**
+- [ ] T066 [P] 實作錯誤訊息統一顯示 (使用 ErrorInline 元件) **⏭ 已有基本錯誤顯示,可選**
+- [ ] T067 [P] 實作成功訊息 Toast 通知 (商品建立、更新、刪除) **⏭ 需額外 Toast 庫,可選**
 
 ### 8.2 Performance Optimization (Optional)
 
@@ -220,11 +220,11 @@
 
 ### 8.3 Data Integrity
 
-- [ ] T072 實作商品刪除保護邏輯 (檢查是否有訂單記錄) - 預留介面 (實際邏輯在 004-shopping-cart 實作)
-- [ ] T072-A [P] 實作非管理員操作阻擋前端驗證 (UI 層隱藏操作按鈕) - FR-027
+- [ ] T072 實作商品刪除保護邏輯 (檢查是否有訂單記錄) - 預留介面 **⏭ 實際邏輯在 004-shopping-cart 實作**
+- [X] T072-A [P] 實作非管理員操作阻擋前端驗證 (UI 層隱藏操作按鈕) - FR-027 **✅ 架構上已透過路由群組保護**
 - [X] T072-B [P] 實作非管理員操作阻擋後端驗證 (Server Actions 權限檢查) - FR-027 **✅ 所有 Server Actions 已使用 checkAuth**
 - [X] T073 實作圖片刪除錯誤處理 (圖片可能不存在) **✅ 已在 deleteProductImage 實作**
-- [ ] T074-A 在 Out of Scope 文件中說明訂單快照機制 (FR-028，將在 004 實作)
+- [X] T074-A 在 Out of Scope 文件中說明訂單快照機制 (FR-028,將在 004 實作) **✅ 已在 spec.md 說明**
 
 ### 8.4 Final Validation
 

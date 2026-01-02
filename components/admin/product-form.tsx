@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ErrorInline } from '@/components/ui/error-inline'
 import { ImageUpload } from '@/components/ui/image-upload'
+import { Loading } from '@/components/ui/loading'
 import type { Product, Category } from '@/types'
 
 interface ProductFormProps {
@@ -28,7 +29,7 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
     ? createProduct
     : (prev: any, formData: FormData) => updateProduct(product!.id, prev, formData)
 
-  const [state, formAction] = useActionState<any>(action as any, null)
+  const [state, formAction, isPending] = useActionState<any>(action as any, null)
 
   const handleCancel = () => {
     router.back()
@@ -188,15 +189,25 @@ export function ProductForm({ product, categories, mode }: ProductFormProps) {
 
         {/* 操作按鈕 */}
         <div className="flex gap-4">
-          <Button type="submit" className="flex-1">
-            <Save className="mr-2 h-5 w-5" />
-            {mode === 'create' ? '建立商品' : '儲存變更'}
+          <Button type="submit" className="flex-1" disabled={isPending}>
+            {isPending ? (
+              <>
+                <Loading size="sm" className="mr-2" />
+                {mode === 'create' ? '建立中...' : '儲存中...'}
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-5 w-5" />
+                {mode === 'create' ? '建立商品' : '儲存變更'}
+              </>
+            )}
           </Button>
 
           <button
             type="button"
             onClick={handleCancel}
-            className="flex-1 rounded-none border-3 border-black bg-gray-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm"
+            disabled={isPending}
+            className="flex-1 rounded-none border-3 border-black bg-gray-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="mr-2 inline-block h-5 w-5" />
             取消

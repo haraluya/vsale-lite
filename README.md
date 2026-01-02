@@ -52,8 +52,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 執行以下 SQL Migration 檔案 (在 Supabase SQL Editor 中):
 
-1. `supabase/migrations/20260101_initial_schema.sql` - 建立資料表結構
+1. `supabase/migrations/20260101_initial_schema.sql` - 建立資料表結構 (會員等級與客戶)
 2. `supabase/migrations/20260101_seed_data.sql` - 插入預設會員等級與測試管理員
+3. `supabase/migrations/20260102_products_and_categories.sql` - 建立商品與分類表 (含 Storage Bucket)
 
 ### 4. 啟動開發伺服器
 
@@ -82,19 +83,27 @@ vsale/
 │   │   ├── login/                # 前台登入 (手機號碼)
 │   │   └── admin/login/          # 後台登入 (Email)
 │   ├── (shop)/                   # 客戶保護路由群組
-│   │   └── store/                # 商品列表 (佔位頁面)
+│   │   └── store/                # 商品列表與商品詳情
 │   └── (admin)/                  # 管理員保護路由群組
 │       └── admin/
 │           ├── dashboard/        # 管理首頁
 │           ├── tiers/            # 會員等級管理
-│           └── clients/          # 客戶管理
+│           ├── clients/          # 客戶管理
+│           ├── categories/       # 商品分類管理
+│           └── products/         # 商品管理
 ├── components/
 │   ├── ui/                       # 基礎 UI 元件
 │   ├── auth/                     # 認證相關元件
-│   └── admin/                    # 後台元件
+│   ├── admin/                    # 後台元件
+│   └── shop/                     # 前台元件 (商品展示)
 ├── lib/
 │   ├── supabase/                 # Supabase Clients
+│   │   ├── client.ts             # Browser Client
+│   │   ├── server.ts             # Server Client
+│   │   └── storage.ts            # Storage Helper
 │   ├── actions/                  # Server Actions
+│   │   ├── categories.ts         # 分類 CRUD
+│   │   └── products.ts           # 商品 CRUD & 圖片管理
 │   ├── validations/              # Zod Schemas
 │   └── utils.ts                  # 工具函式
 ├── types/                        # TypeScript 型別定義
@@ -149,9 +158,32 @@ pnpm lint             # ESLint 檢查
    - 客戶無法訪問後台
    - 管理員「上帝視角」(可訪問所有路由)
 
+6. **商品分類管理** (Admin)
+   - 建立、編輯、刪除商品分類
+   - 分類排序功能
+   - 刪除保護 (檢查是否有商品使用)
+   - 分類遷移功能 (批量更新商品分類)
+
+7. **商品管理** (Admin)
+   - 商品 CRUD (建立、編輯、刪除)
+   - 商品編號唯一性驗證
+   - 負庫存支援 (欠貨/預購)
+   - 商品圖片上傳 (支援 JPG/PNG/WebP,最大 5MB)
+   - 圖片替換與刪除
+   - 商品狀態管理 (啟用/停用)
+   - 商品搜尋 (商品編號或名稱)
+   - 分類篩選
+   - 分頁功能 (20/50/100 筆可選)
+
+8. **前台商品瀏覽** (Client)
+   - 商品列表展示
+   - 分類篩選
+   - 商品詳情頁
+   - 庫存狀態顯示 (含負庫存提示)
+   - 圖片展示
+
 ### 🚧 進行中功能
 
-- 商品管理
 - 價格設定 (等級綁定價格)
 - 購物車與訂單
 
@@ -178,6 +210,39 @@ pnpm lint             # ESLint 檢查
 - created_at: TIMESTAMPTZ
 - updated_at: TIMESTAMPTZ
 ```
+
+**categories** (商品分類):
+```sql
+- id: UUID (PK)
+- name: TEXT (分類名稱,UNIQUE)
+- description: TEXT (分類描述,可選)
+- sort_order: INTEGER (排序順序)
+- created_at: TIMESTAMPTZ
+- updated_at: TIMESTAMPTZ
+```
+
+**products** (商品):
+```sql
+- id: UUID (PK)
+- code: VARCHAR(50) (商品編號,UNIQUE)
+- name: TEXT (商品名稱)
+- category_id: UUID (FK → categories, ON DELETE RESTRICT)
+- description: TEXT (商品描述,可選)
+- stock: INTEGER (庫存數量,支援負數)
+- unit: TEXT (單位,如「件」、「箱」)
+- image_url: TEXT (商品圖片 URL,可選)
+- status: TEXT ('active' | 'inactive')
+- created_at: TIMESTAMPTZ
+- updated_at: TIMESTAMPTZ
+```
+
+### Supabase Storage
+
+**products bucket**:
+- 公開讀取,管理員可寫入
+- 檔案結構: `{product_id}/main.{ext}`
+- 支援格式: JPG, PNG, WebP
+- 大小限制: 5MB
 
 ## 安全性
 
@@ -244,15 +309,20 @@ MIT License
 
 ## 相關文件
 
+### 001-user-tier-management (會員等級與客戶管理)
 - 規格文件: `specs/001-user-tier-management/spec.md`
 - 實作計畫: `specs/001-user-tier-management/plan.md`
 - 任務清單: `specs/001-user-tier-management/tasks.md`
 - API 合約: `specs/001-user-tier-management/contracts/`
 - Middleware 測試場景: `specs/001-user-tier-management/middleware-test-scenarios.md`
+- Quickstart Guide: `specs/001-user-tier-management/quickstart.md`
+- 研究紀錄: `specs/001-user-tier-management/research.md`
 
-## 支援
-
-如有問題,請參考:
-1. Quickstart Guide: `specs/001-user-tier-management/quickstart.md`
-2. 研究紀錄: `specs/001-user-tier-management/research.md`
-3. 實作筆記: `specs/001-user-tier-management/implementation-notes.md`
+### 002-product-management (商品管理)
+- 規格文件: `specs/002-product-management/spec.md`
+- 實作計畫: `specs/002-product-management/plan.md`
+- 任務清單: `specs/002-product-management/tasks.md`
+- 資料模型: `specs/002-product-management/data-model.md`
+- API 合約: `specs/002-product-management/contracts/server-actions.md`
+- Quickstart Guide: `specs/002-product-management/quickstart.md`
+- 研究紀錄: `specs/002-product-management/research.md`
