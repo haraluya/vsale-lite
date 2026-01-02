@@ -209,11 +209,55 @@ pnpm test             # 執行所有測試 (Vitest)
 pnpm test:ui          # 啟動 Vitest UI 介面
 ```
 
-### Supabase Migration
+### Supabase CLI 管理（雲端部署）
+
+**環境設定**:
+- Supabase 專案 ID: `qwovavytryvgchcowjof`
+- 區域: AWS ap-southeast-1
+- 專案 URL: `https://qwovavytryvgchcowjof.supabase.co`
+
+**Migration 管理**:
 ```bash
-# 在 Supabase SQL Editor 中執行 Migration 檔案
-# 檔案位置: supabase/migrations/*.sql
-# 執行順序: 依檔案名稱時間戳排序 (20260101, 20260102...)
+# 1. 連結雲端專案（首次設定）
+supabase link --project-ref qwovavytryvgchcowjof
+
+# 2. 推送新的 Migration 到雲端
+supabase db push
+
+# 3. 從雲端拉取最新 Schema
+supabase db pull
+
+# 4. 比較本地與雲端的差異
+supabase db diff
+
+# 5. 重置本地資料庫（Docker）
+supabase db reset
+```
+
+**測試資料生成**:
+```bash
+# 方法 1: 使用 Supabase Dashboard SQL Editor（推薦）
+# 1. 開啟 https://app.supabase.com/project/qwovavytryvgchcowjof/sql/new
+# 2. 複製 specs/003-series-and-pricing/seed-test-data.sql 內容
+# 3. 貼上並執行
+
+# 方法 2: 使用 psql 直接執行（需安裝 PostgreSQL 客戶端）
+psql -h aws-0-ap-southeast-1.pooler.supabase.com -p 6543 -U postgres.qwovavytryvgchcowjof -d postgres -f specs/003-series-and-pricing/seed-test-data.sql
+```
+
+**Migration 檔案位置**:
+- `supabase/migrations/*.sql` - 按時間戳排序執行 (20260101, 20260102...)
+
+**本地開發（Docker）**:
+```bash
+# 啟動本地 Supabase（包含 PostgreSQL, Auth, Storage 等）
+supabase start
+
+# 停止本地 Supabase
+supabase stop
+
+# 查看本地服務狀態
+supabase status
 ```
 
 ---
