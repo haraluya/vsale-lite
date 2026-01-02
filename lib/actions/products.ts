@@ -5,7 +5,7 @@
  * Feature: 002-product-management & 003-series-and-pricing
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { checkAuth } from './helpers'
 import { createProductSchema, updateProductSchema } from '@/lib/validations/product.schema'
@@ -30,9 +30,10 @@ export async function getProducts(params?: {
   try {
     const { search = '', series_id, status = 'active', page = 1, limit = 20 } = params || {}
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-    let query = supabase
+    let query = adminClient
       .from('products')
       .select('*, series(name)', { count: 'exact' })  // 🔄 Feature 003: JOIN series 表 (取代 categories)
       .order('created_at', { ascending: false })
@@ -99,9 +100,10 @@ export async function getProducts(params?: {
  */
 export async function getProduct(id: string): Promise<Product | null> {
   try {
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await adminClient
       .from('products')
       .select('*, series(name)')  // 🔄 Feature 003: JOIN series 表
       .eq('id', id)
@@ -173,10 +175,11 @@ export async function createProduct(
 
     const data = validationResult.data
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 4. 驗證系列是否存在 (Feature 003)
-    const { data: series } = await supabase
+    const { data: series } = await adminClient
       .from('series')
       .select('id')
       .eq('id', data.series_id)
@@ -190,7 +193,7 @@ export async function createProduct(
     }
 
     // 5. 寫入資料庫 (商品編號由 Trigger 自動產生)
-    const { data: newProduct, error } = await supabase
+    const { data: newProduct, error } = await adminClient
       .from('products')
       .insert({
         series_id: data.series_id,  // 🔄 Feature 003: 改為 series_id
@@ -276,10 +279,11 @@ export async function updateProduct(
 
     const data = validationResult.data
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 4. 檢查商品是否存在
-    const { data: existingProduct } = await supabase
+    const { data: existingProduct } = await adminClient
       .from('products')
       .select('id')
       .eq('id', id)
@@ -294,7 +298,7 @@ export async function updateProduct(
 
     // 5. 若修改系列,驗證新系列是否存在 (Feature 003)
     if (data.series_id) {
-      const { data: series } = await supabase
+      const { data: series } = await adminClient
         .from('series')
         .select('id')
         .eq('id', data.series_id)
@@ -309,7 +313,7 @@ export async function updateProduct(
     }
 
     // 6. 更新資料庫
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('products')
       .update(data)
       .eq('id', id)
@@ -353,10 +357,11 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     // 1. 驗證權限
     await checkAuth('admin')
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 2. 檢查是否已有訂單記錄 (未來實作訂單功能時)
-    // const { count } = await supabase
+    // const { count } = await adminClient
     //   .from('order_items')
     //   .select('*', { count: 'exact', head: true })
     //   .eq('product_id', id)
@@ -366,7 +371,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
 
     if (count && count > 0) {
       // 軟刪除 (改為 inactive)
-      const { error } = await supabase
+      const { error } = await adminClient
         .from('products')
         .update({ status: 'inactive' })
         .eq('id', id)
@@ -388,7 +393,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     } else {
       // 硬刪除
       // 1. 刪除圖片 (所有可能的副檔名)
-      await supabase.storage.from('products').remove([
+      await adminClient.storage.from('products').remove([
         `${id}/main.jpg`,
         `${id}/main.png`,
         `${id}/main.webp`,
@@ -396,7 +401,7 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
       // 註: 不檢查錯誤,因為圖片可能不存在
 
       // 2. 刪除商品記錄
-      const { error } = await supabase.from('products').delete().eq('id', id)
+      const { error } = await adminClient.from('products').delete().eq('id', id)
 
       if (error) {
         console.error('deleteProduct (hard) error:', error)
@@ -448,10 +453,11 @@ export async function updateProductStock(
       }
     }
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 3. 檢查商品是否存在
-    const { data: existingProduct } = await supabase
+    const { data: existingProduct } = await adminClient
       .from('products')
       .select('id')
       .eq('id', id)
@@ -465,7 +471,7 @@ export async function updateProductStock(
     }
 
     // 4. 更新庫存
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('products')
       .update({ stock })
       .eq('id', id)
@@ -530,10 +536,11 @@ export async function uploadProductImage(
       }
     }
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 4. 檢查商品是否存在
-    const { data: product } = await supabase
+    const { data: product } = await adminClient
       .from('products')
       .select('id')
       .eq('id', productId)
@@ -550,7 +557,7 @@ export async function uploadProductImage(
     const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `${productId}/main.${ext}`
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await adminClient.storage
       .from('products')
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -566,10 +573,10 @@ export async function uploadProductImage(
     }
 
     // 6. 取得公開 URL
-    const { data: urlData } = supabase.storage.from('products').getPublicUrl(filePath)
+    const { data: urlData } = adminClient.storage.from('products').getPublicUrl(filePath)
 
     // 7. 更新商品的 image_url
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from('products')
       .update({ image_url: urlData.publicUrl })
       .eq('id', productId)
@@ -615,10 +622,11 @@ export async function deleteProductImage(productId: string): Promise<ActionResul
     // 1. 驗證權限
     await checkAuth('admin')
 
-    const supabase = await createClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 2. 檢查商品是否存在
-    const { data: product } = await supabase
+    const { data: product } = await adminClient
       .from('products')
       .select('id, image_url')
       .eq('id', productId)
@@ -633,14 +641,14 @@ export async function deleteProductImage(productId: string): Promise<ActionResul
 
     // 3. 刪除 Storage 圖片 (所有可能的副檔名)
     // 註: 不檢查錯誤,因為圖片可能不存在
-    await supabase.storage.from('products').remove([
+    await adminClient.storage.from('products').remove([
       `${productId}/main.jpg`,
       `${productId}/main.png`,
       `${productId}/main.webp`,
     ])
 
     // 4. 更新商品的 image_url 為 NULL
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from('products')
       .update({ image_url: null })
       .eq('id', productId)

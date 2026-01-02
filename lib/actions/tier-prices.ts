@@ -6,7 +6,7 @@
  */
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
 import { setTierPriceSchema, batchSetTierPricesSchema } from '@/lib/validations/tier-price.schema'
 import type { ActionResult, TierPrice, TierWithPrice } from '@/types'
@@ -20,12 +20,14 @@ export async function getAllTiersWithPrices(
   product_id?: string
 ): Promise<ActionResult<TierWithPrice[]>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     if (product_id) {
       // 查詢該商品的所有等級價格
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('tiers')
         .select(`
           id,
@@ -58,7 +60,7 @@ export async function getAllTiersWithPrices(
       return { success: true, data: result }
     } else {
       // 僅查詢所有等級
-      const { data, error } = await supabase
+      const { data, error } = await adminClient
         .from('tiers')
         .select('id, name, rank')
         .order('rank', { ascending: true })
@@ -90,7 +92,6 @@ export async function getAllTiersWithPrices(
  */
 export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResult<TierPrice>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
 
     // 驗證輸入
@@ -103,8 +104,11 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
       }
     }
 
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
     // 檢查商品是否存在
-    const { data: product } = await supabase
+    const { data: product } = await adminClient
       .from('products')
       .select('id')
       .eq('id', validation.data.product_id)
@@ -115,7 +119,7 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
     }
 
     // 檢查等級是否存在
-    const { data: tier } = await supabase
+    const { data: tier } = await adminClient
       .from('tiers')
       .select('id')
       .eq('id', validation.data.tier_id)
@@ -126,7 +130,7 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
     }
 
     // UPSERT 操作 (若存在則更新,不存在則新增)
-    const { data: result, error } = await supabase
+    const { data: result, error } = await adminClient
       .from('tier_prices')
       .upsert(
         {
@@ -169,7 +173,6 @@ export async function batchSetTierPrices(
   data: BatchSetTierPricesInput
 ): Promise<ActionResult<{ updated: number }>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
 
     // 驗證輸入
@@ -182,8 +185,11 @@ export async function batchSetTierPrices(
       }
     }
 
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
     // 批量 UPSERT 操作
-    const { data: result, error } = await supabase
+    const { data: result, error } = await adminClient
       .from('tier_prices')
       .upsert(validation.data.prices, {
         onConflict: 'tier_id,product_id',
@@ -218,10 +224,12 @@ export async function getProductTierPrices(
   product_id: string
 ): Promise<ActionResult<TierPrice[]>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
 
-    const { data, error } = await supabase
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    const { data, error } = await adminClient
       .from('tier_prices')
       .select(`
         *,

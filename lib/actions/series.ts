@@ -6,7 +6,7 @@
  */
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
 import { createSeriesSchema, updateSeriesSchema } from '@/lib/validations/series.schema'
 import type { ActionResult, Series } from '@/types'
@@ -18,10 +18,12 @@ import type { CreateSeriesInput, UpdateSeriesInput } from '@/lib/validations/ser
  */
 export async function getSeries(category_id?: string): Promise<ActionResult<Series[]>> {
   try {
-    const supabase = await createClient()
     const auth = await checkAuth() // 驗證登入
 
-    let query = supabase
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    let query = adminClient
       .from('series')
       .select('*')
       .order('sort_order', { ascending: true })
@@ -56,10 +58,12 @@ export async function getSeries(category_id?: string): Promise<ActionResult<Seri
  */
 export async function getSeriesById(id: string): Promise<ActionResult<Series>> {
   try {
-    const supabase = await createClient()
     const auth = await checkAuth() // 驗證登入
 
-    const { data, error } = await supabase
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    const { data, error } = await adminClient
       .from('series')
       .select('*')
       .eq('id', id)
@@ -87,7 +91,6 @@ export async function getSeriesById(id: string): Promise<ActionResult<Series>> {
  */
 export async function createSeries(data: CreateSeriesInput): Promise<ActionResult<Series>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
 
     // 驗證輸入
@@ -100,8 +103,11 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
       }
     }
 
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
     // 新增系列
-    const { data: newSeries, error } = await supabase
+    const { data: newSeries, error } = await adminClient
       .from('series')
       .insert({
         category_id: validation.data.category_id,
@@ -143,7 +149,6 @@ export async function updateSeries(
   data: UpdateSeriesInput
 ): Promise<ActionResult<Series>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
 
     // 驗證輸入
@@ -156,8 +161,11 @@ export async function updateSeries(
       }
     }
 
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
     // 檢查系列是否存在
-    const { data: existing } = await supabase
+    const { data: existing } = await adminClient
       .from('series')
       .select('id')
       .eq('id', id)
@@ -168,7 +176,7 @@ export async function updateSeries(
     }
 
     // 更新系列
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await adminClient
       .from('series')
       .update(validation.data)
       .eq('id', id)
@@ -202,11 +210,13 @@ export async function updateSeries(
  */
 export async function deleteSeries(id: string): Promise<ActionResult<void>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
 
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
     // 檢查系列是否存在
-    const { data: existing } = await supabase
+    const { data: existing } = await adminClient
       .from('series')
       .select('id')
       .eq('id', id)
@@ -217,7 +227,7 @@ export async function deleteSeries(id: string): Promise<ActionResult<void>> {
     }
 
     // 檢查系列下是否有商品
-    const { count } = await supabase
+    const { count } = await adminClient
       .from('products')
       .select('id', { count: 'exact', head: true })
       .eq('series_id', id)
@@ -230,7 +240,7 @@ export async function deleteSeries(id: string): Promise<ActionResult<void>> {
     }
 
     // 刪除系列
-    const { error } = await supabase.from('series').delete().eq('id', id)
+    const { error } = await adminClient.from('series').delete().eq('id', id)
 
     if (error) {
       console.error('deleteSeries 錯誤:', error)
@@ -261,11 +271,13 @@ export async function uploadSeriesImage(
   file: File
 ): Promise<ActionResult<{ image_url: string }>> {
   try {
-    const supabase = await createClient()
     await checkAuth('admin') // 僅管理員可執行
 
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
     // 檢查系列是否存在
-    const { data: existing } = await supabase
+    const { data: existing } = await adminClient
       .from('series')
       .select('id')
       .eq('id', series_id)
@@ -298,7 +310,7 @@ export async function uploadSeriesImage(
     const filePath = `series/${series_id}/main.${ext}`
 
     // 上傳到 Supabase Storage (覆寫模式)
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await adminClient.storage
       .from('products')
       .upload(filePath, file, {
         upsert: true,
@@ -313,10 +325,10 @@ export async function uploadSeriesImage(
     // 取得公開 URL
     const {
       data: { publicUrl },
-    } = supabase.storage.from('products').getPublicUrl(filePath)
+    } = adminClient.storage.from('products').getPublicUrl(filePath)
 
     // 更新 series.image_url 欄位
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from('series')
       .update({ image_url: publicUrl })
       .eq('id', series_id)

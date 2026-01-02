@@ -40,10 +40,11 @@ export async function createClient(
       }
     }
 
-    const supabase = await createSupabaseClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 3. 檢查手機號碼是否已存在
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await adminClient
       .from('profiles')
       .select('id')
       .eq('phone', validatedFields.data.phone)
@@ -60,7 +61,6 @@ export async function createClient(
     const password = generatePassword(validatedFields.data.phone)
 
     // 5. 使用 Admin Client 建立 Auth 使用者 (避免自動登入)
-    const adminClient = createAdminClient()
     const tempEmail = `${validatedFields.data.phone}@temp.local`
     console.log('嘗試建立使用者:', { tempEmail, phone: validatedFields.data.phone })
 
@@ -93,7 +93,8 @@ export async function createClient(
     }
 
     // 6. 手動建立 profile (不依賴 trigger,因為我們用 Email 註冊,phone 欄位會是 null)
-    const { error: insertError } = await supabase
+    // 使用 Admin Client 繞過 RLS
+    const { error: insertError } = await adminClient
       .from('profiles')
       .insert({
         id: authData.user.id,
@@ -108,7 +109,7 @@ export async function createClient(
       console.error('建立 profile 失敗:', insertError)
       // 如果是重複建立,改用 update
       if (insertError.code === '23505') {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await adminClient
           .from('profiles')
           .update({
             phone: validatedFields.data.phone,
@@ -184,10 +185,11 @@ export async function updateClient(
       }
     }
 
-    const supabase = await createSupabaseClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 3. 檢查客戶是否存在
-    const { data: existingClient } = await supabase
+    const { data: existingClient } = await adminClient
       .from('profiles')
       .select('id, role')
       .eq('id', id)
@@ -208,7 +210,7 @@ export async function updateClient(
     }
 
     // 4. 更新客戶資料
-    const { error } = await supabase
+    const { error } = await adminClient
       .from('profiles')
       .update(validatedFields.data)
       .eq('id', id)
@@ -254,10 +256,11 @@ export async function getClients(params?: {
 }> {
   const { search = '', tier_id, page = 1, limit = 20 } = params || {}
 
-  const supabase = await createSupabaseClient()
+  // 使用 Admin Client 繞過 RLS
+  const adminClient = createAdminClient()
 
   // 建立查詢
-  let query = supabase
+  let query = adminClient
     .from('profiles')
     .select('*, tiers(name)', { count: 'exact' })
     .eq('role', 'client')
@@ -314,10 +317,11 @@ export async function deleteClient(id: string): Promise<ActionResult> {
     // 1. 驗證權限
     await checkAuth('admin')
 
-    const supabase = await createSupabaseClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 2. 檢查客戶是否存在
-    const { data: existingClient } = await supabase
+    const { data: existingClient } = await adminClient
       .from('profiles')
       .select('id, role, phone')
       .eq('id', id)
@@ -338,7 +342,6 @@ export async function deleteClient(id: string): Promise<ActionResult> {
     }
 
     // 3. 使用 Admin Client 刪除 Auth 使用者 (確保電話號碼可重新註冊)
-    const adminClient = createAdminClient()
     const { error: authError } = await adminClient.auth.admin.deleteUser(id)
 
     if (authError) {
@@ -350,7 +353,7 @@ export async function deleteClient(id: string): Promise<ActionResult> {
     }
 
     // 4. 再刪除 profile 資料 (cascade delete)
-    const { error: profileError } = await supabase
+    const { error: profileError } = await adminClient
       .from('profiles')
       .delete()
       .eq('id', id)
@@ -403,10 +406,11 @@ export async function updateClientPassword(
       }
     }
 
-    const supabase = await createSupabaseClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
     // 3. 檢查客戶是否存在
-    const { data: existingClient } = await supabase
+    const { data: existingClient } = await adminClient
       .from('profiles')
       .select('id, role')
       .eq('id', id)
@@ -427,7 +431,6 @@ export async function updateClientPassword(
     }
 
     // 4. 使用 Admin Client 更新密碼
-    const adminClient = createAdminClient()
     const { error } = await adminClient.auth.admin.updateUserById(id, {
       password: validatedFields.data.newPassword,
     })
