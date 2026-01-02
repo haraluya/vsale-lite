@@ -111,6 +111,7 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
       .from('series')
       .insert({
         category_id: validation.data.category_id,
+        code: validation.data.code,
         name: validation.data.name,
         description: validation.data.description || null,
         sort_order: validation.data.sort_order,

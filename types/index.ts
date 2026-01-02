@@ -101,6 +101,7 @@ export type Category = {
 export type Series = {
   id: string
   category_id: string | null
+  code: string  // 🆕 系列代碼 (如 TEA, JUC)
   name: string
   description: string | null
   image_url: string | null

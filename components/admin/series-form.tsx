@@ -73,6 +73,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
 
     const data = {
       category_id: formData.get('category_id') as string || null,
+      code: (formData.get('code') as string).toUpperCase(),
       name: formData.get('name') as string,
       description: formData.get('description') as string || '',
       status: formData.get('status') as 'active' | 'inactive',
@@ -129,6 +130,27 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
         <h2 className="mb-4 text-xl font-bold">基本資訊</h2>
 
         <div className="space-y-4">
+          {/* 系列代碼 */}
+          <div>
+            <label htmlFor="code" className="mb-2 block font-bold">
+              系列代碼 <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              defaultValue={series?.code}
+              required
+              maxLength={10}
+              pattern="[A-Z]{3,10}"
+              placeholder="TEA"
+              className="w-full rounded-none border-2 border-black px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="mt-1 text-sm text-gray-500">
+              3-10 個大寫英文字母,用於組成商品編號 (如: DRK-TEA-01)
+            </p>
+          </div>
+
           {/* 系列名稱 */}
           <div>
             <label htmlFor="name" className="mb-2 block font-bold">
