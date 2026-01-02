@@ -123,10 +123,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T036 [P] [US3] 實作 lib/actions/shop.ts - getCurrentUser() (查詢當前用戶資訊)
-- [ ] T037 [P] [US3] 實作 lib/actions/shop.ts - logout() (登出功能)
-- [ ] T038 [P] [US3] 建立 components/shop/Navbar.tsx (導航列 - 手機號碼、等級、登出按鈕)
-- [ ] T039 [US3] 更新 app/(shop)/layout.tsx (新增 Navbar 元件)
+- [X] T036 [P] [US3] 實作 lib/actions/shop.ts - getCurrentUser() (查詢當前用戶資訊)
+- [X] T037 [P] [US3] 實作 lib/actions/shop.ts - logout() (登出功能)
+- [X] T038 [P] [US3] 建立 components/shop/Navbar.tsx (導航列 - 手機號碼、等級、登出按鈕)
+- [X] T039 [US3] 更新 app/(shop)/layout.tsx (新增 Navbar 元件)
 
 **Checkpoint**: User Story 3 完成 - 客戶可查看個人資訊與登出
 
