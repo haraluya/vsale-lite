@@ -185,14 +185,14 @@
 
 ### Implementation for US6
 
-- [ ] T056 [US6] 更新前台商品列表頁面 (app/(shop)/store/page.tsx) - 顯示實際商品
-- [ ] T057 [P] [US6] 建立 ProductCard 元件 (components/shop/product-card.tsx)
-- [ ] T058 [P] [US6] 建立 ProductList 元件 (components/shop/product-list.tsx)
-- [ ] T059 [P] [US6] 建立 CategoryFilter 元件 (components/shop/category-filter.tsx)
-- [ ] T060 [US6] 建立商品詳情頁面 (app/(shop)/store/[id]/page.tsx)
-- [ ] T061 [US6] 實作庫存狀態顯示邏輯 (正數、零、負數的不同顯示)
-- [ ] T062 [US6] 實作分類篩選功能 (前台)
-- [ ] T063 [US6] 確保前台不顯示價格 (FR-024)
+- [X] T056 [US6] 更新前台商品列表頁面 (app/(shop)/store/page.tsx) - 顯示實際商品
+- [X] T057 [P] [US6] 建立 ProductCard 元件 (components/shop/product-card.tsx)
+- [X] T058 [P] [US6] 建立 ProductList 元件 (components/shop/product-list.tsx)
+- [X] T059 [P] [US6] 建立 CategoryFilter 元件 (components/shop/category-filter.tsx)
+- [X] T060 [US6] 建立商品詳情頁面 (app/(shop)/store/[id]/page.tsx)
+- [X] T061 [US6] 實作庫存狀態顯示邏輯 (正數、零、負數的不同顯示)
+- [X] T062 [US6] 實作分類篩選功能 (前台)
+- [X] T063 [US6] 確保前台不顯示價格 (FR-024)
 
 **Checkpoint**: 客戶可完整瀏覽商品列表與詳情,庫存顯示準確
 

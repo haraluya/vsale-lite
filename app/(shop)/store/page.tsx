@@ -1,7 +1,29 @@
+/**
+ * Store Page (前台商品列表頁)
+ * Feature: 002-product-management (US6 - 前台客戶瀏覽商品列表)
+ *
+ * 客戶端商品列表頁面
+ * - 顯示所有啟用的商品
+ * - 支援分類篩選
+ * - 不顯示價格 (FR-024)
+ * - 顯示庫存狀態 (包含負庫存)
+ */
+
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { getProducts } from '@/lib/actions/products'
+import { getCategories } from '@/lib/actions/categories'
+import { ProductList } from '@/components/shop/product-list'
+import { CategoryFilter } from '@/components/shop/category-filter'
+import { Suspense } from 'react'
 
-export default async function StorePage() {
+interface StorePageProps {
+  searchParams: Promise<{
+    category?: string
+  }>
+}
+
+export default async function StorePage({ searchParams }: StorePageProps) {
   const supabase = await createClient()
 
   const {
@@ -19,12 +41,26 @@ export default async function StorePage() {
     .eq('id', user.id)
     .single()
 
+  // 解析 searchParams
+  const params = await searchParams
+  const categoryId = params.category
+
+  // 查詢商品列表 (僅顯示啟用的商品)
+  const { products } = await getProducts({
+    category_id: categoryId,
+    status: 'active',
+    limit: 100, // 前台一次顯示更多商品
+  })
+
+  // 查詢所有分類
+  const categories = await getCategories()
+
   return (
     <div className="min-h-screen bg-background p-6">
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-8 rounded-none border-3 border-black bg-white p-6 shadow-neo">
-          <h1 className="mb-2 text-3xl font-bold">歡迎登入 Vsale-lite</h1>
+        <div className="mb-6 rounded-none border-3 border-black bg-white p-6 shadow-neo">
+          <h1 className="mb-2 text-3xl font-bold">商品列表</h1>
           <p className="text-gray-600">
             {profile?.display_name || profile?.phone} 您好!
           </p>
@@ -35,44 +71,15 @@ export default async function StorePage() {
           )}
         </div>
 
-        {/* Welcome Card */}
-        <div className="rounded-none border-3 border-black bg-yellow-100 p-8 shadow-neo">
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-none border-3 border-black bg-yellow-400 text-2xl">
-                🎉
-              </div>
-              <div>
-                <h2 className="text-xl font-bold">登入成功!</h2>
-                <p className="text-sm text-gray-600">您已成功登入前台購物系統</p>
-              </div>
-            </div>
-
-            <div className="rounded-none border-2 border-black bg-white p-4">
-              <h3 className="mb-2 font-bold">系統狀態</h3>
-              <ul className="space-y-1 text-sm">
-                <li className="flex items-center gap-2">
-                  <span className="font-mono">✓</span>
-                  <span>認證狀態: 已登入</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="font-mono">✓</span>
-                  <span>會員等級: 已綁定</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="font-mono">⏳</span>
-                  <span>商品列表: 即將推出</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="rounded-none border-2 border-yellow-600 bg-yellow-50 p-4">
-              <p className="text-sm font-bold text-yellow-800">
-                📦 商品訂購功能正在開發中,敬請期待!
-              </p>
-            </div>
+        {/* Category Filter */}
+        <Suspense fallback={<div>載入中...</div>}>
+          <div className="mb-6">
+            <CategoryFilter categories={categories} />
           </div>
-        </div>
+        </Suspense>
+
+        {/* Product List */}
+        <ProductList products={products} />
       </div>
     </div>
   )
