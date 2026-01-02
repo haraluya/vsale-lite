@@ -6,7 +6,7 @@
  * Updated: Feature 003-series-and-pricing (US6 - 商品編號自動產生)
  */
 
-import { useActionState, useState } from 'react'
+import { useActionState, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, X } from 'lucide-react'
 import { createProduct, updateProduct } from '@/lib/actions/products'
@@ -38,11 +38,72 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
     status: product?.status || 'active',
   })
 
+  // 🆕 批次新增商品名稱功能 (僅建立模式)
+  const [productNames, setProductNames] = useState<string[]>([''])
+
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitSuccess, setSubmitSuccess] = useState(false)
+
+  // 批次建立商品的處理函數
+  const handleBatchCreate = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    const formDataObj = new FormData(e.currentTarget)
+
+    // 過濾掉空的商品名稱
+    const validNames = productNames.filter(n => n.trim())
+
+    if (validNames.length === 0) {
+      setSubmitError('請至少輸入一個商品名稱')
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      // 循環建立每個商品
+      for (const name of validNames) {
+        const formData = new FormData()
+        formData.set('name', name)
+        formData.set('series_id', formDataObj.get('series_id') || '')
+        formData.set('description', formDataObj.get('description') || '')
+        formData.set('retail_price', formDataObj.get('retail_price') || '0')
+        formData.set('stock', formDataObj.get('stock') || '0')
+        formData.set('stock_status', formDataObj.get('stock_status') || 'sufficient')
+        formData.set('unit', formDataObj.get('unit') || '件')
+        formData.set('status', formDataObj.get('status') || 'active')
+
+        const result = await createProduct(null, formData)
+        if (!result.success) {
+          throw new Error(`建立商品「${name}」失敗: ${result.message}`)
+        }
+      }
+
+      setSubmitSuccess(true)
+      router.push('/admin/products')
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : '批次建立失敗')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   const action = mode === 'create'
     ? createProduct
     : (prev: any, formData: FormData) => updateProduct(product!.id, prev, formData)
 
   const [state, formAction, isPending] = useActionState<any>(action as any, null)
+
+  // 🆕 監聽成功狀態,自動導向商品列表
+  useEffect(() => {
+    if (state?.success && mode === 'create') {
+      router.push('/admin/products')
+    } else if (state?.success && mode === 'edit') {
+      router.push('/admin/products')
+    }
+  }, [state?.success, mode, router])
 
   const handleCancel = () => {
     router.back()
@@ -50,7 +111,11 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
 
   return (
     <div className="mx-auto max-w-2xl rounded-none border-3 border-black bg-white p-8 shadow-neo">
-      <form action={formAction} className="space-y-6">
+      <form
+        action={mode === 'edit' || productNames.length === 1 ? formAction : undefined}
+        onSubmit={mode === 'create' && productNames.length > 1 ? handleBatchCreate : undefined}
+        className="space-y-6"
+      >
         {/* 商品編號 (僅編輯模式顯示 - US6) */}
         {mode === 'edit' && (
           <div>
@@ -70,19 +135,75 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
           </div>
         )}
 
-        {/* 商品名稱 */}
+        {/* 商品名稱 (建立模式支援批次新增) */}
         <div>
-          <label htmlFor="name" className="mb-2 block font-bold">
-            商品名稱 <span className="text-red-600">*</span>
-          </label>
-          <Input
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="例如: 可口可樂 350ml"
-          />
-          <ErrorInline message={state?.errors?.name?.[0]} />
+          <div className="mb-2 flex items-center justify-between">
+            <label htmlFor="name" className="font-bold">
+              商品名稱 <span className="text-red-600">*</span>
+            </label>
+            {mode === 'create' && (
+              <button
+                type="button"
+                onClick={() => setProductNames([...productNames, ''])}
+                className="flex items-center gap-1 rounded-none border-2 border-black bg-green-300 px-3 py-1 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              >
+                <span className="text-lg">+</span> 批次新增
+              </button>
+            )}
+          </div>
+
+          {mode === 'edit' ? (
+            <>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="例如: 可口可樂 350ml"
+              />
+              <ErrorInline message={state?.errors?.name?.[0]} />
+            </>
+          ) : (
+            <div className="space-y-2">
+              {productNames.map((name, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    id={index === 0 ? 'name' : `name_${index}`}
+                    name="name"
+                    value={name}
+                    onChange={(e) => {
+                      const newNames = [...productNames]
+                      newNames[index] = e.target.value
+                      setProductNames(newNames)
+                      if (index === 0) {
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                    }}
+                    placeholder={`商品名稱 ${index + 1}`}
+                    className="flex-1"
+                  />
+                  {index > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newNames = productNames.filter((_, i) => i !== index)
+                        setProductNames(newNames)
+                      }}
+                      className="rounded-none border-2 border-black bg-red-300 px-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <ErrorInline message={state?.errors?.name?.[0]} />
+              {productNames.length > 1 && (
+                <p className="text-sm text-gray-600">
+                  💡 將建立 {productNames.filter(n => n.trim()).length} 個商品,其他欄位(系列、價格、庫存等)相同
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 商品系列 */}
@@ -240,31 +361,37 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
         )}
 
         {/* 錯誤訊息 */}
-        {state?.message && !state.success && (
+        {(state?.message && !state.success) || submitError ? (
           <div className="rounded-none border-3 border-red-600 bg-red-50 p-4">
-            <p className="font-bold text-red-800">{state.message}</p>
+            <p className="font-bold text-red-800">{submitError || state?.message}</p>
           </div>
-        )}
+        ) : null}
 
         {/* 成功訊息 */}
-        {state?.success && (
+        {(state?.success || submitSuccess) && (
           <div className="rounded-none border-3 border-green-600 bg-green-50 p-4">
-            <p className="font-bold text-green-800">{state.message}</p>
+            <p className="font-bold text-green-800">
+              {submitSuccess ? '商品批次建立成功!' : state?.message}
+            </p>
           </div>
         )}
 
         {/* 操作按鈕 */}
         <div className="flex gap-4">
-          <Button type="submit" className="flex-1" disabled={isPending}>
-            {isPending ? (
+          <Button type="submit" className="flex-1" disabled={isPending || isSubmitting}>
+            {isPending || isSubmitting ? (
               <>
                 <Loading size="sm" className="mr-2" />
-                {mode === 'create' ? '建立中...' : '儲存中...'}
+                {isSubmitting ? '批次建立中...' : mode === 'create' ? '建立中...' : '儲存中...'}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-5 w-5" />
-                {mode === 'create' ? '建立商品' : '儲存變更'}
+                {mode === 'create'
+                  ? productNames.length > 1
+                    ? `批次建立 ${productNames.filter(n => n.trim()).length} 個商品`
+                    : '建立商品'
+                  : '儲存變更'}
               </>
             )}
           </Button>

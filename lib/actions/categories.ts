@@ -271,16 +271,16 @@ export async function deleteCategory(id: string): Promise<ActionResult> {
 
     const adminClient = createAdminClient()
 
-    // 2. 檢查是否有商品使用此分類
+    // 2. 檢查是否有系列使用此分類 (Feature 003: 商品改為關聯系列)
     const { count } = await adminClient
-      .from('products')
+      .from('series')
       .select('*', { count: 'exact', head: true })
       .eq('category_id', id)
 
     if (count && count > 0) {
       return {
         success: false,
-        message: `此分類已有 ${count} 個商品使用,請先將商品遷移至其他分類後再刪除`,
+        message: `此分類已有 ${count} 個系列使用,請先將系列遷移至其他分類後再刪除`,
       }
     }
 
