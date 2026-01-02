@@ -53,6 +53,24 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
       </div>
 
       <div>
+        <Label htmlFor="code">分類代碼 *</Label>
+        <Input
+          id="code"
+          name="code"
+          defaultValue={category?.code}
+          placeholder="例: DRK (3-10個大寫英文字母)"
+          required
+          pattern="[A-Z]{3,10}"
+          maxLength={10}
+          className="mt-2"
+        />
+        <p className="mt-1 text-sm text-gray-500">提示: 商品編號會使用此代碼 (如 DRK-0001)</p>
+        {state && 'errors' in state && state.errors?.code && (
+          <p className="mt-2 text-sm text-red-500">{state.errors.code[0]}</p>
+        )}
+      </div>
+
+      <div>
         <Label htmlFor="description">分類描述</Label>
         <Textarea
           id="description"

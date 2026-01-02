@@ -50,6 +50,7 @@ export async function createCategory(
     // 2. 解析表單資料
     const rawData = {
       name: formData.get('name'),
+      code: formData.get('code'),
       description: formData.get('description') || '',
       sort_order: formData.get('sort_order') || '0',
     }
@@ -68,7 +69,7 @@ export async function createCategory(
 
     const data = validationResult.data
 
-    // 4. 檢查分類名稱是否重複（使用 Admin Client）
+    // 4. 檢查分類名稱與代碼是否重複（使用 Admin Client）
     const adminClient = createAdminClient()
 
     const { data: existingCategory } = await adminClient
@@ -84,11 +85,25 @@ export async function createCategory(
       }
     }
 
+    const { data: existingCode } = await adminClient
+      .from('categories')
+      .select('id')
+      .eq('code', data.code)
+      .single()
+
+    if (existingCode) {
+      return {
+        success: false,
+        message: '此分類代碼已存在',
+      }
+    }
+
     // 5. 寫入資料庫
     const { data: newCategory, error } = await adminClient
       .from('categories')
       .insert({
         name: data.name,
+        code: data.code,
         description: data.description || null,
         sort_order: data.sort_order,
       })
@@ -141,6 +156,7 @@ export async function updateCategory(
     // 2. 解析表單資料
     const rawData = {
       name: formData.get('name'),
+      code: formData.get('code'),
       description: formData.get('description') || '',
       sort_order: formData.get('sort_order'),
     }
@@ -188,6 +204,23 @@ export async function updateCategory(
         return {
           success: false,
           message: '此分類名稱已存在',
+        }
+      }
+    }
+
+    // 5.5 若修改 code,檢查是否與其他分類重複
+    if (data.code) {
+      const { data: duplicateCode } = await adminClient
+        .from('categories')
+        .select('id')
+        .eq('code', data.code)
+        .neq('id', id)
+        .single()
+
+      if (duplicateCode) {
+        return {
+          success: false,
+          message: '此分類代碼已存在',
         }
       }
     }
