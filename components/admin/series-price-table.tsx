@@ -56,7 +56,8 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
       // 過濾出有設定價格且非零售等級的價格 (零售價格由 retail_price 控制)
       const priceData = Object.entries(prices)
         .filter(([key, price]) => {
-          if (price === null || price === undefined) return false
+          // 檢查價格是否為有效數字
+          if (price === null || price === undefined || isNaN(price)) return false
           // 檢查是否為零售等級 (零售等級價格不允許手動設定)
           const [productId, tierId] = key.split('-')
           const product = products.find((p) => p.id === productId)
@@ -65,18 +66,33 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
         })
         .map(([key, price]) => {
           const [product_id, tier_id] = key.split('-')
-          return { product_id, tier_id, price: price! }
+          return { product_id, tier_id, price: Number(price) }
         })
 
       if (priceData.length === 0) {
         setError('請至少設定一個非零售等級的價格')
+        setLoading(false)
+        return
+      }
+
+      // 驗證所有價格資料的格式
+      const invalidData = priceData.find(
+        (item) => !item.product_id || !item.tier_id || typeof item.price !== 'number' || item.price < 0
+      )
+      if (invalidData) {
+        setError(`資料格式錯誤: ${JSON.stringify(invalidData)}`)
+        setLoading(false)
         return
       }
 
       const result = await batchSetTierPrices({ prices: priceData })
 
       if (!result.success) {
-        throw new Error(result.message || '批量設定價格失敗')
+        // 顯示詳細錯誤訊息
+        const errorDetails = result.errors
+          ? Object.entries(result.errors).map(([key, msgs]) => `${key}: ${msgs.join(', ')}`).join('\n')
+          : result.message
+        throw new Error(errorDetails || '批量設定價格失敗')
       }
 
       setSuccess(true)
