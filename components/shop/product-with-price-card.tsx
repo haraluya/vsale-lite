@@ -13,6 +13,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { StockStatus } from './stock-status'
 import type { ProductWithPrice } from '@/types'
 
 interface ProductWithPriceCardProps {
@@ -20,40 +21,7 @@ interface ProductWithPriceCardProps {
   tierName: string
 }
 
-/**
- * 取得庫存狀態顯示(基於 stock_status 欄位)
- */
-function getStockStatusDisplay(status: 'sufficient' | 'low' | 'out_of_stock') {
-  switch (status) {
-    case 'sufficient':
-      return {
-        text: '庫存充足',
-        bgColor: 'bg-green-100',
-        borderColor: 'border-green-600',
-        textColor: 'text-green-800',
-        icon: '✓',
-      }
-    case 'low':
-      return {
-        text: '庫存緊張',
-        bgColor: 'bg-yellow-100',
-        borderColor: 'border-yellow-600',
-        textColor: 'text-yellow-800',
-        icon: '⚠',
-      }
-    case 'out_of_stock':
-      return {
-        text: '暫時缺貨',
-        bgColor: 'bg-red-100',
-        borderColor: 'border-red-600',
-        textColor: 'text-red-800',
-        icon: '✕',
-      }
-  }
-}
-
 export function ProductWithPriceCard({ product, tierName }: ProductWithPriceCardProps) {
-  const stockDisplay = getStockStatusDisplay(product.stock_status)
 
   // 計算折扣百分比
   const discountPercent =
@@ -126,11 +94,8 @@ export function ProductWithPriceCard({ product, tierName }: ProductWithPriceCard
         )}
 
         {/* 庫存狀態 */}
-        <div
-          className={`rounded-none border-2 ${stockDisplay.borderColor} ${stockDisplay.bgColor} p-2 text-center text-sm font-bold ${stockDisplay.textColor}`}
-        >
-          <span className="mr-1">{stockDisplay.icon}</span>
-          {stockDisplay.text}
+        <div className="flex justify-center">
+          <StockStatus status={product.stock_status} size="md" />
         </div>
 
         {/* 單位 */}

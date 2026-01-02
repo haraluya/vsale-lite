@@ -3,6 +3,7 @@
 /**
  * Product Form Component
  * Feature: 002-product-management
+ * Updated: Feature 003-series-and-pricing (US6 - 商品編號自動產生)
  */
 
 import { useActionState } from 'react'
@@ -38,26 +39,24 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
   return (
     <div className="mx-auto max-w-2xl rounded-none border-3 border-black bg-white p-8 shadow-neo">
       <form action={formAction} className="space-y-6">
-        {/* 商品編號 */}
-        <div>
-          <label htmlFor="code" className="mb-2 block font-bold">
-            商品編號 <span className="text-red-600">*</span>
-          </label>
-          <Input
-            id="code"
-            name="code"
-            defaultValue={product?.code}
-            placeholder="例如: DRINK-001"
-            disabled={mode === 'edit'} // 編輯時禁用
-            className={mode === 'edit' ? 'cursor-not-allowed bg-gray-100' : ''}
-          />
-          <p className="mt-1 text-xs text-gray-600">
-            {mode === 'edit'
-              ? '商品編號建立後不可修改'
-              : '僅可包含英數字、連字號、底線 (例如: A001, DRINK-001)'}
-          </p>
-          <ErrorInline message={state?.errors?.code?.[0]} />
-        </div>
+        {/* 商品編號 (僅編輯模式顯示 - US6) */}
+        {mode === 'edit' && (
+          <div>
+            <label htmlFor="code" className="mb-2 block font-bold">
+              商品編號
+            </label>
+            <Input
+              id="code"
+              name="code"
+              defaultValue={product?.code}
+              disabled
+              className="cursor-not-allowed bg-gray-100"
+            />
+            <p className="mt-1 text-xs text-gray-600">
+              商品編號由系統自動產生，建立後不可修改
+            </p>
+          </div>
+        )}
 
         {/* 商品名稱 */}
         <div>

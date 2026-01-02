@@ -1,58 +1,25 @@
 /**
  * ProductCard Component
  * Feature: 002-product-management (US6 - 前台客戶瀏覽商品列表)
+ * Updated: Feature 003-series-and-pricing (US5 - 庫存狀態管理)
  *
  * 商品卡片元件,用於前台商品列表頁面
  * - 顯示商品圖片、名稱、編號、庫存狀態
  * - 不顯示價格 (FR-024)
- * - 支援負庫存顯示
+ * - 不顯示實際庫存數量，僅顯示狀態標籤 (US5)
  * - Neo-Brutalism 設計風格
  */
 
 import type { Product } from '@/types'
 import Image from 'next/image'
 import Link from 'next/link'
+import { StockStatus } from './stock-status'
 
 interface ProductCardProps {
   product: Product
 }
 
-/**
- * 取得庫存狀態顯示
- * @param stock 庫存數量
- * @returns 包含樣式和文字的物件
- */
-function getStockDisplay(stock: number) {
-  if (stock > 0) {
-    return {
-      text: `庫存: ${stock}`,
-      bgColor: 'bg-green-100',
-      borderColor: 'border-green-600',
-      textColor: 'text-green-800',
-      icon: '✓',
-    }
-  } else if (stock === 0) {
-    return {
-      text: '缺貨中',
-      bgColor: 'bg-yellow-100',
-      borderColor: 'border-yellow-600',
-      textColor: 'text-yellow-800',
-      icon: '⏳',
-    }
-  } else {
-    // 負庫存 (欠貨/預購)
-    return {
-      text: `欠貨: ${Math.abs(stock)}`,
-      bgColor: 'bg-red-100',
-      borderColor: 'border-red-600',
-      textColor: 'text-red-800',
-      icon: '⚠',
-    }
-  }
-}
-
 export function ProductCard({ product }: ProductCardProps) {
-  const stockDisplay = getStockDisplay(product.stock)
 
   return (
     <Link
@@ -89,12 +56,9 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* 庫存狀態 */}
-        <div
-          className={`rounded-none border-2 ${stockDisplay.borderColor} ${stockDisplay.bgColor} p-2 text-sm font-bold ${stockDisplay.textColor}`}
-        >
-          <span className="mr-1">{stockDisplay.icon}</span>
-          {stockDisplay.text}
+        {/* 庫存狀態 - 僅顯示狀態標籤，不顯示實際數量 */}
+        <div className="flex justify-start">
+          <StockStatus status={product.stock_status} size="sm" />
         </div>
 
         {/* 單位 */}

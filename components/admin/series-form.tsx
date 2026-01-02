@@ -65,6 +65,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
       category_id: formData.get('category_id') as string || null,
       name: formData.get('name') as string,
       description: formData.get('description') as string || '',
+      status: formData.get('status') as 'active' | 'inactive',
       sort_order: parseInt(formData.get('sort_order') as string) || 0,
     }
 
@@ -181,6 +182,24 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="mt-1 text-sm text-gray-500">數字越小,排序越前面</p>
+          </div>
+
+          {/* 狀態 */}
+          <div>
+            <label htmlFor="status" className="mb-2 block font-bold">
+              狀態 <span className="text-red-600">*</span>
+            </label>
+            <select
+              id="status"
+              name="status"
+              defaultValue={series?.status || 'active'}
+              required
+              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="active">上架 (Active)</option>
+              <option value="inactive">下架 (Inactive)</option>
+            </select>
+            <p className="mt-1 text-sm text-gray-500">下架後,前台客戶將無法看到此系列</p>
           </div>
         </div>
       </div>

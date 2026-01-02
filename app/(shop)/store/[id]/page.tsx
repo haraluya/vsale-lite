@@ -1,17 +1,19 @@
 /**
  * Product Detail Page (商品詳情頁)
  * Feature: 002-product-management (US6 - 前台客戶瀏覽商品列表)
+ * Updated: Feature 003-series-and-pricing (US5 - 庫存狀態管理)
  *
  * 前台商品詳情頁面
  * - 顯示商品完整資訊
  * - 不顯示價格 (FR-024)
- * - 顯示庫存狀態 (包含負庫存)
+ * - 不顯示實際庫存數量，僅顯示狀態標籤 (US5)
  * - 提供返回列表連結
  */
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { getProduct } from '@/lib/actions/products'
+import { StockStatus } from '@/components/shop/stock-status'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -19,37 +21,6 @@ interface ProductDetailPageProps {
   params: Promise<{
     id: string
   }>
-}
-
-/**
- * 取得庫存狀態顯示
- */
-function getStockDisplay(stock: number) {
-  if (stock > 0) {
-    return {
-      text: `庫存: ${stock}`,
-      bgColor: 'bg-green-100',
-      borderColor: 'border-green-600',
-      textColor: 'text-green-800',
-      icon: '✓',
-    }
-  } else if (stock === 0) {
-    return {
-      text: '缺貨中',
-      bgColor: 'bg-yellow-100',
-      borderColor: 'border-yellow-600',
-      textColor: 'text-yellow-800',
-      icon: '⏳',
-    }
-  } else {
-    return {
-      text: `欠貨: ${Math.abs(stock)}`,
-      bgColor: 'bg-red-100',
-      borderColor: 'border-red-600',
-      textColor: 'text-red-800',
-      icon: '⚠',
-    }
-  }
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
@@ -72,8 +43,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   if (!product) {
     notFound()
   }
-
-  const stockDisplay = getStockDisplay(product.stock)
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -134,15 +103,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   <p className="text-lg">{product.unit}</p>
                 </div>
 
-                {/* 庫存狀態 */}
-                <div
-                  className={`rounded-none border-2 ${stockDisplay.borderColor} ${stockDisplay.bgColor} p-4`}
-                >
-                  <p className="mb-1 text-sm font-bold text-gray-600">庫存狀態</p>
-                  <p className={`text-xl font-bold ${stockDisplay.textColor}`}>
-                    <span className="mr-2">{stockDisplay.icon}</span>
-                    {stockDisplay.text}
-                  </p>
+                {/* 庫存狀態 - 僅顯示狀態標籤，不顯示實際數量 */}
+                <div className="rounded-none border-2 border-black bg-gray-50 p-4">
+                  <p className="mb-2 text-sm font-bold text-gray-600">庫存狀態</p>
+                  <StockStatus status={product.stock_status} size="lg" />
                 </div>
               </div>
             </div>
