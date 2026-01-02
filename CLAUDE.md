@@ -209,56 +209,98 @@ pnpm test             # 執行所有測試 (Vitest)
 pnpm test:ui          # 啟動 Vitest UI 介面
 ```
 
-### Supabase CLI 管理（雲端部署）
+### Supabase CLI 管理
 
-**環境設定**:
-- Supabase 專案 ID: `qwovavytryvgchcowjof`
-- 區域: AWS ap-southeast-1
-- 專案 URL: `https://qwovavytryvgchcowjof.supabase.co`
+**⚠️ 重要：當前使用本地 Docker Supabase 進行開發**
 
-**Migration 管理**:
+專案配置為使用**本地 Docker Supabase**，完成後再部署到雲端。
+
+---
+
+#### 本地開發環境（Docker）✅ 當前使用
+
 ```bash
-# 1. 連結雲端專案（首次設定）
-supabase link --project-ref qwovavytryvgchcowjof
+# 1. 啟動本地 Supabase（首次或重啟電腦後執行）
+supabase start
 
-# 2. 推送新的 Migration 到雲端
-supabase db push
-
-# 3. 從雲端拉取最新 Schema
-supabase db pull
-
-# 4. 比較本地與雲端的差異
-supabase db diff
-
-# 5. 重置本地資料庫（Docker）
+# 2. 重置資料庫並執行所有 Migrations
 supabase db reset
+
+# 3. 查看本地服務資訊
+supabase status
+
+# 4. 停止本地 Supabase
+supabase stop
 ```
 
-**測試資料生成**:
-```bash
-# 方法 1: 使用 Supabase Dashboard SQL Editor（推薦）
-# 1. 開啟 https://app.supabase.com/project/qwovavytryvgchcowjof/sql/new
-# 2. 複製 specs/003-series-and-pricing/seed-test-data.sql 內容
-# 3. 貼上並執行
+**本地服務連結**:
+- Supabase Studio: http://127.0.0.1:54323
+- API URL: http://127.0.0.1:54321
+- Database: postgresql://postgres:postgres@127.0.0.1:54322/postgres
 
-# 方法 2: 使用 psql 直接執行（需安裝 PostgreSQL 客戶端）
-psql -h aws-0-ap-southeast-1.pooler.supabase.com -p 6543 -U postgres.qwovavytryvgchcowjof -d postgres -f specs/003-series-and-pricing/seed-test-data.sql
+**環境變數** (`.env.local`):
+- ✅ 已設定為本地 Supabase
+- 部署時需手動切換到雲端設定
+
+---
+
+#### 測試資料生成（本地）
+
+```bash
+# 方法 1: 使用 Supabase Studio SQL Editor（推薦）
+# 1. 開啟 http://127.0.0.1:54323
+# 2. 左側 → SQL Editor → New Query
+# 3. 複製 specs/003-series-and-pricing/seed-test-data.sql
+# 4. 執行
+
+# 方法 2: psql 直接執行
+psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f specs/003-series-and-pricing/seed-test-data.sql
+# 密碼: postgres
+```
+
+---
+
+#### Migration 管理
+
+```bash
+# 執行所有 Migrations（開發時常用）
+supabase db reset
+
+# 新增 Migration
+supabase migration new <name>
+
+# 查看 Migration 狀態
+supabase migration list
 ```
 
 **Migration 檔案位置**:
-- `supabase/migrations/*.sql` - 按時間戳排序執行 (20260101, 20260102...)
+- `supabase/migrations/*.sql` - 按時間戳排序 (20260101, 20260102, 20260103...)
 
-**本地開發（Docker）**:
+---
+
+#### 雲端部署（生產環境）- 僅部署時使用
+
 ```bash
-# 啟動本地 Supabase（包含 PostgreSQL, Auth, Storage 等）
-supabase start
+# 1. 連結雲端專案
+supabase link --project-ref qwovavytryvgchcowjof
 
-# 停止本地 Supabase
-supabase stop
+# 2. 推送 Migrations 到雲端
+supabase db push
 
-# 查看本地服務狀態
-supabase status
+# 3. 從雲端拉取 Schema
+supabase db pull
 ```
+
+**雲端設定**:
+- 專案 ID: `qwovavytryvgchcowjof`
+- 區域: AWS ap-southeast-1
+- URL: `https://qwovavytryvgchcowjof.supabase.co`
+
+**部署流程**:
+1. 更新 `.env.local` 切換到雲端設定
+2. `supabase db push` 推送 Migrations
+3. 驗證雲端資料庫
+4. 部署到 Firebase
 
 ---
 
