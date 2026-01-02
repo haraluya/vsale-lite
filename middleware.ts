@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
@@ -25,6 +26,18 @@ export async function middleware(request: NextRequest) {
             supabaseResponse.cookies.set(name, value, options)
           )
         },
+      },
+    }
+  )
+
+  // Admin client for querying profiles (bypasses RLS)
+  const adminClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     }
   )
@@ -93,18 +106,19 @@ export async function middleware(request: NextRequest) {
   }
 
   // 2. 已登入:檢查角色權限
-  // 查詢使用者角色
-  const { data: profile } = await supabase
+  // 查詢使用者角色（使用 Admin Client 繞過 RLS）
+  const { data: profile } = await adminClient
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single()
 
   if (!profile) {
-    // 找不到 profile → 登出並導向登入頁
+    // 找不到 profile → 登出並導向對應的登入頁
     await supabase.auth.signOut()
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    // 判斷是後台還是前台路由
+    url.pathname = pathname.startsWith('/admin') ? '/admin/login' : '/login'
     return NextResponse.redirect(url)
   }
 
