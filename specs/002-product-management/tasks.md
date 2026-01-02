@@ -211,9 +211,9 @@
 
 ### 8.2 Performance Optimization (Optional)
 
-- [ ] T068 [P] 使用 Next.js Image 元件優化商品圖片載入
+- [X] T068 [P] 使用 Next.js Image 元件優化商品圖片載入 **✅ 已在 ProductCard 與商品詳情頁實作**
 - [ ] T069 [P] 實作商品列表 Skeleton Loading
-- [ ] T070 [P] 啟用 Supabase Storage 快取 (cacheControl: 3600)
+- [X] T070 [P] 啟用 Supabase Storage 快取 (cacheControl: 3600) **✅ 已在 uploadProductImage 實作**
 - [ ] T071 [P] 驗證商品搜尋查詢效能 (目標 < 200ms)
 - [ ] T071-A [P] 建立圖片上傳效能測試腳本 (tests/performance/image-upload.spec.ts) - 驗證 SC-003
 - [ ] T071-B [P] 建立搜尋功能效能基準測試 (tests/performance/search-benchmark.spec.ts) - 驗證 SC-004
@@ -222,14 +222,14 @@
 
 - [ ] T072 實作商品刪除保護邏輯 (檢查是否有訂單記錄) - 預留介面 (實際邏輯在 004-shopping-cart 實作)
 - [ ] T072-A [P] 實作非管理員操作阻擋前端驗證 (UI 層隱藏操作按鈕) - FR-027
-- [ ] T072-B [P] 實作非管理員操作阻擋後端驗證 (Server Actions 權限檢查) - FR-027
-- [ ] T073 實作圖片刪除錯誤處理 (圖片可能不存在)
+- [X] T072-B [P] 實作非管理員操作阻擋後端驗證 (Server Actions 權限檢查) - FR-027 **✅ 所有 Server Actions 已使用 checkAuth**
+- [X] T073 實作圖片刪除錯誤處理 (圖片可能不存在) **✅ 已在 deleteProductImage 實作**
 - [ ] T074-A 在 Out of Scope 文件中說明訂單快照機制 (FR-028，將在 004 實作)
 
 ### 8.4 Final Validation
 
-- [ ] T075 [P] TypeScript 型別檢查 (pnpm type-check)
-- [ ] T076 執行 pnpm build 驗證編譯成功
+- [X] T075 [P] TypeScript 型別檢查 (pnpm type-check) **✅ 通過**
+- [X] T076 執行 pnpm build 驗證編譯成功 **✅ 通過**
 - [ ] T077 [P] 程式碼格式化與 Linting 檢查
 - [ ] T078 更新 README.md (新增商品管理功能說明)
 
