@@ -11,7 +11,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getActiveSeries } from '@/lib/actions/shop'
+import { getActiveAnnouncements } from '@/lib/actions/announcements'
 import { SeriesCard } from '@/components/shop/series-card'
+import { AnnouncementCarousel } from '@/components/announcements/AnnouncementCarousel'
 
 export default async function StorePage() {
   const supabase = await createClient()
@@ -35,6 +37,10 @@ export default async function StorePage() {
   const seriesResult = await getActiveSeries()
   const series = seriesResult.success ? seriesResult.data : []
 
+  // 查詢啟用的廣告 (Feature 007 - US4)
+  const announcementsResult = await getActiveAnnouncements()
+  const announcements = announcementsResult.success ? announcementsResult.data : []
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-7xl">
@@ -50,6 +56,13 @@ export default async function StorePage() {
             </p>
           )}
         </div>
+
+        {/* Announcement Carousel (Feature 007 - US4) */}
+        {announcements.length > 0 && (
+          <div className="mb-6">
+            <AnnouncementCarousel announcements={announcements} />
+          </div>
+        )}
 
         {/* Series Grid */}
         {!series || series.length === 0 ? (

@@ -112,14 +112,14 @@
 
 ### Implementation for User Story 4
 
-- [ ] T034 [P] [US4] 實作 getActiveAnnouncements Server Action lib/actions/announcements.ts（前台，僅啟用的廣告）
-- [ ] T035 [P] [US4] 實作 getAllAnnouncements Server Action lib/actions/announcements.ts（管理端，所有廣告）
-- [ ] T036 [P] [US4] 實作 createAnnouncement Server Action lib/actions/announcements.ts（管理端）
-- [ ] T037 [P] [US4] 實作 updateAnnouncement Server Action lib/actions/announcements.ts（管理端）
-- [ ] T038 [P] [US4] 實作 deleteAnnouncement Server Action lib/actions/announcements.ts（管理端，同時刪除圖片）
-- [ ] T039 [P] [US4] 實作 uploadAnnouncementImage Server Action lib/actions/announcements.ts（管理端，儲存至 Supabase Storage，路徑：announcements/{id}/main.{ext}，含檔案大小驗證最大 5MB）
-- [ ] T040 [US4] 新增廣告輪播元件 components/announcements/AnnouncementCarousel.tsx（自動播放、左右箭頭、指示器）
-- [ ] T041 [US4] 更新前台首頁 app/(shop)/store/page.tsx（整合廣告輪播元件）
+- [X] T034 [P] [US4] 實作 getActiveAnnouncements Server Action lib/actions/announcements.ts（前台，僅啟用的廣告）
+- [X] T035 [P] [US4] 實作 getAllAnnouncements Server Action lib/actions/announcements.ts（管理端，所有廣告）
+- [X] T036 [P] [US4] 實作 createAnnouncement Server Action lib/actions/announcements.ts（管理端）
+- [X] T037 [P] [US4] 實作 updateAnnouncement Server Action lib/actions/announcements.ts（管理端）
+- [X] T038 [P] [US4] 實作 deleteAnnouncement Server Action lib/actions/announcements.ts（管理端，同時刪除圖片）
+- [X] T039 [P] [US4] 實作 uploadAnnouncementImage Server Action lib/actions/announcements.ts（管理端，儲存至 Supabase Storage，路徑：announcements/{id}/main.{ext}，含檔案大小驗證最大 5MB）
+- [X] T040 [US4] 新增廣告輪播元件 components/announcements/AnnouncementCarousel.tsx（自動播放、左右箭頭、指示器）
+- [X] T041 [US4] 更新前台首頁 app/(shop)/store/page.tsx（整合廣告輪播元件）
 - [ ] T042 [US4] 新增後台廣告管理頁面 app/(admin)/admin/announcements/page.tsx（列表顯示、CRUD 操作）
 - [ ] T043 [US4] 新增後台廣告編輯頁面 app/(admin)/admin/announcements/[id]/edit/page.tsx（表單與圖片上傳）
 - [ ] T044 [US4] 新增廣告表單元件 components/admin/announcements/AnnouncementForm.tsx（標題、連結、排序、圖片上傳）
