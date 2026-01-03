@@ -1,10 +1,13 @@
 /**
  * Navbar Component
  * Feature: 003-series-and-pricing (US3)
+ * Feature: 006-ux-enhancement (US3)
  *
  * 前台導航列元件
+ * - 顯示 Logo（可點擊回首頁）
  * - 顯示手機號碼與會員等級
  * - 登出按鈕
+ * - 固定置頂（sticky）
  * - Neo-Brutalism 設計風格
  */
 
@@ -17,6 +20,7 @@ import { logout } from '@/lib/actions/shop'
 import type { CurrentUser } from '@/types'
 import { LogOut, User, ShoppingCart, Package } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
+import { Logo } from '@/components/ui/logo'
 
 interface NavbarProps {
   user: CurrentUser
@@ -50,13 +54,14 @@ export function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <nav className="border-b-3 border-black bg-white shadow-neo">
+    <nav className="sticky top-0 z-50 border-b-3 border-black bg-white shadow-neo">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex h-16 items-center justify-between">
           {/* Logo / 品牌 */}
           <div className="flex items-center gap-4">
-            <h1 className="text-2xl font-bold">Vsale</h1>
-            <span className="hidden text-sm text-gray-600 sm:block">批發訂貨系統</span>
+            <Logo variant="full" className="hidden sm:block" />
+            <Logo variant="icon" className="block sm:hidden" />
+            <span className="hidden text-sm text-gray-600 lg:block">批發訂貨系統</span>
           </div>
 
           {/* 用戶資訊與登出 */}
