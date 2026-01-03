@@ -245,18 +245,11 @@ export async function getOrders(
     const offset = (page - 1) * limit
 
     // 建立基礎查詢
+    // 注意：orders.user_id -> auth.users.id, profiles.id -> auth.users.id
+    // 沒有直接的 FK，需要分別查詢
     let query = supabase
       .from('orders')
-      .select(`
-        *,
-        profiles!user_id(
-          id,
-          phone,
-          display_name,
-          tier_id,
-          tiers(name)
-        )
-      `, { count: 'exact' })
+      .select('*', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
 
@@ -265,11 +258,9 @@ export async function getOrders(
       query = query.eq('status', status)
     }
 
-    // 管理員搜尋功能 (訂單編號或客戶名稱/手機)
+    // 訂單編號搜尋
     if (search && role === 'admin') {
-      query = query.or(
-        `order_number.ilike.%${search}%,profiles.phone.ilike.%${search}%,profiles.display_name.ilike.%${search}%`
-      )
+      query = query.ilike('order_number', `%${search}%`)
     }
 
     const { data: orders, count, error } = await query
@@ -282,20 +273,47 @@ export async function getOrders(
       }
     }
 
+    if (!orders || orders.length === 0) {
+      return {
+        success: true,
+        data: {
+          orders: [],
+          total: 0,
+          page,
+          limit,
+        },
+      }
+    }
+
+    // 批次查詢用戶資料
+    const userIds = orders.map((order: any) => order.user_id)
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, phone, display_name, tier_id, tiers(name)')
+      .in('id', userIds)
+
+    // 建立 user_id -> profile 的對應表
+    const profileMap = new Map(
+      (profiles || []).map((profile: any) => [profile.id, profile])
+    )
+
     // 轉換資料格式
-    const formattedOrders: OrderWithUser[] = (orders || []).map((order: any) => ({
-      id: order.id,
-      order_number: order.order_number,
-      user_id: order.user_id,
-      total_amount: order.total_amount,
-      status: order.status,
-      notes: order.notes,
-      created_at: order.created_at,
-      updated_at: order.updated_at,
-      user_name: order.profiles?.display_name || order.profiles?.phone || '未知客戶',
-      user_phone: order.profiles?.phone || '',
-      tier_name: order.profiles?.tiers?.name || '未設定',
-    }))
+    const formattedOrders: OrderWithUser[] = orders.map((order: any) => {
+      const profile = profileMap.get(order.user_id)
+      return {
+        id: order.id,
+        order_number: order.order_number,
+        user_id: order.user_id,
+        total_amount: order.total_amount,
+        status: order.status,
+        notes: order.notes,
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+        user_name: profile?.display_name || profile?.phone || '未知客戶',
+        user_phone: profile?.phone || '',
+        tier_name: profile?.tiers?.name || '未設定',
+      }
+    })
 
     return {
       success: true,
@@ -328,38 +346,10 @@ export async function getOrderById(
     const supabase = await createClient()
     const { userId, role } = await checkAuth()
 
-    // 查詢訂單主表與關聯資料
+    // 查詢訂單主表
     const { data: order, error } = await supabase
       .from('orders')
-      .select(`
-        *,
-        profiles!user_id(
-          id,
-          phone,
-          display_name,
-          tiers(name)
-        ),
-        order_items(
-          id,
-          product_id,
-          product_name_snapshot,
-          deal_price,
-          quantity,
-          subtotal,
-          created_at
-        ),
-        order_timelines(
-          id,
-          action_type,
-          actor_id,
-          actor_role,
-          old_status,
-          new_status,
-          notes,
-          created_at,
-          profiles!actor_id(display_name, phone)
-        )
-      `)
+      .select('*')
       .eq('id', orderId)
       .single()
 
@@ -379,6 +369,36 @@ export async function getOrderById(
       }
     }
 
+    // 查詢訂單客戶資料
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, phone, display_name, tier_id, tiers(name)')
+      .eq('id', order.user_id)
+      .single()
+
+    // 查詢訂單明細
+    const { data: orderItems } = await supabase
+      .from('order_items')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true })
+
+    // 查詢訂單歷史
+    const { data: orderTimelines } = await supabase
+      .from('order_timelines')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true })
+
+    // 批次查詢操作者資料（用於時間軸）
+    const actorIds = (orderTimelines || []).map(t => t.actor_id).filter(Boolean)
+    const { data: actors } = await supabase
+      .from('profiles')
+      .select('id, display_name, phone')
+      .in('id', actorIds)
+
+    const actorMap = new Map((actors || []).map((actor: any) => [actor.id, actor]))
+
     // 格式化訂單資料
     const orderDetail: OrderDetail = {
       id: order.id,
@@ -390,14 +410,14 @@ export async function getOrderById(
       created_at: order.created_at,
       updated_at: order.updated_at,
       user: {
-        id: (order.profiles as any)?.id || '',
-        name: (order.profiles as any)?.display_name || (order.profiles as any)?.phone || '未知客戶',
-        phone: (order.profiles as any)?.phone || '',
-        tier_name: (order.profiles as any)?.tiers?.name || '未設定',
+        id: profile?.id || order.user_id,
+        name: profile?.display_name || profile?.phone || '未知客戶',
+        phone: profile?.phone || '',
+        tier_name: (profile?.tiers as any)?.name || '未設定',
       },
-      items: ((order.order_items as any[]) || []).map((item: any) => ({
+      items: (orderItems || []).map((item: any) => ({
         id: item.id,
-        order_id: order.id,
+        order_id: item.order_id,
         product_id: item.product_id,
         product_name_snapshot: item.product_name_snapshot,
         deal_price: item.deal_price,
@@ -405,11 +425,11 @@ export async function getOrderById(
         subtotal: item.subtotal,
         created_at: item.created_at,
       })),
-      timelines: ((order.order_timelines as any[]) || [])
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-        .map((timeline: any) => ({
+      timelines: (orderTimelines || []).map((timeline: any) => {
+        const actor = actorMap.get(timeline.actor_id)
+        return {
           id: timeline.id,
-          order_id: order.id,
+          order_id: timeline.order_id,
           action_type: timeline.action_type,
           actor_id: timeline.actor_id,
           actor_role: timeline.actor_role,
@@ -417,8 +437,9 @@ export async function getOrderById(
           new_status: timeline.new_status,
           notes: timeline.notes,
           created_at: timeline.created_at,
-          actor_name: timeline.profiles?.display_name || timeline.profiles?.phone || '系統',
-        })),
+          actor_name: actor?.display_name || actor?.phone || '系統',
+        }
+      }),
     }
 
     return {
