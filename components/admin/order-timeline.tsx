@@ -6,9 +6,11 @@ import type { OrderTimelineWithActor as OrderTimelineType } from '@/types'
 /**
  * 訂單操作歷史時間軸元件
  * Feature: 004-cart-and-orders / US5
+ * Enhanced: 007-system-enhancement / US1 - 新增留言氣泡式顯示
  *
- * - 顯示訂單的所有操作記錄
- * - 時間軸設計
+ * - 顯示訂單的所有操作記錄與留言
+ * - 留言採用氣泡式設計（客戶左灰、管理員右藍）
+ * - 操作歷史採用時間軸設計
  * - Neo-Brutalism 設計風格
  */
 
@@ -29,7 +31,12 @@ const ACTION_TYPE_CONFIG: Record<
     emoji: '📝',
     colorClass: 'bg-green-200 border-green-600',
   },
-  status_changed: {
+  confirmed: {
+    label: '確認訂單',
+    emoji: '✅',
+    colorClass: 'bg-blue-200 border-blue-600',
+  },
+  status_updated: {
     label: '狀態變更',
     emoji: '🔄',
     colorClass: 'bg-blue-200 border-blue-600',
@@ -38,6 +45,11 @@ const ACTION_TYPE_CONFIG: Record<
     label: '取消訂單',
     emoji: '❌',
     colorClass: 'bg-red-200 border-red-600',
+  },
+  comment: {
+    label: '留言',
+    emoji: '💬',
+    colorClass: 'bg-yellow-200 border-yellow-600',
   },
 }
 
@@ -89,18 +101,58 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
   return (
     <div className="space-y-4">
       {timelines.map((timeline, index) => {
+        const isComment = timeline.action_type === 'comment'
+        const isAdminComment = isComment && timeline.actor_role === 'admin'
         const config = ACTION_TYPE_CONFIG[timeline.action_type] || {
           label: '其他操作',
           emoji: '📌',
           colorClass: 'bg-gray-200 border-gray-600',
         }
 
+        // 留言採用氣泡式設計
+        if (isComment) {
+          return (
+            <div
+              key={timeline.id}
+              className={`flex ${isAdminComment ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`max-w-md ${isAdminComment ? 'ml-auto' : 'mr-auto'}`}>
+                {/* 氣泡式留言框 */}
+                <div
+                  className={`rounded-none border-3 border-black p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
+                             ${isAdminComment ? 'bg-blue-100' : 'bg-gray-100'}`}
+                >
+                  {/* 留言內容 */}
+                  <div className="mb-3 whitespace-pre-wrap break-words text-sm">
+                    {timeline.content}
+                  </div>
+
+                  {/* 操作者與時間 */}
+                  <div className="flex items-center justify-between gap-2 text-xs text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      <span className="font-semibold">
+                        {timeline.actor_role === 'admin' ? '管理員' : '客戶'}: {timeline.actor_name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      {formatDate(timeline.created_at)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        // 操作歷史採用時間軸設計
         return (
           <div key={timeline.id} className="flex gap-4">
             {/* 時間線 */}
             <div className="flex flex-col items-center">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-none border-2 ${config.colorClass} text-lg`}
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none border-2 ${config.colorClass} text-lg`}
               >
                 {config.emoji}
               </div>

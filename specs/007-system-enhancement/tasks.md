@@ -50,10 +50,10 @@
 
 - [X] T009 [P] [US1] 實作 addOrderComment Server Action lib/actions/orders.ts
 - [X] T010 [P] [US1] 實作 getOrderTimeline Server Action lib/actions/orders.ts
-- [ ] T011 [US1] 更新前台訂單詳情頁 app/(shop)/store/orders/[id]/page.tsx（新增留言區塊與時間軸顯示）
-- [ ] T012 [US1] 更新後台訂單詳情頁 app/(admin)/admin/orders/[id]/page.tsx（新增留言區塊與時間軸顯示）
-- [ ] T013 [US1] 新增訂單時間軸元件 components/orders/OrderTimeline.tsx（氣泡式設計，客戶左灰、管理員右藍）
-- [ ] T014 [US1] 新增留言輸入元件 components/orders/CommentInput.tsx（獨立可重用元件，含字數統計 X/500，可用於前台與後台）
+- [X] T011 [US1] 更新前台訂單詳情頁 app/(shop)/store/orders/[id]/page.tsx（新增留言區塊與時間軸顯示）
+- [X] T012 [US1] 更新後台訂單詳情頁 app/(admin)/admin/orders/[id]/page.tsx（新增留言區塊與時間軸顯示）
+- [X] T013 [US1] 新增訂單時間軸元件 components/admin/order-timeline.tsx（氣泡式設計，客戶左灰、管理員右藍）
+- [X] T014 [US1] 新增留言輸入元件 components/orders/CommentInput.tsx（獨立可重用元件，含字數統計 X/500，可用於前台與後台）
 - [ ] T015 [US1] 測試客戶僅能在自己的訂單留言（權限驗證）
 - [ ] T016 [US1] 測試管理員可在任何訂單留言（權限驗證）
 - [ ] T017 [US1] 測試留言字數超過 500 字時的錯誤處理

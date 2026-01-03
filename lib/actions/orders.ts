@@ -17,6 +17,7 @@ import type {
   GetOrdersResponse,
   CartItem,
   OrderItem,
+  OrderTimelineWithActor,
 } from '@/types'
 
 /**
@@ -746,21 +747,9 @@ export async function addOrderComment(
  * - 包含操作歷史與留言記錄
  * - 依時間排序（舊 → 新）
  */
-export async function getOrderTimeline(orderId: string): Promise<
-  ActionResult<
-    Array<{
-      id: string
-      action_type: string
-      content: string | null
-      actor_id: string | null
-      actor_role: string | null
-      actor_name: string | null
-      old_status: string | null
-      new_status: string | null
-      created_at: string
-    }>
-  >
-> {
+export async function getOrderTimeline(
+  orderId: string
+): Promise<ActionResult<OrderTimelineWithActor[]>> {
   try {
     const supabase = await createClient()
     const { userId, role } = await checkAuth()
@@ -786,6 +775,7 @@ export async function getOrderTimeline(orderId: string): Promise<
       .from('order_timelines')
       .select(`
         id,
+        order_id,
         action_type,
         content,
         actor_id,
@@ -807,12 +797,13 @@ export async function getOrderTimeline(orderId: string): Promise<
     }
 
     // 格式化回傳資料
-    const timelines = data.map((item: any) => ({
+    const timelines: OrderTimelineWithActor[] = data.map((item: any) => ({
       id: item.id,
-      action_type: item.action_type,
+      order_id: item.order_id,
+      action_type: item.action_type as OrderTimelineWithActor['action_type'],
       content: item.content,
       actor_id: item.actor_id,
-      actor_role: item.actor_role,
+      actor_role: item.actor_role as OrderTimelineWithActor['actor_role'],
       actor_name: item.profiles?.display_name || null,
       old_status: item.old_status,
       new_status: item.new_status,

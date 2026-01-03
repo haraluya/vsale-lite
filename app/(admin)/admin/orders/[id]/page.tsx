@@ -2,10 +2,10 @@ import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getOrderById } from '@/lib/actions/orders'
+import { getOrderById, getOrderTimeline } from '@/lib/actions/orders'
 import { OrderStatusBadge } from '@/components/shop/order-status-badge'
 import { OrderActions } from '@/components/admin/order-actions'
-import { OrderTimeline } from '@/components/admin/order-timeline'
+import { OrderCommentSection } from '@/components/admin/order-comment-section'
 import { ArrowLeft, User, Phone, Award, Calendar, FileText } from 'lucide-react'
 
 /**
@@ -50,6 +50,10 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
   }
 
   const order = result.data
+
+  // 取得訂單時間軸（含留言）
+  const timelineResult = await getOrderTimeline(id)
+  const timelines = timelineResult.success && timelineResult.data ? timelineResult.data : []
 
   // 格式化金額
   const formatAmount = (amount: number) => {
@@ -160,10 +164,10 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
           currentStatus={order.status}
         />
 
-        {/* 操作歷史 */}
+        {/* 操作歷史與留言 (Feature 007 - US1) */}
         <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
-          <h2 className="mb-4 text-xl font-bold">操作歷史</h2>
-          <OrderTimeline timelines={order.timelines || []} />
+          <h2 className="mb-6 text-xl font-bold">訂單溝通與操作歷史</h2>
+          <OrderCommentSection orderId={order.id} initialTimelines={timelines} />
         </div>
       </div>
     </div>

@@ -13,11 +13,14 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { getOrderById } from '@/lib/actions/orders'
+import { getOrderById, addOrderComment, getOrderTimeline } from '@/lib/actions/orders'
 import { OrderStatusBadge } from '@/components/shop/order-status-badge'
-import type { OrderDetail } from '@/types'
+import { OrderTimeline } from '@/components/admin/order-timeline'
+import { CommentInput } from '@/components/orders/CommentInput'
+import type { OrderDetail, OrderTimelineWithActor } from '@/types'
 import { formatCurrency } from '@/lib/utils'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 export default function CustomerOrderDetailPage() {
   const params = useParams()
@@ -26,9 +29,11 @@ export default function CustomerOrderDetailPage() {
   const isSuccess = searchParams.get('success') === 'true'
 
   const [order, setOrder] = useState<OrderDetail | null>(null)
+  const [timelines, setTimelines] = useState<OrderTimelineWithActor[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // 載入訂單與時間軸
   useEffect(() => {
     async function loadOrder() {
       setIsLoading(true)
@@ -38,6 +43,12 @@ export default function CustomerOrderDetailPage() {
 
       if (result.success && result.data) {
         setOrder(result.data)
+
+        // 載入時間軸（含留言）
+        const timelineResult = await getOrderTimeline(orderId)
+        if (timelineResult.success && timelineResult.data) {
+          setTimelines(timelineResult.data)
+        }
       } else {
         setError(result.message || '載入訂單詳情時發生錯誤')
       }
@@ -47,6 +58,24 @@ export default function CustomerOrderDetailPage() {
 
     loadOrder()
   }, [orderId])
+
+  // 提交留言
+  const handleSubmitComment = async (content: string) => {
+    const result = await addOrderComment({ orderId, content })
+
+    if (result.success) {
+      toast.success('留言已送出')
+
+      // 重新載入時間軸
+      const timelineResult = await getOrderTimeline(orderId)
+      if (timelineResult.success && timelineResult.data) {
+        setTimelines(timelineResult.data)
+      }
+    } else {
+      toast.error(result.message || '送出留言失敗')
+      throw new Error(result.message)
+    }
+  }
 
   // 載入中狀態
   if (isLoading) {
@@ -206,6 +235,27 @@ export default function CustomerOrderDetailPage() {
               <li>🎉 <strong>已完成</strong>: 訂單已完成</li>
               <li>❌ <strong>已取消</strong>: 訂單已取消</li>
             </ul>
+          </div>
+
+          {/* 訂單留言與操作歷史 (Feature 007 - US1) */}
+          <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+            <h2 className="mb-6 text-2xl font-bold">訂單溝通</h2>
+
+            {/* 時間軸與留言顯示 */}
+            <div className="mb-6">
+              <OrderTimeline timelines={timelines} />
+            </div>
+
+            {/* 留言輸入框 */}
+            {order.status !== 'cancelled' && order.status !== 'completed' && (
+              <div className="mt-6 rounded-none border-2 border-gray-300 bg-gray-50 p-4">
+                <h3 className="mb-3 text-sm font-bold text-gray-700">新增留言</h3>
+                <CommentInput
+                  onSubmit={handleSubmitComment}
+                  placeholder="與管理員溝通訂單相關問題..."
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
