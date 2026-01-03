@@ -6,12 +6,19 @@
 BEGIN;
 
 -- =====================================================
--- 1. 擴充 order_timelines.action_type ENUM
+-- 1. 擴充 order_timelines 表
 -- =====================================================
--- 新增 'comment' 類型以支援訂單留言功能
+-- 1.1 新增 content 欄位（留言內容）
+ALTER TABLE order_timelines
+  ADD COLUMN IF NOT EXISTS content TEXT;
+
+-- 1.2 更新 action_type ENUM（新增 'comment' 類型）
 ALTER TABLE order_timelines DROP CONSTRAINT IF EXISTS order_timelines_action_type_check;
 ALTER TABLE order_timelines ADD CONSTRAINT order_timelines_action_type_check
   CHECK (action_type IN ('created', 'confirmed', 'status_updated', 'cancelled', 'comment'));
+
+-- 1.3 遷移既有 notes 資料到 content（若有資料）
+UPDATE order_timelines SET content = notes WHERE notes IS NOT NULL AND content IS NULL;
 
 -- =====================================================
 -- 2. 擴充 profiles 表新增欄位
