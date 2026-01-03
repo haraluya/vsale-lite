@@ -1,19 +1,25 @@
 /**
  * ProductWithPriceCard Component
  * Feature: 003-series-and-pricing (US1)
+ * Updated: 004-cart-and-orders (US1 - 新增「加入購物車」按鈕)
  *
  * 帶價格顯示的商品卡片元件(用於系列詳情頁)
  * - 顯示原價與會員等級價格
  * - 顯示折扣力度
  * - 顯示庫存狀態
+ * - 支援加入購物車 (Feature 004)
  * - Neo-Brutalism 設計風格
  */
 
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { ShoppingCart, Plus } from 'lucide-react'
 import { StockStatus } from './stock-status'
+import { useCartStore } from '@/stores/cart'
+import { validateCartItem } from '@/lib/actions/cart'
 import type { ProductWithPrice } from '@/types'
 
 interface ProductWithPriceCardProps {
@@ -22,6 +28,9 @@ interface ProductWithPriceCardProps {
 }
 
 export function ProductWithPriceCard({ product, tierName }: ProductWithPriceCardProps) {
+  const { addItem, getItemQuantity } = useCartStore()
+  const [isAdding, setIsAdding] = useState(false)
+  const cartQuantity = getItemQuantity(product.id)
 
   // 計算折扣百分比
   const discountPercent =
@@ -29,10 +38,26 @@ export function ProductWithPriceCard({ product, tierName }: ProductWithPriceCard
       ? Math.round(((product.retail_price - product.user_price) / product.retail_price) * 100)
       : 0
 
+  // 加入購物車
+  const handleAddToCart = async () => {
+    if (isAdding || !product.user_price) return
+
+    setIsAdding(true)
+
+    const validation = await validateCartItem(product.id)
+
+    if (!validation.success) {
+      alert(validation.message)
+      setIsAdding(false)
+      return
+    }
+
+    addItem(product.id, 1)
+    setIsAdding(false)
+  }
+
   return (
-    <Link
-      href={`/store/${product.id}`}
-      className="group block rounded-none border-3 border-black bg-white p-4 shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+    <div className="group rounded-none border-3 border-black bg-white p-4 shadow-neo"
     >
       {/* 商品圖片 */}
       <div className="mb-4 aspect-square overflow-hidden rounded-none border-2 border-black bg-gray-100">
@@ -100,7 +125,30 @@ export function ProductWithPriceCard({ product, tierName }: ProductWithPriceCard
 
         {/* 單位 */}
         <p className="text-sm text-gray-500">單位: {product.unit}</p>
+
+        {/* 加入購物車按鈕 */}
+        <button
+          onClick={handleAddToCart}
+          disabled={isAdding || !product.user_price}
+          className="mt-3 w-full rounded-none border-3 border-black bg-green-400 px-4 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:bg-gray-200 disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+        >
+          {isAdding ? (
+            '加入中...'
+          ) : !product.user_price ? (
+            '價格未設定'
+          ) : cartQuantity > 0 ? (
+            <span className="flex items-center justify-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              再加一件 (已有 {cartQuantity} 件)
+            </span>
+          ) : (
+            <span className="flex items-center justify-center gap-2">
+              <Plus className="h-5 w-5" />
+              加入購物車
+            </span>
+          )}
+        </button>
       </div>
-    </Link>
+    </div>
   )
 }

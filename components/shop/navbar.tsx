@@ -12,9 +12,11 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { logout } from '@/lib/actions/shop'
 import type { CurrentUser } from '@/types'
-import { LogOut, User } from 'lucide-react'
+import { LogOut, User, ShoppingCart } from 'lucide-react'
+import { useCartStore } from '@/stores/cart'
 
 interface NavbarProps {
   user: CurrentUser
@@ -23,6 +25,8 @@ interface NavbarProps {
 export function Navbar({ user }: NavbarProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const { getTotalItems } = useCartStore()
+  const cartItemsCount = getTotalItems()
 
   const handleLogout = async () => {
     if (!confirm('確定要登出嗎?')) return
@@ -80,6 +84,21 @@ export function Navbar({ user }: NavbarProps) {
                 )}
               </div>
             </div>
+
+            {/* 購物車按鈕 */}
+            <Link
+              href="/store/cart"
+              className="relative flex items-center gap-2 rounded-none border-2 border-black bg-green-100 px-4 py-2 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+            >
+              <ShoppingCart className="h-5 w-5" />
+              <span className="hidden sm:inline">購物車</span>
+              {/* 數量徽章 */}
+              {cartItemsCount > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-black bg-red-500 text-xs font-bold text-white">
+                  {cartItemsCount > 99 ? '99+' : cartItemsCount}
+                </span>
+              )}
+            </Link>
 
             {/* 登出按鈕 */}
             <button

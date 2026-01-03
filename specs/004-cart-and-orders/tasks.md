@@ -30,10 +30,10 @@
 
 **目的**: 建立購物車與訂單系統的基礎架構
 
-- [ ] T001 安裝 Zustand 相依套件 (pnpm install zustand)
-- [ ] T002 [P] 建立訂單相關型別定義於 types/index.ts (Order, OrderItem, OrderTimeline, CartItem)
-- [ ] T003 [P] 建立購物車 Zod Schema 於 lib/validations/cart.schema.ts
-- [ ] T004 [P] 建立訂單 Zod Schema 於 lib/validations/order.schema.ts
+- [X] T001 安裝 Zustand 相依套件 (pnpm install zustand)
+- [X] T002 [P] 建立訂單相關型別定義於 types/index.ts (Order, OrderItem, OrderTimeline, CartItem)
+- [X] T003 [P] 建立購物車 Zod Schema 於 lib/validations/cart.schema.ts
+- [X] T004 [P] 建立訂單 Zod Schema 於 lib/validations/order.schema.ts
 
 ---
 
@@ -43,16 +43,16 @@
 
 **⚠️ 關鍵**: 此階段完成前無法開始任何使用者故事實作
 
-- [ ] T005 建立資料庫 Migration 檔案 supabase/migrations/20260104_create_orders.sql
-- [ ] T006 [P] 在 Migration 中建立 orders 表（含索引、RLS、觸發器）
-- [ ] T007 [P] 在 Migration 中建立 order_items 表（含索引、RLS）
-- [ ] T008 [P] 在 Migration 中建立 order_timelines 表（含索引、RLS）
-- [ ] T009 [P] 在 Migration 中建立 PostgreSQL Function: generate_order_number()
-- [ ] T010 [P] 在 Migration 中建立 PostgreSQL Function: confirm_order_and_deduct_stock()
-- [ ] T011 [P] 在 Migration 中建立 PostgreSQL Function: cancel_order_and_restore_stock()
-- [ ] T012 [P] 在 Migration 中建立 PostgreSQL Function: update_order_status()
-- [ ] T013 執行資料庫 Migration (supabase db reset)
-- [ ] T014 驗證 Migration 成功（檢查表、函式、索引、RLS 規則）
+- [X] T005 建立資料庫 Migration 檔案 supabase/migrations/20260107_create_orders.sql
+- [X] T006 [P] 在 Migration 中建立 orders 表（含索引、RLS、觸發器）
+- [X] T007 [P] 在 Migration 中建立 order_items 表（含索引、RLS）
+- [X] T008 [P] 在 Migration 中建立 order_timelines 表（含索引、RLS）
+- [X] T009 [P] 在 Migration 中建立 PostgreSQL Function: generate_order_number()
+- [X] T010 [P] 在 Migration 中建立 PostgreSQL Function: confirm_order_and_deduct_stock()
+- [X] T011 [P] 在 Migration 中建立 PostgreSQL Function: cancel_order_and_restore_stock()
+- [X] T012 [P] 在 Migration 中建立 PostgreSQL Function: update_order_status()
+- [X] T013 執行資料庫 Migration (supabase db reset)
+- [X] T014 驗證 Migration 成功（檢查表、函式、索引、RLS 規則）
 
 **檢查點**: 資料庫基礎架構完成，可開始使用者故事實作
 
@@ -66,15 +66,15 @@
 
 ### 實作 User Story 1
 
-- [ ] T015 [P] [US1] 建立 Zustand 購物車 Store 於 stores/cart.ts（含 persist middleware）
-- [ ] T016 [P] [US1] 建立購物車 Server Action: validateCartItem 於 lib/actions/cart.ts
-- [ ] T017 [P] [US1] 建立購物車 Server Action: getCartItemsWithPrices 於 lib/actions/cart.ts
-- [ ] T018 [P] [US1] 建立購物車 Server Action: validateCartBeforeCheckout 於 lib/actions/cart.ts
-- [ ] T019 [P] [US1] 建立購物車商品項目元件於 components/shop/cart-item.tsx
-- [ ] T020 [P] [US1] 建立購物車摘要元件於 components/shop/cart-summary.tsx
-- [ ] T021 [US1] 建立購物車頁面於 app/(shop)/store/cart/page.tsx（整合 Zustand 與 Server Actions）
-- [ ] T022 [US1] 在客戶端 Layout (app/(shop)/layout.tsx) 新增購物車圖示與數量徽章
-- [ ] T023 [US1] 在商品頁面新增「加入購物車」按鈕（app/(shop)/store/page.tsx）
+- [X] T015 [P] [US1] 建立 Zustand 購物車 Store 於 stores/cart.ts（含 persist middleware）
+- [X] T016 [P] [US1] 建立購物車 Server Action: validateCartItem 於 lib/actions/cart.ts
+- [X] T017 [P] [US1] 建立購物車 Server Action: getCartItemsWithPrices 於 lib/actions/cart.ts
+- [X] T018 [P] [US1] 建立購物車 Server Action: validateCartBeforeCheckout 於 lib/actions/cart.ts
+- [X] T019 [P] [US1] 建立購物車商品項目元件於 components/shop/cart-item.tsx
+- [X] T020 [P] [US1] 建立購物車摘要元件於 components/shop/cart-summary.tsx
+- [X] T021 [US1] 建立購物車頁面於 app/(shop)/store/cart/page.tsx（整合 Zustand 與 Server Actions）
+- [X] T022 [US1] 在客戶端 Navbar 新增購物車圖示與數量徽章
+- [X] T023 [US1] 在商品頁面新增「加入購物車」按鈕（ProductWithPriceCard 元件）
 - [ ] T024 [US1] 整合測試：加入商品、調整數量、移除商品、購物車持久化
 
 **檢查點**: User Story 1 完整可用，購物車功能可獨立測試
