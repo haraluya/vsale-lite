@@ -48,8 +48,8 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] 實作 addOrderComment Server Action lib/actions/orders.ts
-- [ ] T010 [P] [US1] 實作 getOrderTimeline Server Action lib/actions/orders.ts
+- [X] T009 [P] [US1] 實作 addOrderComment Server Action lib/actions/orders.ts
+- [X] T010 [P] [US1] 實作 getOrderTimeline Server Action lib/actions/orders.ts
 - [ ] T011 [US1] 更新前台訂單詳情頁 app/(shop)/store/orders/[id]/page.tsx（新增留言區塊與時間軸顯示）
 - [ ] T012 [US1] 更新後台訂單詳情頁 app/(admin)/admin/orders/[id]/page.tsx（新增留言區塊與時間軸顯示）
 - [ ] T013 [US1] 新增訂單時間軸元件 components/orders/OrderTimeline.tsx（氣泡式設計，客戶左灰、管理員右藍）
