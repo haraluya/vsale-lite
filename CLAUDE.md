@@ -115,39 +115,79 @@ vsale/
 
 ---
 
-## 當前開發重點
+## 當前開發狀態
 
-### 功能: 001-user-tier-management (客戶與會員等級管理)
-**狀態**: 規劃階段完成,準備實作
+### ✅ 已完成功能（已合併到 master）
+
+#### 1. **001-user-tier-management**: 會員等級與客戶管理 ✅
+- 雙入口登入、快速開戶、客戶列表、等級 CRUD
+- RLS 權限控制與 RBAC
+
+#### 2. **002-product-management**: 商品與分類管理 ✅
+- 分類 CRUD、商品 CRUD、圖片上傳、前台商品瀏覽
+
+#### 3. **003-series-and-pricing**: 系列與等級價格管理 ✅
+- 三層階層架構（分類 > 系列 > 產品）
+- 等級綁定價格機制（tier_prices 表）
+- 批次價格設定功能
+
+#### 4. **004-cart-and-orders**: 購物車與訂單管理系統 ✅ **NEW!**
+**狀態**: Phase 1-7 已完成 (2026-01-03)
 
 **核心功能**:
-1. ✅ 會員等級 CRUD (管理員)
-2. ✅ 快速開戶功能 (自動產生預設密碼)
-3. ✅ 雙入口登入驗證 (手機 vs Email)
-4. ✅ 權限控制 (RBAC)
-5. ✅ 客戶列表與搜尋
+1. ✅ 購物車功能（Zustand 狀態管理、持久化儲存）
+2. ✅ 訂單建立（訂單編號產生、價格快照）
+3. ✅ 管理員訂單處理（確認、狀態更新、取消）
+4. ✅ 客戶訂單查詢（RLS 權限控制）
+5. ✅ 訂單操作歷史追蹤（完整稽核軌跡）
 
 **資料庫實體**:
-- `tiers`: 會員等級表
-- `profiles`: 使用者業務資料表 (關聯 auth.users)
+- `orders`: 訂單主表（訂單編號、總金額、狀態、備註）
+- `order_items`: 訂單明細（商品快照、成交價格）
+- `order_timelines`: 訂單操作歷史（操作類型、操作者、狀態變更）
 
 **Server Actions**:
-- `loginWithPhone()`: 前台登入
-- `loginWithEmail()`: 後台登入
-- `createTier()`: 建立等級
-- `updateTier()`: 更新等級
-- `deleteTier()`: 刪除等級 (含保護檢查)
-- `createClient()`: 快速開戶 (自動產生密碼)
-- `updateClient()`: 更新客戶 (主要是變更等級)
-- `getClients()`: 查詢客戶列表 (含搜尋與分頁)
+- `createOrder()`: 建立訂單（含訂單編號產生與價格快照）
+- `getOrders()`: 查詢訂單列表（支援狀態篩選與搜尋）
+- `getOrderById()`: 查詢訂單詳情（含明細與操作歷史）
+- `confirmOrder()`: 確認訂單並扣減庫存（原子性操作）
+- `updateOrderStatus()`: 更新訂單狀態（confirmed → shipping → completed）
+- `cancelOrder()`: 取消訂單並回補庫存（原子性操作）
+- `validateCartItem()`: 驗證購物車商品（價格設定檢查）
+- `validateCartBeforeCheckout()`: 下單前購物車驗證
+
+**PostgreSQL Functions**:
+- `generate_order_number()`: 產生唯一訂單編號（ORD-YYYYMMDD-XXXX）
+- `confirm_order_and_deduct_stock()`: 訂單確認與庫存扣減（原子性）
+- `cancel_order_and_restore_stock()`: 訂單取消與庫存回補（原子性）
+- `update_order_status()`: 更新訂單狀態並記錄歷史
+
+**Zustand Store**:
+- `stores/cart.ts`: 購物車狀態管理（含 persist middleware）
+
+**UI 元件**:
+- 客戶端：購物車頁面、訂單確認頁面、訂單列表、訂單詳情
+- 管理端：訂單列表（含篩選搜尋）、訂單詳情、狀態更新器、取消訂單按鈕、操作歷史時間軸
 
 **文件位置**:
-- 規格: `specs/001-user-tier-management/spec.md`
-- 實作計畫: `specs/001-user-tier-management/plan.md`
-- 資料模型: `specs/001-user-tier-management/data-model.md`
-- API 合約: `specs/001-user-tier-management/contracts/server-actions.md`
-- 快速上手: `specs/001-user-tier-management/quickstart.md`
-- 研究紀錄: `specs/001-user-tier-management/research.md`
+- 規格: `specs/004-cart-and-orders/spec.md`
+- 實作計畫: `specs/004-cart-and-orders/plan.md`
+- 資料模型: `specs/004-cart-and-orders/data-model.md`
+- API 合約: `specs/004-cart-and-orders/contracts/`
+- 快速上手: `specs/004-cart-and-orders/quickstart.md`
+- 研究紀錄: `specs/004-cart-and-orders/research.md`
+- 測試資料: `specs/004-cart-and-orders/seed-test-data.sql`
+
+**進度**: 53/63 任務完成 (84%)
+- Phase 1-7: ✅ 全部完成（MVP 核心功能）
+- Phase 8: ⏳ 進行中（Polish & 品質保證）
+
+### 🚀 待開發功能
+目前所有核心功能已完成，以下是可能的擴充方向：
+- 📊 **報表與分析**: 銷售報表、庫存分析
+- 🔔 **通知系統**: 訂單狀態通知、庫存警示
+- 💳 **付款整合**: 金流串接
+- 🚚 **物流整合**: 出貨與追蹤
 
 ---
 
