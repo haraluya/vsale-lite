@@ -99,8 +99,29 @@ export async function createAnnouncement(
       }
     }
 
-    // 3. 插入資料庫
     const adminClient = createAdminClient()
+
+    // 3. 檢查啟用廣告數量限制（若新增的廣告為啟用狀態）
+    if (validated.data.isActive) {
+      const { count, error: countError } = await adminClient
+        .from('announcements')
+        .select('*', { count: 'exact', head: true })
+        .eq('is_active', true)
+
+      if (countError) {
+        console.error('createAnnouncement 計數錯誤:', countError)
+        return { success: false, message: '檢查廣告數量失敗' }
+      }
+
+      if (count !== null && count >= 5) {
+        return {
+          success: false,
+          message: '啟用的廣告已達上限（5 則），請先停用其他廣告',
+        }
+      }
+    }
+
+    // 4. 插入資料庫
 
     const { data, error } = await adminClient
       .from('announcements')
@@ -119,7 +140,7 @@ export async function createAnnouncement(
       return { success: false, message: '建立廣告失敗' }
     }
 
-    // 4. 更新快取
+    // 5. 更新快取
     revalidatePath('/store') // 前台首頁
     revalidatePath('/admin/announcements') // 後台廣告列表
 
@@ -169,8 +190,39 @@ export async function updateAnnouncement(
     if (validated.data.sortOrder !== undefined) updateData.sort_order = validated.data.sortOrder
     if (validated.data.isActive !== undefined) updateData.is_active = validated.data.isActive
 
-    // 4. 更新資料庫
     const adminClient = createAdminClient()
+
+    // 4. 檢查啟用廣告數量限制（若要將廣告改為啟用）
+    if (validated.data.isActive === true) {
+      // 先查詢當前廣告的狀態
+      const { data: currentAnnouncement } = await adminClient
+        .from('announcements')
+        .select('is_active')
+        .eq('id', validated.data.announcementId)
+        .single()
+
+      // 如果當前是停用，且要改為啟用，需檢查數量限制
+      if (currentAnnouncement && !currentAnnouncement.is_active) {
+        const { count, error: countError } = await adminClient
+          .from('announcements')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_active', true)
+
+        if (countError) {
+          console.error('updateAnnouncement 計數錯誤:', countError)
+          return { success: false, message: '檢查廣告數量失敗' }
+        }
+
+        if (count !== null && count >= 5) {
+          return {
+            success: false,
+            message: '啟用的廣告已達上限（5 則），請先停用其他廣告',
+          }
+        }
+      }
+    }
+
+    // 5. 更新資料庫
 
     const { data, error } = await adminClient
       .from('announcements')
@@ -188,7 +240,7 @@ export async function updateAnnouncement(
       return { success: false, message: '找不到此廣告' }
     }
 
-    // 5. 更新快取
+    // 6. 更新快取
     revalidatePath('/store')
     revalidatePath('/admin/announcements')
     revalidatePath(`/admin/announcements/${validated.data.announcementId}/edit`)
