@@ -124,6 +124,26 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
             </div>
           </div>
 
+          {/* 客戶地址與備註 (Feature 007 - US2) */}
+          {(order.user.address || order.user.admin_notes) && (
+            <div className="mt-4 space-y-3 border-t-2 border-black pt-4">
+              {order.user.address && (
+                <div>
+                  <div className="text-sm font-bold text-gray-700">客戶地址</div>
+                  <div className="mt-1 text-gray-900">{order.user.address}</div>
+                </div>
+              )}
+              {order.user.admin_notes && (
+                <div>
+                  <div className="text-sm font-bold text-yellow-700">管理員備註</div>
+                  <div className="mt-1 rounded-none border-2 border-yellow-500 bg-yellow-50 p-3 text-yellow-900">
+                    {order.user.admin_notes}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* 備註 */}
           {order.notes && (
             <div className="mt-4 border-t-2 border-black pt-4">

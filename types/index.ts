@@ -264,6 +264,8 @@ export type OrderDetail = Order & {
     name: string
     phone: string
     tier_name: string
+    address?: string | null  // 🆕 Feature 007: 客戶地址
+    admin_notes?: string | null  // 🆕 Feature 007: 管理員備註（僅管理端可見）
   }
   items: OrderItem[]
   timelines?: OrderTimelineWithActor[]

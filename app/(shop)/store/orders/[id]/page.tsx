@@ -221,6 +221,13 @@ export default function CustomerOrderDetailPage() {
                   {order.items.reduce((sum, item) => sum + item.quantity, 0)} 件
                 </dd>
               </div>
+              {/* 送貨地址 (Feature 007 - US2) */}
+              {order.user.address && (
+                <div className="flex flex-col border-t-2 border-gray-200 pt-3 mt-3">
+                  <dt className="font-bold mb-1">送貨地址:</dt>
+                  <dd className="text-gray-800">{order.user.address}</dd>
+                </div>
+              )}
             </dl>
           </div>
 

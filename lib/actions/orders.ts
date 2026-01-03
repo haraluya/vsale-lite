@@ -372,10 +372,15 @@ export async function getOrderById(
       }
     }
 
-    // 查詢訂單客戶資料
+    // 查詢訂單客戶資料 (Feature 007: 新增 address 與 admin_notes)
+    // 注意：客戶端不應該看到 admin_notes
+    const selectFields = role === 'admin'
+      ? 'id, phone, display_name, tier_id, address, admin_notes, tiers(name)'
+      : 'id, phone, display_name, tier_id, address, tiers(name)'
+
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id, phone, display_name, tier_id, tiers(name)')
+      .select(selectFields)
       .eq('id', order.user_id)
       .single()
 
@@ -417,6 +422,8 @@ export async function getOrderById(
         name: profile?.display_name || profile?.phone || '未知客戶',
         phone: profile?.phone || '',
         tier_name: (profile?.tiers as any)?.name || '未設定',
+        address: profile?.address || null,  // 🆕 Feature 007
+        admin_notes: role === 'admin' ? (profile?.admin_notes || null) : null,  // 🆕 Feature 007: 僅管理員可見
       },
       items: (orderItems || []).map((item: any) => ({
         id: item.id,
