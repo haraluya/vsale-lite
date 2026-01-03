@@ -248,52 +248,52 @@
 
 ### 8.1 視覺測試 (Chrome DevTools)
 
-- [ ] T046 測試手機直屏 (375px × 667px - iPhone SE)
+- [X] T046 測試手機直屏 (375px × 667px - iPhone SE)
   - 檢查無橫向滾動
   - 檢查 Sidebar 完全隱藏,漢堡菜單可運作
   - 檢查表格切換為卡片視圖
   - 檢查文字可清晰閱讀
   - 檢查按鈕觸控目標 >= 44px
 
-- [ ] T047 測試手機大屏 (414px × 896px - iPhone Pro Max)
+- [X] T047 測試手機大屏 (414px × 896px - iPhone Pro Max)
   - 檢查布局正常
   - 檢查間距適當
 
-- [ ] T048 測試平板直屏 (768px × 1024px - iPad)
+- [X] T048 測試平板直屏 (768px × 1024px - iPad)
   - 檢查 Sidebar 收縮為圖示列 (w-16)
   - 檢查表格仍為卡片視圖或開始顯示表格 (視設計決策)
   - 檢查間距增加 (md: 斷點生效)
 
-- [ ] T049 測試平板橫屏 (1024px × 768px - iPad 橫屏)
+- [X] T049 測試平板橫屏 (1024px × 768px - iPad 橫屏)
   - 檢查 Sidebar 完整展開 (w-64)
   - 檢查表格切換為完整表格
   - 檢查文字尺寸增加 (lg: 斷點生效)
 
-- [ ] T050 測試桌面 (1280px × 800px)
+- [X] T050 測試桌面 (1280px × 800px)
   - 檢查所有元素正常顯示
   - 檢查容器寬度限制 (max-w-7xl)
   - 檢查 Neo-Brutalism 風格完整 (border-3 / shadow-neo)
 
-- [ ] T051 測試大桌面 (1920px × 1080px)
+- [X] T051 測試大桌面 (1920px × 1080px)
   - 檢查容器置中且寬度限制
   - 檢查無過度留白
 
 ### 8.2 跨瀏覽器測試
 
-- [ ] T052 [P] 測試 Chrome (最新版)
-- [ ] T053 [P] 測試 Safari (macOS/iOS)
-- [ ] T054 [P] 測試 Firefox (最新版)
-- [ ] T055 [P] 測試 Edge (最新版)
+- [X] T052 [P] 測試 Chrome (最新版)
+- [X] T053 [P] 測試 Safari (macOS/iOS)
+- [X] T054 [P] 測試 Firefox (最新版)
+- [X] T055 [P] 測試 Edge (最新版)
 
 ### 8.3 可訪問性測試
 
-- [ ] T056 使用 Chrome Lighthouse 執行可訪問性評分
+- [X] T056 使用 Chrome Lighthouse 執行可訪問性評分
   - 目標: Accessibility 評分 >= 95
 
-- [ ] T057 使用 axe DevTools 檢測可訪問性問題
+- [X] T057 使用 axe DevTools 檢測可訪問性問題
   - 確保無 Critical 或 Serious 問題
 
-- [ ] T058 手動鍵盤導航測試
+- [X] T058 手動鍵盤導航測試
   - Tab / Shift+Tab 可正常導航
   - Enter 可觸發按鈕
   - Esc 可關閉 Drawer / Modal
@@ -301,11 +301,11 @@
 
 ### 8.4 效能測試
 
-- [ ] T059 使用 Chrome DevTools Network 測試圖片載入
+- [X] T059 使用 Chrome DevTools Network 測試圖片載入
   - 檢查 `sizes` 屬性是否生效
   - 檢查下載的圖片尺寸是否符合預期
 
-- [ ] T060 使用 Chrome DevTools Performance 測試頁面載入
+- [X] T060 使用 Chrome DevTools Performance 測試頁面載入
   - 檢查 First Contentful Paint < 1.5 秒
 
 **Checkpoint**: 所有測試通過,響應式 UI 適配完成
