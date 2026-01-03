@@ -2,6 +2,9 @@ import { getClients } from '@/lib/actions/clients'
 import { getTiers } from '@/lib/actions/tiers'
 import { ClientTable } from '@/components/admin/client-table'
 import { ClientFilterWrapper } from '@/components/admin/client-filter-wrapper'
+import { ExcelExport } from '@/components/admin/excel-export'
+import { ExcelImport } from '@/components/admin/excel-import'
+import { ExcelTemplateDownload } from '@/components/admin/excel-template-download'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
@@ -40,13 +43,31 @@ export default async function ClientsPage({
             共 {total} 位客戶
           </p>
         </div>
-        <Link href="/admin/clients/new">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            快速開戶
-          </Button>
-        </Link>
+        <div className="flex gap-3">
+          {/* Feature 006 - US7: Excel 功能按鈕 */}
+          <ExcelTemplateDownload />
+          <ExcelExport
+            filters={{
+              tier_id: tier_id || undefined,
+              search: search || undefined,
+            }}
+          />
+          <Link href="/admin/clients/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              快速開戶
+            </Button>
+          </Link>
+        </div>
       </div>
+
+      {/* Feature 006 - US7: Excel 匯入區塊 */}
+      <ExcelImport
+        onImportComplete={() => {
+          // 匯入完成後重新載入頁面
+          window.location.reload()
+        }}
+      />
 
       {/* Feature 006 - US6: 客戶篩選元件 */}
       <ClientFilterWrapper

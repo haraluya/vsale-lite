@@ -202,16 +202,16 @@
 
 ### Implementation for User Story 7
 
-- [ ] T049 [P] [US7] 實作 exportClients Server Action (lib/actions/clients.ts)
-- [ ] T050 [P] [US7] 實作 importClients Server Action (lib/actions/clients.ts)
-- [ ] T051 [P] [US7] 實作 downloadClientTemplate Server Action (lib/actions/clients.ts)
-- [ ] T052 [P] [US7] 建立 Excel 匯出元件 (components/admin/excel-export.tsx)
-- [ ] T053 [P] [US7] 建立 Excel 匯入元件 (components/admin/excel-import.tsx)
-- [ ] T054 [US7] 整合匯出元件到客戶管理頁面 (app/(admin)/admin/users/page.tsx)
-- [ ] T055 [US7] 整合匯入元件到客戶管理頁面 (app/(admin)/admin/users/page.tsx)
-- [ ] T056 [US7] 實作匯入進度顯示與錯誤報告
-- [ ] T057 [US7] 實作試算模式 (dry_run) 驗證功能
-- [ ] T058 [US7] 新增範本下載按鈕
+- [X] T049 [P] [US7] 實作 exportClients Server Action (lib/actions/clients.ts)
+- [X] T050 [P] [US7] 實作 importClients Server Action (lib/actions/clients.ts)
+- [X] T051 [P] [US7] 實作 downloadClientTemplate Server Action (lib/actions/clients.ts)
+- [X] T052 [P] [US7] 建立 Excel 匯出元件 (components/admin/excel-export.tsx)
+- [X] T053 [P] [US7] 建立 Excel 匯入元件 (components/admin/excel-import.tsx)
+- [X] T054 [US7] 整合匯出元件到客戶管理頁面 (app/(admin)/admin/clients/page.tsx)
+- [X] T055 [US7] 整合匯入元件到客戶管理頁面 (app/(admin)/admin/clients/page.tsx)
+- [X] T056 [US7] 實作匯入進度顯示與錯誤報告
+- [X] T057 [US7] 實作試算模式 (dry_run) 驗證功能
+- [X] T058 [US7] 新增範本下載按鈕
 
 **Checkpoint**: Excel 匯入/匯出功能完整可用，可獨立測試
 

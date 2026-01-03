@@ -564,6 +564,409 @@ export async function updateClientPassword(
 }
 
 // ===================================
+// Feature 006: Excel 匯入/匯出功能 (US7)
+// ===================================
+
+/**
+ * 匯出客戶資料為 Excel 檔案
+ * Feature 006 - User Story 7
+ */
+export async function exportClients(filters?: {
+  tier_id?: string
+  search?: string
+  created_after?: string
+}): Promise<ActionResult<{
+  file_name: string
+  file_buffer: Buffer
+  row_count: number
+  columns: string[]
+}>> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 驗證篩選條件
+    const { clientExportFiltersSchema } = await import('@/lib/validations/excel.schema')
+    const validatedFilters = clientExportFiltersSchema.safeParse(filters || {})
+
+    if (!validatedFilters.success) {
+      return {
+        success: false,
+        errors: validatedFilters.error.flatten().fieldErrors,
+        message: '篩選條件驗證失敗',
+      }
+    }
+
+    const adminClient = createAdminClient()
+
+    // 3. 查詢客戶資料
+    let query = adminClient
+      .from('profiles')
+      .select('phone, display_name, tier:tiers(name), created_at')
+      .eq('role', 'client')
+      .order('created_at', { ascending: false })
+
+    // 套用篩選條件
+    if (validatedFilters.data.tier_id) {
+      query = query.eq('tier_id', validatedFilters.data.tier_id)
+    }
+
+    if (validatedFilters.data.search) {
+      query = query.or(`phone.ilike.%${validatedFilters.data.search}%,display_name.ilike.%${validatedFilters.data.search}%`)
+    }
+
+    if (validatedFilters.data.created_after) {
+      query = query.gte('created_at', validatedFilters.data.created_after)
+    }
+
+    const { data: clients, error } = await query
+
+    if (error) {
+      console.error('查詢客戶資料失敗:', error)
+      return {
+        success: false,
+        message: '查詢客戶資料失敗',
+      }
+    }
+
+    if (!clients || clients.length === 0) {
+      return {
+        success: false,
+        message: '無符合條件的客戶資料',
+      }
+    }
+
+    // 4. 轉換為 Excel 格式
+    const excelData = clients.map((c: any) => ({
+      '手機號碼': c.phone || '',
+      '姓名': c.display_name || '',
+      '會員等級': c.tier?.name || '',
+      '建立時間': new Date(c.created_at).toLocaleDateString('zh-TW'),
+    }))
+
+    // 5. 產生 Excel 檔案
+    const { jsonToExcelBuffer, generateExcelFileName } = await import('@/lib/utils/excel')
+    const excelBuffer = jsonToExcelBuffer(excelData, '客戶列表')
+    const fileName = generateExcelFileName('客戶資料')
+
+    return {
+      success: true,
+      data: {
+        file_name: fileName,
+        file_buffer: excelBuffer,
+        row_count: clients.length,
+        columns: ['手機號碼', '姓名', '會員等級', '建立時間'],
+      },
+      message: `成功匯出 ${clients.length} 筆客戶資料`,
+    }
+  } catch (error) {
+    console.error('exportClients error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '匯出失敗',
+    }
+  }
+}
+
+/**
+ * 匯入客戶資料 (批次建立)
+ * Feature 006 - User Story 7
+ */
+export async function importClients(
+  file: File,
+  options?: {
+    dry_run?: boolean
+    skip_errors?: boolean
+  }
+): Promise<ActionResult<{
+  total_rows: number
+  success_count: number
+  error_count: number
+  errors: Array<{
+    row_number: number
+    field: string
+    value: any
+    message: string
+  }>
+  dry_run: boolean
+}>> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 驗證檔案格式與大小
+    const { validateExcelFile } = await import('@/lib/utils/excel')
+    const fileValidation = validateExcelFile(file)
+
+    if (!fileValidation.valid) {
+      return {
+        success: false,
+        message: fileValidation.error || '檔案驗證失敗',
+      }
+    }
+
+    // 3. 解析 Excel 檔案
+    const buffer = await file.arrayBuffer()
+    const { excelBufferToJson, isExcelDataEmpty } = await import('@/lib/utils/excel')
+    const rawData = await excelBufferToJson(buffer)
+
+    if (isExcelDataEmpty(rawData)) {
+      return {
+        success: false,
+        message: 'Excel 檔案為空',
+      }
+    }
+
+    if (rawData.length > 1000) {
+      return {
+        success: false,
+        message: '單次匯入最多 1000 筆資料',
+      }
+    }
+
+    // 4. 驗證資料格式
+    const { clientImportSchema } = await import('@/lib/validations/excel.schema')
+    const errors: Array<{
+      row_number: number
+      field: string
+      value: any
+      message: string
+    }> = []
+    const validClients: Array<{
+      phone: string
+      name: string
+      tier_id: string
+      password: string
+    }> = []
+
+    const adminClient = createAdminClient()
+
+    // 先查詢所有會員等級 (避免重複查詢)
+    const { data: tiers } = await adminClient
+      .from('tiers')
+      .select('id, name')
+
+    const tierMap = new Map((tiers || []).map((t: any) => [t.name, t.id]))
+
+    for (let i = 0; i < rawData.length; i++) {
+      const row = rawData[i]
+      const rowNumber = i + 2 // Excel 第 1 列為標題
+
+      try {
+        // 驗證資料格式
+        const validatedRow = clientImportSchema.safeParse(row)
+
+        if (!validatedRow.success) {
+          const firstError = validatedRow.error.issues[0]
+          errors.push({
+            row_number: rowNumber,
+            field: firstError.path[0] as string,
+            value: row[firstError.path[0] as string],
+            message: firstError.message,
+          })
+          continue
+        }
+
+        // 驗證會員等級是否存在
+        const tierId = tierMap.get(row['會員等級'])
+        if (!tierId) {
+          errors.push({
+            row_number: rowNumber,
+            field: '會員等級',
+            value: row['會員等級'],
+            message: '會員等級不存在',
+          })
+          continue
+        }
+
+        // 檢查手機號碼是否已存在
+        const { data: existingClient } = await adminClient
+          .from('profiles')
+          .select('id')
+          .eq('phone', row['手機號碼'])
+          .single()
+
+        if (existingClient) {
+          errors.push({
+            row_number: rowNumber,
+            field: '手機號碼',
+            value: row['手機號碼'],
+            message: '手機號碼已存在',
+          })
+          continue
+        }
+
+        validClients.push({
+          phone: row['手機號碼'],
+          name: row['姓名'],
+          tier_id: tierId,
+          password: row['密碼'] || row['手機號碼'].slice(-6), // 預設密碼為手機後 6 碼
+        })
+      } catch (error) {
+        errors.push({
+          row_number: rowNumber,
+          field: '未知',
+          value: null,
+          message: error instanceof Error ? error.message : '驗證失敗',
+        })
+      }
+    }
+
+    // 5. 試算模式 (不寫入)
+    if (options?.dry_run) {
+      return {
+        success: true,
+        data: {
+          total_rows: rawData.length,
+          success_count: validClients.length,
+          error_count: errors.length,
+          errors,
+          dry_run: true,
+        },
+        message: `試算完成: ${validClients.length} 筆有效，${errors.length} 筆錯誤`,
+      }
+    }
+
+    // 6. 批次寫入資料庫
+    let successCount = 0
+    for (const client of validClients) {
+      try {
+        // 建立 Auth 使用者
+        const tempEmail = `${client.phone}@temp.local`
+        const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+          email: tempEmail,
+          password: client.password,
+          email_confirm: true,
+          user_metadata: {
+            role: 'client',
+            phone: client.phone,
+          },
+        })
+
+        if (authError || !authData.user) {
+          errors.push({
+            row_number: 0,
+            field: 'database',
+            value: client.phone,
+            message: `建立使用者失敗: ${authError?.message}`,
+          })
+          continue
+        }
+
+        // 建立 profile
+        const { error: insertError } = await adminClient
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            phone: client.phone,
+            role: 'client',
+            tier_id: client.tier_id,
+            display_name: client.name,
+          })
+
+        if (insertError) {
+          errors.push({
+            row_number: 0,
+            field: 'database',
+            value: client.phone,
+            message: `建立客戶資料失敗: ${insertError.message}`,
+          })
+          continue
+        }
+
+        successCount++
+      } catch (error) {
+        errors.push({
+          row_number: 0,
+          field: 'database',
+          value: client.phone,
+          message: `寫入失敗: ${error instanceof Error ? error.message : '未知錯誤'}`,
+        })
+      }
+    }
+
+    // 7. Revalidate
+    revalidatePath('/admin/clients')
+
+    return {
+      success: true,
+      data: {
+        total_rows: rawData.length,
+        success_count: successCount,
+        error_count: errors.length,
+        errors,
+        dry_run: false,
+      },
+      message: `匯入完成: ${successCount} 筆成功，${errors.length} 筆失敗`,
+    }
+  } catch (error) {
+    console.error('importClients error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '匯入失敗',
+    }
+  }
+}
+
+/**
+ * 下載客戶匯入範本
+ * Feature 006 - User Story 7
+ */
+export async function downloadClientTemplate(): Promise<ActionResult<{
+  file_name: string
+  file_buffer: Buffer
+  row_count: number
+  columns: string[]
+}>> {
+  try {
+    // 驗證權限
+    await checkAuth('admin')
+
+    const adminClient = createAdminClient()
+
+    // 查詢第一個會員等級作為範例
+    const { data: tiers } = await adminClient
+      .from('tiers')
+      .select('name')
+      .order('rank', { ascending: true })
+      .limit(1)
+
+    const exampleTierName = tiers?.[0]?.name || '批發'
+
+    // 建立範本資料
+    const templateData = [
+      {
+        '手機號碼': '0912345678',
+        '姓名': '範例姓名',
+        '會員等級': exampleTierName,
+        '密碼': '123456',
+      },
+    ]
+
+    // 產生 Excel 檔案
+    const { jsonToExcelBuffer } = await import('@/lib/utils/excel')
+    const excelBuffer = jsonToExcelBuffer(templateData, '客戶列表')
+
+    return {
+      success: true,
+      data: {
+        file_name: '客戶匯入範本.xlsx',
+        file_buffer: excelBuffer,
+        row_count: 1,
+        columns: ['手機號碼', '姓名', '會員等級', '密碼'],
+      },
+      message: '範本下載成功',
+    }
+  } catch (error) {
+    console.error('downloadClientTemplate error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '下載範本失敗',
+    }
+  }
+}
+
+// ===================================
 // Feature 007: 客戶資訊完整化管理
 // ===================================
 
