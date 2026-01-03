@@ -141,13 +141,13 @@
 
 ### Implementation for User Story 5
 
-- [ ] T050 [P] [US5] 實作 getProductPriceMatrix Server Action lib/actions/pricing.ts（查詢商品 × 所有等級的價格矩陣）
-- [ ] T051 [P] [US5] 實作 batchSetProductPrices Server Action lib/actions/pricing.ts（批次設定商品價格，UPSERT 邏輯）
-- [ ] T052 [P] [US5] 實作 getProductsForPricing Server Action lib/actions/pricing.ts（查詢商品列表用於下拉選單）
-- [ ] T053 [US5] 更新價格管理頁 app/(admin)/admin/pricing/page.tsx（新增標籤切換 UI）
-- [ ] T054 [US5] 新增商品價格表單元件 components/admin/pricing/ProductPricingForm.tsx（商品下拉選單、價格矩陣表格）
-- [ ] T055 [US5] 實作價格矩陣表格（零售價格唯讀、其他等級可編輯）
-- [ ] T056 [US5] 新增零售價格提示訊息（「零售價格請至商品編輯頁修改」）
+- [X] T050 [P] [US5] 實作 getProductPriceMatrix Server Action lib/actions/pricing.ts（查詢商品 × 所有等級的價格矩陣）
+- [X] T051 [P] [US5] 實作 batchSetProductPrices Server Action lib/actions/pricing.ts（批次設定商品價格，UPSERT 邏輯）
+- [X] T052 [P] [US5] 實作 getProductsForPricing Server Action lib/actions/pricing.ts（查詢商品列表用於下拉選單）
+- [X] T053 [US5] 更新價格管理頁 app/(admin)/admin/pricing/page.tsx（新增標籤切換 UI）
+- [X] T054 [US5] 新增商品價格表單元件 components/admin/pricing/ProductPricingForm.tsx（商品下拉選單、價格矩陣表格）
+- [X] T055 [US5] 實作價格矩陣表格（零售價格唯讀、其他等級可編輯）
+- [X] T056 [US5] 新增零售價格提示訊息（「零售價格請至商品編輯頁修改」）
 - [ ] T057 [US5] 測試選擇商品後價格矩陣正確顯示
 - [ ] T058 [US5] 測試零售等級價格唯讀無法修改
 - [ ] T059 [US5] 測試批次儲存價格功能
