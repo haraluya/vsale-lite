@@ -7,8 +7,7 @@ export const clientImportSchema = z.object({
   手機號碼: z.string()
     .regex(/^09\d{8}$/, '手機號碼格式錯誤 (需為 09xxxxxxxx)'),
   姓名: z.string()
-    .min(2, '姓名至少 2 個字元')
-    .max(50, '姓名最多 50 個字元'),
+    .min(1, '姓名不可為空'),
   會員等級: z.string()
     .min(1, '會員等級不可為空'),
   常用地址: z.string()
@@ -21,6 +20,7 @@ export const clientImportSchema = z.object({
     .transform(val => val || undefined), // 空字串轉為 undefined
   密碼: z.string()
     .min(6, '密碼至少 6 個字元')
+    .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/, '密碼不可包含中文字元')
     .optional(),
 });
 
