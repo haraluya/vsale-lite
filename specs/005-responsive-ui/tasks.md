@@ -156,7 +156,7 @@
 
 ### 5.1 Navbar 優化
 
-- [ ] T029 修改 `components/shop/navbar.tsx` 優化響應式
+- [X] T029 修改 `components/shop/navbar.tsx` 優化響應式
   - 優化間距 (`p-3 md:p-4`)
   - 優化按鈕尺寸 (使用 Button 元件響應式尺寸)
   - 移除重複的用戶資訊區塊 (合併為一個,使用響應式顯示)

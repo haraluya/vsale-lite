@@ -18,9 +18,10 @@ import { OrderStatusBadge } from '@/components/shop/order-status-badge'
 import { OrderTimeline } from '@/components/admin/order-timeline'
 import { CommentInput } from '@/components/orders/CommentInput'
 import type { OrderDetail, OrderTimelineWithActor } from '@/types'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, cn } from '@/lib/utils'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { designTokens } from '@/lib/design-tokens'
 
 export default function CustomerOrderDetailPage() {
   const params = useParams()

@@ -18,6 +18,8 @@ import { getActiveCategories, getAvailableTags } from '@/lib/actions/products'
 import { SeriesCard } from '@/components/shop/series-card'
 import { AnnouncementCarousel } from '@/components/announcements/AnnouncementCarousel'
 import { StoreSearch } from '@/components/shop/store-search'
+import { designTokens } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 export default async function StorePage() {
   const supabase = await createClient()
@@ -53,16 +55,38 @@ export default async function StorePage() {
   const availableTags = tagsResult.success ? tagsResult.data : []
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="mx-auto max-w-7xl">
+    <div className={cn(
+      "min-h-screen bg-background",
+      designTokens.spacing.page.padding
+    )}>
+      <div className={cn(
+        designTokens.container.default,
+        designTokens.spacing.page.gap
+      )}>
         {/* Header */}
-        <div className="mb-6 rounded-none border-3 border-black bg-white p-6 shadow-neo">
-          <h1 className="mb-2 text-3xl font-bold">商品系列</h1>
-          <p className="text-gray-600">
+        <div className={cn(
+          "rounded-none bg-white",
+          designTokens.neoBrutalism.border.full,
+          "border-black",
+          designTokens.neoBrutalism.shadow.full,
+          designTokens.spacing.card.padding,
+          designTokens.spacing.section.marginBottom
+        )}>
+          <h1 className={cn(
+            designTokens.typography.h1,
+            "mb-2"
+          )}>商品系列</h1>
+          <p className={cn(
+            designTokens.typography.body.base,
+            "text-gray-600"
+          )}>
             {profile?.display_name || profile?.phone} 您好!
           </p>
           {profile?.tiers && (
-            <p className="mt-2 text-sm text-gray-500">
+            <p className={cn(
+              designTokens.typography.caption,
+              "mt-2 text-gray-500"
+            )}>
               會員等級: <span className="font-bold">{(profile.tiers as any).name}</span>
             </p>
           )}
@@ -70,13 +94,13 @@ export default async function StorePage() {
 
         {/* Announcement Carousel (Feature 007 - US4) */}
         {announcements.length > 0 && (
-          <div className="mb-6">
+          <div className={designTokens.spacing.section.marginBottom}>
             <AnnouncementCarousel announcements={announcements} />
           </div>
         )}
 
         {/* Search Bar & Filters (Feature 006 - US1, US2) */}
-        <div className="mb-6">
+        <div className={designTokens.spacing.section.marginBottom}>
           <StoreSearch
             categories={categories || []}
             availableTags={availableTags || []}
@@ -85,11 +109,23 @@ export default async function StorePage() {
 
         {/* Series Grid */}
         {!series || series.length === 0 ? (
-          <div className="rounded-none border-3 border-black bg-white p-12 text-center shadow-neo">
-            <p className="text-lg text-gray-500">目前沒有可用的商品系列</p>
+          <div className={cn(
+            "rounded-none bg-white text-center",
+            designTokens.neoBrutalism.border.full,
+            "border-black",
+            designTokens.neoBrutalism.shadow.full,
+            "p-8 md:p-12"
+          )}>
+            <p className={cn(
+              designTokens.typography.body.large,
+              "text-gray-500"
+            )}>目前沒有可用的商品系列</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className={cn(
+            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
+            designTokens.spacing.grid.gap
+          )}>
             {series?.map((s) => (
               <SeriesCard key={s.id} series={s} />
             ))}
