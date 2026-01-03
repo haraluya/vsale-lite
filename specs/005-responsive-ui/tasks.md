@@ -123,28 +123,28 @@
 
 ### 4.1 訂單管理頁面
 
-- [ ] T021 [P] 修改 `app/(admin)/admin/orders/page.tsx` 統一容器與間距
-- [ ] T022 [P] 修改 `app/(admin)/admin/orders/[id]/page.tsx` 統一容器與間距,實作響應式布局
+- [X] T021 [P] 修改 `app/(admin)/admin/orders/page.tsx` 統一容器與間距
+- [X] T022 [P] 修改 `app/(admin)/admin/orders/[id]/page.tsx` 統一容器與間距,實作響應式布局
   - 訂單資訊雙欄布局 (桌面版) / 單欄布局 (手機版)
   - 標題響應式文字尺寸
   - 返回按鈕響應式尺寸
 
 ### 4.2 客戶管理頁面
 
-- [ ] T023 [P] 修改 `app/(admin)/admin/clients/page.tsx` 統一容器與間距
-- [ ] T024 [P] 修改 `app/(admin)/admin/tiers/page.tsx` 統一容器與間距
+- [X] T023 [P] 修改 `app/(admin)/admin/clients/page.tsx` 統一容器與間距
+- [X] T024 [P] 修改 `app/(admin)/admin/tiers/page.tsx` 統一容器與間距
 
 ### 4.3 商品管理頁面
 
-- [ ] T025 [P] 修改 `app/(admin)/admin/products/page.tsx` 統一容器與間距
-- [ ] T026 [P] 修改 `app/(admin)/admin/categories/page.tsx` 統一容器與間距
-- [ ] T027 [P] 修改 `app/(admin)/admin/series/page.tsx` 統一容器與間距
+- [X] T025 [P] 修改 `app/(admin)/admin/products/page.tsx` 統一容器與間距
+- [X] T026 [P] 修改 `app/(admin)/admin/categories/page.tsx` 統一容器與間距
+- [X] T027 [P] 修改 `app/(admin)/admin/series/page.tsx` 統一容器與間距
 
 ### 4.4 儀表板與其他頁面
 
-- [ ] T028 [P] 修改 `app/(admin)/admin/dashboard/page.tsx` 統一容器與間距
+- [X] T028 [P] 修改 `app/(admin)/admin/dashboard/page.tsx` 統一容器與間距
 
-**Checkpoint**: 所有後台頁面容器統一化完成
+**Checkpoint**: 所有後台頁面容器統一化完成 ✅
 
 ---
 
