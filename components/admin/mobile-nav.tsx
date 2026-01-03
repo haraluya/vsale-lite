@@ -15,6 +15,7 @@ import { useState } from 'react'
 import {
   Sheet,
   SheetContent,
+  SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { MobileSidebar } from '@/components/admin/mobile-sidebar'
@@ -34,6 +35,7 @@ export function MobileNav() {
           </button>
         </SheetTrigger>
         <SheetContent side="left" className="w-3/4 sm:max-w-sm p-0">
+          <SheetTitle className="sr-only">導航選單</SheetTitle>
           <MobileSidebar onClose={() => setIsOpen(false)} />
         </SheetContent>
       </Sheet>
