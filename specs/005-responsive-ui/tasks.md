@@ -107,9 +107,9 @@
 
 ### 3.3 其他表格響應式 (P1 - 可延後)
 
-- [ ] T018 [P] 修改 `components/admin/product-table.tsx` 實作響應式表格/卡片視圖
-- [ ] T019 [P] 修改 `components/admin/tier-table.tsx` 優化間距與文字尺寸
-- [ ] T020 [P] 修改 `components/admin/category-table.tsx` 優化間距與文字尺寸
+- [X] T018 [P] 修改 `components/admin/product-table.tsx` 實作響應式表格/卡片視圖
+- [X] T019 [P] 修改 `components/admin/tier-table.tsx` 優化間距與文字尺寸
+- [X] T020 [P] 修改 `components/admin/category-table.tsx` 優化間距與文字尺寸
 
 **Checkpoint**: 後台表格響應式完成,測試手機卡片視圖與桌面表格
 

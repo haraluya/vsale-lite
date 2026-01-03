@@ -24,6 +24,8 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { toast } from 'sonner'
+import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 function SortableRow({ category, onDelete, loading }: { category: Category; onDelete: (id: string, name: string) => void; loading: string | null }) {
   const {
@@ -43,27 +45,33 @@ function SortableRow({ category, onDelete, loading }: { category: Category; onDe
 
   return (
     <tr ref={setNodeRef} style={style} className="border-b-3 border-black last:border-b-0 bg-white">
-      <td className="px-4 py-4">
+      <td className={cn("px-3 py-3 md:px-4 md:py-4")}>
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
+          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
         >
           <GripVertical className="h-5 w-5 text-gray-400" />
         </button>
       </td>
-      <td className="px-6 py-4 font-bold">{category.name}</td>
-      <td className="px-6 py-4 text-gray-600">
+      <td className={cn("px-4 py-3 font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>{category.name}</td>
+      <td className={cn("px-4 py-3 text-gray-600 md:px-6 md:py-4", designTokens.typography.caption)}>
         {category.description || <span className="text-gray-400 italic">無描述</span>}
       </td>
-      <td className="px-6 py-4 text-gray-600">
+      <td className={cn("px-4 py-3 text-gray-600 md:px-6 md:py-4", designTokens.typography.caption)}>
         {new Date(category.created_at).toLocaleDateString('zh-TW')}
       </td>
-      <td className="px-6 py-4">
+      <td className={cn("px-4 py-3 md:px-6 md:py-4")}>
         <div className="flex justify-end gap-2">
           <Link
             href={`/admin/categories/${category.id}/edit`}
-            className="inline-flex items-center gap-2 border-3 border-black bg-white px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm"
+            className={cn(
+              "inline-flex items-center gap-2 bg-white font-bold transition-all",
+              designTokens.neoBrutalism.border.full,
+              designTokens.neoBrutalism.shadow.mobile,
+              designTokens.neoBrutalism.hover,
+              designTokens.button.sm
+            )}
           >
             <Edit className="h-4 w-4" />
             編輯
@@ -71,7 +79,13 @@ function SortableRow({ category, onDelete, loading }: { category: Category; onDe
           <button
             onClick={() => onDelete(category.id, category.name)}
             disabled={loading === category.id}
-            className="inline-flex items-center gap-2 border-3 border-black bg-red-500 px-4 py-2 font-bold text-white transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:opacity-50"
+            className={cn(
+              "inline-flex items-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50",
+              designTokens.neoBrutalism.border.full,
+              designTokens.neoBrutalism.shadow.mobile,
+              designTokens.neoBrutalism.hover,
+              designTokens.button.sm
+            )}
           >
             <Trash2 className="h-4 w-4" />
             {loading === category.id ? '刪除中...' : '刪除'}
@@ -145,18 +159,21 @@ export function CategoryTable({ categories: initialCategories }: { categories: C
 
   if (categories.length === 0) {
     return (
-      <div className="card-neo text-center py-12">
-        <p className="text-gray-600">尚無商品分類資料</p>
-        <p className="text-sm text-gray-500 mt-2">點擊右上角「新增分類」開始建立</p>
+      <div className={cn("card-neo text-center", designTokens.spacing.card.padding)}>
+        <p className={cn("text-gray-600", designTokens.typography.body.base)}>尚無商品分類資料</p>
+        <p className={cn("text-gray-500 mt-2", designTokens.typography.caption)}>點擊右上角「新增分類」開始建立</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
+    <div className={designTokens.spacing.page.gap}>
       {isSaving && (
-        <div className="card-neo bg-yellow-50 border-yellow-500 p-4">
-          <p className="text-sm font-bold">正在儲存排序...</p>
+        <div className={cn(
+          "card-neo bg-yellow-50 border-yellow-500",
+          designTokens.spacing.card.padding
+        )}>
+          <p className={cn("font-bold", designTokens.typography.body.base)}>正在儲存排序...</p>
         </div>
       )}
       <div className="card-neo overflow-hidden p-0">
@@ -168,11 +185,11 @@ export function CategoryTable({ categories: initialCategories }: { categories: C
           <table className="w-full">
             <thead className="border-b-3 border-black bg-gray-100">
               <tr>
-                <th className="px-4 py-4 text-left font-bold w-16">拖曳</th>
-                <th className="px-6 py-4 text-left font-bold">分類名稱</th>
-                <th className="px-6 py-4 text-left font-bold">描述</th>
-                <th className="px-6 py-4 text-left font-bold">建立時間</th>
-                <th className="px-6 py-4 text-right font-bold">操作</th>
+                <th className={cn("px-3 py-3 text-left font-bold w-16 md:px-4 md:py-4", designTokens.typography.body.base)}>拖曳</th>
+                <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>分類名稱</th>
+                <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>描述</th>
+                <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>建立時間</th>
+                <th className={cn("px-4 py-3 text-right font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>操作</th>
               </tr>
             </thead>
             <tbody>
@@ -193,8 +210,11 @@ export function CategoryTable({ categories: initialCategories }: { categories: C
           </table>
         </DndContext>
       </div>
-      <div className="card-neo bg-blue-50 border-blue-500 p-4">
-        <p className="text-sm text-gray-700">
+      <div className={cn(
+        "card-neo bg-blue-50 border-blue-500",
+        designTokens.spacing.card.padding
+      )}>
+        <p className={cn("text-gray-700", designTokens.typography.caption)}>
           <strong>提示：</strong>拖曳左側的 <GripVertical className="inline h-4 w-4" /> 圖示來調整分類排序
         </p>
       </div>
