@@ -180,3 +180,101 @@ export type GetProductsResponse = {
   page: number
   limit: number
 }
+
+// ===================================
+// 購物車與訂單型別 (Feature 004)
+// ===================================
+
+// 購物車項目 (Zustand 狀態管理)
+export type CartItem = {
+  productId: string
+  quantity: number
+}
+
+// 購物車項目含商品資訊 (UI 顯示用)
+export type CartItemWithProduct = {
+  productId: string
+  productName: string
+  imageUrl: string | null
+  quantity: number
+  price: number | null  // 當前用戶等級價格
+  subtotal: number
+}
+
+// 訂單狀態
+export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled'
+
+// 訂單主表
+export type Order = {
+  id: string
+  order_number: string  // 格式: ORD-YYYYMMDD-XXXX
+  user_id: string
+  total_amount: number
+  status: OrderStatus
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+// 訂單含客戶資訊 (管理端列表用)
+export type OrderWithUser = Order & {
+  user_name: string | null
+  user_phone: string | null
+  tier_name: string | null
+}
+
+// 訂單明細
+export type OrderItem = {
+  id: string
+  order_id: string
+  product_id: string
+  product_name_snapshot: string  // 商品名稱快照
+  deal_price: number  // 成交價格
+  quantity: number
+  subtotal: number
+  created_at: string
+}
+
+// 訂單操作歷史
+export type OrderTimeline = {
+  id: string
+  order_id: string
+  action_type: 'created' | 'status_changed' | 'cancelled'
+  actor_id: string | null
+  actor_role: 'client' | 'admin' | null
+  old_status: string | null
+  new_status: string | null
+  notes: string | null
+  created_at: string
+}
+
+// 訂單操作歷史含操作者資訊 (UI 顯示用)
+export type OrderTimelineWithActor = OrderTimeline & {
+  actor_name: string | null
+}
+
+// 訂單詳情 (含明細與操作歷史)
+export type OrderDetail = Order & {
+  user_name: string | null
+  user_phone: string | null
+  tier_name: string | null
+  items: OrderItem[]
+  timelines?: OrderTimelineWithActor[]
+}
+
+// 訂單查詢參數
+export type GetOrdersParams = {
+  user_id?: string      // 指定用戶 (客戶端自動帶入)
+  status?: OrderStatus  // 狀態篩選
+  search?: string       // 訂單編號或客戶名稱關鍵字
+  page?: number         // 頁碼 (預設 1)
+  limit?: number        // 每頁筆數 (預設 20)
+}
+
+// 訂單列表回應
+export type GetOrdersResponse = {
+  orders: OrderWithUser[]
+  total: number
+  page: number
+  limit: number
+}
