@@ -639,6 +639,117 @@ export async function uploadProductImage(
 }
 
 /**
+ * 前台全域搜尋商品
+ * Feature: 006-ux-enhancement (US1)
+ * 支援商品名稱、商品編號模糊搜尋，並回傳包含用戶等級價格的商品列表
+ */
+export async function searchProducts(query: string): Promise<ActionResult<Product[]>> {
+  try {
+    // 1. 取得當前用戶資訊 (含等級)
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return {
+        success: false,
+        message: '請先登入',
+      }
+    }
+
+    // 2. 取得用戶 profile (含 tier_id)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('tier_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || !profile.tier_id) {
+      return {
+        success: false,
+        message: '無法取得用戶等級資訊',
+      }
+    }
+
+    // 3. 搜尋商品 (限制結果筆數以優化效能)
+    const { data: products, error } = await supabase
+      .from('products')
+      .select(`
+        id,
+        code,
+        name,
+        description,
+        retail_price,
+        stock,
+        stock_status,
+        unit,
+        image_url,
+        series:series_id (
+          id,
+          name,
+          default_image_url,
+          category:category_id (id, name)
+        ),
+        tier_prices!inner (
+          price
+        ),
+        tags
+      `)
+      .eq('status', 'active')
+      .eq('tier_prices.tier_id', profile.tier_id)
+      .or(`name.ilike.%${query}%,code.ilike.%${query}%`)
+      .limit(50)
+      .order('updated_at', { ascending: false })
+
+    if (error) {
+      console.error('searchProducts error:', error)
+      return {
+        success: false,
+        message: '搜尋失敗',
+      }
+    }
+
+    // 4. 轉換資料格式
+    const result: Product[] = (products || []).map((item: any) => ({
+      id: item.id,
+      code: item.code,
+      name: item.name,
+      series_id: item.series?.id,
+      series_name: item.series?.name,
+      category_name: item.series?.category?.name,
+      description: item.description,
+      retail_price: item.retail_price,
+      user_price: item.tier_prices[0]?.price, // 用戶等級價格
+      stock: item.stock,
+      stock_status: item.stock_status,
+      unit: item.unit,
+      image_url: item.image_url || item.series?.default_image_url,
+      tags: item.tags || [],
+      status: 'active',
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+    }))
+
+    return {
+      success: true,
+      data: result,
+      message: `找到 ${result.length} 筆商品`,
+    }
+  } catch (error: unknown) {
+    console.error('searchProducts error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '搜尋失敗',
+    }
+  }
+}
+
+/**
  * 刪除商品圖片
  * Feature: 002-product-management (US4)
  */

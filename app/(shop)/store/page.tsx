@@ -1,8 +1,10 @@
 /**
- * Store Page (前台商品系列列表頁)
+ * Store Page (前台商店首頁)
  * Feature: 003-series-and-pricing (US1 - 客戶瀏覽系列)
+ * Feature: 006-ux-enhancement (US1 - 全域搜尋)
  *
- * 客戶端系列列表頁面
+ * 客戶端商店首頁
+ * - 全域搜尋商品 (US1)
  * - 顯示所有啟用的系列
  * - 點擊系列進入商品列表
  * - Neo-Brutalism 設計風格
@@ -14,6 +16,7 @@ import { getActiveSeries } from '@/lib/actions/shop'
 import { getActiveAnnouncements } from '@/lib/actions/announcements'
 import { SeriesCard } from '@/components/shop/series-card'
 import { AnnouncementCarousel } from '@/components/announcements/AnnouncementCarousel'
+import { StoreSearch } from '@/components/shop/store-search'
 
 export default async function StorePage() {
   const supabase = await createClient()
@@ -63,6 +66,11 @@ export default async function StorePage() {
             <AnnouncementCarousel announcements={announcements} />
           </div>
         )}
+
+        {/* Search Bar (Feature 006 - US1) */}
+        <div className="mb-6">
+          <StoreSearch />
+        </div>
 
         {/* Series Grid */}
         {!series || series.length === 0 ? (

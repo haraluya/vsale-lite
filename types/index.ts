@@ -122,12 +122,15 @@ export type Product = {
   name: string
   series_id: string  // 🔄 Feature 003: 改為關聯系列 (取代 category_id)
   series_name?: string  // JOIN 查詢時包含
+  category_name?: string  // 🆕 Feature 006: 分類名稱 (用於搜尋結果顯示)
   description: string | null
   retail_price: number | null  // 🆕 Feature 003: 原價/建議售價
+  user_price?: number | null  // 🆕 Feature 006: 用戶等級價格 (用於前台搜尋)
   stock: number
   stock_status: 'sufficient' | 'low' | 'out_of_stock'  // 🆕 Feature 003: 庫存狀態
   unit: string
   image_url: string | null
+  tags?: string[]  // 🆕 Feature 006: 商品標籤
   status: 'active' | 'inactive'
   created_at: string
   updated_at: string
