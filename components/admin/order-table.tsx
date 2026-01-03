@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Search, Filter } from 'lucide-react'
 import { OrderStatusBadge } from '@/components/shop/order-status-badge'
+import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 import type { OrderStatus, OrderWithUser } from '@/types'
 
 /**
@@ -63,16 +65,25 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className={designTokens.spacing.page.gap}>
       {/* 篩選與搜尋區域 */}
-      <div className="flex flex-col gap-4 rounded-none border-3 border-black bg-white p-4 shadow-neo sm:flex-row">
+      <div className={cn(
+        "flex flex-col gap-4 rounded-none bg-white sm:flex-row",
+        designTokens.neoBrutalism.border.full,
+        designTokens.neoBrutalism.shadow.full,
+        designTokens.spacing.card.padding
+      )}>
         {/* 狀態篩選 */}
         <div className="flex items-center gap-2">
           <Filter className="h-5 w-5" />
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value as OrderStatus | 'all')}
-            className="rounded-none border-2 border-black bg-white px-3 py-2 font-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none focus:outline-none"
+            className={cn(
+              "rounded-none border-2 border-black bg-white font-bold focus:outline-none",
+              designTokens.input.base,
+              designTokens.neoBrutalism.hover
+            )}
           >
             {STATUS_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>
@@ -83,7 +94,10 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
         </div>
 
         {/* 搜尋框 */}
-        <div className="flex flex-1 items-center gap-2 rounded-none border-2 border-black bg-white px-3 py-2">
+        <div className={cn(
+          "flex flex-1 items-center gap-2 rounded-none border-2 border-black bg-white",
+          designTokens.input.base
+        )}>
           <Search className="h-5 w-5" />
           <input
             type="text"
@@ -95,8 +109,12 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
         </div>
       </div>
 
-      {/* 訂單列表 */}
-      <div className="rounded-none border-3 border-black bg-white shadow-neo">
+      {/* 桌面版: 完整表格 */}
+      <div className={cn(
+        "hidden lg:block rounded-none bg-white overflow-x-auto",
+        designTokens.neoBrutalism.border.full,
+        designTokens.neoBrutalism.shadow.full
+      )}>
         {/* 標題列 */}
         <div className="grid grid-cols-6 gap-4 border-b-3 border-black bg-gray-100 p-4 font-bold">
           <div>訂單編號</div>
@@ -137,8 +155,62 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
         )}
       </div>
 
+      {/* 手機版: 卡片視圖 */}
+      <div className="lg:hidden space-y-3 md:space-y-4">
+        {filteredOrders.length === 0 ? (
+          <div className={cn(
+            "rounded-none bg-white p-8 text-center text-gray-500",
+            designTokens.neoBrutalism.border.full,
+            designTokens.neoBrutalism.shadow.full
+          )}>
+            {searchTerm || statusFilter !== 'all' ? '找不到符合條件的訂單' : '尚無訂單'}
+          </div>
+        ) : (
+          filteredOrders.map(order => (
+            <Link
+              key={order.id}
+              href={`/admin/orders/${order.id}`}
+              className={cn(
+                "block rounded-none bg-white",
+                getNeoBrutalismClasses({ active: true }),
+                designTokens.spacing.card.padding,
+                designTokens.spacing.card.gap
+              )}
+            >
+              {/* 訂單編號與狀態 */}
+              <div className="flex items-start justify-between gap-3">
+                <div className={cn("font-mono font-bold text-blue-600", designTokens.typography.body.base)}>
+                  {order.order_number}
+                </div>
+                <OrderStatusBadge status={order.status} size="sm" />
+              </div>
+
+              {/* 客戶資訊 */}
+              <div className={designTokens.spacing.card.gap}>
+                <div className={cn("font-bold", designTokens.typography.body.base)}>
+                  {order.user_name}
+                </div>
+                <div className={cn("text-gray-600", designTokens.typography.caption)}>
+                  {order.user_phone} • {order.tier_name}
+                </div>
+              </div>
+
+              {/* 金額與時間 */}
+              <div className="flex items-center justify-between pt-2 border-t border-gray-200">
+                <div className={cn("text-gray-600", designTokens.typography.caption)}>
+                  {formatDate(order.created_at)}
+                </div>
+                <div className={cn("font-bold", designTokens.typography.body.base)}>
+                  {formatAmount(order.total_amount)}
+                </div>
+              </div>
+            </Link>
+          ))
+        )}
+      </div>
+
       {/* 統計資訊 */}
-      <div className="text-sm text-gray-600">
+      <div className={cn("text-gray-600", designTokens.typography.caption)}>
         顯示 {filteredOrders.length} 筆訂單 {filteredOrders.length !== initialTotal && `（篩選自共 ${initialTotal} 筆）`}
       </div>
     </div>

@@ -14,23 +14,25 @@ import { getSeries } from '@/lib/actions/series'
 import { Button } from '@/components/ui/button'
 import { SeriesDeleteButton } from '@/components/admin/series-delete-button'
 import Image from 'next/image'
+import { cn } from '@/lib/utils'
+import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
 
 export default async function SeriesPage() {
   const seriesResult = await getSeries()
   const series = seriesResult.success ? seriesResult.data : []
 
   return (
-    <div>
+    <div className={getPageContainerClasses('default')}>
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">系列管理</h1>
-          <p className="mt-2 text-gray-600">管理商品系列、分類與圖片</p>
+          <h1 className={designTokens.typography.h1}>系列管理</h1>
+          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>管理商品系列、分類與圖片</p>
         </div>
 
         <Link href="/admin/series/new">
           <Button>
-            <Plus className="mr-2 h-5 w-5" />
+            <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />
             新增系列
           </Button>
         </Link>
@@ -38,24 +40,31 @@ export default async function SeriesPage() {
 
       {/* Series List */}
       {!series || series.length === 0 ? (
-        <div className="rounded-none border-3 border-black bg-white p-12 text-center shadow-neo">
-          <p className="text-lg text-gray-500">尚未建立任何系列</p>
+        <div className={cn(
+          "rounded-none bg-white text-center",
+          getNeoBrutalismClasses(),
+          "p-8 md:p-12"
+        )}>
+          <p className={cn(designTokens.typography.body.large, "text-gray-500")}>尚未建立任何系列</p>
           <Link href="/admin/series/new" className="mt-4 inline-block">
             <Button>
-              <Plus className="mr-2 h-5 w-5" />
+              <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />
               建立第一個系列
             </Button>
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3", designTokens.spacing.grid.gap)}>
           {series.map((s) => (
             <div
               key={s.id}
-              className="rounded-none border-3 border-black bg-white shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              className={cn(
+                "rounded-none bg-white transition-all",
+                getNeoBrutalismClasses({ hover: true })
+              )}
             >
               {/* 系列圖片 */}
-              <div className="relative aspect-square border-b-3 border-black bg-gray-100">
+              <div className="relative aspect-square border-b-2 md:border-b-3 border-black bg-gray-100">
                 {s.image_url ? (
                   <Image
                     src={s.image_url}
@@ -65,7 +74,7 @@ export default async function SeriesPage() {
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 ) : (
-                  <div className="flex h-full items-center justify-center text-6xl">
+                  <div className="flex h-full items-center justify-center text-5xl md:text-6xl">
                     📦
                   </div>
                 )}
@@ -73,11 +82,14 @@ export default async function SeriesPage() {
                 {/* 狀態標籤 */}
                 <div className="absolute right-2 top-2">
                   <span
-                    className={`rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${
+                    className={cn(
+                      "rounded-none border-2 border-black font-bold",
+                      designTokens.typography.caption,
+                      "px-2 py-1",
                       s.status === 'active'
                         ? 'bg-green-300 text-green-800'
                         : 'bg-gray-300 text-gray-800'
-                    }`}
+                    )}
                   >
                     {s.status === 'active' ? '啟用' : '停用'}
                   </span>
@@ -85,18 +97,18 @@ export default async function SeriesPage() {
               </div>
 
               {/* 系列資訊 */}
-              <div className="p-4">
-                <h3 className="mb-2 text-lg font-bold">{s.name}</h3>
+              <div className={designTokens.spacing.card.padding}>
+                <h3 className={cn(designTokens.typography.h3, "mb-2")}>{s.name}</h3>
                 {s.description && (
-                  <p className="line-clamp-2 text-sm text-gray-600">{s.description}</p>
+                  <p className={cn(designTokens.typography.caption, "line-clamp-2 text-gray-600")}>{s.description}</p>
                 )}
 
-                <div className="mt-3 text-sm text-gray-500">
+                <div className={cn(designTokens.typography.caption, "mt-2 md:mt-3 text-gray-500")}>
                   排序順序: {s.sort_order}
                 </div>
 
                 {/* 操作按鈕 */}
-                <div className="mt-4 flex gap-2">
+                <div className="mt-3 md:mt-4 flex gap-2">
                   <Link href={`/admin/series/${s.id}`} className="flex-1">
                     <Button variant="outline" className="w-full">
                       <Edit className="mr-2 h-4 w-4" />

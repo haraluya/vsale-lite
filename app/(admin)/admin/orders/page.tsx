@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { getOrders } from '@/lib/actions/orders'
 import { OrderTable } from '@/components/admin/order-table'
 import { Package } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
 
 /**
  * 管理員訂單列表頁面
@@ -37,9 +39,13 @@ export default async function AdminOrdersPage() {
   if (!result.success) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="rounded-none border-3 border-black bg-red-100 p-8 text-center shadow-neo">
-          <h2 className="mb-2 text-xl font-bold">載入失敗</h2>
-          <p className="text-gray-700">{result.message}</p>
+        <div className={cn(
+          "rounded-none bg-red-100 text-center",
+          getNeoBrutalismClasses(),
+          designTokens.spacing.card.padding
+        )}>
+          <h2 className={cn(designTokens.typography.h2, "mb-2")}>載入失敗</h2>
+          <p className={cn(designTokens.typography.body.base, "text-gray-700")}>{result.message}</p>
         </div>
       </div>
     )
@@ -47,10 +53,14 @@ export default async function AdminOrdersPage() {
 
   if (!result.data) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="rounded-none border-3 border-black bg-red-100 p-8 text-center shadow-neo">
-          <h2 className="mb-2 text-xl font-bold">載入失敗</h2>
-          <p className="text-gray-700">訂單資料不存在</p>
+      <div className={getPageContainerClasses('default')}>
+        <div className={cn(
+          "rounded-none bg-red-100 text-center",
+          getNeoBrutalismClasses(),
+          designTokens.spacing.card.padding
+        )}>
+          <h2 className={cn(designTokens.typography.h2, "mb-2")}>載入失敗</h2>
+          <p className={cn(designTokens.typography.body.base, "text-gray-700")}>訂單資料不存在</p>
         </div>
       </div>
     )
@@ -59,22 +69,24 @@ export default async function AdminOrdersPage() {
   const { orders, total } = result.data
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
-      <div className="mx-auto max-w-7xl">
-        {/* 標題 */}
-        <div className="mb-8 flex items-center gap-4 rounded-none border-3 border-black bg-white p-6 shadow-neo">
-          <div className="rounded-none border-2 border-black bg-blue-400 p-3">
-            <Package className="h-8 w-8" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold">訂單管理</h1>
-            <p className="text-gray-600">管理所有客戶訂單</p>
-          </div>
+    <div className={getPageContainerClasses('default')}>
+      {/* 標題 */}
+      <div className={cn(
+        "flex items-center gap-3 md:gap-4 rounded-none bg-white",
+        getNeoBrutalismClasses(),
+        designTokens.spacing.card.padding
+      )}>
+        <div className="rounded-none border-2 border-black bg-blue-400 p-2 md:p-3">
+          <Package className="h-6 w-6 md:h-8 md:w-8" />
         </div>
-
-        {/* 訂單列表 */}
-        <OrderTable initialOrders={orders} initialTotal={total} />
+        <div>
+          <h1 className={designTokens.typography.h1}>訂單管理</h1>
+          <p className={cn(designTokens.typography.body.base, "text-gray-600")}>管理所有客戶訂單</p>
+        </div>
       </div>
+
+      {/* 訂單列表 */}
+      <OrderTable initialOrders={orders} initialTotal={total} />
     </div>
   )
 }

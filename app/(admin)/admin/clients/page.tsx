@@ -8,6 +8,8 @@ import { ExcelTemplateDownload } from '@/components/admin/excel-template-downloa
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
 
 type SearchParams = {
   search?: string
@@ -35,15 +37,15 @@ export default async function ClientsPage({
   ])
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className={getPageContainerClasses('default')}>
+      <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">客戶管理</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className={designTokens.typography.h1}>客戶管理</h1>
+          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>
             共 {total} 位客戶
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 md:gap-3">
           {/* Feature 006 - US7: Excel 功能按鈕 */}
           <ExcelTemplateDownload />
           <ExcelExport

@@ -5,6 +5,8 @@ import { getCategories } from '@/lib/actions/categories'
 import { ProductTable } from '@/components/admin/product-table'
 import { ProductTableWithTags } from '@/components/admin/product-table-with-tags'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
 
 export default async function ProductsPage({
   searchParams,
@@ -31,17 +33,17 @@ export default async function ProductsPage({
   const series = (seriesResult.success ? seriesResult.data : []) || []
 
   return (
-    <div>
+    <div className={getPageContainerClasses('default')}>
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">商品管理</h1>
-          <p className="mt-2 text-gray-600">管理商品資料、庫存與分類</p>
+          <h1 className={designTokens.typography.h1}>商品管理</h1>
+          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>管理商品資料、庫存與分類</p>
         </div>
 
         <Link href="/admin/products/new">
           <Button>
-            <Plus className="mr-2 h-5 w-5" />
+            <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />
             新增商品
           </Button>
         </Link>

@@ -15,6 +15,8 @@ import { getSeriesProductsWithPrice } from '@/lib/actions/shop'
 import { SeriesDetailClient } from '@/components/series/SeriesDetailClient'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { designTokens } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface SeriesDetailPageProps {
   params: Promise<{ id: string }>
@@ -62,24 +64,56 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
   const tierName = (profile.tiers as any).name
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="mx-auto max-w-7xl">
+    <div className={cn(
+      "min-h-screen bg-background",
+      designTokens.spacing.page.padding
+    )}>
+      <div className={cn(
+        designTokens.container.default,
+        designTokens.spacing.page.gap
+      )}>
         {/* 返回按鈕 */}
         <Link
           href="/store"
-          className="mb-6 inline-flex items-center gap-2 rounded-none border-2 border-black bg-white px-4 py-2 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className={cn(
+            "inline-flex items-center gap-2 rounded-none bg-white font-bold transition-all",
+            designTokens.neoBrutalism.border.full,
+            "border-black",
+            designTokens.neoBrutalism.shadow.mobile,
+            "md:shadow-neo",
+            designTokens.neoBrutalism.hover,
+            "px-3 py-2 md:px-4",
+            "min-h-[44px]",  // WCAG 2.1 AA
+            designTokens.spacing.section.marginBottom
+          )}
         >
-          <ArrowLeft className="h-5 w-5" />
-          返回系列列表
+          <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
+          <span className={designTokens.typography.body.base}>返回系列列表</span>
         </Link>
 
         {/* 系列標題 */}
-        <div className="mb-6 rounded-none border-3 border-black bg-white p-6 shadow-neo">
-          <h1 className="mb-2 text-3xl font-bold">{series.name}</h1>
+        <div className={cn(
+          "rounded-none bg-white",
+          designTokens.neoBrutalism.border.full,
+          "border-black",
+          designTokens.neoBrutalism.shadow.full,
+          designTokens.spacing.card.padding,
+          designTokens.spacing.section.marginBottom
+        )}>
+          <h1 className={cn(
+            designTokens.typography.h1,
+            "mb-2"
+          )}>{series.name}</h1>
           {series.description && (
-            <p className="text-gray-600">{series.description}</p>
+            <p className={cn(
+              designTokens.typography.body.base,
+              "text-gray-600"
+            )}>{series.description}</p>
           )}
-          <p className="mt-4 text-sm text-gray-500">
+          <p className={cn(
+            designTokens.typography.caption,
+            "mt-4 text-gray-500"
+          )}>
             會員等級: <span className="font-bold">{tierName}</span>
           </p>
         </div>

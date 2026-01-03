@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 const buttonVariants = cva(
-  'btn-neo inline-flex items-center justify-center rounded-none disabled:pointer-events-none',
+  'inline-flex items-center justify-center rounded-none disabled:pointer-events-none border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo font-bold transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed',
   {
     variants: {
       variant: {
@@ -13,9 +13,9 @@ const buttonVariants = cva(
         outline: 'bg-white hover:bg-gray-50 text-black',
       },
       size: {
-        default: 'px-6 py-3 text-base',
-        sm: 'px-4 py-2 text-sm',
-        lg: 'px-8 py-4 text-lg',
+        default: 'px-4 py-2 text-sm md:px-6 md:py-3 md:text-base',
+        sm: 'px-3 py-1.5 text-xs md:px-4 md:py-2 md:text-sm',
+        lg: 'px-6 py-3 text-base md:px-8 md:py-4 md:text-lg',
       },
     },
     defaultVariants: {

@@ -9,6 +9,8 @@ import { useState } from 'react'
 import { Edit, Trash2, Key, Copy, Check } from 'lucide-react'
 import { deleteClient } from '@/lib/actions/clients'
 import { useHighlightKeyword } from './client-filter'
+import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 type ClientTableProps = {
   clients: Client[]
@@ -88,10 +90,12 @@ ${displayName ? `\n客戶名稱: ${displayName}` : ''}
   }
 
   return (
-    <div className="space-y-4">
+    <div className={designTokens.spacing.page.gap}>
 
-      {/* 客戶列表 */}
-      <div className="card-neo bg-white overflow-hidden">
+      {/* 桌面版: 完整表格 */}
+      <div className={cn(
+        "hidden lg:block card-neo bg-white overflow-hidden"
+      )}>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="border-b-3 border-black bg-gray-50">
@@ -218,10 +222,126 @@ ${displayName ? `\n客戶名稱: ${displayName}` : ''}
         </div>
       </div>
 
+      {/* 手機版: 卡片視圖 */}
+      <div className="lg:hidden space-y-3 md:space-y-4">
+        {clients.length === 0 ? (
+          <div className={cn(
+            "rounded-none bg-white p-8 text-center text-gray-500",
+            designTokens.neoBrutalism.border.full,
+            designTokens.neoBrutalism.shadow.full
+          )}>
+            {searchKeyword || total === 0
+              ? '查無符合條件的客戶'
+              : '尚無客戶資料,點擊「快速開戶」建立第一位客戶'}
+          </div>
+        ) : (
+          clients.map((client) => {
+            const addressPreview = client.address
+              ? client.address.length > 20
+                ? client.address.substring(0, 20) + '...'
+                : client.address
+              : '-'
+
+            return (
+              <div
+                key={client.id}
+                className={cn(
+                  "rounded-none bg-white",
+                  designTokens.neoBrutalism.border.full,
+                  designTokens.neoBrutalism.shadow.full,
+                  designTokens.spacing.card.padding,
+                  designTokens.spacing.card.gap
+                )}
+              >
+                {/* 姓名與會員等級 */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className={designTokens.spacing.card.gap}>
+                    <div className={cn("font-bold", designTokens.typography.body.base)}>
+                      {client.display_name || '未設定姓名'}
+                    </div>
+                    <div className={cn("font-mono text-gray-600", designTokens.typography.caption)}>
+                      {highlightKeyword(client.phone)}
+                    </div>
+                  </div>
+                  <span className="inline-block rounded-none border-2 border-black bg-blue-100 px-2 py-1 text-xs font-bold whitespace-nowrap">
+                    {client.tier_name || '未設定'}
+                  </span>
+                </div>
+
+                {/* 地址與註冊時間 */}
+                {(client.address || client.admin_notes) && (
+                  <div className={cn("text-gray-600", designTokens.typography.caption)}>
+                    {client.address && (
+                      <div title={client.address}>
+                        地址: {addressPreview}
+                      </div>
+                    )}
+                    {client.admin_notes && (
+                      <div className="text-yellow-700" title={client.admin_notes}>
+                        備註: {client.admin_notes.length > 20 ? client.admin_notes.substring(0, 20) + '...' : client.admin_notes}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 操作按鈕 */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleCopyLoginInfo(client)}
+                    className="border-2 border-black bg-green-100 hover:bg-green-200"
+                  >
+                    {copiedClientId === client.id ? (
+                      <>
+                        <Check className="h-3 w-3 mr-1" />
+                        已複製
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3 w-3 mr-1" />
+                        複製
+                      </>
+                    )}
+                  </Button>
+                  <Link href={`/admin/clients/${client.id}/edit`}>
+                    <Button size="sm" variant="secondary" className="w-full">
+                      <Edit className="h-3 w-3 mr-1" />
+                      編輯
+                    </Button>
+                  </Link>
+                  <Link href={`/admin/clients/${client.id}/password`}>
+                    <Button size="sm" variant="secondary" className="w-full">
+                      <Key className="h-3 w-3 mr-1" />
+                      改密碼
+                    </Button>
+                  </Link>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => handleDeleteClick(client)}
+                    disabled={isDeleting}
+                    className="border-2 border-black bg-red-500 text-white hover:bg-red-600"
+                  >
+                    <Trash2 className="h-3 w-3 mr-1" />
+                    刪除
+                  </Button>
+                </div>
+
+                {/* 註冊時間 */}
+                <div className={cn("text-gray-500 text-right", designTokens.typography.caption)}>
+                  {new Date(client.created_at).toLocaleDateString('zh-TW')}
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+
       {/* 分頁 */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className={cn("text-gray-600", designTokens.typography.caption)}>
             第 {page} / {totalPages} 頁,共 {total} 筆
           </p>
           <div className="flex gap-2">

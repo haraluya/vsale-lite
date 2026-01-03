@@ -2,6 +2,8 @@ import { getDashboardStats } from '@/lib/actions/dashboard'
 import { DashboardCard, DashboardTrendCard } from '@/components/admin/dashboard-card'
 import { OrderTrendChart } from '@/components/admin/order-trend-chart'
 import { TrendingUp, Calendar } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
 
 /**
  * 管理員儀表板頁面
@@ -13,13 +15,13 @@ export default async function DashboardPage() {
 
   if (!result.success || !result.data) {
     return (
-      <div className="space-y-6">
+      <div className={getPageContainerClasses('default')}>
         <div>
-          <h1 className="text-3xl font-bold">儀表板</h1>
-          <p className="mt-2 text-gray-600">歡迎使用 Vsale-lite 管理後台</p>
+          <h1 className={designTokens.typography.h1}>儀表板</h1>
+          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>歡迎使用 Vsale-lite 管理後台</p>
         </div>
-        <div className="card-neo p-6">
-          <p className="text-red-600">載入儀表板資料時發生錯誤，請稍後再試。</p>
+        <div className={cn("card-neo", designTokens.spacing.card.padding)}>
+          <p className={cn(designTokens.typography.body.base, "text-red-600")}>載入儀表板資料時發生錯誤,請稍後再試。</p>
         </div>
       </div>
     )
@@ -28,20 +30,20 @@ export default async function DashboardPage() {
   const stats = result.data
 
   return (
-    <div className="space-y-6">
+    <div className={getPageContainerClasses('wide')}>
       {/* 頁面標題 */}
       <div>
-        <h1 className="text-3xl font-bold">儀表板</h1>
-        <p className="mt-2 text-gray-600">歡迎使用 Vsale-lite 管理後台</p>
+        <h1 className={designTokens.typography.h1}>儀表板</h1>
+        <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>歡迎使用 Vsale-lite 管理後台</p>
       </div>
 
       {/* 今日統計 */}
       <div>
-        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
+        <h2 className={cn(designTokens.typography.h3, "mb-3 flex items-center gap-2")}>
+          <Calendar className="h-4 w-4 md:h-5 md:w-5" />
           今日概況
         </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className={cn("grid grid-cols-1 md:grid-cols-2", designTokens.spacing.grid.gap)}>
           {/* T078 - 今日訂單數 */}
           <DashboardCard
             title="今日訂單"
@@ -66,11 +68,11 @@ export default async function DashboardPage() {
 
       {/* 警示與待處理 */}
       <div>
-        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
+        <h2 className={cn(designTokens.typography.h3, "mb-3 flex items-center gap-2")}>
+          <TrendingUp className="h-4 w-4 md:h-5 md:w-5" />
           重要提醒
         </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className={cn("grid grid-cols-1 md:grid-cols-2", designTokens.spacing.grid.gap)}>
           {/* T080 - 庫存警示商品數 */}
           <DashboardCard
             title="庫存警示"

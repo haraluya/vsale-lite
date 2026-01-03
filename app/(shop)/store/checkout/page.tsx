@@ -17,9 +17,10 @@ import { useCartStore } from '@/stores/cart'
 import { getCartItemsWithPrices, validateCartBeforeCheckout } from '@/lib/actions/cart'
 import { createOrder } from '@/lib/actions/orders'
 import type { CartItemWithProduct } from '@/types'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, cn } from '@/lib/utils'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { designTokens } from '@/lib/design-tokens'
 
 export default function CheckoutPage() {
   const router = useRouter()
@@ -118,12 +119,15 @@ export default function CheckoutPage() {
   // 載入中狀態
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
+      <div className={cn(
+        "min-h-screen bg-gray-50",
+        designTokens.spacing.page.padding
+      )}>
+        <div className={designTokens.container.default}>
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="mb-4 text-6xl">⏳</div>
-              <p className="text-xl font-bold">載入訂單資訊...</p>
+              <p className={designTokens.typography.h3}>載入訂單資訊...</p>
             </div>
           </div>
         </div>
@@ -134,15 +138,33 @@ export default function CheckoutPage() {
   // 空購物車狀態
   if (isEmpty) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
+      <div className={cn(
+        "min-h-screen bg-gray-50",
+        designTokens.spacing.page.padding
+      )}>
+        <div className={designTokens.container.default}>
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="mb-6 text-8xl">🛒</div>
-            <h2 className="mb-4 text-3xl font-bold">購物車是空的</h2>
-            <p className="mb-8 text-gray-600">請先將商品加入購物車</p>
+            <div className="mb-6 text-6xl md:text-8xl">🛒</div>
+            <h2 className={cn(
+              designTokens.typography.h1,
+              "mb-4"
+            )}>購物車是空的</h2>
+            <p className={cn(
+              designTokens.typography.body.large,
+              "mb-8 text-gray-600"
+            )}>請先將商品加入購物車</p>
             <Link
               href="/store"
-              className="rounded-none border-3 border-black bg-green-400 px-8 py-4 text-lg font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              className={cn(
+                "rounded-none bg-green-400 font-bold transition-all",
+                designTokens.neoBrutalism.border.full,
+                "border-black",
+                designTokens.neoBrutalism.shadow.full,
+                designTokens.neoBrutalism.hover,
+                "px-6 py-3 md:px-8 md:py-4",
+                "min-h-[44px]",
+                designTokens.typography.body.large
+              )}
             >
               開始購物
             </Link>
@@ -153,40 +175,70 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className={cn(
+      "min-h-screen bg-gray-50",
+      designTokens.spacing.page.padding
+    )}>
+      <div className={cn(
+        designTokens.container.narrow,
+        designTokens.spacing.page.gap
+      )}>
         {/* 頁面標題 */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold">訂單確認</h1>
-          <p className="mt-2 text-gray-600">請確認訂單資訊後送出</p>
+        <div className={designTokens.spacing.section.marginBottom}>
+          <h1 className={designTokens.typography.h1}>訂單確認</h1>
+          <p className={cn(
+            designTokens.typography.body.base,
+            "mt-2 text-gray-600"
+          )}>請確認訂單資訊後送出</p>
         </div>
 
         {/* 錯誤訊息 */}
         {error && (
-          <div className="mb-6 rounded-none border-3 border-red-600 bg-red-100 p-4">
+          <div className={cn(
+            "rounded-none bg-red-100",
+            designTokens.neoBrutalism.border.full,
+            "border-red-600",
+            "p-3 md:p-4",
+            designTokens.spacing.section.marginBottom
+          )}>
             <p className="text-red-600 font-bold">❌ {error}</p>
           </div>
         )}
 
         {/* 訂單內容 */}
-        <div className="space-y-6">
+        <div className={designTokens.spacing.page.gap}>
           {/* 商品列表 */}
-          <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
-            <h2 className="mb-4 text-2xl font-bold">訂單商品</h2>
-            <div className="space-y-4">
+          <div className={cn(
+            "rounded-none bg-white",
+            designTokens.neoBrutalism.border.full,
+            "border-black",
+            designTokens.neoBrutalism.shadow.full,
+            designTokens.spacing.card.padding
+          )}>
+            <h2 className={cn(
+              designTokens.typography.h2,
+              "mb-3 md:mb-4"
+            )}>訂單商品</h2>
+            <div className={designTokens.spacing.card.gap}>
               {cartItemsWithPrices.map((item) => (
                 <div
                   key={item.productId}
-                  className="flex items-center justify-between border-b-2 border-gray-200 pb-4 last:border-b-0 last:pb-0"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
                 >
                   <div className="flex-1">
-                    <h3 className="font-bold">{item.productName}</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className={cn(
+                      "font-bold",
+                      designTokens.typography.body.large
+                    )}>{item.productName}</h3>
+                    <p className={cn(
+                      designTokens.typography.caption,
+                      "text-gray-600"
+                    )}>
                       單價: {formatCurrency(item.price || 0)} × {item.quantity}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-green-600">
+                  <div className="text-left sm:text-right">
+                    <p className="text-lg md:text-xl font-bold text-green-600">
                       {formatCurrency(item.subtotal)}
                     </p>
                   </div>
@@ -195,10 +247,15 @@ export default function CheckoutPage() {
             </div>
 
             {/* 總計 */}
-            <div className="mt-6 border-t-3 border-black pt-4">
+            <div className={cn(
+              "mt-4 md:mt-6 pt-3 md:pt-4",
+              designTokens.neoBrutalism.border.mobile,
+              "md:border-t-3",
+              "border-t-black"
+            )}>
               <div className="flex items-center justify-between">
-                <p className="text-xl font-bold">訂單總金額</p>
-                <p className="text-3xl font-bold text-green-600">
+                <p className={designTokens.typography.h3}>訂單總金額</p>
+                <p className="text-2xl md:text-3xl font-bold text-green-600">
                   {formatCurrency(totalAmount)}
                 </p>
               </div>
@@ -206,41 +263,88 @@ export default function CheckoutPage() {
           </div>
 
           {/* 訂單備註 */}
-          <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
-            <h2 className="mb-4 text-2xl font-bold">訂單備註 (選填)</h2>
+          <div className={cn(
+            "rounded-none bg-white",
+            designTokens.neoBrutalism.border.full,
+            "border-black",
+            designTokens.neoBrutalism.shadow.full,
+            designTokens.spacing.card.padding
+          )}>
+            <h2 className={cn(
+              designTokens.typography.h2,
+              "mb-3 md:mb-4"
+            )}>訂單備註 (選填)</h2>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               maxLength={500}
               rows={4}
               placeholder="例如: 請盡快出貨、包裝需求等..."
-              className="w-full rounded-none border-3 border-black p-4 text-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+              className={cn(
+                "w-full rounded-none",
+                designTokens.neoBrutalism.border.full,
+                "border-black",
+                "p-3 md:p-4",
+                designTokens.typography.body.base,
+                "focus:outline-none focus:ring-2 focus:ring-green-400"
+              )}
             />
-            <p className="mt-2 text-sm text-gray-600">
+            <p className={cn(
+              "mt-2",
+              designTokens.typography.caption,
+              "text-gray-600"
+            )}>
               {notes.length} / 500 字
             </p>
           </div>
 
           {/* 操作按鈕 */}
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
             <Link
               href="/store/cart"
-              className="flex-1 rounded-none border-3 border-black bg-gray-200 px-6 py-4 text-center text-lg font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              className={cn(
+                "flex-1 rounded-none bg-gray-200 text-center font-bold transition-all",
+                designTokens.neoBrutalism.border.full,
+                "border-black",
+                designTokens.neoBrutalism.shadow.full,
+                designTokens.neoBrutalism.hover,
+                "px-4 py-3 md:px-6 md:py-4",
+                "min-h-[44px]",
+                designTokens.typography.body.large
+              )}
             >
               返回購物車
             </Link>
             <button
               onClick={handleSubmitOrder}
               disabled={isSubmitting || isEmpty}
-              className="flex-1 rounded-none border-3 border-black bg-green-400 px-6 py-4 text-lg font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
+              className={cn(
+                "flex-1 rounded-none bg-green-400 font-bold transition-all",
+                designTokens.neoBrutalism.border.full,
+                "border-black",
+                designTokens.neoBrutalism.shadow.full,
+                designTokens.neoBrutalism.hover,
+                "px-4 py-3 md:px-6 md:py-4",
+                "min-h-[44px]",
+                designTokens.typography.body.large,
+                "disabled:opacity-50 disabled:cursor-not-allowed",
+                "disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
+              )}
             >
               {isSubmitting ? '送出中...' : '確認送出訂單'}
             </button>
           </div>
 
           {/* 提示訊息 */}
-          <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-4">
-            <p className="text-sm text-gray-600">
+          <div className={cn(
+            "rounded-none bg-gray-50",
+            "border-2 border-gray-300",
+            "p-3 md:p-4"
+          )}>
+            <p className={cn(
+              designTokens.typography.caption,
+              "text-gray-600"
+            )}>
               📝 訂單送出後，我們將盡快為您處理。您可以在「我的訂單」查看訂單狀態。
             </p>
           </div>
