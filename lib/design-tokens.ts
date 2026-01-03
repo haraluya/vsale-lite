@@ -93,17 +93,17 @@ export function getNeoBrutalismClasses(options?: {
   hover?: boolean
   active?: boolean
 }) {
-  const classes = [
+  const classes: string[] = [
     designTokens.neoBrutalism.border.full,
     designTokens.neoBrutalism.shadow.full,
   ]
 
   if (options?.hover) {
-    classes.push(designTokens.neoBrutalism.hover)
+    classes.push(designTokens.neoBrutalism.hover as string)
   }
 
   if (options?.active) {
-    classes.push(designTokens.neoBrutalism.active)
+    classes.push(designTokens.neoBrutalism.active as string)
   }
 
   return classes.join(' ')

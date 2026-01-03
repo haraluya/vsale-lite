@@ -176,7 +176,9 @@ export function CategoryTable({ categories: initialCategories }: { categories: C
           <p className={cn("font-bold", designTokens.typography.body.base)}>正在儲存排序...</p>
         </div>
       )}
-      <div className="card-neo overflow-hidden p-0">
+
+      {/* 桌面版: 完整表格 */}
+      <div className="hidden lg:block card-neo overflow-hidden p-0">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -210,12 +212,76 @@ export function CategoryTable({ categories: initialCategories }: { categories: C
           </table>
         </DndContext>
       </div>
+
+      {/* 手機版: 卡片視圖 */}
+      <div className="lg:hidden space-y-3 md:space-y-4">
+        {categories.map((category) => (
+          <div
+            key={category.id}
+            className={cn(
+              "rounded-none bg-white",
+              getNeoBrutalismClasses(),
+              designTokens.spacing.card.padding
+            )}
+          >
+            {/* 分類名稱 */}
+            <div className="mb-3">
+              <h3 className={cn(designTokens.typography.h3, "mb-1")}>{category.name}</h3>
+              {category.description ? (
+                <p className={cn(designTokens.typography.caption, "text-gray-600")}>
+                  {category.description}
+                </p>
+              ) : (
+                <p className={cn(designTokens.typography.caption, "text-gray-400 italic")}>無描述</p>
+              )}
+            </div>
+
+            {/* 建立時間 */}
+            <div className="mb-3 pb-3 border-b border-gray-200">
+              <span className={cn(designTokens.typography.caption, "text-gray-500")}>
+                建立於 {new Date(category.created_at).toLocaleDateString('zh-TW')}
+              </span>
+            </div>
+
+            {/* 操作按鈕 */}
+            <div className="flex gap-2">
+              <Link
+                href={`/admin/categories/${category.id}/edit`}
+                className={cn(
+                  "flex-1 inline-flex items-center justify-center gap-2 bg-white font-bold transition-all",
+                  getNeoBrutalismClasses({ active: true }),
+                  designTokens.button.md
+                )}
+              >
+                <Edit className="h-4 w-4" />
+                編輯
+              </Link>
+              <button
+                onClick={() => handleDelete(category.id, category.name)}
+                disabled={loading === category.id}
+                className={cn(
+                  "flex-1 inline-flex items-center justify-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50",
+                  getNeoBrutalismClasses({ active: true }),
+                  designTokens.button.md
+                )}
+              >
+                <Trash2 className="h-4 w-4" />
+                {loading === category.id ? '刪除中...' : '刪除'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div className={cn(
         "card-neo bg-blue-50 border-blue-500",
         designTokens.spacing.card.padding
       )}>
         <p className={cn("text-gray-700", designTokens.typography.caption)}>
-          <strong>提示：</strong>拖曳左側的 <GripVertical className="inline h-4 w-4" /> 圖示來調整分類排序
+          <strong className="hidden lg:inline">提示：</strong>
+          <strong className="lg:hidden">提示：</strong>
+          <span className="hidden lg:inline">拖曳左側的 <GripVertical className="inline h-4 w-4" /> 圖示來調整分類排序</span>
+          <span className="lg:hidden">請使用桌面版調整分類排序</span>
         </p>
       </div>
     </div>
