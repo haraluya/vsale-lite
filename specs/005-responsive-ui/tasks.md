@@ -90,7 +90,7 @@
 
 ### 3.1 訂單表格響應式
 
-- [ ] T016 修改 `components/admin/order-table.tsx` 實作響應式表格/卡片視圖
+- [X] T016 修改 `components/admin/order-table.tsx` 實作響應式表格/卡片視圖
   - 桌面版: 完整表格 (`hidden lg:block`)
   - 手機版: 卡片視圖 (`lg:hidden space-y-3 md:space-y-4`)
   - 卡片資訊層級: 訂單編號 / 客戶資訊 / 狀態 / 金額 / 時間
@@ -99,7 +99,7 @@
 
 ### 3.2 客戶表格響應式
 
-- [ ] T017 修改 `components/admin/client-table.tsx` 實作響應式表格/卡片視圖
+- [X] T017 修改 `components/admin/client-table.tsx` 實作響應式表格/卡片視圖
   - 桌面版: 完整表格 (`hidden lg:block`)
   - 手機版: 卡片視圖 (`lg:hidden space-y-3 md:space-y-4`)
   - 卡片資訊層級: 姓名 / 手機號碼 / 等級 / 狀態 / 註冊時間
