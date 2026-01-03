@@ -18,9 +18,13 @@ export const clientImportSchema = z.object({
     .max(500, '備註最多 500 個字元')
     .optional()
     .transform(val => val || undefined), // 空字串轉為 undefined
-  密碼: z.string()
-    .min(6, '密碼至少 6 個字元')
-    .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/, '密碼不可包含中文字元')
+  密碼: z.union([z.string(), z.number()]) // 接受字串或數字
+    .transform(val => String(val)) // 轉換為字串
+    .pipe(
+      z.string()
+        .min(6, '密碼至少 6 個字元')
+        .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/, '密碼不可包含中文字元')
+    )
     .optional(),
 });
 
