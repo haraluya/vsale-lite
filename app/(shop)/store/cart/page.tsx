@@ -143,7 +143,7 @@ export default function CartPage() {
             </Link>
           </div>
         ) : (
-          /* 購物車內容 */}
+          /* 購物車內容 */
           <div className={cn(
             "grid grid-cols-1 lg:grid-cols-3",
             "gap-6 md:gap-8"
