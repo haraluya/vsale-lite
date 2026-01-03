@@ -71,10 +71,11 @@ export function ClientTable({
   const handleCopyLoginInfo = (client: Client) => {
     const loginUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login'
     const phone = client.phone
+    const displayName = client.display_name || ''
 
     // 與快速開戶相同的格式，但密碼顯示為「請向管理員索取」
     const fullGuide = `【Vsale 訂貨系統 - 登入資訊】
-
+${displayName ? `\n客戶名稱: ${displayName}` : ''}
 前台網址: ${loginUrl}
 登入電話: ${phone}
 登入密碼: (請向管理員索取)
