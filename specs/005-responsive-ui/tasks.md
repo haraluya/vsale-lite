@@ -320,9 +320,9 @@
 
 ### 9.1 文件更新
 
-- [ ] T061 建立 `docs/design-tokens.md` 設計 Token 使用文件
-- [ ] T062 建立 `docs/responsive-guide.md` 響應式開發指南
-- [ ] T063 建立 `docs/component-responsive-checklist.md` 元件響應式檢查清單
+- [X] T061 建立 `docs/design-tokens.md` 設計 Token 使用文件
+- [X] T062 建立 `docs/responsive-guide.md` 響應式開發指南
+- [X] T063 建立 `docs/component-responsive-checklist.md` 元件響應式檢查清單
 
 ### 9.2 Screenshot 文件 (可選)
 
@@ -332,10 +332,10 @@
 
 ### 9.3 程式碼清理
 
-- [ ] T067 移除未使用的響應式類別或註解
-- [ ] T068 確保所有響應式類別按順序排列 (預設 → sm → md → lg → xl)
-- [ ] T069 執行 TypeScript 型別檢查 (`pnpm type-check`)
-- [ ] T070 執行 ESLint 檢查 (`pnpm lint`)
+- [X] T067 移除未使用的響應式類別或註解
+- [X] T068 確保所有響應式類別按順序排列 (預設 → sm → md → lg → xl)
+- [X] T069 執行 TypeScript 型別檢查 (`pnpm type-check`)
+- [X] T070 執行 ESLint 檢查 (`pnpm lint`)
 
 **Checkpoint**: 響應式 UI 適配系統完成,文件齊全
 
