@@ -107,7 +107,7 @@ export function ProductPricingForm() {
           <option value="">請選擇商品...</option>
           {Object.entries(groupedProducts).map(([seriesName, seriesProducts]) => (
             <optgroup key={seriesName} label={seriesName}>
-              {seriesProducts.map((product) => (
+              {(seriesProducts as typeof products).map((product) => (
                 <option key={product.id} value={product.id}>
                   {product.code} - {product.name}
                 </option>

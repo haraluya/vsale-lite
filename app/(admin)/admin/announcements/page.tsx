@@ -15,7 +15,7 @@ import { Plus } from 'lucide-react'
 
 export default async function AnnouncementsPage() {
   const result = await getAllAnnouncements()
-  const announcements = result.success ? result.data : []
+  const announcements = result.success ? (result.data || []) : []
 
   return (
     <div className="space-y-6">

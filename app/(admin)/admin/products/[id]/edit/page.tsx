@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { getProduct } from '@/lib/actions/products'
 import { getSeries } from '@/lib/actions/series'
 import { ProductForm } from '@/components/admin/product-form'
+import { TagManager } from '@/components/admin/tag-manager'
 
 export default async function EditProductPage({
   params,
@@ -27,7 +28,20 @@ export default async function EditProductPage({
         </p>
       </div>
 
-      <ProductForm product={product} series={series} mode="edit" />
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* 商品表單 */}
+        <div className="lg:col-span-2">
+          <ProductForm product={product} series={series} mode="edit" />
+        </div>
+
+        {/* 標籤管理 */}
+        <div className="lg:col-span-1">
+          <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+            <h2 className="mb-4 text-xl font-bold">標籤管理</h2>
+            <TagManager productId={product.id} initialTags={product.tags || []} />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

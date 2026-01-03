@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { Plus } from 'lucide-react'
+import { Plus, Tags } from 'lucide-react'
 import { getProducts } from '@/lib/actions/products'
 import { getCategories } from '@/lib/actions/categories'
 import { ProductTable } from '@/components/admin/product-table'
+import { ProductTableWithTags } from '@/components/admin/product-table-with-tags'
 import { Button } from '@/components/ui/button'
 
 export default async function ProductsPage({
@@ -46,8 +47,8 @@ export default async function ProductsPage({
         </Link>
       </div>
 
-      {/* Products Table */}
-      <ProductTable
+      {/* Products Table with Tags Management */}
+      <ProductTableWithTags
         products={products}
         series={series}
         total={total}

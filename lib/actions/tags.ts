@@ -148,7 +148,7 @@ export async function batchUpdateProductTags(
         newTags = Array.from(new Set(combinedTags)).slice(0, 5) // 限制最多 5 個
       } else {
         // 移除標籤
-        newTags = currentTags.filter((tag) => !tags.includes(tag))
+        newTags = currentTags.filter((tag: string) => !tags.includes(tag))
       }
 
       return {

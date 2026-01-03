@@ -4,16 +4,18 @@ import { useTransition } from 'react'
 import { confirmOrder } from '@/lib/actions/orders'
 import { OrderStatusUpdater } from './order-status-updater'
 import { OrderCancelButton } from './order-cancel-button'
+import { OrderDeleteButton } from './order-delete-button'
 import { toast } from 'sonner'
 import type { OrderStatus } from '@/types'
 
 /**
  * 訂單操作元件
- * Feature: 004-cart-and-orders / US3
+ * Feature: 004-cart-and-orders / US3 + 006-ux-enhancement / US8
  *
  * - 確認訂單（扣減庫存）
  * - 更新訂單狀態
  * - 取消訂單
+ * - 刪除訂單（僅 pending 狀態）
  * - Neo-Brutalism 設計風格
  */
 
@@ -58,6 +60,11 @@ export function OrderActions({ orderId, orderNumber, currentStatus }: OrderActio
         )}
         <OrderStatusUpdater orderId={orderId} currentStatus={currentStatus} />
         <OrderCancelButton
+          orderId={orderId}
+          currentStatus={currentStatus}
+          orderNumber={orderNumber}
+        />
+        <OrderDeleteButton
           orderId={orderId}
           currentStatus={currentStatus}
           orderNumber={orderNumber}

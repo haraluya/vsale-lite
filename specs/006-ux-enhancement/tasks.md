@@ -231,11 +231,11 @@
 ### Implementation for User Story 8
 
 - [X] T059 [US8] 實作 deleteOrder Server Action (lib/actions/orders.ts)
-- [ ] T060 [US8] 更新訂單詳情頁新增刪除按鈕 (app/(admin)/admin/orders/[id]/page.tsx)
-- [ ] T061 [US8] 實作刪除確認對話框元件
-- [ ] T062 [US8] 實作訂單狀態檢查邏輯 (僅允許刪除 pending)
-- [ ] T063 [US8] 實作刪除操作記錄於 order_timelines
-- [ ] T064 [US8] 實作刪除成功後導向訂單列表
+- [X] T060 [US8] 更新訂單詳情頁新增刪除按鈕 (app/(admin)/admin/orders/[id]/page.tsx)
+- [X] T061 [US8] 實作刪除確認對話框元件
+- [X] T062 [US8] 實作訂單狀態檢查邏輯 (僅允許刪除 pending)
+- [X] T063 [US8] 實作刪除操作記錄於 order_timelines
+- [X] T064 [US8] 實作刪除成功後導向訂單列表
 
 **Checkpoint**: 訂單刪除功能完整可用，可獨立測試
 
@@ -257,12 +257,12 @@
 - [X] T065 [P] [US9] 實作 updateProductTags Server Action (lib/actions/tags.ts)
 - [X] T066 [P] [US9] 實作 batchUpdateProductTags Server Action (lib/actions/tags.ts)
 - [X] T067 [P] [US9] 實作 getAvailableTags Server Action (lib/actions/tags.ts)
-- [ ] T068 [P] [US9] 建立標籤管理元件 (components/admin/tag-manager.tsx)
-- [ ] T069 [US9] 整合標籤管理到商品管理頁面 (app/(admin)/admin/products/page.tsx)
-- [ ] T070 [US9] 實作商品編輯頁面標籤輸入框
-- [ ] T071 [US9] 實作批次標籤設定功能 (選擇多個商品)
-- [ ] T072 [US9] 實作標籤自動完成與常用標籤選擇
-- [ ] T073 [US9] 驗證標籤數量與長度約束 (最多 5 個，2-8 字元)
+- [X] T068 [P] [US9] 建立標籤管理元件 (components/admin/tag-manager.tsx)
+- [X] T069 [US9] 整合標籤管理到商品管理頁面 (app/(admin)/admin/products/page.tsx)
+- [X] T070 [US9] 實作商品編輯頁面標籤輸入框
+- [X] T071 [US9] 實作批次標籤設定功能 (選擇多個商品)
+- [X] T072 [US9] 實作標籤自動完成與常用標籤選擇
+- [X] T073 [US9] 驗證標籤數量與長度約束 (最多 5 個，2-8 字元)
 
 **Checkpoint**: 商品標籤系統完整可用，可獨立測試
 
@@ -312,12 +312,12 @@
 
 ### Implementation for User Story 11
 
-- [ ] T084 [US11] 整合 Logo 到前台導航列 (app/(shop)/layout.tsx)
-- [ ] T085 [US11] 整合 Logo 到後台側邊欄 (app/(admin)/admin/layout.tsx)
-- [ ] T086 [US11] 整合 Logo 到前台登入頁面 (app/(auth)/login/page.tsx)
-- [ ] T087 [US11] 整合 Logo 到後台登入頁面 (app/(auth)/admin/login/page.tsx)
-- [ ] T088 [US11] 設定 Favicon 於 HTML head
-- [ ] T089 [US11] 手機版導航列僅顯示 Logo 圖示
+- [X] T084 [US11] 整合 Logo 到前台導航列 (app/(shop)/layout.tsx)
+- [X] T085 [US11] 整合 Logo 到後台側邊欄 (app/(admin)/admin/layout.tsx)
+- [X] T086 [US11] 整合 Logo 到前台登入頁面 (app/(auth)/login/page.tsx)
+- [X] T087 [US11] 整合 Logo 到後台登入頁面 (app/(auth)/admin/login/page.tsx)
+- [X] T088 [US11] 設定 Favicon 於 HTML head
+- [X] T089 [US11] 手機版導航列僅顯示 Logo 圖示
 
 **Checkpoint**: Logo 整合完成，所有頁面統一顯示
 
@@ -327,19 +327,19 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T090 [P] 檢查所有 UI 元件符合 Neo-Brutalism 設計風格
-- [ ] T091 [P] 驗證色彩對比符合無障礙標準 (WCAG AA)
-- [ ] T092 [P] 優化行動裝置響應式設計 (前台)
-- [ ] T093 [P] 優化桌面裝置版面 (後台)
-- [ ] T094 程式碼清理與重構 (移除未使用的匯入與變數)
-- [ ] T095 執行型別檢查 (pnpm type-check)
-- [ ] T096 執行建置檢查 (pnpm build)
-- [ ] T097 驗證搜尋響應時間 < 300ms
-- [ ] T098 驗證篩選切換 < 200ms
-- [ ] T099 驗證 Excel 匯入 100 筆 < 5s
-- [ ] T100 執行 quickstart.md 驗證流程
-- [ ] T101 更新 CLAUDE.md 新增 006 功能概述
-- [ ] T102 準備 Git Commit 訊息 (繁體中文)
+- [X] T090 [P] 檢查所有 UI 元件符合 Neo-Brutalism 設計風格
+- [X] T091 [P] 驗證色彩對比符合無障礙標準 (WCAG AA)
+- [X] T092 [P] 優化行動裝置響應式設計 (前台)
+- [X] T093 [P] 優化桌面裝置版面 (後台)
+- [X] T094 程式碼清理與重構 (移除未使用的匯入與變數)
+- [X] T095 執行型別檢查 (pnpm type-check)
+- [X] T096 執行建置檢查 (pnpm build)
+- [X] T097 驗證搜尋響應時間 < 300ms
+- [X] T098 驗證篩選切換 < 200ms
+- [X] T099 驗證 Excel 匯入 100 筆 < 5s
+- [X] T100 執行 quickstart.md 驗證流程
+- [X] T101 更新 CLAUDE.md 新增 006 功能概述
+- [X] T102 準備 Git Commit 訊息 (繁體中文)
 
 ---
 

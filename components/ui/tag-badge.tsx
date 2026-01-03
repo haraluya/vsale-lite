@@ -33,7 +33,7 @@ export function TagBadge({ tag, variant, size = 'md', className = '' }: TagBadge
   const finalVariant = variant || getTagVariant(tag)
 
   // 根據 variant 決定顏色
-  const colorClasses: Record<NonNullable<TagBadgeProps['variant']>, string> = {
+  const colorClasses: Record<Exclude<TagBadgeProps['variant'], undefined>, string> = {
     default: 'bg-gray-100 border-gray-600 text-gray-900',
     hot: 'bg-red-100 border-red-600 text-red-900',
     new: 'bg-green-100 border-green-600 text-green-900',
@@ -42,7 +42,7 @@ export function TagBadge({ tag, variant, size = 'md', className = '' }: TagBadge
   }
 
   // 根據 size 決定尺寸
-  const sizeClasses: Record<NonNullable<TagBadgeProps['size']>, string> = {
+  const sizeClasses: Record<Exclude<TagBadgeProps['size'], undefined>, string> = {
     sm: 'px-2 py-0.5 text-xs',
     md: 'px-3 py-1 text-sm',
     lg: 'px-4 py-1.5 text-base',
@@ -52,8 +52,8 @@ export function TagBadge({ tag, variant, size = 'md', className = '' }: TagBadge
     <span
       className={cn(
         'inline-block rounded-none border-2 font-bold',
-        colorClasses[finalVariant],
-        sizeClasses[size],
+        colorClasses[finalVariant!],
+        sizeClasses[size!],
         className
       )}
     >

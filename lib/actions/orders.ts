@@ -409,6 +409,7 @@ export async function getOrderById(
     const actorMap = new Map((actors || []).map((actor: any) => [actor.id, actor]))
 
     // 格式化訂單資料
+    const profileData = profile as any
     const orderDetail: OrderDetail = {
       id: order.id,
       order_number: order.order_number,
@@ -419,12 +420,12 @@ export async function getOrderById(
       created_at: order.created_at,
       updated_at: order.updated_at,
       user: {
-        id: profile?.id || order.user_id,
-        name: profile?.display_name || profile?.phone || '未知客戶',
-        phone: profile?.phone || '',
-        tier_name: (profile?.tiers as any)?.name || '未設定',
-        address: profile?.address || null,  // 🆕 Feature 007
-        admin_notes: role === 'admin' ? (profile?.admin_notes || null) : null,  // 🆕 Feature 007: 僅管理員可見
+        id: profileData?.id || order.user_id,
+        name: profileData?.display_name || profileData?.phone || '未知客戶',
+        phone: profileData?.phone || '',
+        tier_name: profileData?.tiers?.name || '未設定',
+        address: profileData?.address || null,  // 🆕 Feature 007
+        admin_notes: role === 'admin' ? (profileData?.admin_notes || null) : null,  // 🆕 Feature 007: 僅管理員可見
       },
       items: (orderItems || []).map((item: any) => ({
         id: item.id,

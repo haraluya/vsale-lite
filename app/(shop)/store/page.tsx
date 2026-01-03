@@ -43,7 +43,7 @@ export default async function StorePage() {
 
   // 查詢啟用的廣告 (Feature 007 - US4)
   const announcementsResult = await getActiveAnnouncements()
-  const announcements = announcementsResult.success ? announcementsResult.data : []
+  const announcements = announcementsResult.success ? (announcementsResult.data || []) : []
 
   // 查詢分類與標籤 (Feature 006 - US2)
   const categoriesResult = await getActiveCategories()

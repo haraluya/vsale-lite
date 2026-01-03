@@ -1,6 +1,7 @@
 import { ClientLoginForm } from '@/components/auth/client-login-form'
 import { LogoutButton } from '@/components/auth/logout-button'
 import { createClient } from '@/lib/supabase/server'
+import { Logo } from '@/components/ui/logo'
 
 export default async function LoginPage() {
   const supabase = await createClient()
@@ -20,6 +21,11 @@ export default async function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
+        {/* Logo */}
+        <div className="flex justify-center">
+          <Logo variant="full" href="/" />
+        </div>
+
         <div>
           <h1 className="text-center text-4xl font-bold">客戶登入</h1>
           <p className="mt-2 text-center text-sm text-gray-600">

@@ -73,7 +73,7 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         })
 
         if (!result.success) {
-          setErrors(result.errors || {})
+          setErrors({})
           alert(result.message || '更新失敗')
           setIsSubmitting(false)
           return
@@ -107,7 +107,7 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         })
 
         if (!result.success || !result.data) {
-          setErrors(result.errors || {})
+          setErrors({})
           alert(result.message || '建立失敗')
           setIsSubmitting(false)
           return
