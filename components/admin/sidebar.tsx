@@ -69,6 +69,10 @@ const navSections: NavSection[] = [
       { label: '廣告管理', href: '/admin/announcements', icon: Megaphone },
     ],
   },
+  {
+    title: '帳戶',
+    items: [],
+  },
 ]
 
 export function Sidebar() {
@@ -134,15 +138,15 @@ export function Sidebar() {
                   </Link>
                 )
               })}
+
+              {/* 登出按鈕 - 放在帳戶區塊內 */}
+              {section.title === '帳戶' && (
+                <LogoutButton />
+              )}
             </div>
           </div>
         ))}
       </nav>
-
-      {/* Logout Button (底部) */}
-      <div className="mt-6 pt-6 border-t-2 border-gray-300">
-        <LogoutButton />
-      </div>
     </aside>
   )
 }
