@@ -58,7 +58,7 @@
 
 ### 2.1 Sidebar 響應式改造
 
-- [ ] T012 修改 `components/admin/sidebar.tsx` 實作響應式布局
+- [X] T012 修改 `components/admin/sidebar.tsx` 實作響應式布局
   - 手機版: 完全隱藏 (`hidden md:flex`)
   - 平板版: 收縮為圖示列 (`md:w-16`,僅圖示)
   - 桌面版: 完整展開 (`lg:w-64`,圖示+文字)
@@ -67,12 +67,12 @@
 
 ### 2.2 手機版導航元件
 
-- [ ] T013 [P] 建立手機版漢堡按鈕元件 `components/admin/mobile-nav.tsx`
-- [ ] T014 [P] 建立手機版 Sidebar 內容元件 `components/admin/mobile-sidebar.tsx`
+- [X] T013 [P] 建立手機版漢堡按鈕元件 `components/admin/mobile-nav.tsx`
+- [X] T014 [P] 建立手機版 Sidebar 內容元件 `components/admin/mobile-sidebar.tsx`
 
 ### 2.3 Admin Layout 整合
 
-- [ ] T015 修改 `app/(admin)/admin/layout.tsx` 整合響應式 Sidebar 與 MobileNav
+- [X] T015 修改 `app/(admin)/admin/layout.tsx` 整合響應式 Sidebar 與 MobileNav
   - 整合 `<MobileNav />` (手機版)
   - 整合 `<Sidebar />` (平板/桌面版)
   - 統一 Main Content 間距 (`p-4 md:p-6 lg:p-8`)

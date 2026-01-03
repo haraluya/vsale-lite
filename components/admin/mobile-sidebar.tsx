@@ -1,13 +1,13 @@
 'use client'
 
 /**
- * 後台側邊欄元件
- * Feature: 006-ux-enhancement (US5)
+ * 手機版側邊欄內容
+ * Feature: 005-responsive-ui
  *
- * 視覺分類導航
- * - 功能模組分組（分隔線與標題）
- * - 當前頁面高亮顯示
- * - Neo-Brutalism 設計風格
+ * 功能:
+ * - 完整導航列表 (與桌面版相同)
+ * - 點擊項目後自動關閉 Drawer
+ * - Logo + 導航 + 登出按鈕
  */
 
 import Link from 'next/link'
@@ -71,44 +71,37 @@ const navSections: NavSection[] = [
   },
 ]
 
-export function Sidebar() {
+interface MobileSidebarProps {
+  onClose: () => void
+}
+
+export function MobileSidebar({ onClose }: MobileSidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex md:w-16 lg:w-64 border-r-2 md:border-r-3 border-black bg-white p-3 md:p-4 lg:p-6 flex-col min-h-screen">
-      {/* Logo - 平板顯示 icon / 桌面顯示 full */}
-      <div className="mb-6 md:mb-8">
-        <div className="md:flex md:justify-center lg:block">
-          <Logo
-            variant="icon"
-            href="/admin/dashboard"
-            className="hidden md:block lg:hidden"
-          />
-          <Logo
-            variant="full"
-            href="/admin/dashboard"
-            className="hidden lg:block"
-          />
-        </div>
-        <p className="hidden lg:block text-sm text-gray-600 mt-2">管理後台</p>
+    <div className="flex flex-col h-full bg-white p-6">
+      {/* Logo */}
+      <div className="mb-6">
+        <Logo variant="full" href="/admin/dashboard" />
+        <p className="text-sm text-gray-600 mt-2">管理後台</p>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-3 md:space-y-4 lg:space-y-6">
+      <nav className="flex-1 space-y-6 overflow-y-auto">
         {navSections.map((section, sectionIndex) => (
           <div key={section.title}>
             {/* 分隔線（除了第一個區塊） */}
             {sectionIndex > 0 && (
-              <div className="mb-3 md:mb-4 border-t-2 border-gray-300" />
+              <div className="mb-4 border-t-2 border-gray-300" />
             )}
 
-            {/* 區塊標題 - 桌面版顯示 */}
-            <h3 className="hidden lg:block mb-2 px-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+            {/* 區塊標題 */}
+            <h3 className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-gray-500">
               {section.title}
             </h3>
 
             {/* 導航項目 */}
-            <div className="space-y-1 md:space-y-2">
+            <div className="space-y-1">
               {section.items.map((item) => {
                 const Icon = item.icon
                 const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
@@ -117,20 +110,16 @@ export function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    title={item.label}
+                    onClick={onClose}
                     className={cn(
-                      'flex items-center rounded-none border-2 font-bold transition-all',
-                      // 平板版: 正方形圖示按鈕 (w-12 h-12)
-                      'md:w-12 md:h-12 md:justify-center md:p-0',
-                      // 桌面版: 完整按鈕
-                      'lg:w-auto lg:h-auto lg:justify-start lg:gap-3 lg:px-4 lg:py-2.5',
+                      'flex items-center gap-3 rounded-none border-2 px-4 py-2.5 font-bold transition-all',
                       isActive
                         ? 'border-black bg-brand-primary text-white shadow-none translate-x-[2px] translate-y-[2px]'
-                        : 'border-black bg-white text-black shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                        : 'border-black bg-white text-black shadow-neo-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
                     )}
                   >
-                    <Icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="hidden lg:inline text-sm">{item.label}</span>
+                    <Icon className="h-5 w-5" />
+                    <span className="text-sm">{item.label}</span>
                   </Link>
                 )
               })}
@@ -143,6 +132,6 @@ export function Sidebar() {
       <div className="mt-6 pt-6 border-t-2 border-gray-300">
         <LogoutButton />
       </div>
-    </aside>
+    </div>
   )
 }
