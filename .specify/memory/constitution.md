@@ -1,15 +1,19 @@
 <!--
 Sync Impact Report
 ==================
-Version Change: Initial → 1.0.0
-Modified Principles: N/A (Initial creation)
-Added Sections: All sections created from template
+Version Change: 1.0.0 → 1.1.0
+Modified Principles: None
+Added Sections:
+  - VII. 使用者體驗優先 (User Experience First) - 新增原則,強調 UI/UX 優化、視覺引導、操作效率
 Removed Sections: None
 Templates Status:
-  ✅ plan-template.md - Reviewed, aligned with constitution principles
-  ✅ spec-template.md - Reviewed, aligned with user story requirements
-  ✅ tasks-template.md - Reviewed, aligned with user story-driven development
-Follow-up TODOs: None
+  ✅ plan-template.md - 需更新以包含 UX 考量
+  ✅ spec-template.md - 需更新以包含 UI/UX 驗收標準
+  ✅ tasks-template.md - 需更新以包含 UI 優化任務類型
+Follow-up TODOs:
+  - 更新所有模板文件以反映新的 UX 優先原則
+  - 建立 UI 元件設計指南文件
+  - 建立前後台 UX 優化檢查清單
 -->
 
 # Vsale-lite 專案憲章
@@ -110,6 +114,44 @@ Follow-up TODOs: None
 
 ---
 
+### VII. 使用者體驗優先 (User Experience First)
+
+**核心原則**:
+- 系統 **必須** 在功能完備後,持續優化 UI/UX 以提升操作效率與滿意度。
+- 介面設計 **必須** 透過色彩、排版、圖示等視覺語言引導使用者完成任務。
+- 所有關鍵操作 **必須** 提供快捷方式或批次處理,減少重複操作。
+
+**實施要求**:
+
+**A. 前台客戶端 (Mobile First)**:
+- **必須** 在首頁提供全域搜尋欄,支援商品名稱與商品編號即時搜尋。
+- **必須** 提供類別與標籤快速篩選按鈕,支援多選組合篩選。
+- **必須** 在導航列提供「回到首頁」按鈕,確保用戶可快速返回。
+- **必須** 使用色彩區分商品狀態 (有貨/缺貨/預購),提升視覺辨識度。
+- **應該** 在商品卡片顯示標籤 (tags),方便用戶快速識別商品特性。
+
+**B. 後台管理端 (Desktop Optimized)**:
+- **必須** 在側邊欄使用色彩或分隔線區分不同功能模組 (用戶管理/商品管理/訂單管理)。
+- **必須** 在客戶管理頁面提供等級快速切換與搜尋功能。
+- **必須** 支援客戶資料批次匯入/匯出 Excel 功能。
+- **必須** 在訂單管理提供「刪除訂單」功能 (僅限特定狀態,如 pending)。
+- **必須** 在商品管理支援標籤 (tags) 批次設定與篩選。
+- **應該** 在儀表板提供關鍵業務指標視覺化圖表 (訂單數量、營收、庫存警示)。
+
+**C. 品牌識別**:
+- **必須** 設計符合 Neo-Brutalism 風格的 Vsale Logo,包含圖示與文字組合。
+- **必須** 在前後台統一使用 Logo,建立品牌一致性。
+- **應該** 使用品牌色彩系統 (主色、輔色、狀態色) 取代純黑白設計。
+
+**D. 效能與互動**:
+- 搜尋與篩選 **必須** 即時響應 (< 300ms),使用防抖 (debounce) 優化。
+- 批次操作 **必須** 顯示進度指示器,避免用戶誤以為無回應。
+- 表單驗證 **必須** 即時反饋,不等到提交才顯示錯誤。
+
+**理由**: MVP 功能完成後,使用者體驗成為系統競爭力的關鍵差異化因素。良好的 UX 能顯著降低學習曲線、減少操作錯誤、提升使用者滿意度與留存率。
+
+---
+
 ## 技術規範
 
 ### 開發框架與工具
@@ -121,11 +163,13 @@ Follow-up TODOs: None
 - **資料庫**: Supabase (PostgreSQL)
 - **部署平台**: Firebase App Hosting
 - **樣式工具**: Tailwind CSS
+- **Excel 處理**: SheetJS (xlsx) - 用於客戶資料匯入匯出
 
 **技術決策理由**:
 - Next.js 15: 支援 Server Actions 與 SSR,降低客戶端負擔。
 - Supabase: 提供完整的 SQL 能力與即時訂閱,適合複雜業務邏輯。
 - Firebase: 提供全球 CDN 與快速部署,適合台灣與東南亞市場。
+- SheetJS: 業界標準的 Excel 處理庫,支援前後端匯入匯出。
 
 ---
 
@@ -138,7 +182,7 @@ Follow-up TODOs: None
 
 **實施要求**:
 - 使用 Firebase CLI 的增量部署功能。
-- 每次部署前 **必須** 執行 `npm run build` 與 `npm run type-check`。
+- 每次部署前 **必須** 執行 `pnpm build` 與 `pnpm type-check`。
 
 ---
 
@@ -153,11 +197,15 @@ Follow-up TODOs: None
 | `tiers` | id, name, rank | 會員等級主表 |
 | `users` | id, phone, tier_id (FK), role | 使用者表,role 限定為 'client' 或 'admin' |
 | `series` | id, name, default_image_url, is_active | 產品系列 |
-| `products` | id, series_id (FK), name, tags, stock, specific_image_url | 產品單項 |
+| `products` | id, series_id (FK), name, **tags**, stock, specific_image_url | 產品單項,**tags 為 TEXT[] 陣列** |
 | `prices` | id, tier_id (FK), product_id (FK), amount | **必須** 有 Unique (tier_id, product_id) 約束 |
 | `orders` | id, user_id, status, total_amount, created_at | 訂單主表 |
 | `order_items` | id, order_id, product_id, quantity, deal_price | 訂單明細,**必須** 記錄 deal_price |
 | `order_timelines` | id, order_id, type, content, created_at | 操作紀錄 |
+
+**新增欄位要求**:
+- `products.tags`: **必須** 為 `TEXT[]` 型別,支援多標籤儲存與查詢。
+- 標籤範例: `['熱銷', '新品', '限量', '促銷']`
 
 **正規化要求**:
 - **禁止** 在 `products` 表中直接儲存價格。
@@ -172,7 +220,12 @@ Follow-up TODOs: None
 **Commit 訊息格式**:
 - **必須** 使用繁體中文撰寫 commit message。
 - **必須** 在每次功能完成或重要變更後執行 commit。
-- 格式範例: `feat: 新增客戶端購物車功能` 或 `fix: 修復價格顯示錯誤`
+- 格式範例:
+  - `feat: 新增前台全域搜尋功能`
+  - `feat: 新增後台客戶 Excel 匯入匯出`
+  - `ui: 優化後台側邊欄色彩分類`
+  - `ui: 新增 Vsale Logo 設計`
+  - `fix: 修復商品標籤顯示錯誤`
 
 **自動化要求**:
 - AI 助手在完成變更後 **必須** 自動執行 `git add` 與 `git commit`。
@@ -186,9 +239,10 @@ Follow-up TODOs: None
 - **P1 功能** 應該包含單元測試 (Unit Test)。
 - **P2 功能** 可選擇性測試,依時間與資源決定。
 
-**驗證標準**:
-- 每個使用者故事完成後 **必須** 可獨立驗證功能正確性。
-- **禁止** 在未驗證的情況下合併至主分支。
+**UX 驗證標準** (新增):
+- 所有互動操作 **必須** 在真實裝置上測試 (手機/平板/桌面)。
+- 搜尋與篩選功能 **必須** 驗證響應時間 < 300ms。
+- 批次操作 **必須** 驗證進度指示器正確顯示。
 
 ---
 
@@ -225,4 +279,4 @@ Follow-up TODOs: None
 
 ---
 
-**Version**: 1.0.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-01
+**Version**: 1.1.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-03
