@@ -577,7 +577,7 @@ export async function exportClients(filters?: {
   created_after?: string
 }): Promise<ActionResult<{
   file_name: string
-  file_buffer: Buffer
+  file_buffer: number[] // Changed from Buffer to number[]
   row_count: number
   columns: string[]
 }>> {
@@ -653,7 +653,7 @@ export async function exportClients(filters?: {
       success: true,
       data: {
         file_name: fileName,
-        file_buffer: excelBuffer,
+        file_buffer: Array.from(excelBuffer), // Convert Buffer to number array
         row_count: clients.length,
         columns: ['手機號碼', '姓名', '會員等級', '建立時間'],
       },
@@ -914,7 +914,7 @@ export async function importClients(
  */
 export async function downloadClientTemplate(): Promise<ActionResult<{
   file_name: string
-  file_buffer: Buffer
+  file_buffer: number[] // Changed from Buffer to number[]
   row_count: number
   columns: string[]
 }>> {
@@ -951,7 +951,7 @@ export async function downloadClientTemplate(): Promise<ActionResult<{
       success: true,
       data: {
         file_name: '客戶匯入範本.xlsx',
-        file_buffer: excelBuffer,
+        file_buffer: Array.from(excelBuffer), // Convert Buffer to number array
         row_count: 1,
         columns: ['手機號碼', '姓名', '會員等級', '密碼'],
       },
