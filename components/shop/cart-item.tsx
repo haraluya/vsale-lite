@@ -14,6 +14,8 @@ import type { CartItemWithProduct } from '@/types'
 import Image from 'next/image'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
+import { designTokens } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface CartItemProps {
   item: CartItemWithProduct
@@ -37,10 +39,20 @@ export function CartItem({ item }: CartItemProps) {
   }
 
   return (
-    <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo">
-      <div className="flex gap-4">
+    <div className={cn(
+      "rounded-none bg-white",
+      designTokens.neoBrutalism.border.full,
+      "border-black",
+      designTokens.neoBrutalism.shadow.full,
+      designTokens.spacing.card.padding
+    )}>
+      <div className="flex gap-3 md:gap-4">
         {/* 商品圖片 */}
-        <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-none border-2 border-black bg-gray-100">
+        <div className={cn(
+          "h-16 w-16 md:h-24 md:w-24 flex-shrink-0 overflow-hidden rounded-none bg-gray-100",
+          designTokens.neoBrutalism.border.mobile,
+          "border-black"
+        )}>
           {item.imageUrl ? (
             <Image
               src={item.imageUrl}
@@ -50,45 +62,71 @@ export function CartItem({ item }: CartItemProps) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-4xl text-gray-300">
+            <div className="flex h-full w-full items-center justify-center text-3xl md:text-4xl text-gray-300">
               📦
             </div>
           )}
         </div>
 
         {/* 商品資訊 */}
-        <div className="flex flex-1 flex-col justify-between">
+        <div className="flex flex-1 flex-col justify-between gap-2 md:gap-0">
           <div>
-            <h3 className="font-bold text-lg line-clamp-2">{item.productName}</h3>
+            <h3 className={cn(
+              "line-clamp-2 font-bold",
+              designTokens.typography.body.large
+            )}>{item.productName}</h3>
             <div className="mt-1">
               {item.price !== null ? (
-                <p className="text-xl font-bold text-green-600">NT$ {item.price.toLocaleString()}</p>
+                <p className={cn(
+                  "text-lg md:text-xl font-bold text-green-600"
+                )}>NT$ {item.price.toLocaleString()}</p>
               ) : (
-                <p className="text-sm text-red-600">價格未設定</p>
+                <p className={cn(
+                  designTokens.typography.caption,
+                  "text-red-600"
+                )}>價格未設定</p>
               )}
             </div>
           </div>
 
           {/* 數量控制與移除按鈕 */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             {/* 數量控制 */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2">
               <button
                 onClick={handleDecrease}
                 disabled={item.quantity <= 1}
-                className="rounded-none border-2 border-black bg-white p-2 transition-all hover:bg-gray-100 active:translate-x-[1px] active:translate-y-[1px] disabled:cursor-not-allowed disabled:opacity-50"
+                className={cn(
+                  "rounded-none bg-white transition-all hover:bg-gray-100",
+                  designTokens.neoBrutalism.border.mobile,
+                  "border-black",
+                  "p-1.5 md:p-2",
+                  "min-h-[40px] min-w-[40px]", // WCAG 2.1 AA
+                  "active:translate-x-[1px] active:translate-y-[1px]",
+                  "disabled:cursor-not-allowed disabled:opacity-50"
+                )}
                 aria-label="減少數量"
               >
                 <Minus className="h-4 w-4" />
               </button>
 
-              <span className="min-w-[3rem] text-center text-lg font-bold">
+              <span className={cn(
+                "min-w-[2.5rem] md:min-w-[3rem] text-center font-bold",
+                designTokens.typography.body.large
+              )}>
                 {item.quantity}
               </span>
 
               <button
                 onClick={handleIncrease}
-                className="rounded-none border-2 border-black bg-white p-2 transition-all hover:bg-gray-100 active:translate-x-[1px] active:translate-y-[1px]"
+                className={cn(
+                  "rounded-none bg-white transition-all hover:bg-gray-100",
+                  designTokens.neoBrutalism.border.mobile,
+                  "border-black",
+                  "p-1.5 md:p-2",
+                  "min-h-[40px] min-w-[40px]", // WCAG 2.1 AA
+                  "active:translate-x-[1px] active:translate-y-[1px]"
+                )}
                 aria-label="增加數量"
               >
                 <Plus className="h-4 w-4" />
@@ -98,20 +136,36 @@ export function CartItem({ item }: CartItemProps) {
             {/* 移除按鈕 */}
             <button
               onClick={handleRemove}
-              className="rounded-none border-2 border-black bg-red-100 px-3 py-2 text-red-600 transition-all hover:bg-red-200 active:translate-x-[1px] active:translate-y-[1px]"
+              className={cn(
+                "rounded-none bg-red-100 text-red-600 transition-all hover:bg-red-200",
+                designTokens.neoBrutalism.border.mobile,
+                "border-black",
+                "px-2.5 py-2 md:px-3",
+                "min-h-[40px]", // WCAG 2.1 AA
+                "active:translate-x-[1px] active:translate-y-[1px]"
+              )}
               aria-label="移除商品"
             >
-              <Trash2 className="h-5 w-5" />
+              <Trash2 className="h-4 w-4 md:h-5 md:w-5" />
             </button>
           </div>
         </div>
       </div>
 
       {/* 小計 */}
-      <div className="mt-4 border-t-2 border-black pt-4">
+      <div className={cn(
+        "mt-3 md:mt-4 pt-3 md:pt-4",
+        designTokens.neoBrutalism.border.mobile,
+        "border-t-black"
+      )}>
         <div className="flex items-center justify-between">
-          <span className="text-gray-600">小計</span>
-          <span className="text-xl font-bold">
+          <span className={cn(
+            designTokens.typography.body.base,
+            "text-gray-600"
+          )}>小計</span>
+          <span className={cn(
+            "text-lg md:text-xl font-bold"
+          )}>
             NT$ {item.subtotal.toLocaleString()}
           </span>
         </div>

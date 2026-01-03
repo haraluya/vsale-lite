@@ -18,6 +18,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { StockStatus } from './stock-status'
 import { TagBadgeList } from '@/components/ui/tag-badge'
+import { designTokens } from '@/lib/design-tokens'
 
 interface ProductCardProps {
   product: Product
@@ -40,7 +41,11 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link
       href={`/store/${product.id}`}
       className={cn(
-        'group block rounded-none border-3 bg-white p-4 shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none relative',
+        'group block rounded-none bg-white transition-all relative',
+        designTokens.neoBrutalism.border.full,
+        designTokens.neoBrutalism.shadow.full,
+        designTokens.neoBrutalism.hover,
+        "p-3 md:p-4",
         borderColor
       )}
     >
@@ -52,7 +57,11 @@ export function ProductCard({ product }: ProductCardProps) {
       )}
 
       {/* 商品圖片 */}
-      <div className="mb-4 aspect-square overflow-hidden rounded-none border-2 border-black bg-gray-100">
+      <div className={cn(
+        "mb-3 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
+        designTokens.neoBrutalism.border.mobile,
+        "border-black"
+      )}>
         {product.image_url ? (
           <Image
             src={product.image_url}
@@ -62,7 +71,7 @@ export function ProductCard({ product }: ProductCardProps) {
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-6xl text-gray-300">
+          <div className="flex h-full w-full items-center justify-center text-5xl md:text-6xl text-gray-300">
             📦
           </div>
         )}
@@ -70,13 +79,26 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* 商品資訊 */}
       <div className="space-y-2">
-        <h3 className="line-clamp-2 text-lg font-bold">{product.name}</h3>
+        <h3 className={cn(
+          "line-clamp-2 font-bold",
+          designTokens.typography.body.large
+        )}>{product.name}</h3>
 
-        <p className="text-sm text-gray-600">編號: {product.code}</p>
+        <p className={cn(
+          designTokens.typography.caption,
+          "text-gray-600"
+        )}>編號: {product.code}</p>
 
         {/* 系列標籤 */}
         {product.series_name && (
-          <div className="inline-block rounded-none border-2 border-black bg-blue-100 px-2 py-1 text-xs font-bold">
+          <div className={cn(
+            "inline-block rounded-none bg-blue-100",
+            designTokens.neoBrutalism.border.mobile,
+            "border-black",
+            "px-2 py-1",
+            designTokens.typography.caption,
+            "font-bold"
+          )}>
             {product.series_name}
           </div>
         )}
@@ -86,18 +108,27 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="space-y-1">
             {/* 原價（刪除線） */}
             {product.retail_price && product.retail_price > 0 && (
-              <p className="text-sm text-gray-500 line-through">
+              <p className={cn(
+                designTokens.typography.caption,
+                "text-gray-500 line-through"
+              )}>
                 原價 ${product.retail_price}
               </p>
             )}
             {/* 您的價格（醒目） */}
-            <p className="text-2xl font-bold text-brand-primary">
+            <p className="text-xl md:text-2xl font-bold text-brand-primary">
               ${product.user_price}
-              <span className="ml-2 text-sm font-normal text-gray-600">/{product.unit || '件'}</span>
+              <span className={cn(
+                designTokens.typography.caption,
+                "ml-2 font-normal text-gray-600"
+              )}>/{product.unit || '件'}</span>
             </p>
           </div>
         ) : (
-          <p className="text-sm font-bold text-red-600">價格未設定</p>
+          <p className={cn(
+            designTokens.typography.caption,
+            "font-bold text-red-600"
+          )}>價格未設定</p>
         )}
 
         {/* 庫存狀態與提示 */}
@@ -107,7 +138,9 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
           {/* 預購商品提示 */}
           {(product.stock || 0) < 0 && (
-            <p className="text-xs text-red-600 font-bold">可預購</p>
+            <p className={cn(
+              "text-xs font-bold text-red-600"
+            )}>可預購</p>
           )}
         </div>
       </div>
