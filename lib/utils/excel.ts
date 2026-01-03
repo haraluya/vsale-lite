@@ -48,6 +48,34 @@ export function validateExcelFile(file: File): { valid: boolean; error?: string 
  */
 export function jsonToExcelBuffer(data: any[], sheetName: string = 'Sheet1'): Buffer {
   const worksheet = XLSX.utils.json_to_sheet(data);
+
+  // 取得工作表範圍
+  const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
+
+  // 遍歷所有儲存格，為手機號碼和密碼欄位設定文字格式
+  for (let R = range.s.r; R <= range.e.r; ++R) {
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+      const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+      const cell = worksheet[cellAddress];
+
+      if (!cell) continue;
+
+      // 取得欄位名稱（第一列）
+      const headerCell = worksheet[XLSX.utils.encode_cell({ r: 0, c: C })];
+      const headerValue = headerCell?.v;
+
+      // 如果是手機號碼或密碼欄位，強制設定為文字格式
+      if (headerValue === '手機號碼' || headerValue === '密碼') {
+        // 確保值為字串並加上前綴單引號強制文字格式
+        if (cell.v !== undefined && cell.v !== null) {
+          cell.t = 's'; // 設定儲存格類型為字串
+          cell.v = String(cell.v); // 確保值為字串
+          cell.z = '@'; // 設定數字格式為文字
+        }
+      }
+    }
+  }
+
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 

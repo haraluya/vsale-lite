@@ -22,7 +22,7 @@ export const clientImportSchema = z.object({
     .transform(val => String(val)) // 轉換為字串
     .pipe(
       z.string()
-        .min(6, '密碼至少 6 個字元')
+        .min(5, '密碼至少 5 個字元')
         .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/, '密碼不可包含中文字元')
     )
     .optional(),
