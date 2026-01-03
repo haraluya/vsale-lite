@@ -9,7 +9,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         ref={ref}
-        className={cn('input-neo rounded-none', className)}
+        className={cn(
+          'rounded-none border-2 md:border-3 border-black px-3 py-2 text-sm md:px-4 md:py-2.5 md:text-base w-full focus:outline-none focus:ring-2 focus:ring-primary',
+          className
+        )}
         {...props}
       />
     )
