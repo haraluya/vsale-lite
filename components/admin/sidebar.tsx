@@ -26,6 +26,7 @@ import {
   type LucideIcon
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { LogoutButton } from '@/components/admin/logout-button'
 
 type NavItem = {
   label: string
@@ -121,6 +122,11 @@ export function Sidebar() {
           </div>
         ))}
       </nav>
+
+      {/* Logout Button (底部) */}
+      <div className="mt-6 pt-6 border-t-2 border-gray-300">
+        <LogoutButton />
+      </div>
     </aside>
   )
 }
