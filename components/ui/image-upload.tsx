@@ -173,10 +173,18 @@ export function ImageUpload({
         </div>
       )}
 
+      {/* 建議尺寸提示 */}
+      <div className="rounded-none border-2 border-blue-500 bg-blue-50 p-3">
+        <p className="text-sm font-bold text-blue-900">
+          📐 建議尺寸：800 × 800 像素（正方形 1:1 比例）
+        </p>
+        <p className="mt-1 text-xs text-blue-700">
+          正方形圖片最適合商品展示，確保在各種裝置上都能完整顯示
+        </p>
+      </div>
+
       {/* 提示訊息 */}
       <p className="text-xs text-gray-600">
-        • 建議上傳正方形圖片 (1:1 比例)
-        <br />
         • 支援格式: JPG, PNG, WebP
         <br />
         • 檔案大小限制: 5MB

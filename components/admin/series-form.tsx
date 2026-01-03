@@ -260,6 +260,16 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
             </div>
           )}
 
+          {/* 建議尺寸提示 */}
+          <div className="rounded-none border-2 border-blue-500 bg-blue-50 p-3">
+            <p className="text-sm font-bold text-blue-900">
+              📐 建議尺寸：800 × 800 像素（正方形 1:1 比例）
+            </p>
+            <p className="mt-1 text-xs text-blue-700">
+              正方形圖片最適合系列展示，確保在各種裝置上都能完整顯示
+            </p>
+          </div>
+
           {/* 上傳按鈕 */}
           <div>
             <label
