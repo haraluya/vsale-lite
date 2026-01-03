@@ -6,7 +6,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Edit, Trash2, Key } from 'lucide-react'
+import { Edit, Trash2, Key, Copy, Check } from 'lucide-react'
 import { deleteClient } from '@/lib/actions/clients'
 import { useHighlightKeyword } from './client-filter'
 
@@ -27,6 +27,7 @@ export function ClientTable({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [copiedClientId, setCopiedClientId] = useState<string | null>(null)
 
   // 高亮關鍵字 Hook
   const highlightKeyword = useHighlightKeyword(searchKeyword)
@@ -65,6 +66,24 @@ export function ClientTable({
       setDeleteDialogOpen(false)
       setClientToDelete(null)
     }
+  }
+
+  const handleCopyLoginInfo = (client: Client) => {
+    const loginUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login'
+    const phone = client.phone
+
+    // 與快速開戶相同的格式，但密碼顯示為「請向管理員索取」
+    const fullGuide = `【Vsale 訂貨系統 - 登入資訊】
+
+前台網址: ${loginUrl}
+登入電話: ${phone}
+登入密碼: (請向管理員索取)
+
+請使用以上資訊登入系統進行下單。`
+
+    navigator.clipboard.writeText(fullGuide)
+    setCopiedClientId(client.id)
+    setTimeout(() => setCopiedClientId(null), 2000)
   }
 
   return (
@@ -146,6 +165,25 @@ export function ClientTable({
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleCopyLoginInfo(client)}
+                            className="border-3 border-black bg-green-100 hover:bg-green-200"
+                            title="複製登入資訊（不含密碼）"
+                          >
+                            {copiedClientId === client.id ? (
+                              <>
+                                <Check className="h-3 w-3 mr-1" />
+                                已複製
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3 w-3 mr-1" />
+                                複製帳密
+                              </>
+                            )}
+                          </Button>
                           <Link href={`/admin/clients/${client.id}/edit`}>
                             <Button size="sm" variant="secondary">
                               <Edit className="h-3 w-3 mr-1" />
