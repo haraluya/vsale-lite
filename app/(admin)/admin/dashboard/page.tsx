@@ -1,7 +1,7 @@
 import { getDashboardStats } from '@/lib/actions/dashboard'
 import { DashboardCard, DashboardTrendCard } from '@/components/admin/dashboard-card'
 import { OrderTrendChart } from '@/components/admin/order-trend-chart'
-import { ShoppingCart, DollarSign, Package, Clock, TrendingUp, Calendar } from 'lucide-react'
+import { TrendingUp, Calendar } from 'lucide-react'
 
 /**
  * 管理員儀表板頁面
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
             title="今日訂單"
             value={stats.todayOrders}
             subtitle={`本月累計 ${stats.monthOrders} 筆`}
-            icon={ShoppingCart}
+            iconName="cart"
             iconColor="bg-blue-500"
             href="/admin/orders"
           />
@@ -57,7 +57,7 @@ export default async function DashboardPage() {
             title="今日營收"
             value={`$${stats.todayRevenue.toLocaleString()}`}
             subtitle={`本月累計 $${stats.monthRevenue.toLocaleString()}`}
-            icon={DollarSign}
+            iconName="dollar"
             iconColor="bg-green-500"
             href="/admin/orders"
           />
@@ -76,7 +76,7 @@ export default async function DashboardPage() {
             title="庫存警示"
             value={stats.lowStockProducts}
             subtitle="庫存低於 10 件的商品"
-            icon={Package}
+            iconName="package"
             iconColor={stats.lowStockProducts > 0 ? 'bg-orange-500' : 'bg-gray-400'}
             href="/admin/products"
           />
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
             title="待處理訂單"
             value={stats.pendingOrders}
             subtitle="等待確認的訂單"
-            icon={Clock}
+            iconName="clock"
             iconColor={stats.pendingOrders > 0 ? 'bg-red-500' : 'bg-gray-400'}
             href="/admin/orders?status=pending"
           />

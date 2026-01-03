@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LucideIcon } from 'lucide-react'
+import { ShoppingCart, DollarSign, Package, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
@@ -9,11 +9,21 @@ import { cn } from '@/lib/utils'
  * Feature: 006-ux-enhancement / US10
  */
 
+// 圖示映射
+const iconMap = {
+  cart: ShoppingCart,
+  dollar: DollarSign,
+  package: Package,
+  clock: Clock,
+} as const
+
+type IconName = keyof typeof iconMap
+
 interface DashboardCardProps {
   title: string
   value: string | number
   subtitle?: string
-  icon: LucideIcon
+  iconName: IconName // 使用圖示名稱而非元件
   iconColor: string // Tailwind 色彩類別 (如 'bg-primary')
   href?: string // T083 - 點擊跳轉詳細頁面
   className?: string
@@ -23,11 +33,13 @@ export function DashboardCard({
   title,
   value,
   subtitle,
-  icon: Icon,
+  iconName,
   iconColor,
   href,
   className,
 }: DashboardCardProps) {
+  const Icon = iconMap[iconName]
+
   const content = (
     <div className={cn('card-neo p-6', href && 'cursor-pointer transition-all hover:shadow-neo-hover', className)}>
       <div className="flex items-center gap-4">
