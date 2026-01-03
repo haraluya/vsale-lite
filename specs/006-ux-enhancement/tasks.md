@@ -282,16 +282,16 @@
 
 ### Implementation for User Story 10
 
-- [ ] T074 [P] [US10] 實作 getDashboardStats Server Action (lib/actions/dashboard.ts)
-- [ ] T075 [P] [US10] 建立儀表板卡片元件 (components/admin/dashboard-card.tsx)
-- [ ] T076 [P] [US10] 建立訂單趨勢圖表元件 (components/admin/order-trend-chart.tsx)
-- [ ] T077 [US10] 更新儀表板頁面整合指標卡片 (app/(admin)/admin/dashboard/page.tsx)
-- [ ] T078 [US10] 實作今日/本月訂單數查詢
-- [ ] T079 [US10] 實作今日/本月營收查詢
-- [ ] T080 [US10] 實作庫存警示商品數查詢
-- [ ] T081 [US10] 實作待處理訂單數查詢
-- [ ] T082 [US10] 實作近 7 日訂單趨勢圖表
-- [ ] T083 [US10] 實作指標卡片點擊跳轉詳細頁面
+- [X] T074 [P] [US10] 實作 getDashboardStats Server Action (lib/actions/dashboard.ts)
+- [X] T075 [P] [US10] 建立儀表板卡片元件 (components/admin/dashboard-card.tsx)
+- [X] T076 [P] [US10] 建立訂單趨勢圖表元件 (components/admin/order-trend-chart.tsx)
+- [X] T077 [US10] 更新儀表板頁面整合指標卡片 (app/(admin)/admin/dashboard/page.tsx)
+- [X] T078 [US10] 實作今日/本月訂單數查詢
+- [X] T079 [US10] 實作今日/本月營收查詢
+- [X] T080 [US10] 實作庫存警示商品數查詢
+- [X] T081 [US10] 實作待處理訂單數查詢
+- [X] T082 [US10] 實作近 7 日訂單趨勢圖表
+- [X] T083 [US10] 實作指標卡片點擊跳轉詳細頁面
 
 **Checkpoint**: 儀表板視覺化完整可用，可獨立測試
 
