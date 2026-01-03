@@ -73,7 +73,6 @@ export default function CustomerOrderDetailPage() {
       }
     } else {
       toast.error(result.message || '送出留言失敗')
-      throw new Error(result.message)
     }
   }
 

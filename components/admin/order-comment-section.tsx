@@ -40,7 +40,6 @@ export function OrderCommentSection({ orderId, initialTimelines }: OrderCommentS
       await refreshTimelines()
     } else {
       toast.error(result.message || '送出留言失敗')
-      throw new Error(result.message)
     }
   }
 
