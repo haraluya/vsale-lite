@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { logout } from '@/lib/actions/shop'
 import type { CurrentUser } from '@/types'
-import { LogOut, User, ShoppingCart } from 'lucide-react'
+import { LogOut, User, ShoppingCart, Package } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
 
 interface NavbarProps {
@@ -84,6 +84,15 @@ export function Navbar({ user }: NavbarProps) {
                 )}
               </div>
             </div>
+
+            {/* 我的訂單按鈕 */}
+            <Link
+              href="/store/orders"
+              className="flex items-center gap-2 rounded-none border-2 border-black bg-yellow-100 px-4 py-2 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+            >
+              <Package className="h-5 w-5" />
+              <span className="hidden sm:inline">我的訂單</span>
+            </Link>
 
             {/* 購物車按鈕 */}
             <Link

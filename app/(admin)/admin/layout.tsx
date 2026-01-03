@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { LayoutDashboard, Users, Tag, FolderTree, Package, Layers, DollarSign } from 'lucide-react'
+import { LayoutDashboard, Users, Tag, FolderTree, Package, Layers, DollarSign, ShoppingBag } from 'lucide-react'
 import { LogoutButton } from '@/components/admin/logout-button'
 
 export default function AdminLayout({
@@ -71,6 +71,14 @@ export default function AdminLayout({
           >
             <DollarSign className="h-5 w-5" />
             <span>價格管理</span>
+          </Link>
+
+          <Link
+            href="/admin/orders"
+            className="flex items-center gap-3 rounded-none border-3 border-black bg-white px-4 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm"
+          >
+            <ShoppingBag className="h-5 w-5" />
+            <span>訂單管理</span>
           </Link>
         </nav>
 
