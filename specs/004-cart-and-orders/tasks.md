@@ -89,14 +89,14 @@
 
 ### 實作 User Story 2
 
-- [ ] T025 [P] [US2] 建立訂單 Server Action: createOrder 於 lib/actions/orders.ts（含訂單編號產生、價格快照、清空購物車）
-- [ ] T026 [P] [US2] 建立訂單 Server Action: getOrders 於 lib/actions/orders.ts（支援篩選與分頁）
-- [ ] T027 [P] [US2] 建立訂單 Server Action: getOrderById 於 lib/actions/orders.ts（含訂單明細與操作歷史）
-- [ ] T028 [P] [US2] 建立訂單狀態徽章元件於 components/shop/order-status-badge.tsx
-- [ ] T029 [P] [US2] 建立訂單卡片元件於 components/shop/order-card.tsx
-- [ ] T030 [US2] 建立訂單確認頁面於 app/(shop)/store/checkout/page.tsx（顯示商品列表、總金額、備註輸入）
-- [ ] T031 [US2] 建立客戶訂單列表頁面於 app/(shop)/store/orders/page.tsx（含狀態篩選）
-- [ ] T032 [US2] 建立客戶訂單詳情頁面於 app/(shop)/store/orders/[id]/page.tsx（顯示訂單明細）
+- [X] T025 [P] [US2] 建立訂單 Server Action: createOrder 於 lib/actions/orders.ts（含訂單編號產生、價格快照、清空購物車）
+- [X] T026 [P] [US2] 建立訂單 Server Action: getOrders 於 lib/actions/orders.ts（支援篩選與分頁）
+- [X] T027 [P] [US2] 建立訂單 Server Action: getOrderById 於 lib/actions/orders.ts（含訂單明細與操作歷史）
+- [X] T028 [P] [US2] 建立訂單狀態徽章元件於 components/shop/order-status-badge.tsx
+- [X] T029 [P] [US2] 建立訂單卡片元件於 components/shop/order-card.tsx
+- [X] T030 [US2] 建立訂單確認頁面於 app/(shop)/store/checkout/page.tsx（顯示商品列表、總金額、備註輸入）
+- [X] T031 [US2] 建立客戶訂單列表頁面於 app/(shop)/store/orders/page.tsx（含狀態篩選）
+- [X] T032 [US2] 建立客戶訂單詳情頁面於 app/(shop)/store/orders/[id]/page.tsx（顯示訂單明細）
 - [ ] T033 [US2] 整合測試：送出訂單、訂單編號唯一性、購物車清空、查看訂單歷史
 
 **檢查點**: User Story 2 完整可用，客戶可獨立完成下單流程
