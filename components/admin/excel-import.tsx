@@ -21,7 +21,6 @@ interface ImportResult {
 }
 
 interface ExcelImportProps {
-  onImportComplete?: (result: ImportResult) => void
   className?: string
 }
 
@@ -29,7 +28,7 @@ interface ExcelImportProps {
  * Excel 匯入元件
  * Feature 006 - User Story 7
  */
-export function ExcelImport({ onImportComplete, className = '' }: ExcelImportProps) {
+export function ExcelImport({ className = '' }: ExcelImportProps) {
   const [isImporting, setIsImporting] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
@@ -85,15 +84,21 @@ export function ExcelImport({ onImportComplete, className = '' }: ExcelImportPro
           toast.success(`驗證通過！共 ${result.data.success_count} 筆資料可匯入`)
         } else {
           toast.success(result.message || `成功匯入 ${result.data.success_count} 筆客戶資料`)
-          onImportComplete?.(result.data)
           handleClearFile()
+          // 匯入成功後重新載入頁面
+          setTimeout(() => {
+            window.location.reload()
+          }, 1500)
         }
       } else {
         if (isDryRun) {
           toast.warning(`驗證完成：${result.data.success_count} 筆有效，${result.data.error_count} 筆錯誤`)
         } else {
           toast.warning(result.message || `匯入完成，${result.data.error_count} 筆失敗`)
-          onImportComplete?.(result.data)
+          // 即使有部分失敗，也重新載入頁面以顯示已匯入的資料
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000)
         }
       }
     } catch (error) {

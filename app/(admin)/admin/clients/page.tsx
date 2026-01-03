@@ -62,12 +62,7 @@ export default async function ClientsPage({
       </div>
 
       {/* Feature 006 - US7: Excel 匯入區塊 */}
-      <ExcelImport
-        onImportComplete={() => {
-          // 匯入完成後重新載入頁面
-          window.location.reload()
-        }}
-      />
+      <ExcelImport />
 
       {/* Feature 006 - US6: 客戶篩選元件 */}
       <ClientFilterWrapper
