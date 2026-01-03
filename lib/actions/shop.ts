@@ -152,27 +152,4 @@ export async function getCurrentUser(): Promise<ActionResult<CurrentUser>> {
   }
 }
 
-/**
- * 登出當前用戶
- */
-export async function logout(): Promise<ActionResult<void>> {
-  try {
-    const supabase = await createClient()
-
-    const { error } = await supabase.auth.signOut()
-
-    if (error) {
-      console.error('logout 錯誤:', error)
-      return { success: false, message: '登出失敗' }
-    }
-
-    // 清除所有快取
-    revalidatePath('/', 'layout')
-
-    // 導回登入頁面 (由前端處理)
-    return { success: true, message: '登出成功' }
-  } catch (error) {
-    console.error('logout 異常:', error)
-    return { success: false, message: error instanceof Error ? error.message : '登出失敗' }
-  }
-}
+// 移除重複的 logout 函數，統一使用 lib/actions/auth.ts 中的 logout

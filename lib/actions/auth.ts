@@ -174,10 +174,29 @@ export async function loginWithPhone(
 
 /**
  * 登出 (前後台共用)
+ * 自動根據當前用戶角色導向對應的登入頁
  */
 export async function logout(): Promise<void> {
   const supabase = await createClient()
+
+  // 先查詢當前用戶角色
+  const { data: { user } } = await supabase.auth.getUser()
+  let targetLoginPage = '/login' // 預設前台登入頁
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    // 如果是管理員，導向後台登入頁
+    if (profile?.role === 'admin') {
+      targetLoginPage = '/admin/login'
+    }
+  }
+
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
-  redirect('/login')
+  redirect(targetLoginPage)
 }

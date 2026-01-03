@@ -2,19 +2,15 @@
 
 import { logout } from '@/lib/actions/auth'
 import { LogOut } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 export function LogoutButton() {
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
 
   const handleLogout = async () => {
     setLoading(true)
     try {
-      await logout()
-      router.push('/admin/login')
-      router.refresh()
+      await logout() // logout 函數會自動根據角色導向對應的登入頁
     } catch (error) {
       console.error('登出失敗:', error)
       setLoading(false)

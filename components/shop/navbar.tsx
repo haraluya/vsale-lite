@@ -14,9 +14,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { logout } from '@/lib/actions/shop'
 import type { CurrentUser } from '@/types'
 import { LogOut, User, ShoppingCart, Package } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
@@ -27,7 +25,6 @@ interface NavbarProps {
 }
 
 export function Navbar({ user }: NavbarProps) {
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const { getTotalItems } = useCartStore()
   const cartItemsCount = getTotalItems()
@@ -38,17 +35,12 @@ export function Navbar({ user }: NavbarProps) {
     setLoading(true)
 
     try {
-      const result = await logout()
-
-      if (result.success) {
-        router.push('/login')
-        router.refresh()
-      } else {
-        alert(result.message || '登出失敗')
-      }
+      // 移除 shop.ts 的 logout，改用統一的 auth.ts logout
+      // logout 函數會自動根據角色導向對應的登入頁
+      const authLogout = await import('@/lib/actions/auth').then(m => m.logout)
+      await authLogout()
     } catch (error) {
       alert('登出失敗，請稍後再試')
-    } finally {
       setLoading(false)
     }
   }
