@@ -3,7 +3,7 @@
 import { createClient as createSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { createClientSchema, updateClientSchema, updatePasswordSchema } from '@/lib/validations/user.schema'
 import { updateClientSchema as updateClientSchemaV2 } from '@/lib/validations/client.schema'
-import type { ActionResult, Client, Profile } from '@/types'
+import type { ActionResult, Client, Profile, Tier } from '@/types'
 import { checkAuth } from './helpers'
 import { revalidatePath } from 'next/cache'
 
@@ -313,6 +313,110 @@ export async function getClients(params?: {
 }
 
 /**
+ * 篩選客戶列表 (Feature 006 - US6: 客戶管理快速切換與搜尋)
+ * 支援等級篩選與關鍵字搜尋 (手機號碼、顯示名稱)
+ */
+export async function filterClients(params?: {
+  tier_ids?: string[]  // 等級 ID 陣列 (多選)
+  search?: string      // 搜尋關鍵字 (手機號碼或顯示名稱)
+  limit?: number       // 回傳筆數上限
+  offset?: number      // 分頁偏移量
+}): Promise<ActionResult<{
+  clients: Client[]
+  total_count: number
+  applied_filters: {
+    tiers: Tier[]
+    search: string
+  }
+}>> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    const { tier_ids = [], search = '', limit = 100, offset = 0 } = params || {}
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    // 2. 建立查詢
+    let query = adminClient
+      .from('profiles')
+      .select('*, tiers(id, name)', { count: 'exact' })
+      .eq('role', 'client')
+
+    // 等級篩選 (OR 邏輯: 符合任一等級即可)
+    if (tier_ids.length > 0) {
+      query = query.in('tier_id', tier_ids)
+    }
+
+    // 搜尋條件 (手機號碼或顯示名稱)
+    if (search) {
+      query = query.or(`phone.ilike.%${search}%,display_name.ilike.%${search}%`)
+    }
+
+    // 排序與分頁
+    query = query
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
+
+    const { data, error, count } = await query
+
+    if (error) {
+      console.error('篩選客戶失敗:', error)
+      return {
+        success: false,
+        message: '篩選失敗，請稍後再試',
+      }
+    }
+
+    // 3. 轉換客戶資料格式
+    const clients: Client[] = (data || []).map((item: any) => ({
+      id: item.id,
+      phone: item.phone,
+      display_name: item.display_name,
+      role: item.role,
+      tier_id: item.tier_id,
+      tier_name: item.tiers?.name,
+      notes: item.notes,
+      address: item.address,
+      admin_notes: item.admin_notes,
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+    }))
+
+    // 4. 查詢已套用的等級資訊
+    let appliedTiers: Tier[] = []
+    if (tier_ids.length > 0) {
+      const { data: tierData } = await adminClient
+        .from('tiers')
+        .select('id, name, rank, created_at, updated_at')
+        .in('id', tier_ids)
+        .order('rank', { ascending: true })
+
+      appliedTiers = tierData || []
+    }
+
+    return {
+      success: true,
+      data: {
+        clients,
+        total_count: count || 0,
+        applied_filters: {
+          tiers: appliedTiers,
+          search,
+        },
+      },
+    }
+  } catch (error) {
+    console.error('filterClients error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '篩選失敗',
+    }
+  }
+}
+
+/**
  * 刪除客戶
  */
 export async function deleteClient(id: string): Promise<ActionResult> {
@@ -470,10 +574,10 @@ export async function updateClientPassword(
 export async function getClientProfile(clientId: string): Promise<ActionResult<Omit<Profile, 'admin_notes'>>> {
   try {
     // 1. 驗證權限 (僅客戶可查詢自己的資料)
-    const { user, profile } = await checkAuth('client')
+    const authContext = await checkAuth('client')
 
     // 2. 權限檢查 - 客戶僅能查詢自己的資料
-    if (profile.role === 'client' && user.id !== clientId) {
+    if (authContext.role === 'client' && authContext.userId !== clientId) {
       return {
         success: false,
         message: '您無權查詢此客戶資料',

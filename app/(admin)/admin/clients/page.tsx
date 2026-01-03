@@ -1,13 +1,14 @@
 import { getClients } from '@/lib/actions/clients'
 import { getTiers } from '@/lib/actions/tiers'
 import { ClientTable } from '@/components/admin/client-table'
+import { ClientFilterWrapper } from '@/components/admin/client-filter-wrapper'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
 type SearchParams = {
   search?: string
-  tier_id?: string
+  tier_ids?: string  // 改為支援多選 (逗號分隔)
   page?: string
 }
 
@@ -18,8 +19,12 @@ export default async function ClientsPage({
 }) {
   const params = await searchParams
   const search = params.search || ''
-  const tier_id = params.tier_id || ''
+  const tier_idsStr = params.tier_ids || ''
+  const tier_ids = tier_idsStr ? tier_idsStr.split(',') : []
   const page = Number(params.page) || 1
+
+  // 如果有多選等級,使用第一個等級進行查詢 (向後兼容)
+  const tier_id = tier_ids[0] || ''
 
   const [{ clients, total }, tiers] = await Promise.all([
     getClients({ search, tier_id, page, limit: 20 }),
@@ -43,13 +48,19 @@ export default async function ClientsPage({
         </Link>
       </div>
 
+      {/* Feature 006 - US6: 客戶篩選元件 */}
+      <ClientFilterWrapper
+        tiers={tiers}
+        initialSearch={search}
+        initialTierIds={tier_ids}
+        totalCount={total}
+      />
+
       <ClientTable
         clients={clients}
-        tiers={tiers}
         total={total}
         page={page}
-        search={search}
-        selectedTierId={tier_id}
+        searchKeyword={search}
       />
     </div>
   )

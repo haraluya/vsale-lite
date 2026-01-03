@@ -176,13 +176,13 @@
 
 ### Implementation for User Story 6
 
-- [ ] T042 [P] [US6] 實作 filterClients Server Action (lib/actions/clients.ts)
-- [ ] T043 [P] [US6] 建立客戶快速篩選元件 (components/admin/client-filter.tsx)
-- [ ] T044 [US6] 整合篩選元件到客戶管理頁面 (app/(admin)/admin/users/page.tsx)
-- [ ] T045 [US6] 實作等級快速切換按鈕
-- [ ] T046 [US6] 實作客戶搜尋欄 (支援手機號碼與姓名)
-- [ ] T047 [US6] 新增搜尋結果高亮關鍵字功能
-- [ ] T048 [US6] 新增篩選狀態清除按鈕與結果數量顯示
+- [X] T042 [P] [US6] 實作 filterClients Server Action (lib/actions/clients.ts)
+- [X] T043 [P] [US6] 建立客戶快速篩選元件 (components/admin/client-filter.tsx)
+- [X] T044 [US6] 整合篩選元件到客戶管理頁面 (app/(admin)/admin/users/page.tsx)
+- [X] T045 [US6] 實作等級快速切換按鈕
+- [X] T046 [US6] 實作客戶搜尋欄 (支援手機號碼與姓名)
+- [X] T047 [US6] 新增搜尋結果高亮關鍵字功能
+- [X] T048 [US6] 新增篩選狀態清除按鈕與結果數量顯示
 
 **Checkpoint**: 客戶管理快速切換與搜尋完成，可獨立測試
 

@@ -1,76 +1,43 @@
 'use client'
 
-import { Client, Tier } from '@/types'
+import { Client } from '@/types'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, useTransition } from 'react'
-import { Edit, Search, Trash2, Key } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { Edit, Trash2, Key } from 'lucide-react'
 import { deleteClient } from '@/lib/actions/clients'
+import { useHighlightKeyword } from './client-filter'
 
 type ClientTableProps = {
   clients: Client[]
-  tiers: Tier[]
   total: number
   page: number
-  search: string
-  selectedTierId: string
+  searchKeyword?: string  // 搜尋關鍵字 (用於高亮)
 }
 
 export function ClientTable({
   clients,
-  tiers,
   total,
   page,
-  search: initialSearch,
-  selectedTierId,
+  searchKeyword = '',
 }: ClientTableProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isPending, startTransition] = useTransition()
-  const [search, setSearch] = useState(initialSearch)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // 高亮關鍵字 Hook
+  const highlightKeyword = useHighlightKeyword(searchKeyword)
+
   const limit = 20
   const totalPages = Math.ceil(total / limit)
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    const params = new URLSearchParams(searchParams)
-    if (search) {
-      params.set('search', search)
-    } else {
-      params.delete('search')
-    }
-    params.delete('page') // 重置到第一頁
-    startTransition(() => {
-      router.push(`/admin/clients?${params.toString()}`)
-    })
-  }
-
-  const handleTierFilter = (tier_id: string) => {
-    const params = new URLSearchParams(searchParams)
-    if (tier_id) {
-      params.set('tier_id', tier_id)
-    } else {
-      params.delete('tier_id')
-    }
-    params.delete('page')
-    startTransition(() => {
-      router.push(`/admin/clients?${params.toString()}`)
-    })
-  }
-
   const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams)
+    const params = new URLSearchParams(window.location.search)
     params.set('page', newPage.toString())
-    startTransition(() => {
-      router.push(`/admin/clients?${params.toString()}`)
-    })
+    router.push(`/admin/clients?${params.toString()}`)
   }
 
   const handleDeleteClick = (client: Client) => {
@@ -102,38 +69,6 @@ export function ClientTable({
 
   return (
     <div className="space-y-4">
-      {/* 搜尋與篩選 */}
-      <div className="card-neo bg-white p-4">
-        <div className="flex gap-4">
-          <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-            <Input
-              type="search"
-              placeholder="搜尋手機號碼或顯示名稱..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1"
-            />
-            <Button type="submit" disabled={isPending}>
-              <Search className="h-4 w-4 mr-2" />
-              搜尋
-            </Button>
-          </form>
-
-          <select
-            value={selectedTierId}
-            onChange={(e) => handleTierFilter(e.target.value)}
-            className="input-neo"
-            disabled={isPending}
-          >
-            <option value="">全部等級</option>
-            {tiers.map((tier) => (
-              <option key={tier.id} value={tier.id}>
-                {tier.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
       {/* 客戶列表 */}
       <div className="card-neo bg-white overflow-hidden">
@@ -168,7 +103,7 @@ export function ClientTable({
               {clients.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
-                    {search || selectedTierId
+                    {searchKeyword || total === 0
                       ? '查無符合條件的客戶'
                       : '尚無客戶資料,點擊「快速開戶」建立第一位客戶'}
                   </td>
@@ -190,10 +125,10 @@ export function ClientTable({
                   return (
                     <tr key={client.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 text-sm font-mono">
-                        {client.phone}
+                        {highlightKeyword(client.phone)}
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        {client.display_name || '-'}
+                        {client.display_name ? highlightKeyword(client.display_name) : '-'}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600" title={client.address || ''}>
                         {addressPreview}
@@ -255,7 +190,7 @@ export function ClientTable({
               size="sm"
               variant="secondary"
               onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1 || isPending}
+              disabled={page === 1}
             >
               上一頁
             </Button>
@@ -263,7 +198,7 @@ export function ClientTable({
               size="sm"
               variant="secondary"
               onClick={() => handlePageChange(page + 1)}
-              disabled={page === totalPages || isPending}
+              disabled={page === totalPages}
             >
               下一頁
             </Button>
