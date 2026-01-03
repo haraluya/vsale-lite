@@ -25,6 +25,9 @@ interface CartState {
   // 清空購物車
   clearCart: () => void
 
+  // 批次移除無效商品
+  removeInvalidItems: (invalidProductIds: string[]) => void
+
   // 取得購物車項目總數
   getTotalItems: () => number
 
@@ -79,6 +82,13 @@ export const useCartStore = create<CartState>()(
 
       clearCart: () => {
         set({ items: [] })
+      },
+
+      removeInvalidItems: (invalidProductIds) => {
+        const validItems = get().items.filter(
+          item => !invalidProductIds.includes(item.productId)
+        )
+        set({ items: validItems })
       },
 
       getTotalItems: () => {

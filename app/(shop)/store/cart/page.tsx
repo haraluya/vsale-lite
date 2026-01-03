@@ -20,9 +20,10 @@ import { CartSummary } from '@/components/shop/cart-summary'
 import type { CartItemWithProduct } from '@/types'
 import { ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 
 export default function CartPage() {
-  const { items, getTotalItems } = useCartStore()
+  const { items, getTotalItems, removeInvalidItems } = useCartStore()
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -40,6 +41,21 @@ export default function CartPage() {
 
       if (result.success && result.data) {
         setCartItemsWithPrices(result.data)
+
+        // 檢查是否有無效商品（在 localStorage 中但未返回的商品）
+        const validProductIds = result.data.map(item => item.productId)
+        const invalidProductIds = items
+          .map(item => item.productId)
+          .filter(id => !validProductIds.includes(id))
+
+        // 自動移除無效商品
+        if (invalidProductIds.length > 0) {
+          removeInvalidItems(invalidProductIds)
+          toast.warning(
+            `已自動移除 ${invalidProductIds.length} 個無效商品（商品已刪除或停用）`,
+            { duration: 5000 }
+          )
+        }
       } else {
         setError(result.message || '載入購物車商品時發生錯誤')
       }
@@ -47,7 +63,7 @@ export default function CartPage() {
     }
 
     loadCartItems()
-  }, [items])
+  }, [items, removeInvalidItems])
 
   // 計算總金額
   const totalAmount = cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)

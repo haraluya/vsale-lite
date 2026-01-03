@@ -249,7 +249,7 @@ export async function getOrders(
       .from('orders')
       .select(`
         *,
-        profiles!inner(
+        profiles!user_id(
           id,
           phone,
           display_name,
@@ -333,7 +333,7 @@ export async function getOrderById(
       .from('orders')
       .select(`
         *,
-        profiles!inner(
+        profiles!user_id(
           id,
           phone,
           display_name,
@@ -357,7 +357,7 @@ export async function getOrderById(
           new_status,
           notes,
           created_at,
-          profiles(display_name, phone)
+          profiles!actor_id(display_name, phone)
         )
       `)
       .eq('id', orderId)
