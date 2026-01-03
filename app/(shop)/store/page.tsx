@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getActiveSeries } from '@/lib/actions/shop'
 import { getActiveAnnouncements } from '@/lib/actions/announcements'
+import { getActiveCategories, getAvailableTags } from '@/lib/actions/products'
 import { SeriesCard } from '@/components/shop/series-card'
 import { AnnouncementCarousel } from '@/components/announcements/AnnouncementCarousel'
 import { StoreSearch } from '@/components/shop/store-search'
@@ -44,6 +45,13 @@ export default async function StorePage() {
   const announcementsResult = await getActiveAnnouncements()
   const announcements = announcementsResult.success ? announcementsResult.data : []
 
+  // 查詢分類與標籤 (Feature 006 - US2)
+  const categoriesResult = await getActiveCategories()
+  const categories = categoriesResult.success ? categoriesResult.data : []
+
+  const tagsResult = await getAvailableTags()
+  const availableTags = tagsResult.success ? tagsResult.data : []
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="mx-auto max-w-7xl">
@@ -67,9 +75,12 @@ export default async function StorePage() {
           </div>
         )}
 
-        {/* Search Bar (Feature 006 - US1) */}
+        {/* Search Bar & Filters (Feature 006 - US1, US2) */}
         <div className="mb-6">
-          <StoreSearch />
+          <StoreSearch
+            categories={categories || []}
+            availableTags={availableTags || []}
+          />
         </div>
 
         {/* Series Grid */}

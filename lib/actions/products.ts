@@ -750,6 +750,244 @@ export async function searchProducts(query: string): Promise<ActionResult<Produc
 }
 
 /**
+ * 前台篩選商品
+ * Feature: 006-ux-enhancement (US2)
+ * 支援類別與標籤快速篩選，支援多選組合篩選
+ */
+export async function filterProducts(params: {
+  category_ids?: string[]
+  tags?: string[]
+  limit?: number
+}): Promise<ActionResult<Product[]>> {
+  try {
+    const { category_ids = [], tags = [], limit = 100 } = params
+
+    // 1. 取得當前用戶資訊 (含等級)
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return {
+        success: false,
+        message: '請先登入',
+      }
+    }
+
+    // 2. 取得用戶 profile (含 tier_id)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('tier_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || !profile.tier_id) {
+      return {
+        success: false,
+        message: '無法取得用戶等級資訊',
+      }
+    }
+
+    // 3. 建立查詢
+    let query = supabase
+      .from('products')
+      .select(`
+        id,
+        code,
+        name,
+        description,
+        retail_price,
+        stock,
+        stock_status,
+        unit,
+        image_url,
+        series:series_id (
+          id,
+          name,
+          default_image_url,
+          category:category_id (id, name)
+        ),
+        tier_prices!inner (
+          price
+        ),
+        tags
+      `)
+      .eq('status', 'active')
+      .eq('tier_prices.tier_id', profile.tier_id)
+      .limit(limit)
+      .order('updated_at', { ascending: false })
+
+    // 4. 套用類別篩選
+    if (category_ids.length > 0) {
+      // 需要先查詢該類別下的所有系列 ID
+      const { data: seriesData } = await supabase
+        .from('series')
+        .select('id')
+        .in('category_id', category_ids)
+        .eq('status', 'active')
+
+      if (seriesData && seriesData.length > 0) {
+        const seriesIds = seriesData.map(s => s.id)
+        query = query.in('series_id', seriesIds)
+      } else {
+        // 沒有符合的系列，直接回傳空結果
+        return {
+          success: true,
+          data: [],
+          message: '找到 0 筆商品',
+        }
+      }
+    }
+
+    // 5. 套用標籤篩選 (包含任一標籤)
+    if (tags.length > 0) {
+      // PostgreSQL 陣列交集查詢: tags && ARRAY['tag1', 'tag2']
+      query = query.overlaps('tags', tags)
+    }
+
+    // 6. 執行查詢
+    const { data: products, error } = await query
+
+    if (error) {
+      console.error('filterProducts error:', error)
+      return {
+        success: false,
+        message: '篩選失敗',
+      }
+    }
+
+    // 7. 轉換資料格式
+    const result: Product[] = (products || []).map((item: any) => ({
+      id: item.id,
+      code: item.code,
+      name: item.name,
+      series_id: item.series?.id,
+      series_name: item.series?.name,
+      category_name: item.series?.category?.name,
+      description: item.description,
+      retail_price: item.retail_price,
+      user_price: item.tier_prices[0]?.price,
+      stock: item.stock,
+      stock_status: item.stock_status,
+      unit: item.unit,
+      image_url: item.image_url || item.series?.default_image_url,
+      tags: item.tags || [],
+      status: 'active',
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+    }))
+
+    return {
+      success: true,
+      data: result,
+      message: `找到 ${result.length} 筆商品`,
+    }
+  } catch (error: unknown) {
+    console.error('filterProducts error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '篩選失敗',
+    }
+  }
+}
+
+/**
+ * 取得所有啟用的分類（用於篩選）
+ * Feature: 006-ux-enhancement (US2)
+ */
+export async function getActiveCategories(): Promise<ActionResult<{ id: string; name: string }[]>> {
+  try {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from('categories')
+      .select('id, name')
+      .eq('status', 'active')
+      .order('sort_order', { ascending: true })
+
+    if (error) {
+      console.error('getActiveCategories error:', error)
+      return {
+        success: false,
+        message: '取得分類列表失敗',
+      }
+    }
+
+    return {
+      success: true,
+      data: data || [],
+    }
+  } catch (error: unknown) {
+    console.error('getActiveCategories error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '取得分類列表失敗',
+    }
+  }
+}
+
+/**
+ * 取得所有使用中的標籤（用於篩選）
+ * Feature: 006-ux-enhancement (US2)
+ */
+export async function getAvailableTags(): Promise<ActionResult<string[]>> {
+  try {
+    const supabase = await createClient()
+
+    // 查詢所有啟用商品的標籤，並去重
+    const { data, error } = await supabase
+      .from('products')
+      .select('tags')
+      .eq('status', 'active')
+      .not('tags', 'is', null)
+
+    if (error) {
+      console.error('getAvailableTags error:', error)
+      return {
+        success: false,
+        message: '取得標籤列表失敗',
+      }
+    }
+
+    // 將所有標籤展平並去重
+    const allTags = new Set<string>()
+    data?.forEach((item: any) => {
+      if (item.tags && Array.isArray(item.tags)) {
+        item.tags.forEach((tag: string) => allTags.add(tag))
+      }
+    })
+
+    return {
+      success: true,
+      data: Array.from(allTags).sort(),
+    }
+  } catch (error: unknown) {
+    console.error('getAvailableTags error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '取得標籤列表失敗',
+    }
+  }
+}
+
+/**
  * 刪除商品圖片
  * Feature: 002-product-management (US4)
  */
