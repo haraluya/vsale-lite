@@ -1,0 +1,247 @@
+/**
+ * Vsale-lite 響應式設計 Token 系統
+ *
+ * 這是設計 Token 的範例檔案,實際實作時應複製到 lib/design-tokens.ts
+ *
+ * @see specs/005-responsive-ui/quickstart.md - 使用範例
+ * @see specs/005-responsive-ui/research.md - 設計決策理由
+ */
+
+export const designTokens = {
+  /**
+   * 容器寬度 Token
+   *
+   * @example
+   * // 一般頁面 (商品列表、訂單列表)
+   * <div className={designTokens.container.default}>
+   *
+   * // 表單頁面 (登入、新增商品)
+   * <div className={designTokens.container.narrow}>
+   */
+  container: {
+    default: 'mx-auto max-w-7xl',        // 一般頁面 (1280px)
+    narrow: 'mx-auto max-w-4xl',         // 表單頁面 (896px)
+    wide: 'mx-auto max-w-screen-2xl',    // 儀表板 (1536px,僅特殊情況)
+  },
+
+  /**
+   * 間距系統 Token
+   *
+   * @example
+   * // 頁面外層間距
+   * <div className={designTokens.spacing.page.padding}>
+   *
+   * // 卡片內距
+   * <div className={designTokens.spacing.card.padding}>
+   */
+  spacing: {
+    page: {
+      padding: 'p-4 md:p-6 lg:p-8',                     // 頁面外層
+      gap: 'space-y-4 md:space-y-6 lg:space-y-8',      // 垂直區塊間距
+    },
+    card: {
+      padding: 'p-4 md:p-6',                           // 卡片內距
+      gap: 'space-y-3 md:space-y-4',                   // 卡片內元素間距
+    },
+    grid: {
+      gap: 'gap-4 md:gap-6',                           // Grid 列間距
+    },
+    section: {
+      marginBottom: 'mb-4 md:mb-6 lg:mb-8',            // 區塊下方間距
+    },
+  },
+
+  /**
+   * 文字尺寸階梯 Token
+   *
+   * @example
+   * // 頁面主標題
+   * <h1 className={designTokens.typography.h1}>標題</h1>
+   *
+   * // 正文
+   * <p className={designTokens.typography.body.base}>內容</p>
+   */
+  typography: {
+    h1: 'text-2xl md:text-3xl lg:text-4xl font-bold',  // 頁面主標題
+    h2: 'text-xl md:text-2xl lg:text-3xl font-bold',   // 區塊標題
+    h3: 'text-lg md:text-xl font-bold',                // 次標題
+    body: {
+      base: 'text-sm md:text-base',                    // 正文
+      large: 'text-base md:text-lg',                   // 大正文
+    },
+    caption: 'text-xs md:text-sm',                     // 輔助文字
+    label: 'text-xs md:text-sm font-medium',           // 表單標籤
+  },
+
+  /**
+   * Neo-Brutalism 響應式 Token
+   *
+   * @example
+   * // 完整 Neo-Brutalism 風格 (邊框 + 陰影)
+   * <div className={cn(
+   *   designTokens.neoBrutalism.border.full,
+   *   designTokens.neoBrutalism.shadow.full
+   * )}>
+   *
+   * // 或使用工具函式
+   * <div className={getNeoBrutalismClasses({ hover: true })}>
+   */
+  neoBrutalism: {
+    border: {
+      mobile: 'border-2',                              // 手機版
+      desktop: 'md:border-3',                          // 桌面版
+      full: 'border-2 md:border-3',                    // 完整 (手機+桌面)
+    },
+    shadow: {
+      mobile: 'shadow-neo-sm',                         // 2px 陰影
+      desktop: 'md:shadow-neo',                        // 4px 陰影
+      full: 'shadow-neo-sm md:shadow-neo',             // 完整 (手機+桌面)
+    },
+    active: 'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+    hover: 'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+  },
+
+  /**
+   * 按鈕尺寸 Token
+   *
+   * @example
+   * // Button 元件中使用
+   * <button className={cn(
+   *   designTokens.button[size],
+   *   getNeoBrutalismClasses({ active: true })
+   * )}>
+   */
+  button: {
+    sm: 'px-3 py-1.5 text-xs md:px-4 md:py-2 md:text-sm',
+    md: 'px-4 py-2 text-sm md:px-6 md:py-3 md:text-base',
+    lg: 'px-6 py-3 text-base md:px-8 md:py-4 md:text-lg',
+  },
+
+  /**
+   * 輸入框尺寸 Token
+   *
+   * @example
+   * // Input 元件中使用
+   * <input className={cn(
+   *   designTokens.input.base,
+   *   designTokens.neoBrutalism.border.full
+   * )} />
+   */
+  input: {
+    base: 'px-3 py-2 text-sm md:px-4 md:py-2.5 md:text-base',
+  },
+} as const
+
+/**
+ * 工具函式: 組合 Neo-Brutalism 完整樣式
+ *
+ * @param options - 選項物件
+ * @param options.hover - 是否包含 hover 效果
+ * @param options.active - 是否包含 active 效果
+ * @returns 組合後的 className 字串
+ *
+ * @example
+ * // 按鈕 (包含 active 效果)
+ * <button className={getNeoBrutalismClasses({ active: true })}>
+ *
+ * // 可點擊卡片 (包含 hover + active 效果)
+ * <Link className={getNeoBrutalismClasses({ hover: true, active: true })}>
+ */
+export function getNeoBrutalismClasses(options?: {
+  hover?: boolean
+  active?: boolean
+}) {
+  const classes = [
+    designTokens.neoBrutalism.border.full,
+    designTokens.neoBrutalism.shadow.full,
+  ]
+
+  if (options?.hover) {
+    classes.push(designTokens.neoBrutalism.hover)
+  }
+
+  if (options?.active) {
+    classes.push(designTokens.neoBrutalism.active)
+  }
+
+  return classes.join(' ')
+}
+
+/**
+ * 工具函式: 組合頁面容器樣式
+ *
+ * @param variant - 容器寬度變體 (default / narrow / wide)
+ * @returns 組合後的 className 字串
+ *
+ * @example
+ * // 一般頁面
+ * <div className={getPageContainerClasses('default')}>
+ *
+ * // 表單頁面
+ * <div className={getPageContainerClasses('narrow')}>
+ */
+export function getPageContainerClasses(
+  variant: 'default' | 'narrow' | 'wide' = 'default'
+) {
+  return [
+    'min-h-screen bg-background',
+    designTokens.spacing.page.padding,
+    designTokens.container[variant],
+    designTokens.spacing.page.gap,
+  ].join(' ')
+}
+
+/**
+ * TypeScript 型別輔助: 提取 Token 值的型別
+ *
+ * @example
+ * type ButtonSize = keyof typeof designTokens.button // 'sm' | 'md' | 'lg'
+ * type ContainerVariant = keyof typeof designTokens.container // 'default' | 'narrow' | 'wide'
+ */
+export type DesignTokens = typeof designTokens
+
+/**
+ * 使用範例
+ *
+ * @example
+ * import { designTokens, getNeoBrutalismClasses, getPageContainerClasses } from '@/lib/design-tokens'
+ * import { cn } from '@/lib/utils'
+ *
+ * // 範例 1: 建立響應式頁面
+ * export default function ExamplePage() {
+ *   return (
+ *     <div className={getPageContainerClasses('default')}>
+ *       <h1 className={designTokens.typography.h1}>頁面標題</h1>
+ *       <p className={designTokens.typography.body.base}>頁面內容</p>
+ *     </div>
+ *   )
+ * }
+ *
+ * // 範例 2: 建立響應式卡片
+ * export function ExampleCard({ title, description }) {
+ *   return (
+ *     <div className={cn(
+ *       "rounded-none bg-white",
+ *       getNeoBrutalismClasses({ hover: true }),
+ *       designTokens.spacing.card.padding
+ *     )}>
+ *       <h2 className={designTokens.typography.h2}>{title}</h2>
+ *       <p className={designTokens.typography.body.base}>{description}</p>
+ *     </div>
+ *   )
+ * }
+ *
+ * // 範例 3: 建立響應式按鈕
+ * export function ExampleButton({ children, size = 'md' }) {
+ *   return (
+ *     <button className={cn(
+ *       "inline-flex items-center justify-center font-bold rounded-none",
+ *       getNeoBrutalismClasses({ active: true }),
+ *       designTokens.button[size],
+ *       "bg-brand-primary text-white"
+ *     )}>
+ *       {children}
+ *     </button>
+ *   )
+ * }
+ */
