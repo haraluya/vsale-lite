@@ -12,7 +12,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { getSeriesById } from '@/lib/actions/series'
 import { getSeriesProductsWithPrice } from '@/lib/actions/shop'
-import { ProductWithPriceCard } from '@/components/shop/product-with-price-card'
+import { SeriesDetailClient } from '@/components/series/SeriesDetailClient'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
@@ -84,22 +84,12 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
           </p>
         </div>
 
-        {/* 商品列表 */}
-        {!products || products.length === 0 ? (
-          <div className="rounded-none border-3 border-black bg-white p-12 text-center shadow-neo">
-            <p className="text-lg text-gray-500">此系列目前沒有可用的商品</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products?.map((product) => (
-              <ProductWithPriceCard
-                key={product.id}
-                product={product}
-                tierName={tierName}
-              />
-            ))}
-          </div>
-        )}
+        {/* 商品列表與圖片切換功能 */}
+        <SeriesDetailClient
+          series={series}
+          products={products || []}
+          tierName={tierName}
+        />
       </div>
     </div>
   )

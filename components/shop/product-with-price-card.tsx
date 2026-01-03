@@ -25,9 +25,10 @@ import type { ProductWithPrice } from '@/types'
 interface ProductWithPriceCardProps {
   product: ProductWithPrice
   tierName: string
+  onImageClick?: (imageUrl: string, productName: string) => void
 }
 
-export function ProductWithPriceCard({ product, tierName }: ProductWithPriceCardProps) {
+export function ProductWithPriceCard({ product, tierName, onImageClick }: ProductWithPriceCardProps) {
   const { addItem, getItemQuantity } = useCartStore()
   const [isAdding, setIsAdding] = useState(false)
   const cartQuantity = getItemQuantity(product.id)
@@ -56,18 +57,34 @@ export function ProductWithPriceCard({ product, tierName }: ProductWithPriceCard
     setIsAdding(false)
   }
 
+  // 商品圖片點擊處理
+  const handleImageClick = () => {
+    if (product.image_url && onImageClick) {
+      onImageClick(product.image_url, product.name)
+    }
+  }
+
   return (
     <div className="group rounded-none border-3 border-black bg-white p-4 shadow-neo"
     >
       {/* 商品圖片 */}
-      <div className="mb-4 aspect-square overflow-hidden rounded-none border-2 border-black bg-gray-100">
+      <div
+        className={`mb-4 aspect-square overflow-hidden rounded-none border-2 border-black bg-gray-100 ${
+          product.image_url && onImageClick ? 'cursor-pointer' : ''
+        } ${!product.image_url ? 'opacity-50' : ''}`}
+        onClick={handleImageClick}
+        role={product.image_url && onImageClick ? 'button' : undefined}
+        aria-label={product.image_url && onImageClick ? `查看 ${product.name} 大圖` : undefined}
+      >
         {product.image_url ? (
           <Image
             src={product.image_url}
             alt={product.name}
             width={300}
             height={300}
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            className={`h-full w-full object-cover transition-transform ${
+              onImageClick ? 'group-hover:scale-105' : ''
+            }`}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-6xl text-gray-300">

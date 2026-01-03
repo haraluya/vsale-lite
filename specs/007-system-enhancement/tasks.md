@@ -78,8 +78,8 @@
 - [X] T023 [US2] 更新客戶列表頁 app/(admin)/admin/clients/page.tsx（顯示地址與備註摘要，最多 30 字）
 - [X] T024 [US2] 更新訂單詳情頁客戶資訊區塊（前台與後台，顯示地址與備註）
 - [X] T025 [US2] 新增客戶編輯表單元件 components/admin/client-form-v2.tsx（含地址與備註 Textarea）
-- [ ] T026 [US2] 測試客戶端無法查詢 admin_notes 欄位（RLS 驗證）
-- [ ] T027 [US2] 測試管理員可查詢與編輯 admin_notes（功能驗證）
+- [X] T026 [US2] 測試客戶端無法查詢 admin_notes 欄位（RLS 驗證）
+- [X] T027 [US2] 測試管理員可查詢與編輯 admin_notes（功能驗證）
 
 **檢查點**: User Stories 1 和 2 應可獨立運作
 
@@ -93,10 +93,10 @@
 
 ### Implementation for User Story 3
 
-- [ ] T028 [P] [US3] 新增系列頁圖片切換元件 components/series/SeriesHeroImage.tsx（使用 CSS Transition 淡入淡出）
-- [ ] T029 [US3] 更新系列詳情頁 app/(shop)/store/series/[id]/page.tsx（整合圖片切換元件）
-- [ ] T030 [US3] 更新商品卡片樣式（有圖片：可點擊，無圖片：禁用狀態半透明）
-- [ ] T031 [US3] 新增大圖關閉按鈕（X 圖示，點擊恢復系列圖片）
+- [X] T028 [P] [US3] 新增系列頁圖片切換元件 components/series/SeriesHeroImage.tsx（使用 CSS Transition 淡入淡出）
+- [X] T029 [US3] 更新系列詳情頁 app/(shop)/store/series/[id]/page.tsx（整合圖片切換元件）
+- [X] T030 [US3] 更新商品卡片樣式（有圖片：可點擊，無圖片：禁用狀態半透明）
+- [X] T031 [US3] 新增大圖關閉按鈕（X 圖示，點擊恢復系列圖片）
 - [ ] T032 [US3] 測試圖片切換動畫流暢度（300ms 過渡效果）
 - [ ] T033 [US3] 測試無圖片商品卡片禁用狀態
 
