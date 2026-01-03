@@ -60,6 +60,7 @@ export function CartItem({ item }: CartItemProps) {
               width={96}
               height={96}
               className="h-full w-full object-cover"
+              sizes="96px"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-3xl md:text-4xl text-gray-300">

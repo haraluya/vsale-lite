@@ -69,6 +69,7 @@ export function ProductCard({ product }: ProductCardProps) {
             width={300}
             height={300}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-5xl md:text-6xl text-gray-300">
