@@ -1,7 +1,7 @@
 'use client'
 
 import { Clock, User } from 'lucide-react'
-import type { OrderTimeline as OrderTimelineType } from '@/types'
+import type { OrderTimelineWithActor as OrderTimelineType } from '@/types'
 
 /**
  * 訂單操作歷史時間軸元件

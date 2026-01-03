@@ -83,7 +83,10 @@ export default function CheckoutPage() {
       const validation = await validateCartBeforeCheckout(items)
 
       if (!validation.success || !validation.data?.isValid) {
-        setError(validation.data?.message || '購物車驗證失敗')
+        const message = validation.success && validation.data?.message
+          ? validation.data.message
+          : validation.message || '購物車驗證失敗'
+        setError(message)
         setIsSubmitting(false)
         return
       }

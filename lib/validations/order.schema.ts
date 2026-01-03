@@ -36,7 +36,7 @@ export const createOrderSchema = z.object({
 export const updateOrderStatusSchema = z.object({
   orderId: z.string().uuid('無效的訂單 ID'),
   newStatus: z.enum(['confirmed', 'shipping', 'completed'], {
-    errorMap: () => ({ message: '無效的訂單狀態' }),
+    message: '無效的訂單狀態',
   }),
 })
 

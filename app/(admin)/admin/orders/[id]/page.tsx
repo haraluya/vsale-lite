@@ -3,11 +3,9 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getOrderById } from '@/lib/actions/orders'
-import { confirmOrder } from '@/lib/actions/orders'
 import { OrderStatusBadge } from '@/components/shop/order-status-badge'
-import { OrderStatusUpdater } from '@/components/admin/order-status-updater'
+import { OrderActions } from '@/components/admin/order-actions'
 import { OrderTimeline } from '@/components/admin/order-timeline'
-import { OrderCancelButton } from '@/components/admin/order-cancel-button'
 import { ArrowLeft, User, Phone, Award, Calendar, FileText } from 'lucide-react'
 
 /**
@@ -47,7 +45,7 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
   // 取得訂單詳情
   const result = await getOrderById(id)
 
-  if (!result.success) {
+  if (!result.success || !result.data) {
     notFound()
   }
 
@@ -156,23 +154,11 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
         </div>
 
         {/* 訂單操作 */}
-        <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
-          <h2 className="mb-4 text-xl font-bold">訂單操作</h2>
-          <div className="flex flex-wrap gap-4">
-            {order.status === 'pending' && (
-              <form action={confirmOrder.bind(null, order.id)}>
-                <button
-                  type="submit"
-                  className="rounded-none border-3 border-black bg-green-400 px-6 py-3 font-bold shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-                >
-                  確認訂單（扣減庫存）
-                </button>
-              </form>
-            )}
-            <OrderStatusUpdater orderId={order.id} currentStatus={order.status} />
-            <OrderCancelButton orderId={order.id} currentStatus={order.status} orderNumber={order.order_number} />
-          </div>
-        </div>
+        <OrderActions
+          orderId={order.id}
+          orderNumber={order.order_number}
+          currentStatus={order.status}
+        />
 
         {/* 操作歷史 */}
         <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">

@@ -19,7 +19,7 @@ interface OrderStatusUpdaterProps {
   currentStatus: OrderStatus
 }
 
-const NEXT_STATUS_MAP: Partial<Record<OrderStatus, { status: OrderStatus; label: string }>> = {
+const NEXT_STATUS_MAP: Partial<Record<OrderStatus, { status: 'confirmed' | 'shipping' | 'completed'; label: string }>> = {
   confirmed: { status: 'shipping', label: '標記為出貨中' },
   shipping: { status: 'completed', label: '標記為已完成' },
 }

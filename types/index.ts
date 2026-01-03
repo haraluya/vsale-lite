@@ -255,9 +255,12 @@ export type OrderTimelineWithActor = OrderTimeline & {
 
 // 訂單詳情 (含明細與操作歷史)
 export type OrderDetail = Order & {
-  user_name: string | null
-  user_phone: string | null
-  tier_name: string | null
+  user: {
+    id: string
+    name: string
+    phone: string
+    tier_name: string
+  }
   items: OrderItem[]
   timelines?: OrderTimelineWithActor[]
 }

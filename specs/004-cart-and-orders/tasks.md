@@ -121,9 +121,9 @@
 - [X] T041 [P] [US3] 建立取消訂單按鈕元件於 components/admin/order-cancel-button.tsx（含確認對話框）
 - [X] T042 [US3] 建立管理員訂單列表頁面於 app/(admin)/admin/orders/page.tsx
 - [X] T043 [US3] 建立管理員訂單詳情頁面於 app/(admin)/admin/orders/[id]/page.tsx（含狀態更新、取消訂單、操作歷史）
-- [ ] T044 [US3] 整合測試：確認訂單並扣減庫存、更新訂單狀態、取消訂單並回補庫存、操作歷史記錄
+- [X] T044 [US3] 整合測試：確認訂單並扣減庫存、更新訂單狀態、取消訂單並回補庫存、操作歷史記錄
 
-**檢查點**: User Story 3 完整可用，管理員可獨立處理訂單流程 ⏳
+**檢查點**: User Story 3 完整可用，管理員可獨立處理訂單流程 ✅
 
 ---
 
@@ -135,10 +135,10 @@
 
 ### 實作 User Story 4
 
-- [ ] T045 [US4] 在客戶端導航列 (app/(shop)/layout.tsx) 新增「我的訂單」連結
-- [ ] T046 [US4] 驗證客戶訂單列表頁面 (app/(shop)/store/orders/page.tsx) 的 RLS 權限（客戶只能看到自己的訂單）
-- [ ] T047 [US4] 驗證客戶訂單詳情頁面 (app/(shop)/store/orders/[id]/page.tsx) 的 RLS 權限
-- [ ] T048 [US4] 整合測試：客戶 A 無法查看客戶 B 的訂單、空訂單列表顯示提示訊息
+- [X] T045 [US4] 在客戶端導航列 (app/(shop)/layout.tsx) 新增「我的訂單」連結
+- [X] T046 [US4] 驗證客戶訂單列表頁面 (app/(shop)/store/orders/page.tsx) 的 RLS 權限（客戶只能看到自己的訂單）
+- [X] T047 [US4] 驗證客戶訂單詳情頁面 (app/(shop)/store/orders/[id]/page.tsx) 的 RLS 權限
+- [X] T048 [US4] 整合測試：客戶 A 無法查看客戶 B 的訂單、空訂單列表顯示提示訊息
 
 **檢查點**: User Story 4 完整可用，客戶可獨立查看訂單歷史
 

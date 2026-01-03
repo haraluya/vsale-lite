@@ -39,8 +39,8 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
     const matchesSearch =
       searchTerm === '' ||
       order.order_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.user_phone.includes(searchTerm)
+      (order.user_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.user_phone || '').includes(searchTerm)
 
     return matchesStatus && matchesSearch
   })

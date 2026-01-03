@@ -45,6 +45,17 @@ export default async function AdminOrdersPage() {
     )
   }
 
+  if (!result.data) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="rounded-none border-3 border-black bg-red-100 p-8 text-center shadow-neo">
+          <h2 className="mb-2 text-xl font-bold">載入失敗</h2>
+          <p className="text-gray-700">訂單資料不存在</p>
+        </div>
+      </div>
+    )
+  }
+
   const { orders, total } = result.data
 
   return (
