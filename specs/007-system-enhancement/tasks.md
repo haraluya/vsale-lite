@@ -120,9 +120,9 @@
 - [X] T039 [P] [US4] 實作 uploadAnnouncementImage Server Action lib/actions/announcements.ts（管理端，儲存至 Supabase Storage，路徑：announcements/{id}/main.{ext}，含檔案大小驗證最大 5MB）
 - [X] T040 [US4] 新增廣告輪播元件 components/announcements/AnnouncementCarousel.tsx（自動播放、左右箭頭、指示器）
 - [X] T041 [US4] 更新前台首頁 app/(shop)/store/page.tsx（整合廣告輪播元件）
-- [ ] T042 [US4] 新增後台廣告管理頁面 app/(admin)/admin/announcements/page.tsx（列表顯示、CRUD 操作）
-- [ ] T043 [US4] 新增後台廣告編輯頁面 app/(admin)/admin/announcements/[id]/edit/page.tsx（表單與圖片上傳）
-- [ ] T044 [US4] 新增廣告表單元件 components/admin/announcements/AnnouncementForm.tsx（標題、連結、排序、圖片上傳）
+- [X] T042 [US4] 新增後台廣告管理頁面 app/(admin)/admin/announcements/page.tsx（列表顯示、CRUD 操作）
+- [X] T043 [US4] 新增後台廣告編輯頁面 app/(admin)/admin/announcements/[id]/edit/page.tsx（表單與圖片上傳）
+- [X] T044 [US4] 新增廣告表單元件 components/admin/announcements/AnnouncementForm.tsx（標題、連結、排序、圖片上傳）
 - [ ] T045 [US4] 測試輪播自動播放功能（每 5 秒切換）
 - [ ] T046 [US4] 測試左右箭頭切換功能
 - [ ] T047 [US4] 測試廣告點擊跳轉功能
