@@ -65,10 +65,14 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
     switch (timeline.action_type) {
       case 'created':
         return `${timeline.actor_name} 建立訂單`
-      case 'status_changed':
+      case 'confirmed':
+        return `${timeline.actor_name} 確認訂單`
+      case 'status_updated':
         return `${timeline.actor_name} 將訂單狀態從「${STATUS_LABELS[timeline.old_status || '']}」改為「${STATUS_LABELS[timeline.new_status || '']}」`
       case 'cancelled':
         return `${timeline.actor_name} 取消訂單`
+      case 'comment':
+        return null // 留言不需要標題訊息，直接顯示內容
       default:
         return '未知操作'
     }
@@ -114,7 +118,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
                   </div>
                 </div>
 
-                {timeline.notes && <div className="text-sm text-gray-600">{timeline.notes}</div>}
+                {timeline.content && <div className="text-sm text-gray-600">{timeline.content}</div>}
 
                 <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
                   <User className="h-3 w-3" />

@@ -5,8 +5,10 @@ import { checkAuth } from './helpers'
 import { revalidatePath } from 'next/cache'
 import {
   createOrderSchema,
+  addOrderCommentSchema,
   type CreateOrderInput,
   type GetOrdersInput,
+  type AddOrderCommentInput,
 } from '@/lib/validations/order.schema'
 import type {
   ActionResult,
@@ -435,7 +437,7 @@ export async function getOrderById(
           actor_role: timeline.actor_role,
           old_status: timeline.old_status,
           new_status: timeline.new_status,
-          notes: timeline.notes,
+          content: timeline.content,
           created_at: timeline.created_at,
           actor_name: actor?.display_name || actor?.phone || '系統',
         }
@@ -655,6 +657,177 @@ export async function cancelOrder(
     return {
       success: false,
       message: error instanceof Error ? error.message : '取消訂單時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 新增訂單留言 (Feature 007 - User Story 1)
+ * - 客戶僅能在自己的訂單留言
+ * - 管理員可在任何訂單留言
+ * - 留言字數限制 500 字
+ */
+export async function addOrderComment(
+  input: AddOrderCommentInput
+): Promise<ActionResult<{ id: string }>> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 驗證輸入
+    const validated = addOrderCommentSchema.safeParse(input)
+    if (!validated.success) {
+      return {
+        success: false,
+        message: '留言內容驗證失敗',
+        errors: validated.error.flatten().fieldErrors,
+      }
+    }
+
+    const { orderId, content } = validated.data
+
+    // 客戶端：驗證訂單所有權
+    if (role === 'client') {
+      const { data: order } = await supabase
+        .from('orders')
+        .select('user_id')
+        .eq('id', orderId)
+        .single()
+
+      if (!order || order.user_id !== userId) {
+        return {
+          success: false,
+          message: '您無權在此訂單留言',
+        }
+      }
+    }
+
+    // 插入留言到 order_timelines
+    const { data, error } = await supabase
+      .from('order_timelines')
+      .insert({
+        order_id: orderId,
+        action_type: 'comment',
+        content: content,
+        actor_id: userId,
+        actor_role: role,
+      })
+      .select('id')
+      .single()
+
+    if (error) {
+      console.error('新增留言錯誤:', error)
+      return {
+        success: false,
+        message: '新增留言時發生錯誤',
+      }
+    }
+
+    // 重新驗證相關頁面
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath(`/store/orders/${orderId}`)
+
+    return {
+      success: true,
+      data: { id: data.id },
+      message: '留言已送出',
+    }
+  } catch (error) {
+    console.error('addOrderComment error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '新增留言時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 取得訂單時間軸（含留言） (Feature 007 - User Story 1)
+ * - 包含操作歷史與留言記錄
+ * - 依時間排序（舊 → 新）
+ */
+export async function getOrderTimeline(orderId: string): Promise<
+  ActionResult<
+    Array<{
+      id: string
+      action_type: string
+      content: string | null
+      actor_id: string | null
+      actor_role: string | null
+      actor_name: string | null
+      old_status: string | null
+      new_status: string | null
+      created_at: string
+    }>
+  >
+> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 客戶端：驗證訂單所有權
+    if (role === 'client') {
+      const { data: order } = await supabase
+        .from('orders')
+        .select('user_id')
+        .eq('id', orderId)
+        .single()
+
+      if (!order || order.user_id !== userId) {
+        return {
+          success: false,
+          message: '您無權查看此訂單',
+        }
+      }
+    }
+
+    // 查詢訂單時間軸（含操作者資訊）
+    const { data, error } = await supabase
+      .from('order_timelines')
+      .select(`
+        id,
+        action_type,
+        content,
+        actor_id,
+        actor_role,
+        old_status,
+        new_status,
+        created_at,
+        profiles:actor_id(display_name)
+      `)
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true })
+
+    if (error) {
+      console.error('查詢訂單時間軸錯誤:', error)
+      return {
+        success: false,
+        message: '查詢訂單時間軸時發生錯誤',
+      }
+    }
+
+    // 格式化回傳資料
+    const timelines = data.map((item: any) => ({
+      id: item.id,
+      action_type: item.action_type,
+      content: item.content,
+      actor_id: item.actor_id,
+      actor_role: item.actor_role,
+      actor_name: item.profiles?.display_name || null,
+      old_status: item.old_status,
+      new_status: item.new_status,
+      created_at: item.created_at,
+    }))
+
+    return {
+      success: true,
+      data: timelines,
+    }
+  } catch (error) {
+    console.error('getOrderTimeline error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢訂單時間軸時發生未知錯誤',
     }
   }
 }
