@@ -163,27 +163,27 @@
 
 ### 5.2 前台頁面容器統一化
 
-- [ ] T030 [P] 修改 `app/(shop)/store/page.tsx` 統一容器與間距
-- [ ] T031 [P] 修改 `app/(shop)/store/[seriesId]/page.tsx` 統一容器與間距 (系列商品列表)
-- [ ] T032 [P] 修改 `app/(shop)/store/cart/page.tsx` 統一容器與間距
-- [ ] T033 [P] 修改 `app/(shop)/store/orders/page.tsx` 統一容器與間距
-- [ ] T034 [P] 修改 `app/(shop)/store/orders/[id]/page.tsx` 統一容器與間距
+- [X] T030 [P] 修改 `app/(shop)/store/page.tsx` 統一容器與間距
+- [X] T031 [P] 修改 `app/(shop)/store/[seriesId]/page.tsx` 統一容器與間距 (系列商品列表)
+- [X] T032 [P] 修改 `app/(shop)/store/cart/page.tsx` 統一容器與間距
+- [X] T033 [P] 修改 `app/(shop)/store/orders/page.tsx` 統一容器與間距
+- [X] T034 [P] 修改 `app/(shop)/store/orders/[id]/page.tsx` 統一容器與間距
 
 ### 5.3 商品相關元件優化
 
-- [ ] T035 [P] 修改 `components/shop/product-card.tsx` 優化響應式
+- [X] T035 [P] 修改 `components/shop/product-card.tsx` 優化響應式
   - 邊框與陰影 (`border-2 md:border-3 shadow-neo-sm md:shadow-neo`)
   - 間距優化 (`p-3 md:p-4`)
   - 文字尺寸響應式
 
-- [ ] T036 [P] 修改 `components/shop/series-card.tsx` 優化響應式
+- [X] T036 [P] 修改 `components/shop/series-card.tsx` 優化響應式
   - 邊框與陰影響應式
   - 間距優化
   - 文字尺寸響應式
 
 ### 5.4 購物車元件優化
 
-- [ ] T037 修改 `components/shop/cart-item.tsx` 優化響應式
+- [X] T037 修改 `components/shop/cart-item.tsx` 優化響應式
   - 圖片尺寸響應式 (`h-16 w-16 md:h-24 md:w-24`)
   - 間距優化
   - 文字尺寸響應式
@@ -200,18 +200,18 @@
 
 ### 6.1 商品圖片優化
 
-- [ ] T038 [P] 修改 `components/shop/product-card.tsx` 新增 Image `sizes` 屬性
+- [X] T038 [P] 修改 `components/shop/product-card.tsx` 新增 Image `sizes` 屬性
   - `sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"`
 
-- [ ] T039 [P] 修改 `components/shop/series-card.tsx` 新增 Image `sizes` 屬性
+- [X] T039 [P] 修改 `components/shop/series-card.tsx` 新增 Image `sizes` 屬性
   - `sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"`
 
 ### 6.2 購物車與訂單圖片優化
 
-- [ ] T040 [P] 修改 `components/shop/cart-item.tsx` 新增 Image `sizes` 屬性
+- [X] T040 [P] 修改 `components/shop/cart-item.tsx` 新增 Image `sizes` 屬性
   - `sizes="96px"` (固定尺寸)
 
-- [ ] T041 [P] 修改訂單明細相關元件圖片 (如有使用 Image 元件)
+- [X] T041 [P] 修改訂單明細相關元件圖片 (如有使用 Image 元件)
 
 **Checkpoint**: 圖片優化完成,驗證載入速度改善
 
@@ -225,16 +225,16 @@
 
 ### 7.1 批量查找與修改
 
-- [ ] T042 使用 Grep 查找所有 `text-3xl` 或 `text-4xl` 的頁面標題
-- [ ] T043 批量修改頁面標題為響應式文字尺寸
+- [X] T042 使用 Grep 查找所有 `text-3xl` 或 `text-4xl` 的頁面標題
+- [X] T043 批量修改頁面標題為響應式文字尺寸
   - `text-4xl` → `text-2xl md:text-3xl lg:text-4xl`
   - `text-3xl` → `text-xl md:text-2xl lg:text-3xl`
   - `text-2xl` → `text-lg md:text-xl lg:text-2xl`
 
 ### 7.2 區塊標題優化
 
-- [ ] T044 批量修改區塊標題 (h2) 為響應式文字尺寸
-- [ ] T045 批量修改次標題 (h3) 為響應式文字尺寸
+- [X] T044 批量修改區塊標題 (h2) 為響應式文字尺寸
+- [X] T045 批量修改次標題 (h3) 為響應式文字尺寸
 
 **Checkpoint**: 所有文字尺寸響應式完成
 
