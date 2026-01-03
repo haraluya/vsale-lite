@@ -770,21 +770,10 @@ export async function getOrderTimeline(
       }
     }
 
-    // 查詢訂單時間軸（含操作者資訊）
+    // 查詢訂單時間軸
     const { data, error } = await supabase
       .from('order_timelines')
-      .select(`
-        id,
-        order_id,
-        action_type,
-        content,
-        actor_id,
-        actor_role,
-        old_status,
-        new_status,
-        created_at,
-        profiles:actor_id(display_name)
-      `)
+      .select('*')
       .eq('order_id', orderId)
       .order('created_at', { ascending: true })
 
@@ -796,19 +785,35 @@ export async function getOrderTimeline(
       }
     }
 
+    // 批次查詢操作者資料
+    const actorIds = (data || []).map(t => t.actor_id).filter(Boolean)
+    let actorMap = new Map()
+
+    if (actorIds.length > 0) {
+      const { data: actors } = await supabase
+        .from('profiles')
+        .select('id, display_name, phone')
+        .in('id', actorIds)
+
+      actorMap = new Map((actors || []).map((actor: any) => [actor.id, actor]))
+    }
+
     // 格式化回傳資料
-    const timelines: OrderTimelineWithActor[] = data.map((item: any) => ({
-      id: item.id,
-      order_id: item.order_id,
-      action_type: item.action_type as OrderTimelineWithActor['action_type'],
-      content: item.content,
-      actor_id: item.actor_id,
-      actor_role: item.actor_role as OrderTimelineWithActor['actor_role'],
-      actor_name: item.profiles?.display_name || null,
-      old_status: item.old_status,
-      new_status: item.new_status,
-      created_at: item.created_at,
-    }))
+    const timelines: OrderTimelineWithActor[] = data.map((item: any) => {
+      const actor = actorMap.get(item.actor_id)
+      return {
+        id: item.id,
+        order_id: item.order_id,
+        action_type: item.action_type as OrderTimelineWithActor['action_type'],
+        content: item.content,
+        actor_id: item.actor_id,
+        actor_role: item.actor_role as OrderTimelineWithActor['actor_role'],
+        actor_name: actor?.display_name || actor?.phone || null,
+        old_status: item.old_status,
+        new_status: item.new_status,
+        created_at: item.created_at,
+      }
+    })
 
     return {
       success: true,
