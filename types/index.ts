@@ -38,6 +38,8 @@ export type Profile = {
   created_at: string
   display_name: string | null
   notes: string | null
+  address: string | null  // 🆕 Feature 007: 常用地址
+  admin_notes: string | null  // 🆕 Feature 007: 管理員備註（僅管理端可見）
 }
 
 // 客戶 (含等級資訊)
@@ -239,12 +241,12 @@ export type OrderItem = {
 export type OrderTimeline = {
   id: string
   order_id: string
-  action_type: 'created' | 'status_changed' | 'cancelled'
+  action_type: 'created' | 'confirmed' | 'status_updated' | 'cancelled' | 'comment'  // 🆕 Feature 007: 新增 comment 類型
   actor_id: string | null
   actor_role: 'client' | 'admin' | null
+  content: string | null  // 🆕 Feature 007: 留言內容（當 action_type = 'comment'）
   old_status: string | null
   new_status: string | null
-  notes: string | null
   created_at: string
 }
 
@@ -280,4 +282,20 @@ export type GetOrdersResponse = {
   total: number
   page: number
   limit: number
+}
+
+// ===================================
+// 廣告輪播型別 (Feature 007)
+// ===================================
+
+// 廣告
+export type Announcement = {
+  id: string
+  title: string
+  image_url: string
+  link_url: string | null
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
 }

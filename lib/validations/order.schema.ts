@@ -62,9 +62,18 @@ export const getOrdersSchema = z.object({
     .default(20),
 }).optional()
 
+// 新增訂單留言 (Feature 007)
+export const addOrderCommentSchema = z.object({
+  orderId: z.string().uuid('無效的訂單 ID'),
+  content: z.string()
+    .min(1, '留言內容不得為空')
+    .max(500, '留言內容不得超過 500 字'),
+})
+
 // 型別推導
 export type OrderStatusInput = z.infer<typeof orderStatusSchema>
 export type CreateOrderInput = z.infer<typeof createOrderSchema>
 export type UpdateOrderStatusInput = z.infer<typeof updateOrderStatusSchema>
 export type CancelOrderInput = z.infer<typeof cancelOrderSchema>
 export type GetOrdersInput = z.infer<typeof getOrdersSchema>
+export type AddOrderCommentInput = z.infer<typeof addOrderCommentSchema>
