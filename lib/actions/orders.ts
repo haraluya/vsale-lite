@@ -433,3 +433,207 @@ export async function getOrderById(
     }
   }
 }
+
+/**
+ * 確認訂單並扣減庫存 (US3 - 管理員)
+ * - 呼叫 PostgreSQL Function 確保原子性操作
+ * - 訂單狀態從 pending → confirmed
+ * - 扣減商品庫存（支援負庫存）
+ * - 自動記錄操作歷史
+ */
+export async function confirmOrder(
+  orderId: string
+): Promise<ActionResult<{ orderId: string }>> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 僅管理員可確認訂單
+    if (role !== 'admin') {
+      return {
+        success: false,
+        message: '僅管理員可執行此操作',
+      }
+    }
+
+    // 呼叫 PostgreSQL Function 進行原子性操作
+    const { data, error } = await supabase.rpc('confirm_order_and_deduct_stock', {
+      p_order_id: orderId,
+      p_actor_id: userId,
+    })
+
+    if (error || !data) {
+      console.error('確認訂單錯誤:', error)
+      return {
+        success: false,
+        message: error?.message || '確認訂單時發生錯誤',
+      }
+    }
+
+    // 檢查 Function 回傳結果
+    const result = data as { success: boolean; error?: string; order_id?: string }
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.error || '確認訂單失敗',
+      }
+    }
+
+    // 重新驗證相關頁面
+    revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath('/store/orders')
+
+    return {
+      success: true,
+      data: { orderId: result.order_id || orderId },
+      message: '訂單已確認，庫存已扣減',
+    }
+  } catch (error) {
+    console.error('confirmOrder error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '確認訂單時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 更新訂單狀態 (US3 - 管理員)
+ * - confirmed → shipping → completed
+ * - 呼叫 PostgreSQL Function 確保原子性操作
+ * - 自動記錄操作歷史
+ */
+export async function updateOrderStatus(
+  orderId: string,
+  newStatus: 'confirmed' | 'shipping' | 'completed'
+): Promise<ActionResult<{ orderId: string; newStatus: string }>> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 僅管理員可更新訂單狀態
+    if (role !== 'admin') {
+      return {
+        success: false,
+        message: '僅管理員可執行此操作',
+      }
+    }
+
+    // 呼叫 PostgreSQL Function 進行原子性操作
+    const { data, error } = await supabase.rpc('update_order_status', {
+      p_order_id: orderId,
+      p_new_status: newStatus,
+      p_actor_id: userId,
+    })
+
+    if (error || !data) {
+      console.error('更新訂單狀態錯誤:', error)
+      return {
+        success: false,
+        message: error?.message || '更新訂單狀態時發生錯誤',
+      }
+    }
+
+    // 檢查 Function 回傳結果
+    const result = data as { success: boolean; error?: string; order_id?: string; new_status?: string }
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.error || '更新訂單狀態失敗',
+      }
+    }
+
+    // 重新驗證相關頁面
+    revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath('/store/orders')
+    revalidatePath(`/store/orders/${orderId}`)
+
+    // 狀態標籤映射
+    const statusLabels: Record<string, string> = {
+      pending: '待確認',
+      confirmed: '已確認',
+      shipping: '出貨中',
+      completed: '已完成',
+      cancelled: '已取消',
+    }
+
+    return {
+      success: true,
+      data: { orderId: result.order_id || orderId, newStatus: result.new_status || newStatus },
+      message: `訂單狀態已更新為「${statusLabels[result.new_status || newStatus]}」`,
+    }
+  } catch (error) {
+    console.error('updateOrderStatus error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '更新訂單狀態時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 取消訂單並回補庫存 (US3 - 管理員)
+ * - 僅能取消 pending 或 confirmed 狀態的訂單
+ * - 若訂單已確認，會自動回補庫存
+ * - 呼叫 PostgreSQL Function 確保原子性操作
+ * - 自動記錄操作歷史
+ */
+export async function cancelOrder(
+  orderId: string
+): Promise<ActionResult<{ orderId: string }>> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 僅管理員可取消訂單
+    if (role !== 'admin') {
+      return {
+        success: false,
+        message: '僅管理員可執行此操作',
+      }
+    }
+
+    // 呼叫 PostgreSQL Function 進行原子性操作
+    const { data, error } = await supabase.rpc('cancel_order_and_restore_stock', {
+      p_order_id: orderId,
+      p_actor_id: userId,
+    })
+
+    if (error || !data) {
+      console.error('取消訂單錯誤:', error)
+      return {
+        success: false,
+        message: error?.message || '取消訂單時發生錯誤',
+      }
+    }
+
+    // 檢查 Function 回傳結果
+    const result = data as { success: boolean; error?: string; order_id?: string }
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.error || '取消訂單失敗',
+      }
+    }
+
+    // 重新驗證相關頁面
+    revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath('/store/orders')
+    revalidatePath(`/store/orders/${orderId}`)
+
+    return {
+      success: true,
+      data: { orderId: result.order_id || orderId },
+      message: '訂單已取消，庫存已回補',
+    }
+  } catch (error) {
+    console.error('cancelOrder error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '取消訂單時發生未知錯誤',
+    }
+  }
+}

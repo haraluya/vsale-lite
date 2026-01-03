@@ -75,9 +75,9 @@
 - [X] T021 [US1] 建立購物車頁面於 app/(shop)/store/cart/page.tsx（整合 Zustand 與 Server Actions）
 - [X] T022 [US1] 在客戶端 Navbar 新增購物車圖示與數量徽章
 - [X] T023 [US1] 在商品頁面新增「加入購物車」按鈕（ProductWithPriceCard 元件）
-- [ ] T024 [US1] 整合測試：加入商品、調整數量、移除商品、購物車持久化
+- [X] T024 [US1] 整合測試：加入商品、調整數量、移除商品、購物車持久化
 
-**檢查點**: User Story 1 完整可用，購物車功能可獨立測試
+**檢查點**: User Story 1 完整可用，購物車功能可獨立測試 ✅
 
 ---
 
@@ -97,9 +97,9 @@
 - [X] T030 [US2] 建立訂單確認頁面於 app/(shop)/store/checkout/page.tsx（顯示商品列表、總金額、備註輸入）
 - [X] T031 [US2] 建立客戶訂單列表頁面於 app/(shop)/store/orders/page.tsx（含狀態篩選）
 - [X] T032 [US2] 建立客戶訂單詳情頁面於 app/(shop)/store/orders/[id]/page.tsx（顯示訂單明細）
-- [ ] T033 [US2] 整合測試：送出訂單、訂單編號唯一性、購物車清空、查看訂單歷史
+- [X] T033 [US2] 整合測試：送出訂單、訂單編號唯一性、購物車清空、查看訂單歷史
 
-**檢查點**: User Story 2 完整可用，客戶可獨立完成下單流程
+**檢查點**: User Story 2 完整可用，客戶可獨立完成下單流程 ✅
 
 ---
 
@@ -111,19 +111,19 @@
 
 ### 實作 User Story 3
 
-- [ ] T034 [P] [US3] 建立訂單 Server Action: confirmOrder 於 lib/actions/orders.ts（呼叫 PostgreSQL Function 扣減庫存）
-- [ ] T035 [P] [US3] 建立訂單 Server Action: updateOrderStatus 於 lib/actions/orders.ts（更新訂單狀態）
-- [ ] T036 [P] [US3] 建立訂單 Server Action: cancelOrder 於 lib/actions/orders.ts（呼叫 PostgreSQL Function 回補庫存）
-- [ ] T037 [P] [US3] 建立訂單時間軸 Server Action: getOrderTimelines 於 lib/actions/order-timelines.ts
-- [ ] T038 [P] [US3] 建立管理員訂單列表元件於 components/admin/order-table.tsx（含篩選與搜尋）
-- [ ] T039 [P] [US3] 建立訂單狀態更新器元件於 components/admin/order-status-updater.tsx
-- [ ] T040 [P] [US3] 建立訂單操作歷史時間軸元件於 components/admin/order-timeline.tsx
-- [ ] T041 [P] [US3] 建立取消訂單按鈕元件於 components/admin/order-cancel-button.tsx（含確認對話框）
-- [ ] T042 [US3] 建立管理員訂單列表頁面於 app/(admin)/admin/orders/page.tsx
-- [ ] T043 [US3] 建立管理員訂單詳情頁面於 app/(admin)/admin/orders/[id]/page.tsx（含狀態更新、取消訂單、操作歷史）
+- [X] T034 [P] [US3] 建立訂單 Server Action: confirmOrder 於 lib/actions/orders.ts（呼叫 PostgreSQL Function 扣減庫存）
+- [X] T035 [P] [US3] 建立訂單 Server Action: updateOrderStatus 於 lib/actions/orders.ts（更新訂單狀態）
+- [X] T036 [P] [US3] 建立訂單 Server Action: cancelOrder 於 lib/actions/orders.ts（呼叫 PostgreSQL Function 回補庫存）
+- [X] T037 [P] [US3] 建立訂單時間軸 Server Action: getOrderTimelines 於 lib/actions/order-timelines.ts
+- [X] T038 [P] [US3] 建立管理員訂單列表元件於 components/admin/order-table.tsx（含篩選與搜尋）
+- [X] T039 [P] [US3] 建立訂單狀態更新器元件於 components/admin/order-status-updater.tsx
+- [X] T040 [P] [US3] 建立訂單操作歷史時間軸元件於 components/admin/order-timeline.tsx
+- [X] T041 [P] [US3] 建立取消訂單按鈕元件於 components/admin/order-cancel-button.tsx（含確認對話框）
+- [X] T042 [US3] 建立管理員訂單列表頁面於 app/(admin)/admin/orders/page.tsx
+- [X] T043 [US3] 建立管理員訂單詳情頁面於 app/(admin)/admin/orders/[id]/page.tsx（含狀態更新、取消訂單、操作歷史）
 - [ ] T044 [US3] 整合測試：確認訂單並扣減庫存、更新訂單狀態、取消訂單並回補庫存、操作歷史記錄
 
-**檢查點**: User Story 3 完整可用，管理員可獨立處理訂單流程
+**檢查點**: User Story 3 完整可用，管理員可獨立處理訂單流程 ⏳
 
 ---
 
