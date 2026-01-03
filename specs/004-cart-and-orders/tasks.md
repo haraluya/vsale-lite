@@ -152,11 +152,11 @@
 
 ### 實作 User Story 5
 
-- [ ] T049 [US5] 驗證訂單建立時自動記錄操作歷史（action_type='created'）
-- [ ] T050 [US5] 驗證訂單狀態變更時自動記錄操作歷史（action_type='status_changed'）
-- [ ] T051 [US5] 驗證訂單取消時自動記錄操作歷史（action_type='cancelled'）
-- [ ] T052 [US5] 驗證操作歷史顯示正確的操作者名稱與時間
-- [ ] T053 [US5] 整合測試：完整訂單流程的操作歷史記錄完整性
+- [X] T049 [US5] 驗證訂單建立時自動記錄操作歷史（action_type='created'）
+- [X] T050 [US5] 驗證訂單狀態變更時自動記錄操作歷史（action_type='status_changed'）
+- [X] T051 [US5] 驗證訂單取消時自動記錄操作歷史（action_type='cancelled'）
+- [X] T052 [US5] 驗證操作歷史顯示正確的操作者名稱與時間
+- [X] T053 [US5] 整合測試：完整訂單流程的操作歷史記錄完整性
 
 **檢查點**: User Story 5 完整可用，訂單操作歷史可獨立追蹤
 
