@@ -2,7 +2,8 @@
 
 import { createClient as createSupabaseClient, createAdminClient } from '@/lib/supabase/server'
 import { createClientSchema, updateClientSchema, updatePasswordSchema } from '@/lib/validations/user.schema'
-import type { ActionResult, Client } from '@/types'
+import { updateClientSchema as updateClientSchemaV2 } from '@/lib/validations/client.schema'
+import type { ActionResult, Client, Profile } from '@/types'
 import { checkAuth } from './helpers'
 import { revalidatePath } from 'next/cache'
 
@@ -288,7 +289,7 @@ export async function getClients(params?: {
     return { clients: [], total: 0, page, limit }
   }
 
-  // 轉換資料格式
+  // 轉換資料格式 (Feature 007: 新增 address 與 admin_notes 摘要)
   const clients: Client[] = (data || []).map((item: any) => ({
     id: item.id,
     phone: item.phone,
@@ -297,6 +298,8 @@ export async function getClients(params?: {
     tier_id: item.tier_id,
     tier_name: item.tiers?.name,
     notes: item.notes,
+    address: item.address,  // 🆕 Feature 007
+    admin_notes: item.admin_notes,  // 🆕 Feature 007
     created_at: item.created_at,
     updated_at: item.updated_at,
   }))
@@ -452,6 +455,200 @@ export async function updateClientPassword(
     return {
       success: false,
       message: error instanceof Error ? error.message : '更新密碼失敗',
+    }
+  }
+}
+
+// ===================================
+// Feature 007: 客戶資訊完整化管理
+// ===================================
+
+/**
+ * 查詢客戶資料 (客戶端) - 排除 admin_notes
+ * Feature 007 - User Story 2
+ */
+export async function getClientProfile(clientId: string): Promise<ActionResult<Omit<Profile, 'admin_notes'>>> {
+  try {
+    // 1. 驗證權限 (僅客戶可查詢自己的資料)
+    const { user, profile } = await checkAuth('client')
+
+    // 2. 權限檢查 - 客戶僅能查詢自己的資料
+    if (profile.role === 'client' && user.id !== clientId) {
+      return {
+        success: false,
+        message: '您無權查詢此客戶資料',
+      }
+    }
+
+    const supabase = await createSupabaseClient()
+
+    // 3. 查詢客戶資料 (明確排除 admin_notes)
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, phone, email, role, tier_id, display_name, notes, address, created_at')
+      .eq('id', clientId)
+      .single()
+
+    if (error) {
+      console.error('查詢客戶資料失敗:', error)
+      return {
+        success: false,
+        message: '查詢失敗',
+      }
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        message: '客戶不存在',
+      }
+    }
+
+    return {
+      success: true,
+      data: data as Omit<Profile, 'admin_notes'>,
+    }
+  } catch (error) {
+    console.error('getClientProfile error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢失敗',
+    }
+  }
+}
+
+/**
+ * 查詢客戶資料 (管理端) - 包含 admin_notes
+ * Feature 007 - User Story 2
+ */
+export async function getAdminClientProfile(clientId: string): Promise<ActionResult<Profile>> {
+  try {
+    // 1. 驗證權限 (僅管理員)
+    await checkAuth('admin')
+
+    const adminClient = createAdminClient()
+
+    // 2. 查詢客戶資料 (包含所有欄位)
+    const { data, error } = await adminClient
+      .from('profiles')
+      .select('*')
+      .eq('id', clientId)
+      .single()
+
+    if (error) {
+      console.error('查詢客戶資料失敗:', error)
+      return {
+        success: false,
+        message: '查詢失敗',
+      }
+    }
+
+    if (!data) {
+      return {
+        success: false,
+        message: '客戶不存在',
+      }
+    }
+
+    return {
+      success: true,
+      data: data as Profile,
+    }
+  } catch (error) {
+    console.error('getAdminClientProfile error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢失敗',
+    }
+  }
+}
+
+/**
+ * 更新客戶資料 V2 (管理端) - 支援 address 與 admin_notes
+ * Feature 007 - User Story 2
+ */
+export async function updateClientV2(
+  input: {
+    clientId: string
+    displayName?: string
+    tierId?: string
+    address?: string | null
+    adminNotes?: string | null
+  }
+): Promise<ActionResult<{ id: string }>> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 驗證輸入
+    const validatedFields = updateClientSchemaV2.safeParse(input)
+
+    if (!validatedFields.success) {
+      return {
+        success: false,
+        errors: validatedFields.error.flatten().fieldErrors,
+        message: '驗證失敗',
+      }
+    }
+
+    const adminClient = createAdminClient()
+
+    // 3. 檢查客戶是否存在
+    const { data: existingClient } = await adminClient
+      .from('profiles')
+      .select('id, role')
+      .eq('id', input.clientId)
+      .single()
+
+    if (!existingClient) {
+      return {
+        success: false,
+        message: '客戶不存在',
+      }
+    }
+
+    if (existingClient.role !== 'client') {
+      return {
+        success: false,
+        message: '此帳號不是客戶',
+      }
+    }
+
+    // 4. 準備更新資料
+    const updateData: any = {}
+    if (validatedFields.data.displayName !== undefined) updateData.display_name = validatedFields.data.displayName
+    if (validatedFields.data.tierId !== undefined) updateData.tier_id = validatedFields.data.tierId
+    if (validatedFields.data.address !== undefined) updateData.address = validatedFields.data.address
+    if (validatedFields.data.adminNotes !== undefined) updateData.admin_notes = validatedFields.data.adminNotes
+
+    // 5. 更新客戶資料
+    const { error } = await adminClient
+      .from('profiles')
+      .update(updateData)
+      .eq('id', input.clientId)
+
+    if (error) {
+      console.error('更新客戶失敗:', error)
+      return {
+        success: false,
+        message: '更新失敗,請稍後再試',
+      }
+    }
+
+    // 6. Revalidate
+    revalidatePath('/admin/users')
+    revalidatePath(`/admin/users/${input.clientId}`)
+
+    return {
+      success: true,
+      data: { id: input.clientId },
+      message: '客戶更新成功',
+    }
+  } catch (error) {
+    console.error('updateClientV2 error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '更新失敗',
     }
   }
 }

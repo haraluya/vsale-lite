@@ -148,6 +148,12 @@ export function ClientTable({
                   顯示名稱
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-bold">
+                  地址
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-bold">
+                  備註
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-bold">
                   會員等級
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-bold">
@@ -161,57 +167,77 @@ export function ClientTable({
             <tbody className="divide-y-2 divide-gray-200">
               {clients.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                     {search || selectedTierId
                       ? '查無符合條件的客戶'
                       : '尚無客戶資料,點擊「快速開戶」建立第一位客戶'}
                   </td>
                 </tr>
               ) : (
-                clients.map((client) => (
-                  <tr key={client.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm font-mono">
-                      {client.phone}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {client.display_name || '-'}
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className="inline-block rounded-none border-2 border-black bg-blue-100 px-3 py-1 text-xs font-bold">
-                        {client.tier_name || '未設定'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {new Date(client.created_at).toLocaleDateString('zh-TW')}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                        <Link href={`/admin/clients/${client.id}/edit`}>
-                          <Button size="sm" variant="secondary">
-                            <Edit className="h-3 w-3 mr-1" />
-                            編輯
+                clients.map((client) => {
+                  // 地址與備註摘要 (最多 30 字)
+                  const addressPreview = client.address
+                    ? client.address.length > 30
+                      ? client.address.substring(0, 30) + '...'
+                      : client.address
+                    : '-'
+                  const notesPreview = client.admin_notes
+                    ? client.admin_notes.length > 30
+                      ? client.admin_notes.substring(0, 30) + '...'
+                      : client.admin_notes
+                    : '-'
+
+                  return (
+                    <tr key={client.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 text-sm font-mono">
+                        {client.phone}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        {client.display_name || '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600" title={client.address || ''}>
+                        {addressPreview}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600" title={client.admin_notes || ''}>
+                        <span className="text-yellow-700">{notesPreview}</span>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className="inline-block rounded-none border-2 border-black bg-blue-100 px-3 py-1 text-xs font-bold">
+                          {client.tier_name || '未設定'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {new Date(client.created_at).toLocaleDateString('zh-TW')}
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <Link href={`/admin/clients/${client.id}/edit`}>
+                            <Button size="sm" variant="secondary">
+                              <Edit className="h-3 w-3 mr-1" />
+                              編輯
+                            </Button>
+                          </Link>
+                          <Link href={`/admin/clients/${client.id}/password`}>
+                            <Button size="sm" variant="secondary">
+                              <Key className="h-3 w-3 mr-1" />
+                              改密碼
+                            </Button>
+                          </Link>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleDeleteClick(client)}
+                            disabled={isDeleting}
+                            className="border-3 border-black bg-red-500 text-white hover:bg-red-600"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            刪除
                           </Button>
-                        </Link>
-                        <Link href={`/admin/clients/${client.id}/password`}>
-                          <Button size="sm" variant="secondary">
-                            <Key className="h-3 w-3 mr-1" />
-                            改密碼
-                          </Button>
-                        </Link>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleDeleteClick(client)}
-                          disabled={isDeleting}
-                          className="border-3 border-black bg-red-500 text-white hover:bg-red-600"
-                        >
-                          <Trash2 className="h-3 w-3 mr-1" />
-                          刪除
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>

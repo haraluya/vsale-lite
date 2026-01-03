@@ -51,6 +51,8 @@ export type Client = {
   tier_id: string | null
   tier_name?: string | null
   notes?: string | null
+  address?: string | null  // 🆕 Feature 007: 常用地址
+  admin_notes?: string | null  // 🆕 Feature 007: 管理員備註
   created_at: string
   updated_at: string
 }

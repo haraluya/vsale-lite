@@ -1,6 +1,6 @@
 import { getTiers } from '@/lib/actions/tiers'
 import { getClients } from '@/lib/actions/clients'
-import { ClientForm } from '@/components/admin/client-form'
+import { ClientFormV2 } from '@/components/admin/client-form-v2'
 import { notFound } from 'next/navigation'
 
 export default async function EditClientPage({
@@ -31,7 +31,7 @@ export default async function EditClientPage({
       </div>
 
       <div className="card-neo bg-white">
-        <ClientForm client={client} tiers={tiers} mode="edit" />
+        <ClientFormV2 client={client} tiers={tiers} />
       </div>
     </div>
   )
