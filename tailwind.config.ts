@@ -23,6 +23,15 @@ const config: Config = {
         },
         surface: '#FFFFFF',
         background: '#F3F4F6',
+        // 品牌色彩系統 (006-ux-enhancement)
+        brand: {
+          primary: '#1E40AF',    // 深藍 (主色)
+          secondary: '#F97316',  // 橘色 (輔色)
+          success: '#22C55E',    // 綠色 (成功狀態)
+          warning: '#EAB308',    // 黃色 (警告狀態)
+          error: '#EF4444',      // 紅色 (錯誤狀態)
+          info: '#3B82F6',       // 藍色 (資訊狀態)
+        },
       },
     },
   },

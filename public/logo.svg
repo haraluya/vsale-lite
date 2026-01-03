@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- V 字母與購物車組合 Logo -->
+
+  <!-- V 字母 (左側) -->
+  <path d="M10 10 L25 50 L40 10"
+        stroke="#000"
+        stroke-width="3"
+        fill="none"
+        stroke-linejoin="miter"/>
+
+  <!-- 購物車主體 (中間) -->
+  <rect x="50" y="25"
+        width="35"
+        height="25"
+        stroke="#000"
+        stroke-width="3"
+        fill="#1E40AF"/>
+
+  <!-- 購物車把手 -->
+  <path d="M85 25 L90 20 L90 15"
+        stroke="#000"
+        stroke-width="3"
+        fill="none"
+        stroke-linecap="square"/>
+
+  <!-- 購物車輪子 -->
+  <circle cx="60" cy="55" r="4" fill="#000"/>
+  <circle cx="75" cy="55" r="4" fill="#000"/>
+
+  <!-- Vsale 文字 -->
+  <text x="100" y="42"
+        font-family="Arial, sans-serif"
+        font-weight="bold"
+        font-size="32"
+        fill="#000">Vsale</text>
+
+  <!-- 底線裝飾 (Neo-Brutalism 風格) -->
+  <rect x="100" y="48"
+        width="95"
+        height="3"
+        fill="#1E40AF"/>
+</svg>

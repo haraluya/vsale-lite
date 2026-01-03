@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Vsale Favicon - 簡化版圖示 -->
+  <rect width="32" height="32" fill="#1E40AF"/>
+
+  <!-- V 字母 (簡化) -->
+  <path d="M4 8 L12 24 L20 8"
+        stroke="#FFF"
+        stroke-width="2.5"
+        fill="none"
+        stroke-linejoin="miter"/>
+
+  <!-- 購物車 (簡化) -->
+  <rect x="20" y="14"
+        width="10"
+        height="8"
+        stroke="#FFF"
+        stroke-width="2"
+        fill="none"/>
+
+  <!-- 購物車輪子 -->
+  <circle cx="22" cy="26" r="1.5" fill="#FFF"/>
+  <circle cx="28" cy="26" r="1.5" fill="#FFF"/>
+</svg>
