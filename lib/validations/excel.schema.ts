@@ -11,6 +11,14 @@ export const clientImportSchema = z.object({
     .max(50, '姓名最多 50 個字元'),
   會員等級: z.string()
     .min(1, '會員等級不可為空'),
+  常用地址: z.string()
+    .max(200, '常用地址最多 200 個字元')
+    .optional()
+    .transform(val => val || undefined), // 空字串轉為 undefined
+  備註: z.string()
+    .max(500, '備註最多 500 個字元')
+    .optional()
+    .transform(val => val || undefined), // 空字串轉為 undefined
   密碼: z.string()
     .min(6, '密碼至少 6 個字元')
     .optional(),

@@ -602,7 +602,7 @@ export async function exportClients(filters?: {
     // 3. 查詢客戶資料
     let query = adminClient
       .from('profiles')
-      .select('phone, display_name, tier:tiers(name), created_at')
+      .select('phone, display_name, tier:tiers(name), address, admin_notes, created_at')
       .eq('role', 'client')
       .order('created_at', { ascending: false })
 
@@ -641,6 +641,8 @@ export async function exportClients(filters?: {
       '手機號碼': c.phone || '',
       '姓名': c.display_name || '',
       '會員等級': c.tier?.name || '',
+      '常用地址': c.address || '',
+      '備註': c.admin_notes || '',
       '建立時間': new Date(c.created_at).toLocaleDateString('zh-TW'),
     }))
 
@@ -655,7 +657,7 @@ export async function exportClients(filters?: {
         file_name: fileName,
         file_buffer: Array.from(excelBuffer), // Convert Buffer to number array
         row_count: clients.length,
-        columns: ['手機號碼', '姓名', '會員等級', '建立時間'],
+        columns: ['手機號碼', '姓名', '會員等級', '常用地址', '備註', '建立時間'],
       },
       message: `成功匯出 ${clients.length} 筆客戶資料`,
     }
@@ -736,6 +738,8 @@ export async function importClients(
       phone: string
       name: string
       tier_id: string
+      address?: string
+      admin_notes?: string
       password: string
     }> = []
 
@@ -800,6 +804,8 @@ export async function importClients(
           phone: row['手機號碼'],
           name: row['姓名'],
           tier_id: tierId,
+          address: row['常用地址'] || undefined,
+          admin_notes: row['備註'] || undefined,
           password: row['密碼'] || row['手機號碼'].slice(-6), // 預設密碼為手機後 6 碼
         })
       } catch (error) {
@@ -862,6 +868,8 @@ export async function importClients(
             role: 'client',
             tier_id: client.tier_id,
             display_name: client.name,
+            address: client.address,
+            admin_notes: client.admin_notes,
           })
 
         if (insertError) {
@@ -939,6 +947,8 @@ export async function downloadClientTemplate(): Promise<ActionResult<{
         '手機號碼': '0912345678',
         '姓名': '範例姓名',
         '會員等級': exampleTierName,
+        '常用地址': '台北市信義區信義路五段7號',
+        '備註': '這是管理員備註',
         '密碼': '123456',
       },
     ]
@@ -953,7 +963,7 @@ export async function downloadClientTemplate(): Promise<ActionResult<{
         file_name: '客戶匯入範本.xlsx',
         file_buffer: Array.from(excelBuffer), // Convert Buffer to number array
         row_count: 1,
-        columns: ['手機號碼', '姓名', '會員等級', '密碼'],
+        columns: ['手機號碼', '姓名', '會員等級', '常用地址', '備註', '密碼'],
       },
       message: '範本下載成功',
     }
