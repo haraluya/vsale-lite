@@ -57,12 +57,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] 實作 searchProducts Server Action (lib/actions/products.ts)
-- [ ] T015 [P] [US1] 建立搜尋欄元件 (components/ui/search-bar.tsx)
-- [ ] T016 [US1] 整合搜尋欄到商店首頁 (app/(shop)/store/page.tsx)
-- [ ] T017 [US1] 實作防抖機制 (300ms) 於搜尋欄元件
-- [ ] T018 [US1] 新增載入指示器與無結果提示
-- [ ] T019 [US1] 建立 products.name 索引優化搜尋效能 (Migration 或手動執行)
+- [X] T014 [P] [US1] 實作 searchProducts Server Action (lib/actions/products.ts)
+- [X] T015 [P] [US1] 建立搜尋欄元件 (components/ui/search-bar.tsx)
+- [X] T016 [US1] 整合搜尋欄到商店首頁 (app/(shop)/store/page.tsx)
+- [X] T017 [US1] 實作防抖機制 (300ms) 於搜尋欄元件
+- [X] T018 [US1] 新增載入指示器與無結果提示
+- [X] T019 [US1] 建立 products.name 索引優化搜尋效能 (Migration 或手動執行)
 
 **Checkpoint**: 搜尋功能完整可用，可獨立測試
 
@@ -82,13 +82,13 @@
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] 實作 filterProducts Server Action (lib/actions/products.ts)
-- [ ] T021 [P] [US2] 建立篩選按鈕元件 (components/ui/filter-buttons.tsx)
-- [ ] T022 [US2] 整合篩選按鈕到商店首頁 (app/(shop)/store/page.tsx)
-- [ ] T023 [US2] 實作多選篩選邏輯 (支援類別與標籤組合)
-- [ ] T024 [US2] 新增篩選結果數量即時顯示
-- [ ] T025 [US2] 新增清除篩選按鈕
-- [ ] T026 [US2] 實作篩選狀態持久化 (localStorage 或 URL query)
+- [X] T020 [P] [US2] 實作 filterProducts Server Action (lib/actions/products.ts)
+- [X] T021 [P] [US2] 建立篩選按鈕元件 (components/ui/filter-buttons.tsx)
+- [X] T022 [US2] 整合篩選按鈕到商店首頁 (app/(shop)/store/page.tsx)
+- [X] T023 [US2] 實作多選篩選邏輯 (支援類別與標籤組合)
+- [X] T024 [US2] 新增篩選結果數量即時顯示
+- [X] T025 [US2] 新增清除篩選按鈕
+- [X] T026 [US2] 實作篩選狀態持久化 (localStorage 或 URL query)
 
 **Checkpoint**: 篩選功能完整可用，可獨立測試
 
@@ -107,11 +107,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T027 [P] [US3] 建立麵包屑導航元件 (components/shop/breadcrumb.tsx)
-- [ ] T028 [US3] 整合 Logo 到前台 Layout (app/(shop)/layout.tsx)
-- [ ] T029 [US3] 實作導航列固定置頂 (sticky positioning)
-- [ ] T030 [US3] 實作麵包屑導航路徑邏輯
-- [ ] T031 [US3] 手機版導航列精簡優化 (僅顯示 Logo 圖示)
+- [X] T027 [P] [US3] 建立麵包屑導航元件 (components/shop/breadcrumb.tsx)
+- [X] T028 [US3] 整合 Logo 到前台 Layout (app/(shop)/layout.tsx)
+- [X] T029 [US3] 實作導航列固定置頂 (sticky positioning)
+- [X] T030 [US3] 實作麵包屑導航路徑邏輯
+- [X] T031 [US3] 手機版導航列精簡優化 (僅顯示 Logo 圖示)
 
 **Checkpoint**: 導航功能完整可用，可獨立測試
 
@@ -130,12 +130,12 @@
 
 ### Implementation for User Story 4
 
-- [ ] T032 [P] [US4] 建立標籤徽章元件 (components/ui/tag-badge.tsx)
-- [ ] T033 [US4] 更新商品卡片元件新增庫存色彩邏輯 (components/shop/product-card.tsx)
-- [ ] T034 [US4] 實作標籤徽章顯示邏輯 (最多顯示 2 個)
-- [ ] T035 [US4] 優化價格顯示樣式 (原價刪除線 + 您的價格醒目)
-- [ ] T036 [US4] 實作缺貨商品禁用加入購物車按鈕
-- [ ] T037 [US4] 新增預購商品提示文字
+- [X] T032 [P] [US4] 建立標籤徽章元件 (components/ui/tag-badge.tsx)
+- [X] T033 [US4] 更新商品卡片元件新增庫存色彩邏輯 (components/shop/product-card.tsx)
+- [X] T034 [US4] 實作標籤徽章顯示邏輯 (最多顯示 2 個)
+- [X] T035 [US4] 優化價格顯示樣式 (原價刪除線 + 您的價格醒目)
+- [X] T036 [US4] 實作缺貨商品禁用加入購物車按鈕
+- [X] T037 [US4] 新增預購商品提示文字
 
 **Checkpoint**: 商品卡片視覺優化完成，可獨立測試
 
@@ -153,10 +153,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T038 [US5] 更新後台側邊欄元件新增視覺分類 (components/admin/sidebar.tsx)
-- [ ] T039 [US5] 實作功能模組分隔線與標題
-- [ ] T040 [US5] 實作當前頁面高亮邏輯
-- [ ] T041 [US5] 調整側邊欄色彩與間距符合設計規範
+- [X] T038 [US5] 更新後台側邊欄元件新增視覺分類 (components/admin/sidebar.tsx)
+- [X] T039 [US5] 實作功能模組分隔線與標題
+- [X] T040 [US5] 實作當前頁面高亮邏輯
+- [X] T041 [US5] 調整側邊欄色彩與間距符合設計規範
 
 **Checkpoint**: 側邊欄視覺分類完成，可獨立測試
 
@@ -230,7 +230,7 @@
 
 ### Implementation for User Story 8
 
-- [ ] T059 [US8] 實作 deleteOrder Server Action (lib/actions/orders.ts)
+- [X] T059 [US8] 實作 deleteOrder Server Action (lib/actions/orders.ts)
 - [ ] T060 [US8] 更新訂單詳情頁新增刪除按鈕 (app/(admin)/admin/orders/[id]/page.tsx)
 - [ ] T061 [US8] 實作刪除確認對話框元件
 - [ ] T062 [US8] 實作訂單狀態檢查邏輯 (僅允許刪除 pending)
@@ -254,9 +254,9 @@
 
 ### Implementation for User Story 9
 
-- [ ] T065 [P] [US9] 實作 updateProductTags Server Action (lib/actions/tags.ts)
-- [ ] T066 [P] [US9] 實作 batchUpdateProductTags Server Action (lib/actions/tags.ts)
-- [ ] T067 [P] [US9] 實作 getAvailableTags Server Action (lib/actions/tags.ts)
+- [X] T065 [P] [US9] 實作 updateProductTags Server Action (lib/actions/tags.ts)
+- [X] T066 [P] [US9] 實作 batchUpdateProductTags Server Action (lib/actions/tags.ts)
+- [X] T067 [P] [US9] 實作 getAvailableTags Server Action (lib/actions/tags.ts)
 - [ ] T068 [P] [US9] 建立標籤管理元件 (components/admin/tag-manager.tsx)
 - [ ] T069 [US9] 整合標籤管理到商品管理頁面 (app/(admin)/admin/products/page.tsx)
 - [ ] T070 [US9] 實作商品編輯頁面標籤輸入框

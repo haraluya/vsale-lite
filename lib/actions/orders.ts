@@ -10,6 +10,7 @@ import {
   type GetOrdersInput,
   type AddOrderCommentInput,
 } from '@/lib/validations/order.schema'
+import { deleteOrderSchema, type DeleteOrderInput } from '@/lib/validations/tags.schema'
 import type {
   ActionResult,
   OrderWithUser,
@@ -831,6 +832,103 @@ export async function getOrderTimeline(
     return {
       success: false,
       message: error instanceof Error ? error.message : '查詢訂單時間軸時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 刪除訂單 (Feature 006 - User Story 8)
+ * - 僅允許刪除 pending 狀態的訂單
+ * - 僅管理員可執行此操作
+ * - 記錄刪除操作於 order_timelines
+ */
+export async function deleteOrder(
+  input: DeleteOrderInput
+): Promise<ActionResult> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 僅管理員可刪除訂單
+    if (role !== 'admin') {
+      return {
+        success: false,
+        message: '僅管理員可執行此操作',
+      }
+    }
+
+    // 驗證輸入
+    const validated = deleteOrderSchema.safeParse(input)
+    if (!validated.success) {
+      return {
+        success: false,
+        message: '刪除訂單驗證失敗',
+        errors: validated.error.flatten().fieldErrors,
+      }
+    }
+
+    const { order_id, reason } = validated.data
+
+    // 查詢訂單狀態
+    const { data: order, error: fetchError } = await supabase
+      .from('orders')
+      .select('id, order_number, status')
+      .eq('id', order_id)
+      .single()
+
+    if (fetchError || !order) {
+      console.error('查詢訂單錯誤:', fetchError)
+      return {
+        success: false,
+        message: '訂單不存在',
+      }
+    }
+
+    // 僅允許刪除 pending 狀態的訂單
+    if (order.status !== 'pending') {
+      return {
+        success: false,
+        message: '僅允許刪除「待確認」狀態的訂單',
+      }
+    }
+
+    // 記錄刪除操作於 order_timelines
+    await supabase
+      .from('order_timelines')
+      .insert({
+        order_id: order.id,
+        action_type: 'deleted',
+        content: `管理員刪除訂單 (原因: ${reason || '未提供'})`,
+        actor_id: userId,
+        actor_role: role,
+      })
+
+    // 刪除訂單（CASCADE 會自動刪除 order_items 與 order_timelines）
+    const { error: deleteError } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', order_id)
+
+    if (deleteError) {
+      console.error('刪除訂單錯誤:', deleteError)
+      return {
+        success: false,
+        message: '刪除訂單時發生錯誤',
+      }
+    }
+
+    // 重新驗證相關頁面
+    revalidatePath('/admin/orders')
+
+    return {
+      success: true,
+      message: `訂單 ${order.order_number} 已刪除`,
+    }
+  } catch (error) {
+    console.error('deleteOrder error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '刪除訂單時發生未知錯誤',
     }
   }
 }
