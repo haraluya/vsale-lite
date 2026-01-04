@@ -4,9 +4,10 @@ import { AuditLogFilters } from '@/components/admin/AuditLogFilters'
 import { checkAuth } from '@/lib/actions/helpers'
 import { AuditActionType } from '@/types'
 
-export const metadata = {
-  title: '操作日誌 | Vsale-lite',
-  description: '查看所有後台操作記錄',
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('操作日誌', '查看所有後台操作記錄')
 }
 
 export default async function AuditLogsPage({

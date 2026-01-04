@@ -6,10 +6,10 @@ import { MemberForm } from '@/components/admin/MemberForm'
 import { Button } from '@/components/ui/button'
 import { redirect } from 'next/navigation'
 import type { ActionResult } from '@/types'
+import { generatePageMetadata } from '@/lib/metadata'
 
-export const metadata = {
-  title: '新增成員 | Vsale-lite',
-  description: '建立新的工作人員帳號',
+export async function generateMetadata() {
+  return generatePageMetadata('新增成員', '建立新的工作人員帳號')
 }
 
 export default async function NewMemberPage() {

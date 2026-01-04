@@ -10,9 +10,10 @@ import { LogoUploader } from '@/components/admin/LogoUploader'
 import { updateSetting, uploadLogo, deleteLogo } from '@/lib/actions/system'
 import { revalidatePath } from 'next/cache'
 
-export const metadata = {
-  title: '系統設定 | Vsale-lite',
-  description: '管理系統設定、Logo 與網站參數',
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('系統設定', '管理系統設定、Logo 與網站參數')
 }
 
 export default async function SystemSettingsPage() {
@@ -34,10 +35,10 @@ export default async function SystemSettingsPage() {
 
   const settings = result.data
 
-  // Logo 設定
-  const logoSettings = settings.filter((s) =>
-    s.key.includes('_url') && s.value_type === 'image_url'
-  )
+  // Logo 設定 - 只保留 logo_url
+  const logoSetting = settings.find((s) => s.key === 'logo_url')
+
+  // 一般設定 - 排除所有 Logo 相關設定
   const generalSettings = settings.filter(
     (s) => !s.key.includes('_url') || s.value_type !== 'image_url'
   )
@@ -103,24 +104,19 @@ export default async function SystemSettingsPage() {
       {/* Logo 上傳區塊 */}
       <div>
         <h2 className="text-xl font-black mb-4">Logo 管理</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {logoSettings.map((setting) => {
-            const logoType = setting.key.replace('_url', '').replace('_', '-') as
-              | 'logo'
-              | 'logo-icon'
-              | 'favicon'
-
-            return (
-              <LogoUploader
-                key={setting.key}
-                logoType={logoType}
-                currentUrl={setting.value as string}
-                uploadAction={handleUploadLogo}
-                deleteAction={handleDeleteLogo}
-              />
-            )
-          })}
-        </div>
+        <p className="mb-4 text-sm text-gray-600">
+          上傳的 Logo 會顯示在左上角（建議尺寸：200 × 60 像素）
+        </p>
+        {logoSetting && (
+          <div className="max-w-md">
+            <LogoUploader
+              logoType="logo"
+              currentUrl={logoSetting.value as string}
+              uploadAction={handleUploadLogo}
+              deleteAction={handleDeleteLogo}
+            />
+          </div>
+        )}
       </div>
 
       {/* 一般設定 */}

@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import type { ActionResult } from '@/types'
+import { generatePageMetadata } from '@/lib/metadata'
 
-export const metadata = {
-  title: '編輯成員 | Vsale-lite',
-  description: '修改工作人員資料',
+export async function generateMetadata() {
+  return generatePageMetadata('編輯成員', '修改工作人員資料')
 }
 
 export default async function EditAdminPage({

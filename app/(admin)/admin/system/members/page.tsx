@@ -6,10 +6,10 @@ import { checkAuth } from '@/lib/actions/helpers'
 import { MemberListClient } from '@/components/admin/MemberListClient'
 import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading'
+import { generatePageMetadata } from '@/lib/metadata'
 
-export const metadata = {
-  title: '成員管理 | Vsale-lite',
-  description: '管理工作人員帳號',
+export async function generateMetadata() {
+  return generatePageMetadata('成員管理', '管理工作人員帳號')
 }
 
 async function MembersContent() {

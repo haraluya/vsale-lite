@@ -98,7 +98,7 @@ export function LogoUploader({
   }
 
   const logoTypeLabels = {
-    logo: '完整版 Logo',
+    logo: '網站 Logo',
     'logo-icon': '圖示版 Logo',
     favicon: 'Favicon',
   }
