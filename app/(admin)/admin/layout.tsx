@@ -10,7 +10,7 @@
  * - 平板/桌面版側邊欄 (Sidebar)
  */
 
-import { Sidebar } from '@/components/admin/Sidebar'
+import { Sidebar } from '@/components/admin/sidebar'
 import { MobileNav } from '@/components/admin/mobile-nav'
 
 export default function AdminLayout({

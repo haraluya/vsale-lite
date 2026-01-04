@@ -63,8 +63,8 @@ export function Navbar({ user }: NavbarProps) {
         <div className="flex h-14 md:h-16 items-center justify-between">
           {/* Logo / 品牌 */}
           <div className="flex items-center gap-4">
-            <Logo variant="full" className="hidden sm:block" />
-            <Logo variant="icon" className="block sm:hidden" />
+            <Logo variant="full" href="/store" className="hidden sm:block" />
+            <Logo variant="icon" href="/store" className="block sm:hidden" />
             <span className="hidden text-sm text-gray-600 lg:block">批發訂貨系統</span>
           </div>
 
