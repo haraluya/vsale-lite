@@ -5,25 +5,27 @@
  * Feature: 008-system-admin (T059)
  */
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Upload, Trash2 } from 'lucide-react'
 
 interface LogoUploaderProps {
   logoType: 'logo' | 'logo-icon' | 'favicon'
   currentUrl?: string
-  onUpload: (file: File) => Promise<void>
-  onDelete: () => Promise<void>
+  uploadAction: (formData: FormData) => Promise<void>
+  deleteAction: (formData: FormData) => Promise<void>
 }
 
 export function LogoUploader({
   logoType,
   currentUrl,
-  onUpload,
-  onDelete,
+  uploadAction,
+  deleteAction,
 }: LogoUploaderProps) {
   const [uploading, setUploading] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const deleteFormRef = useRef<HTMLFormElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -31,7 +33,10 @@ export function LogoUploader({
 
     setUploading(true)
     try {
-      await onUpload(file)
+      const formData = new FormData()
+      formData.append('logoType', logoType)
+      formData.append('file', file)
+      await uploadAction(formData)
       e.target.value = '' // 清空輸入框
     } finally {
       setUploading(false)
@@ -43,7 +48,9 @@ export function LogoUploader({
 
     setDeleting(true)
     try {
-      await onDelete()
+      const formData = new FormData()
+      formData.append('logoType', logoType)
+      await deleteAction(formData)
     } finally {
       setDeleting(false)
     }

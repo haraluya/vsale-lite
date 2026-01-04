@@ -7,20 +7,23 @@
 
 import { useState } from 'react'
 import { ParsedSetting } from '@/types'
-import { Button } from '@/components/ui/button'
 
 interface SystemSettingsFormProps {
   settings: ParsedSetting[]
-  onUpdate: (key: string, value: string | number | boolean) => Promise<void>
+  updateAction: (formData: FormData) => Promise<void>
 }
 
-export function SystemSettingsForm({ settings, onUpdate }: SystemSettingsFormProps) {
+export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFormProps) {
   const [loading, setLoading] = useState<string | null>(null)
 
-  const handleSubmit = async (key: string, value: string | number | boolean) => {
+  const handleSubmit = async (key: string, value: string | number | boolean, valueType: string) => {
     setLoading(key)
     try {
-      await onUpdate(key, value)
+      const formData = new FormData()
+      formData.append('key', key)
+      formData.append('value', String(value))
+      formData.append('valueType', valueType)
+      await updateAction(formData)
     } finally {
       setLoading(null)
     }
@@ -46,7 +49,7 @@ export function SystemSettingsForm({ settings, onUpdate }: SystemSettingsFormPro
                   type="checkbox"
                   defaultChecked={setting.value as boolean}
                   className="h-5 w-5 rounded border-2 border-black"
-                  onChange={(e) => handleSubmit(setting.key, e.target.checked)}
+                  onChange={(e) => handleSubmit(setting.key, e.target.checked, setting.value_type)}
                   disabled={loading === setting.key}
                 />
               )}
@@ -56,7 +59,7 @@ export function SystemSettingsForm({ settings, onUpdate }: SystemSettingsFormPro
                   type="number"
                   defaultValue={setting.value as number}
                   className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
-                  onBlur={(e) => handleSubmit(setting.key, parseFloat(e.target.value))}
+                  onBlur={(e) => handleSubmit(setting.key, parseFloat(e.target.value), setting.value_type)}
                   disabled={loading === setting.key}
                 />
               )}
@@ -66,7 +69,7 @@ export function SystemSettingsForm({ settings, onUpdate }: SystemSettingsFormPro
                   type="text"
                   defaultValue={setting.value as string}
                   className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
-                  onBlur={(e) => handleSubmit(setting.key, e.target.value)}
+                  onBlur={(e) => handleSubmit(setting.key, e.target.value, setting.value_type)}
                   disabled={loading === setting.key}
                 />
               )}
@@ -78,7 +81,7 @@ export function SystemSettingsForm({ settings, onUpdate }: SystemSettingsFormPro
                   rows={4}
                   onBlur={(e) => {
                     try {
-                      handleSubmit(setting.key, JSON.parse(e.target.value))
+                      handleSubmit(setting.key, JSON.parse(e.target.value), setting.value_type)
                     } catch {
                       alert('JSON 格式錯誤')
                     }

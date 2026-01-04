@@ -42,10 +42,24 @@ export default async function SystemSettingsPage() {
     (s) => !s.key.includes('_url') || s.value_type !== 'image_url'
   )
 
-  // Server Actions
-  async function handleUpdateSetting(key: string, value: string | number | boolean) {
+  // Server Actions - 使用 bind 模式
+  async function handleUpdateSetting(formData: FormData) {
     'use server'
-    const result = await updateSetting({ key, value })
+    const key = formData.get('key') as string
+    const value = formData.get('value') as string
+    const valueType = formData.get('valueType') as string
+
+    // 解析值
+    let parsedValue: string | number | boolean
+    if (valueType === 'number') {
+      parsedValue = parseFloat(value)
+    } else if (valueType === 'boolean') {
+      parsedValue = value === 'true'
+    } else {
+      parsedValue = value
+    }
+
+    const result = await updateSetting({ key, value: parsedValue })
     if (result.success) {
       revalidatePath('/admin/system/settings')
     } else {
@@ -53,11 +67,11 @@ export default async function SystemSettingsPage() {
     }
   }
 
-  async function handleUploadLogo(
-    logoType: 'logo' | 'logo-icon' | 'favicon',
-    file: File
-  ) {
+  async function handleUploadLogo(formData: FormData) {
     'use server'
+    const logoType = formData.get('logoType') as 'logo' | 'logo-icon' | 'favicon'
+    const file = formData.get('file') as File
+
     const result = await uploadLogo({ logoType, file })
     if (result.success) {
       revalidatePath('/admin/system/settings')
@@ -66,8 +80,10 @@ export default async function SystemSettingsPage() {
     }
   }
 
-  async function handleDeleteLogo(logoType: 'logo' | 'logo-icon' | 'favicon') {
+  async function handleDeleteLogo(formData: FormData) {
     'use server'
+    const logoType = formData.get('logoType') as 'logo' | 'logo-icon' | 'favicon'
+
     const result = await deleteLogo(logoType)
     if (result.success) {
       revalidatePath('/admin/system/settings')
@@ -99,12 +115,8 @@ export default async function SystemSettingsPage() {
                 key={setting.key}
                 logoType={logoType}
                 currentUrl={setting.value as string}
-                onUpload={async (file) => {
-                  await handleUploadLogo(logoType, file)
-                }}
-                onDelete={async () => {
-                  await handleDeleteLogo(logoType)
-                }}
+                uploadAction={handleUploadLogo}
+                deleteAction={handleDeleteLogo}
               />
             )
           })}
@@ -114,7 +126,7 @@ export default async function SystemSettingsPage() {
       {/* 一般設定 */}
       <div>
         <h2 className="text-xl font-black mb-4">一般設定</h2>
-        <SystemSettingsForm settings={generalSettings} onUpdate={handleUpdateSetting} />
+        <SystemSettingsForm settings={generalSettings} updateAction={handleUpdateSetting} />
       </div>
     </div>
   )
