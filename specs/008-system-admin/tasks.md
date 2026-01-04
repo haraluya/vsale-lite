@@ -11,10 +11,10 @@
 
 ## 📊 實作進度總覽
 
-**更新時間**: 2026-01-05 (Feature 008 核心功能完成 - 準備合併)
+**更新時間**: 2026-01-05 (Feature 008 已合併到 master - 核心功能完成)
 **總任務數**: 86
-**已完成**: 73 任務 (85%)
-**待完成**: 13 任務 (15%)
+**已完成**: 74 任務 (86%)
+**待完成**: 12 任務 (14%)
 
 ### Phase 狀態
 
@@ -25,7 +25,7 @@
 | Phase 3: US1 管理員登入 | 6 | 6 | 100% | ✅ 完成 |
 | Phase 4: US2 成員管理 | 16 | 16 | 100% | ✅ 完成 |
 | Phase 5: US3 操作日誌 | 17 | 17 | 100% | ✅ 完成 |
-| Phase 6: US4 系統設定 | 19 | 11 | 58% | ✅ 核心完成 |
+| Phase 6: US4 系統設定 | 19 | 12 | 63% | ✅ 核心完成 |
 | Phase 7: US5 操作歷史 | 7 | 0 | 0% | 📋 UI 可選 |
 | Phase 8: Polish | 10 | 8 | 80% | ✅ 核心完成 |
 
@@ -62,24 +62,25 @@
 
 ### 下一步建議
 
-**當前狀態**: Feature 008 核心功能已完成 (84%) ✅
+**當前狀態**: ✅ Feature 008 已合併到 master (86% 完成)
 
-**已完成**:
-- ✅ Phase 1-5: 完整的成員管理與操作日誌系統
-- ✅ Phase 6: 系統設定後端 API + UI 元件（核心功能完整）
-- ✅ Phase 8: 程式碼品質保證（TypeScript 型別檢查通過）
+**已完成並合併**:
+- ✅ Phase 1-5: 完整的成員管理與操作日誌系統 (100%)
+- ✅ Phase 6: 系統設定核心功能（後端 API + UI 元件 + 操作日誌整合，63%）
+- ✅ Phase 8: 程式碼品質保證（TypeScript 型別檢查通過，80%）
 
-**待完成** (可選):
-1. **Phase 6 進階 UI** (9 任務): 設定分類、批次操作、匯入/匯出、歷史版本
-2. **Phase 7** (7 任務): 操作歷史時間軸元件與整合
-3. **Phase 8 測試** (2 任務): 完整測試流程與效能測試
+**待完成** (可選，不影響生產使用):
+1. **Phase 6 前台整合** (2 任務): T061 前台 Layout、T062 後台 Sidebar Logo
+2. **Phase 6 測試** (6 任務): T064-T069 系統設定測試項目
+3. **Phase 7** (7 任務): 操作歷史時間軸元件與整合
+4. **Phase 8 剩餘** (2 任務): T083 ESLint、T084-T085 測試
 
 **建議執行順序**:
-1. **優先**: 執行 TEST_CHECKLIST.md 中的測試項目（T030-T069, T084-T085）
-2. **可選**: 實作 Phase 7 操作歷史時間軸（提升管理體驗）
-3. **可選**: Phase 6 進階功能（依實際需求決定）
+1. **推薦**: T061-T062 前台整合（讓系統設定在前台生效）
+2. **可選**: Phase 7 操作歷史時間軸（提升管理體驗）
+3. **可選**: Phase 6 測試項目（品質驗證）
 
-**生產就緒度**: ✅ 當前系統已可投入生產使用
+**生產就緒度**: ✅ 核心系統已可投入生產使用
 
 ---
 
@@ -274,18 +275,18 @@
 
 ### UI Components for User Story 4
 
-- [x] T058 [P] [US4] 建立系統設定表單元件 `components/admin/SystemSettingsForm.tsx`
-- [x] T059 [P] [US4] 建立 Logo 上傳元件 `components/admin/LogoUploader.tsx`
+- [X] T058 [P] [US4] 建立系統設定表單元件 `components/admin/SystemSettingsForm.tsx`
+- [X] T059 [P] [US4] 建立 Logo 上傳元件 `components/admin/LogoUploader.tsx`
 
 ### Pages for User Story 4
 
-- [x] T060 [US4] 建立系統設定頁面 `app/(admin)/admin/system/settings/page.tsx`
+- [X] T060 [US4] 建立系統設定頁面 `app/(admin)/admin/system/settings/page.tsx`
 
 ### Integration for User Story 4
 
 - [ ] T061 [US4] 整合公開設定於前台 Layout `app/(shop)/layout.tsx`
 - [ ] T062 [US4] 整合公開設定於後台 Sidebar（顯示 Logo）
-- [ ] T063 [US4] 整合操作日誌記錄於系統設定變更
+- [X] T063 [US4] 整合操作日誌記錄於系統設定變更
 
 ### Testing for User Story 4
 
@@ -296,7 +297,7 @@
 - [ ] T068 [US4] 測試 Logo 檔案驗證（大小限制 2MB、格式限制）
 - [ ] T069 [US4] 驗證前台即時套用新設定（revalidatePath 生效）
 
-**Checkpoint**: 系統設定管理完整可用，前台即時套用變更
+**Checkpoint**: ✅ 系統設定管理核心功能完成（後端 API + UI + 操作日誌）
 
 ---
 
