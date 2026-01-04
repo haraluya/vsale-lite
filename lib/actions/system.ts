@@ -282,15 +282,33 @@ export async function uploadLogo(input: {
       }
     }
 
-    // 3. 上傳至 Supabase Storage
+    // 3. 刪除舊檔案（如果存在）
     const supabase = await createClient()
     const fileExt = input.file.name.split('.').pop()
     const filePath = `system/${input.logoType}.${fileExt}`
 
+    // 列出所有同名檔案（不同副檔名）
+    const { data: existingFiles } = await supabase.storage
+      .from('products')
+      .list('system', {
+        search: input.logoType,
+      })
+
+    // 刪除所有舊檔案
+    if (existingFiles && existingFiles.length > 0) {
+      const filesToDelete = existingFiles
+        .filter((file) => file.name.startsWith(input.logoType))
+        .map((file) => `system/${file.name}`)
+
+      if (filesToDelete.length > 0) {
+        await supabase.storage.from('products').remove(filesToDelete)
+      }
+    }
+
+    // 4. 上傳新檔案
     const { error: uploadError } = await supabase.storage
-      .from('products') // 使用現有的 products bucket
+      .from('products')
       .upload(filePath, input.file, {
-        upsert: true, // 覆寫舊圖片
         contentType: input.file.type,
       })
 
@@ -302,12 +320,12 @@ export async function uploadLogo(input: {
       }
     }
 
-    // 4. 取得公開 URL
+    // 5. 取得公開 URL
     const {
       data: { publicUrl },
     } = supabase.storage.from('products').getPublicUrl(filePath)
 
-    // 5. 更新 system_settings 表
+    // 6. 更新 system_settings 表
     const adminClient = createAdminClient()
     const settingKey = `${input.logoType.replace('-', '_')}_url` // logo-icon → logo_icon_url
 
@@ -328,7 +346,7 @@ export async function uploadLogo(input: {
       }
     }
 
-    // 6. 記錄操作日誌
+    // 7. 記錄操作日誌
     await logAudit({
       target_type: 'system_setting',
       target_id: settingKey,
@@ -338,7 +356,7 @@ export async function uploadLogo(input: {
       notes: `上傳 ${input.logoType} 圖片`,
     })
 
-    // 7. 執行全站重新驗證
+    // 8. 執行全站重新驗證
     revalidatePath('/', 'layout')
 
     return {
