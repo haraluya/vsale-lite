@@ -16,28 +16,57 @@ interface SystemSettingsFormProps {
 
 export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFormProps) {
   const [loading, setLoading] = useState(false)
-  const [changes, setChanges] = useState<Record<string, { value: string | number | boolean; valueType: string }>>({})
+  // 儲存當前的值（初始值 + 變更）
+  const [values, setValues] = useState<Record<string, string | number | boolean | object>>(() => {
+    const initialValues: Record<string, string | number | boolean | object> = {}
+    settings.forEach((setting) => {
+      initialValues[setting.key] = setting.value
+    })
+    return initialValues
+  })
 
-  const handleChange = (key: string, value: string | number | boolean, valueType: string) => {
-    setChanges((prev) => ({
-      ...prev,
-      [key]: { value, valueType },
-    }))
+  // 記錄哪些欄位被修改過
+  const [changedKeys, setChangedKeys] = useState<Set<string>>(new Set())
+
+  const handleChange = (key: string, value: string | number | boolean | object) => {
+    setValues((prev) => ({ ...prev, [key]: value }))
+    setChangedKeys((prev) => new Set(prev).add(key))
+  }
+
+  const handleCancel = () => {
+    // 重置為原始值
+    const resetValues: Record<string, string | number | boolean | object> = {}
+    settings.forEach((setting) => {
+      resetValues[setting.key] = setting.value
+    })
+    setValues(resetValues)
+    setChangedKeys(new Set())
   }
 
   const handleSave = async () => {
     setLoading(true)
     try {
-      // 依序更新所有變更的設定
-      for (const [key, { value, valueType }] of Object.entries(changes)) {
+      // 只更新有變更的設定
+      for (const key of changedKeys) {
+        const setting = settings.find((s) => s.key === key)
+        if (!setting) continue
+
         const formData = new FormData()
         formData.append('key', key)
-        formData.append('value', String(value))
-        formData.append('valueType', valueType)
+
+        // 根據型別轉換值
+        const value = values[key]
+        if (typeof value === 'object') {
+          formData.append('value', JSON.stringify(value))
+        } else {
+          formData.append('value', String(value))
+        }
+
+        formData.append('valueType', setting.value_type)
         await updateAction(formData)
       }
       // 清空變更記錄
-      setChanges({})
+      setChangedKeys(new Set())
     } catch (error) {
       console.error('儲存設定失敗:', error)
     } finally {
@@ -45,96 +74,94 @@ export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFor
     }
   }
 
-  const hasChanges = Object.keys(changes).length > 0
+  const hasChanges = changedKeys.size > 0
 
   return (
     <div className="space-y-4">
-      {settings.map((setting) => (
-        <div
-          key={setting.key}
-          className="rounded-none border-3 border-black bg-white p-4 shadow-neo"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <label className="block text-sm font-bold text-gray-700 mb-1">
-                {setting.description || setting.key}
-              </label>
-              <p className="text-xs text-gray-500 mb-2">{setting.key}</p>
+      {settings.map((setting) => {
+        const currentValue = values[setting.key]
+        const isChanged = changedKeys.has(setting.key)
 
-              {/* 根據型別顯示不同的輸入框 */}
-              {setting.value_type === 'boolean' && (
-                <input
-                  type="checkbox"
-                  defaultChecked={
-                    changes[setting.key]?.value !== undefined
-                      ? (changes[setting.key].value as boolean)
-                      : (setting.value as boolean)
-                  }
-                  className="h-5 w-5 rounded border-2 border-black"
-                  onChange={(e) => handleChange(setting.key, e.target.checked, setting.value_type)}
-                  disabled={loading}
-                />
-              )}
+        return (
+          <div
+            key={setting.key}
+            className={`rounded-none border-3 bg-white p-4 shadow-neo ${
+              isChanged ? 'border-blue-500' : 'border-black'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <label className="block text-sm font-bold text-gray-700 mb-1">
+                  {setting.description || setting.key}
+                  {isChanged && <span className="ml-2 text-xs text-blue-600">(已修改)</span>}
+                </label>
+                <p className="text-xs text-gray-500 mb-2">{setting.key}</p>
 
-              {setting.value_type === 'number' && (
-                <input
-                  type="number"
-                  defaultValue={
-                    changes[setting.key]?.value !== undefined
-                      ? (changes[setting.key].value as number)
-                      : (setting.value as number)
-                  }
-                  className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
-                  onChange={(e) => handleChange(setting.key, parseFloat(e.target.value), setting.value_type)}
-                  disabled={loading}
-                />
-              )}
+                {/* 根據型別顯示不同的輸入框 */}
+                {setting.value_type === 'boolean' && (
+                  <input
+                    type="checkbox"
+                    checked={currentValue as boolean}
+                    className="h-5 w-5 rounded border-2 border-black"
+                    onChange={(e) => handleChange(setting.key, e.target.checked)}
+                    disabled={loading}
+                  />
+                )}
 
-              {setting.value_type === 'text' && (
-                <input
-                  type="text"
-                  defaultValue={
-                    changes[setting.key]?.value !== undefined
-                      ? (changes[setting.key].value as string)
-                      : (setting.value as string)
-                  }
-                  className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
-                  onChange={(e) => handleChange(setting.key, e.target.value, setting.value_type)}
-                  disabled={loading}
-                />
-              )}
+                {setting.value_type === 'number' && (
+                  <input
+                    type="number"
+                    value={currentValue as number}
+                    className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
+                    onChange={(e) => handleChange(setting.key, parseFloat(e.target.value) || 0)}
+                    disabled={loading}
+                  />
+                )}
 
-              {setting.value_type === 'json' && (
-                <textarea
-                  defaultValue={
-                    changes[setting.key]?.value !== undefined
-                      ? JSON.stringify(changes[setting.key].value, null, 2)
-                      : JSON.stringify(setting.value, null, 2)
-                  }
-                  className="w-full rounded-none border-2 border-black px-3 py-2 font-mono text-sm"
-                  rows={4}
-                  onChange={(e) => {
-                    try {
-                      handleChange(setting.key, JSON.parse(e.target.value), setting.value_type)
-                    } catch {
-                      // JSON 格式錯誤時不更新
+                {setting.value_type === 'text' && (
+                  <input
+                    type="text"
+                    value={currentValue as string}
+                    className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
+                    onChange={(e) => handleChange(setting.key, e.target.value)}
+                    disabled={loading}
+                  />
+                )}
+
+                {setting.value_type === 'json' && (
+                  <textarea
+                    value={
+                      typeof currentValue === 'string'
+                        ? currentValue
+                        : JSON.stringify(currentValue, null, 2)
                     }
-                  }}
-                  disabled={loading}
-                />
-              )}
+                    className="w-full rounded-none border-2 border-black px-3 py-2 font-mono text-sm"
+                    rows={4}
+                    onChange={(e) => {
+                      try {
+                        const parsed = JSON.parse(e.target.value)
+                        handleChange(setting.key, parsed)
+                      } catch {
+                        // JSON 格式錯誤時允許繼續編輯
+                        handleChange(setting.key, e.target.value)
+                      }
+                    }}
+                    disabled={loading}
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
 
       {/* 儲存按鈕 */}
       <div className="flex justify-end gap-4 pt-4 border-t-3 border-black">
-        <Button type="button" variant="outline" onClick={() => setChanges({})} disabled={!hasChanges || loading}>
+        <Button type="button" variant="outline" onClick={handleCancel} disabled={!hasChanges || loading}>
           取消變更
         </Button>
         <Button type="button" onClick={handleSave} disabled={!hasChanges || loading}>
-          {loading ? '儲存中...' : `儲存設定 (${Object.keys(changes).length})`}
+          {loading ? '儲存中...' : `儲存設定 (${changedKeys.size})`}
         </Button>
       </div>
     </div>
