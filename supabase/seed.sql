@@ -53,12 +53,14 @@ BEGIN
         id,
         email,
         role,
-        display_name
+        display_name,
+        username
     ) VALUES (
         v_user_id,
         'admin@example.com',
         'admin',
-        '系統管理員'
+        '系統管理員',
+        'admin'
     );
 
     RAISE NOTICE '✅ 管理員帳號建立成功 (admin@example.com / password123)';

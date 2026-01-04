@@ -194,9 +194,46 @@ vsale/
 - Phase 1-7: ✅ 全部完成（MVP 核心功能）
 - Phase 8: ⏳ 進行中（Polish & 品質保證）
 
+#### 5. **008-system-admin**: 後台系統管理功能 ✅ **NEW!**
+**狀態**: Phase 1-5, Phase 6 後端, Phase 8 核心 已完成 (2026-01-04)
+
+**核心功能**:
+1. ✅ 管理員帳號管理（建立、編輯、刪除、重設密碼）
+2. ✅ 管理員登入系統（username 模式，無需 email）
+3. ✅ 操作日誌系統（完整稽核軌跡，五種操作類型）
+4. ✅ 系統設定 API（設定查詢、更新、Logo 上傳）
+
+**資料庫實體**:
+- `admin_users`: 管理員帳號表（username、密碼、暱稱）
+- `audit_logs`: 操作日誌表（操作類型、目標、變更內容、操作者快照）
+- `system_settings`: 系統設定表（key-value 儲存，支援多種型別）
+
+**Server Actions**:
+- 管理員管理: `createAdmin()`, `getAdmins()`, `updateAdmin()`, `resetPassword()`, `deleteAdmin()`
+- 操作日誌: `logAudit()`, `getAuditLogs()`, `getAuditLogsByTarget()`, `getAuditLogStats()`
+- 系統設定: `getSettings()`, `getPublicSettings()`, `updateSetting()`, `uploadLogo()`, `deleteLogo()`
+
+**UI 元件**:
+- 管理端：成員列表、成員表單、操作日誌列表、操作日誌篩選器、操作類型 Badge
+
+**文件位置**:
+- 規格: `specs/008-system-admin/spec.md`
+- 實作計畫: `specs/008-system-admin/plan.md`
+- 任務清單: `specs/008-system-admin/tasks.md`
+- API 合約: `specs/008-system-admin/contracts/`
+- 實作指引: `specs/008-system-admin/IMPLEMENTATION_GUIDE.md`
+- 測試報告: `specs/008-system-admin/TESTING_REPORT.md`
+
+**進度**: 69/86 任務完成 (80%)
+- Phase 1-5: ✅ 完整（成員管理 + 操作日誌）
+- Phase 6: 🔄 後端完成（系統設定 Server Actions）
+- Phase 7: 📋 UI 可選（操作歷史時間軸）
+- Phase 8: ✅ 核心完成（TypeScript 型別檢查通過）
+
 ### 🚀 待開發功能
 目前所有核心功能已完成，以下是可能的擴充方向：
-- 📊 **報表與分析**: 銷售報表、庫存分析
+- 🎨 **Phase 6-7 UI**: 系統設定前端介面、操作歷史時間軸元件
+- 📊 **報表與分析**: 銷售報表、庫存分析、操作日誌統計
 - 🔔 **通知系統**: 訂單狀態通知、庫存警示
 - 💳 **付款整合**: 金流串接
 - 🚚 **物流整合**: 出貨與追蹤

@@ -40,6 +40,7 @@ export type Profile = {
   notes: string | null
   address: string | null  // 🆕 Feature 007: 常用地址
   admin_notes: string | null  // 🆕 Feature 007: 管理員備註（僅管理端可見）
+  username: string | null  // 🆕 Feature 008: 管理員登入帳號（僅管理員使用）
 }
 
 // 客戶 (含等級資訊)
@@ -305,4 +306,109 @@ export type Announcement = {
   is_active: boolean
   created_at: string
   updated_at: string
+}
+
+// ===================================
+// 系統管理型別 (Feature 008)
+// ===================================
+
+// 管理員資料 (擴充 Profile)
+export type AdminProfile = Profile & {
+  username: string  // 管理員登入帳號（必填）
+  email: string  // Email（必填）
+}
+
+// 系統設定值類型
+export type SettingValueType = 'text' | 'number' | 'boolean' | 'json' | 'image_url'
+
+// 系統設定分類
+export type SettingCategory = 'general' | 'branding' | 'carousel' | 'system'
+
+// 系統設定
+export type SystemSetting = {
+  id: string
+  key: string
+  value: string  // TEXT 統一儲存，依 value_type 解析
+  value_type: SettingValueType
+  category: SettingCategory
+  is_public: boolean
+  description: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+// 已解析的系統設定（用於 Server Action 回傳）
+export type ParsedSetting = {
+  key: string
+  value: string | number | boolean | object
+  value_type: SettingValueType
+  description: string | null
+}
+
+// 操作類型
+export type AuditActionType = 'created' | 'updated' | 'deleted' | 'stock_adjusted' | 'comment_added'
+
+// 操作日誌
+export type AuditLog = {
+  id: string
+  target_type: string  // product, client, order, tier, series, etc.
+  target_id: string
+  action_type: AuditActionType
+  actor_id: string | null
+  actor_role: 'client' | 'admin' | null
+  actor_display_name: string | null
+  old_values: Record<string, any> | null  // JSONB
+  new_values: Record<string, any> | null  // JSONB
+  notes: string | null
+  created_at: string
+}
+
+// 操作日誌查詢參數
+export type GetAuditLogsParams = {
+  target_type?: string  // 篩選實體類型
+  target_id?: string  // 篩選特定實體
+  action_type?: string | string[] | AuditActionType  // 篩選操作類型（支援 URL 查詢參數的陣列形式）
+  actor_id?: string  // 篩選操作者
+  date_from?: string  // 起始日期 (YYYY-MM-DD)
+  date_to?: string  // 結束日期 (YYYY-MM-DD)
+  page?: number | string  // 頁碼 (預設 1，支援 URL 查詢參數的字串形式)
+  limit?: number | string  // 每頁筆數 (預設 20，支援 URL 查詢參數的字串形式)
+}
+
+// 操作日誌列表回應
+export type GetAuditLogsResponse = {
+  logs: AuditLog[]
+  total: number
+  page: number
+  limit: number
+}
+
+// 操作日誌統計
+export type AuditLogStats = {
+  total_logs: number
+  logs_by_type: {
+    action_type: AuditActionType
+    count: number
+  }[]
+  logs_by_actor: {
+    actor_id: string
+    actor_name: string
+    count: number
+  }[]
+}
+
+// 管理員查詢參數
+export type GetAdminsParams = {
+  search?: string  // 帳號或 Email 關鍵字
+  page?: number  // 頁碼 (預設 1)
+  limit?: number  // 每頁筆數 (預設 20)
+}
+
+// 管理員列表回應
+export type GetAdminsResponse = {
+  admins: AdminProfile[]
+  total: number
+  page: number
+  limit: number
 }

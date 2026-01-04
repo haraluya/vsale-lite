@@ -77,7 +77,8 @@ export function ClientTable({
 
     // 與快速開戶相同的格式，但密碼顯示為「請向管理員索取」
     const fullGuide = `【Vsale 訂貨系統 - 登入資訊】
-${displayName ? `\n客戶名稱: ${displayName}` : ''}
+
+客戶名稱: ${displayName || '未設定'}
 前台網址: ${loginUrl}
 登入電話: ${phone}
 登入密碼: (請向管理員索取)

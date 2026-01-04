@@ -20,6 +20,7 @@ import type {
   OrderItem,
   OrderTimelineWithActor,
 } from '@/types'
+import { logAudit } from './audit'
 
 /**
  * 訂單管理 Server Actions
@@ -732,6 +733,14 @@ export async function addOrderComment(
         message: '新增留言時發生錯誤',
       }
     }
+
+    // 記錄操作日誌 (Feature 008)
+    await logAudit({
+      target_type: 'order',
+      target_id: orderId,
+      action_type: 'comment_added',
+      notes: `留言內容: ${content}`,
+    })
 
     // 重新驗證相關頁面
     revalidatePath(`/admin/orders/${orderId}`)
