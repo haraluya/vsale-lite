@@ -117,8 +117,8 @@ export async function getAuditLogs(
       target_type: params.target_type === '' ? undefined : params.target_type,
       target_id: params.target_id === '' ? undefined : params.target_id,
       actor_id: params.actor_id,
-      date_from: params.date_from,
-      date_to: params.date_to,
+      date_from: params.date_from === '' ? undefined : params.date_from,
+      date_to: params.date_to === '' ? undefined : params.date_to,
       page: typeof params.page === 'string' ? parseInt(params.page, 10) : params.page,
       limit: typeof params.limit === 'string' ? parseInt(params.limit, 10) : params.limit,
     }

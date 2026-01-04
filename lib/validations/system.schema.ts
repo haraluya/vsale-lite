@@ -61,12 +61,16 @@ export const getAuditLogsSchema = z.object({
   actor_id: z.string().uuid({ message: '無效的使用者 ID 格式' }).optional(),
   date_from: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式應為 YYYY-MM-DD')
-    .optional(),
+    .trim()
+    .optional()
+    .transform((v) => (v === '' ? undefined : v))
+    .pipe(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式應為 YYYY-MM-DD').optional()),
   date_to: z
     .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式應為 YYYY-MM-DD')
-    .optional(),
+    .trim()
+    .optional()
+    .transform((v) => (v === '' ? undefined : v))
+    .pipe(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式應為 YYYY-MM-DD').optional()),
   page: z.number().int().min(1).optional().default(1),
   limit: z.number().int().min(1).max(100).optional().default(20),
 })
