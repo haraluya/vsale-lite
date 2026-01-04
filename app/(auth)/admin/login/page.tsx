@@ -46,7 +46,7 @@ export default async function AdminLoginPage() {
                 <h2 className="text-sm font-black uppercase tracking-wider text-white">管理後台</h2>
               </div>
               <p className="text-sm font-bold text-gray-300">
-                管理員請使用 Email 登入
+                管理員請使用帳號登入
               </p>
             </div>
 

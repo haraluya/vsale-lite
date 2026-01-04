@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { loginWithEmail } from '@/lib/actions/auth'
+import { loginWithUsername } from '@/lib/actions/admins'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,25 +11,29 @@ import type { ActionResult } from '@/types'
 
 export function AdminLoginForm() {
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
-    loginWithEmail,
+    async (_prevState: ActionResult | null, formData: FormData) => {
+      const username = formData.get('username') as string
+      const password = formData.get('password') as string
+      return await loginWithUsername({ username, password })
+    },
     null
   )
 
   return (
     <form action={formAction} className="space-y-6">
       <div>
-        <Label htmlFor="email">Email *</Label>
+        <Label htmlFor="username">帳號 *</Label>
         <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          placeholder="admin@example.com"
+          id="username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          placeholder="請輸入管理員帳號"
           required
           className="mt-2"
         />
-        {state && 'errors' in state && state.errors?.email && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.email[0]}</p>
+        {state && 'errors' in state && state.errors?.username && (
+          <p className="mt-2 text-sm text-red-500">{state.errors.username[0]}</p>
         )}
       </div>
 
