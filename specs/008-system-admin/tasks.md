@@ -95,27 +95,27 @@
 
 ### Server Actions for User Story 2
 
-- [ ] T018 [P] [US2] 實作 createAdmin Server Action 於 `lib/actions/admins.ts`
-- [ ] T019 [P] [US2] 實作 getAdmins Server Action 於 `lib/actions/admins.ts`
-- [ ] T020 [P] [US2] 實作 getAdminById Server Action 於 `lib/actions/admins.ts`
-- [ ] T021 [P] [US2] 實作 updateAdmin Server Action 於 `lib/actions/admins.ts`
-- [ ] T022 [P] [US2] 實作 resetPassword Server Action 於 `lib/actions/admins.ts`
-- [ ] T023 [P] [US2] 實作 deleteAdmin Server Action 於 `lib/actions/admins.ts`
+- [X] T018 [P] [US2] 實作 createAdmin Server Action 於 `lib/actions/admins.ts`
+- [X] T019 [P] [US2] 實作 getAdmins Server Action 於 `lib/actions/admins.ts`
+- [X] T020 [P] [US2] 實作 getAdminById Server Action 於 `lib/actions/admins.ts`
+- [X] T021 [P] [US2] 實作 updateAdmin Server Action 於 `lib/actions/admins.ts`
+- [X] T022 [P] [US2] 實作 resetPassword Server Action 於 `lib/actions/admins.ts`
+- [X] T023 [P] [US2] 實作 deleteAdmin Server Action 於 `lib/actions/admins.ts`
 
 ### UI Components for User Story 2
 
-- [ ] T024 [P] [US2] 建立管理員列表元件 `components/admin/AdminList.tsx`
-- [ ] T025 [P] [US2] 建立管理員表單元件 `components/admin/AdminForm.tsx`
+- [X] T024 [P] [US2] 建立管理員列表元件 `components/admin/AdminList.tsx`
+- [X] T025 [P] [US2] 建立管理員表單元件 `components/admin/AdminForm.tsx`
 
 ### Pages for User Story 2
 
-- [ ] T026 [US2] 建立管理員列表頁面 `app/(admin)/admin/system/admins/page.tsx`
-- [ ] T027 [US2] 建立新增管理員頁面 `app/(admin)/admin/system/admins/new/page.tsx`
-- [ ] T028 [US2] 建立編輯管理員頁面 `app/(admin)/admin/system/admins/[id]/page.tsx`
+- [ ] T026 [US2] 建立管理員列表頁面 `app/(admin)/admin/system/admins/page.tsx` (已生成範本於 IMPLEMENTATION_GUIDE.md)
+- [ ] T027 [US2] 建立新增管理員頁面 `app/(admin)/admin/system/admins/new/page.tsx` (已生成範本於 IMPLEMENTATION_GUIDE.md)
+- [ ] T028 [US2] 建立編輯管理員頁面 `app/(admin)/admin/system/admins/[id]/page.tsx` (已生成範本於 IMPLEMENTATION_GUIDE.md)
 
 ### Integration & Testing for User Story 2
 
-- [ ] T029 [US2] 整合操作日誌記錄於所有管理員 CRUD 操作
+- [X] T029 [US2] 整合操作日誌記錄於所有管理員 CRUD 操作
 - [ ] T030 [US2] 測試建立管理員流程（帳號重複檢查、密碼強度驗證）
 - [ ] T031 [US2] 測試編輯管理員暱稱與 Email
 - [ ] T032 [US2] 測試重設密碼功能
