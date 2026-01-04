@@ -11,10 +11,10 @@
 
 ## 📊 實作進度總覽
 
-**更新時間**: 2026-01-04 (Feature 008 Phase 6 UI 完成)
+**更新時間**: 2026-01-05 (Feature 008 核心功能完成 - 準備合併)
 **總任務數**: 86
-**已完成**: 72 任務 (84%)
-**待完成**: 14 任務 (16%)
+**已完成**: 73 任務 (85%)
+**待完成**: 13 任務 (15%)
 
 ### Phase 狀態
 
@@ -25,7 +25,7 @@
 | Phase 3: US1 管理員登入 | 6 | 6 | 100% | ✅ 完成 |
 | Phase 4: US2 成員管理 | 16 | 16 | 100% | ✅ 完成 |
 | Phase 5: US3 操作日誌 | 17 | 17 | 100% | ✅ 完成 |
-| Phase 6: US4 系統設定 | 19 | 10 | 53% | ✅ 核心完成 |
+| Phase 6: US4 系統設定 | 19 | 11 | 58% | ✅ 核心完成 |
 | Phase 7: US5 操作歷史 | 7 | 0 | 0% | 📋 UI 可選 |
 | Phase 8: Polish | 10 | 8 | 80% | ✅ 核心完成 |
 
@@ -233,7 +233,7 @@
 - [X] T041 [US3] 整合操作日誌記錄於現有商品 CRUD Server Actions (`lib/actions/products.ts`)
 - [X] T042 [US3] 整合操作日誌記錄於現有客戶 CRUD Server Actions (`lib/actions/clients.ts`)
 - [X] T043 [US3] 整合操作日誌記錄於現有訂單 Server Actions (`lib/actions/orders.ts`)
-- [ ] T044 [US3] 整合操作日誌記錄於系統設定 Server Actions (`lib/actions/system.ts`)
+- [X] T044 [US3] 整合操作日誌記錄於系統設定 Server Actions (`lib/actions/system.ts`)
 
 ### Testing for User Story 3
 
