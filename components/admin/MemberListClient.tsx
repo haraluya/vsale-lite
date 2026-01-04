@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { deleteAdmin, resetPassword } from '@/lib/actions/admins'
-import { AdminList } from './AdminList'
+import { MemberList } from './MemberList'
 import type { AdminProfile } from '@/types'
 
-interface AdminListClientProps {
+interface MemberListClientProps {
   admins: AdminProfile[]
   currentUserId: string
 }
 
-export function AdminListClient({ admins, currentUserId }: AdminListClientProps) {
+export function MemberListClient({ admins, currentUserId }: MemberListClientProps) {
   const router = useRouter()
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -19,7 +19,7 @@ export function AdminListClient({ admins, currentUserId }: AdminListClientProps)
     if (isProcessing) return
 
     const confirmed = confirm(
-      `確定要刪除管理員「${username}」嗎？\n\n此操作無法復原。`
+      `確定要刪除成員「${username}」嗎？\n\n此操作無法復原。`
     )
     if (!confirmed) return
 
@@ -27,7 +27,7 @@ export function AdminListClient({ admins, currentUserId }: AdminListClientProps)
     try {
       const result = await deleteAdmin({ admin_id: adminId })
       if (result.success) {
-        alert('管理員已刪除')
+        alert('成員已刪除')
         router.refresh()
       } else {
         alert(result.message || '刪除失敗')
@@ -41,7 +41,7 @@ export function AdminListClient({ admins, currentUserId }: AdminListClientProps)
     if (isProcessing) return
 
     const newPassword = prompt(
-      `請輸入「${username}」的新密碼：\n\n密碼須至少 8 字元，包含大小寫字母與數字`
+      `請輸入「${username}」的新密碼：\n\n密碼須至少 6 字元`
     )
     if (!newPassword) return
 
@@ -59,7 +59,7 @@ export function AdminListClient({ admins, currentUserId }: AdminListClientProps)
   }
 
   return (
-    <AdminList
+    <MemberList
       admins={admins}
       currentUserId={currentUserId}
       onDelete={handleDelete}

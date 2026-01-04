@@ -2,14 +2,14 @@ import Link from 'next/link'
 import { ArrowLeft, AlertCircle } from 'lucide-react'
 import { getAdminById, updateAdmin } from '@/lib/actions/admins'
 import { checkAuth } from '@/lib/actions/helpers'
-import { AdminForm } from '@/components/admin/AdminForm'
+import { MemberForm } from '@/components/admin/MemberForm'
 import { Button } from '@/components/ui/button'
 import { redirect } from 'next/navigation'
 import { notFound } from 'next/navigation'
 import type { ActionResult } from '@/types'
 
 export const metadata = {
-  title: '編輯管理員 | Vsale-lite',
+  title: '編輯成員 | Vsale-lite',
   description: '修改工作人員資料',
 }
 
@@ -23,7 +23,7 @@ export default async function EditAdminPage({
 
   const { id } = await params
 
-  // 查詢管理員資料
+  // 查詢成員資料
   const result = await getAdminById(id)
 
   if (!result.success || !result.data) {
@@ -38,18 +38,16 @@ export default async function EditAdminPage({
   ): Promise<ActionResult> {
     'use server'
 
-    const email = formData.get('email') as string
     const display_name = formData.get('display_name') as string
 
     const result = await updateAdmin({
       admin_id: id,
-      email,
       display_name: display_name || null,
     })
 
     if (result.success) {
       // 成功後導向列表頁
-      redirect('/admin/system/admins')
+      redirect('/admin/system/members')
     }
 
     return result
@@ -58,7 +56,7 @@ export default async function EditAdminPage({
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       {/* 返回按鈕 */}
-      <Link href="/admin/system/admins">
+      <Link href="/admin/system/members">
         <Button
           variant="outline"
           className="inline-flex items-center gap-2 rounded-none border-2 border-black bg-white px-4 py-2 text-sm font-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
@@ -70,7 +68,7 @@ export default async function EditAdminPage({
 
       {/* 頁面標題 */}
       <div className="rounded-none border-3 border-black bg-blue-400 p-6 shadow-neo">
-        <h1 className="text-3xl font-black">編輯管理員</h1>
+        <h1 className="text-3xl font-black">編輯成員</h1>
         <p className="mt-2 text-sm font-bold text-gray-800">
           修改「{admin.username}」的資料
         </p>
@@ -78,7 +76,7 @@ export default async function EditAdminPage({
 
       {/* 表單卡片 */}
       <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
-        <AdminForm admin={admin} onSubmit={handleSubmit} submitLabel="儲存變更" />
+        <MemberForm admin={admin} onSubmit={handleSubmit} submitLabel="儲存變更" />
       </div>
 
       {/* 說明 */}
@@ -90,7 +88,7 @@ export default async function EditAdminPage({
             <ul className="list-disc list-inside space-y-1">
               <li>帳號（username）建立後無法修改</li>
               <li>如需修改密碼，請使用列表頁的「重設密碼」功能</li>
-              <li>Email 與暱稱可隨時修改</li>
+              <li>暱稱可隨時修改</li>
             </ul>
           </div>
         </div>

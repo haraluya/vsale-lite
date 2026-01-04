@@ -23,6 +23,7 @@ import {
   DollarSign,
   ShoppingBag,
   Megaphone,
+  UserCog,
   type LucideIcon
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
@@ -67,6 +68,12 @@ const navSections: NavSection[] = [
     items: [
       { label: '訂單管理', href: '/admin/orders', icon: ShoppingBag },
       { label: '廣告管理', href: '/admin/announcements', icon: Megaphone },
+    ],
+  },
+  {
+    title: '系統設定',
+    items: [
+      { label: '成員管理', href: '/admin/system/members', icon: UserCog },
     ],
   },
   {

@@ -1,6 +1,6 @@
 /**
- * Feature 008: 管理員帳號管理 Server Actions
- * 提供管理員登入、CRUD、密碼重設等功能
+ * Feature 008: 成員帳號管理 Server Actions
+ * 提供成員登入、CRUD、密碼重設等功能
  */
 
 'use server'
@@ -32,7 +32,7 @@ import {
 } from '@/lib/validations/admin.schema'
 
 // ===================================
-// 管理員登入功能
+// 成員登入功能
 // ===================================
 
 /**
@@ -81,18 +81,18 @@ export async function loginWithUsername(
 }
 
 // ===================================
-// 管理員 CRUD 功能
+// 成員 CRUD 功能
 // ===================================
 
 /**
- * 建立管理員帳號
- * @param input 管理員資料
+ * 建立成員帳號
+ * @param input 成員資料
  */
 export async function createAdmin(
   input: CreateAdminInput
 ): Promise<ActionResult<string>> {
   try {
-    // 權限檢查：僅管理員可建立管理員帳號
+    // 權限檢查：僅管理員可建立成員帳號
     await checkAuth('admin')
 
     // 驗證輸入
@@ -112,22 +112,25 @@ export async function createAdmin(
       return { success: false, message: '帳號已存在' }
     }
 
-    // 2. 使用 Admin Client 建立 Auth User
+    // 2. 產生虛擬 Email（因為成員不需要真實 Email）
+    const virtualEmail = `${validatedInput.username}@admin.local`
+
+    // 3. 使用 Admin Client 建立 Auth User
     const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
-      email: validatedInput.email,
+      email: virtualEmail,
       password: validatedInput.password,
       email_confirm: true, // 自動確認 Email
     })
 
     if (authError || !authData.user) {
       console.error('[createAdmin] 建立 Auth User 失敗:', authError)
-      return { success: false, message: '建立管理員失敗' }
+      return { success: false, message: '建立成員失敗' }
     }
 
-    // 3. 建立 Profile
+    // 4. 建立 Profile
     const { error: profileError } = await adminClient.from('profiles').insert({
       id: authData.user.id,
-      email: validatedInput.email,
+      email: virtualEmail,
       username: validatedInput.username,
       display_name: validatedInput.display_name || null,
       role: 'admin',
@@ -137,43 +140,42 @@ export async function createAdmin(
       console.error('[createAdmin] 建立 Profile 失敗:', profileError)
       // 回滾：刪除已建立的 Auth User
       await adminClient.auth.admin.deleteUser(authData.user.id)
-      return { success: false, message: '建立管理員失敗' }
+      return { success: false, message: '建立成員失敗' }
     }
 
-    // 4. 記錄操作日誌
+    // 5. 記錄操作日誌
     await logAudit({
       target_type: 'admin',
       target_id: authData.user.id,
       action_type: 'created',
       new_values: {
         username: validatedInput.username,
-        email: validatedInput.email,
         display_name: validatedInput.display_name,
       },
     })
 
-    revalidatePath('/admin/system/admins')
+    revalidatePath('/admin/system/members')
 
     return {
       success: true,
       data: authData.user.id,
-      message: '管理員建立成功',
+      message: '成員建立成功',
     }
   } catch (error) {
     console.error('[createAdmin] 錯誤:', error)
-    return { success: false, message: '建立管理員失敗' }
+    return { success: false, message: '建立成員失敗' }
   }
 }
 
 /**
- * 查詢管理員列表
+ * 查詢成員列表
  * @param params 查詢參數
  */
 export async function getAdmins(
   params: GetAdminsParams
 ): Promise<ActionResult<GetAdminsResponse>> {
   try {
-    // 權限檢查：僅管理員可查詢管理員列表
+    // 權限檢查：僅管理員可查詢成員列表
     await checkAuth('admin')
 
     // 驗證輸入
@@ -187,10 +189,10 @@ export async function getAdmins(
       .select('*', { count: 'exact' })
       .eq('role', 'admin')
 
-    // 搜尋條件
+    // 搜尋條件（僅搜尋 username 和 display_name）
     if (validatedParams.search) {
       query = query.or(
-        `username.ilike.%${validatedParams.search}%,email.ilike.%${validatedParams.search}%`
+        `username.ilike.%${validatedParams.search}%,display_name.ilike.%${validatedParams.search}%`
       )
     }
 
@@ -209,7 +211,7 @@ export async function getAdmins(
 
     if (error) {
       console.error('[getAdmins] 查詢失敗:', error)
-      return { success: false, message: '查詢管理員列表失敗' }
+      return { success: false, message: '查詢成員列表失敗' }
     }
 
     return {
@@ -223,19 +225,19 @@ export async function getAdmins(
     }
   } catch (error) {
     console.error('[getAdmins] 錯誤:', error)
-    return { success: false, message: '查詢管理員列表失敗' }
+    return { success: false, message: '查詢成員列表失敗' }
   }
 }
 
 /**
- * 查詢單一管理員資料
- * @param adminId 管理員 ID
+ * 查詢單一成員資料
+ * @param adminId 成員 ID
  */
 export async function getAdminById(
   adminId: string
 ): Promise<ActionResult<AdminProfile>> {
   try {
-    // 權限檢查：僅管理員可查詢管理員資料
+    // 權限檢查：僅管理員可查詢成員資料
     await checkAuth('admin')
 
     const supabase = await createClient()
@@ -249,7 +251,7 @@ export async function getAdminById(
 
     if (error) {
       console.error('[getAdminById] 查詢失敗:', error)
-      return { success: false, message: '查詢管理員資料失敗' }
+      return { success: false, message: '查詢成員資料失敗' }
     }
 
     return {
@@ -258,17 +260,17 @@ export async function getAdminById(
     }
   } catch (error) {
     console.error('[getAdminById] 錯誤:', error)
-    return { success: false, message: '查詢管理員資料失敗' }
+    return { success: false, message: '查詢成員資料失敗' }
   }
 }
 
 /**
- * 更新管理員資料
+ * 更新成員資料
  * @param input 更新參數
  */
 export async function updateAdmin(input: UpdateAdminInput): Promise<ActionResult> {
   try {
-    // 權限檢查：僅管理員可更新管理員資料
+    // 權限檢查：僅管理員可更新成員資料
     await checkAuth('admin')
 
     // 驗證輸入
@@ -280,7 +282,7 @@ export async function updateAdmin(input: UpdateAdminInput): Promise<ActionResult
     // 1. 查詢舊資料
     const { data: oldProfile } = await supabase
       .from('profiles')
-      .select('display_name, email')
+      .select('display_name')
       .eq('id', validatedInput.admin_id)
       .single()
 
@@ -288,9 +290,6 @@ export async function updateAdmin(input: UpdateAdminInput): Promise<ActionResult
     const updateData: Record<string, any> = {}
     if (validatedInput.display_name !== undefined) {
       updateData.display_name = validatedInput.display_name
-    }
-    if (validatedInput.email) {
-      updateData.email = validatedInput.email
     }
 
     const { error: profileError } = await adminClient
@@ -300,17 +299,10 @@ export async function updateAdmin(input: UpdateAdminInput): Promise<ActionResult
 
     if (profileError) {
       console.error('[updateAdmin] 更新 Profile 失敗:', profileError)
-      return { success: false, message: '更新管理員資料失敗' }
+      return { success: false, message: '更新成員資料失敗' }
     }
 
-    // 3. 若更新 Email，同步更新 Auth User
-    if (validatedInput.email) {
-      await adminClient.auth.admin.updateUserById(validatedInput.admin_id, {
-        email: validatedInput.email,
-      })
-    }
-
-    // 4. 記錄操作日誌
+    // 3. 記錄操作日誌
     await logAudit({
       target_type: 'admin',
       target_id: validatedInput.admin_id,
@@ -319,17 +311,17 @@ export async function updateAdmin(input: UpdateAdminInput): Promise<ActionResult
       new_values: updateData,
     })
 
-    revalidatePath('/admin/system/admins')
+    revalidatePath('/admin/system/members')
 
-    return { success: true, message: '管理員資料更新成功' }
+    return { success: true, message: '成員資料更新成功' }
   } catch (error) {
     console.error('[updateAdmin] 錯誤:', error)
-    return { success: false, message: '更新管理員資料失敗' }
+    return { success: false, message: '更新成員資料失敗' }
   }
 }
 
 /**
- * 重設管理員密碼
+ * 重設成員密碼
  * @param input 重設密碼參數
  */
 export async function resetPassword(
@@ -365,7 +357,7 @@ export async function resetPassword(
       notes: '重設密碼',
     })
 
-    revalidatePath('/admin/system/admins')
+    revalidatePath('/admin/system/members')
 
     return { success: true, message: '密碼重設成功' }
   } catch (error) {
@@ -375,12 +367,12 @@ export async function resetPassword(
 }
 
 /**
- * 刪除管理員帳號
+ * 刪除成員帳號
  * @param input 刪除參數
  */
 export async function deleteAdmin(input: DeleteAdminInput): Promise<ActionResult> {
   try {
-    // 權限檢查：僅管理員可刪除管理員帳號
+    // 權限檢查：僅管理員可刪除成員帳號
     const authContext = await checkAuth('admin')
 
     // 驗證輸入
@@ -397,7 +389,7 @@ export async function deleteAdmin(input: DeleteAdminInput): Promise<ActionResult
     // 1. 查詢舊資料
     const { data: oldProfile } = await supabase
       .from('profiles')
-      .select('username, email, display_name')
+      .select('username, display_name')
       .eq('id', validatedInput.admin_id)
       .single()
 
@@ -409,7 +401,7 @@ export async function deleteAdmin(input: DeleteAdminInput): Promise<ActionResult
 
     if (profileError) {
       console.error('[deleteAdmin] 刪除 Profile 失敗:', profileError)
-      return { success: false, message: '刪除管理員失敗' }
+      return { success: false, message: '刪除成員失敗' }
     }
 
     // 3. 刪除 Auth User
@@ -429,11 +421,11 @@ export async function deleteAdmin(input: DeleteAdminInput): Promise<ActionResult
       old_values: oldProfile || {},
     })
 
-    revalidatePath('/admin/system/admins')
+    revalidatePath('/admin/system/members')
 
-    return { success: true, message: '管理員刪除成功' }
+    return { success: true, message: '成員刪除成功' }
   } catch (error) {
     console.error('[deleteAdmin] 錯誤:', error)
-    return { success: false, message: '刪除管理員失敗' }
+    return { success: false, message: '刪除成員失敗' }
   }
 }

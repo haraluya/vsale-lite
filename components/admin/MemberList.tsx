@@ -6,23 +6,23 @@ import { zhTW } from 'date-fns/locale'
 import { Edit, Trash2, KeyRound } from 'lucide-react'
 import Link from 'next/link'
 
-interface AdminListProps {
+interface MemberListProps {
   admins: AdminProfile[]
   currentUserId: string
   onDelete: (adminId: string, username: string) => void
   onResetPassword: (adminId: string, username: string) => void
 }
 
-export function AdminList({
+export function MemberList({
   admins,
   currentUserId,
   onDelete,
   onResetPassword,
-}: AdminListProps) {
+}: MemberListProps) {
   if (admins.length === 0) {
     return (
       <div className="rounded-none border-3 border-gray-300 bg-gray-50 p-12 text-center">
-        <p className="text-lg font-bold text-gray-500">尚無管理員帳號</p>
+        <p className="text-lg font-bold text-gray-500">尚無成員帳號</p>
       </div>
     )
   }
@@ -39,9 +39,6 @@ export function AdminList({
               </th>
               <th className="px-6 py-4 text-left text-sm font-black uppercase tracking-wider">
                 暱稱
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-black uppercase tracking-wider">
-                Email
               </th>
               <th className="px-6 py-4 text-left text-sm font-black uppercase tracking-wider">
                 建立時間
@@ -75,9 +72,6 @@ export function AdminList({
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-sm text-gray-700">{admin.email}</span>
-                </td>
-                <td className="px-6 py-4">
                   <span className="text-sm text-gray-500">
                     {formatDistanceToNow(new Date(admin.created_at), {
                       addSuffix: true,
@@ -88,7 +82,7 @@ export function AdminList({
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <Link
-                      href={`/admin/system/admins/${admin.id}`}
+                      href={`/admin/system/members/${admin.id}`}
                       className="inline-flex items-center gap-1 rounded-none border-2 border-black bg-white px-3 py-2 text-sm font-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                     >
                       <Edit className="h-4 w-4" />
@@ -137,7 +131,6 @@ export function AdminList({
               {admin.display_name && (
                 <p className="text-sm text-gray-700 mb-1">{admin.display_name}</p>
               )}
-              <p className="text-sm text-gray-500 mb-1">{admin.email}</p>
               <p className="text-xs text-gray-400">
                 {formatDistanceToNow(new Date(admin.created_at), {
                   addSuffix: true,
@@ -148,7 +141,7 @@ export function AdminList({
 
             <div className="flex flex-col gap-2">
               <Link
-                href={`/admin/system/admins/${admin.id}`}
+                href={`/admin/system/members/${admin.id}`}
                 className="inline-flex items-center justify-center gap-1 rounded-none border-2 border-black bg-white px-3 py-2 text-sm font-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
               >
                 <Edit className="h-4 w-4" />

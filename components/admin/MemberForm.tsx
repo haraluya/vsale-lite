@@ -8,17 +8,17 @@ import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
 import type { ActionResult, AdminProfile } from '@/types'
 
-interface AdminFormProps {
+interface MemberFormProps {
   admin?: AdminProfile // 編輯模式傳入現有資料
   onSubmit: (prevState: ActionResult | null, formData: FormData) => Promise<ActionResult>
   submitLabel?: string
 }
 
-export function AdminForm({
+export function MemberForm({
   admin,
   onSubmit,
   submitLabel = '儲存',
-}: AdminFormProps) {
+}: MemberFormProps) {
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     onSubmit,
     null
@@ -49,23 +49,6 @@ export function AdminForm({
         </div>
       )}
 
-      {/* Email */}
-      <div>
-        <Label htmlFor="email">Email *</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          placeholder="admin@example.com"
-          defaultValue={admin?.email}
-          required
-          className="mt-2"
-        />
-        {state && 'errors' in state && state.errors?.email && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.email[0]}</p>
-        )}
-      </div>
-
       {/* 密碼（僅新增模式顯示） */}
       {!isEditMode && (
         <div>
@@ -74,7 +57,7 @@ export function AdminForm({
             id="password"
             name="password"
             type="password"
-            placeholder="至少 8 字元，含大小寫字母+數字"
+            placeholder="至少 6 字元"
             required
             className="mt-2"
           />
@@ -82,7 +65,7 @@ export function AdminForm({
             <p className="mt-2 text-sm text-red-500">{state.errors.password[0]}</p>
           )}
           <p className="mt-2 text-xs text-gray-500">
-            密碼須至少 8 字元，包含大寫字母、小寫字母、數字
+            密碼須至少 6 字元
           </p>
         </div>
       )}
