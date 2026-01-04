@@ -338,6 +338,14 @@ export type SystemSetting = {
   updated_at: string
 }
 
+// 已解析的系統設定（用於 Server Action 回傳）
+export type ParsedSetting = {
+  key: string
+  value: string | number | boolean | object
+  value_type: SettingValueType
+  description: string | null
+}
+
 // 操作類型
 export type AuditActionType = 'created' | 'updated' | 'deleted' | 'stock_adjusted' | 'comment_added'
 
