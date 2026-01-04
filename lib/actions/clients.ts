@@ -6,6 +6,7 @@ import { updateClientSchema as updateClientSchemaV2 } from '@/lib/validations/cl
 import type { ActionResult, Client, Profile, Tier } from '@/types'
 import { checkAuth } from './helpers'
 import { revalidatePath } from 'next/cache'
+import { logAudit } from './audit'
 
 /**
  * 產生預設密碼 (使用電話號碼後6碼)
@@ -138,7 +139,19 @@ export async function createClient(
 
     console.log('Profile 建立成功:', authData.user.id)
 
-    // 9. Revalidate
+    // 9. 記錄操作日誌 (Feature 008)
+    await logAudit({
+      target_type: 'client',
+      target_id: authData.user.id,
+      action_type: 'created',
+      new_values: {
+        phone: validatedFields.data.phone,
+        tier_id: validatedFields.data.tier_id,
+        display_name: validatedFields.data.display_name,
+      },
+    })
+
+    // 10. Revalidate
     revalidatePath('/admin/clients')
 
     return {
@@ -1110,10 +1123,10 @@ export async function updateClientV2(
 
     const adminClient = createAdminClient()
 
-    // 3. 檢查客戶是否存在
+    // 3. 檢查客戶是否存在並取得舊值 (用於 audit log)
     const { data: existingClient } = await adminClient
       .from('profiles')
-      .select('id, role')
+      .select('id, role, display_name, tier_id, address, admin_notes')
       .eq('id', input.clientId)
       .single()
 
@@ -1152,7 +1165,21 @@ export async function updateClientV2(
       }
     }
 
-    // 6. Revalidate
+    // 6. 記錄操作日誌 (Feature 008)
+    await logAudit({
+      target_type: 'client',
+      target_id: input.clientId,
+      action_type: 'updated',
+      old_values: {
+        display_name: existingClient.display_name,
+        tier_id: existingClient.tier_id,
+        address: existingClient.address,
+        admin_notes: existingClient.admin_notes,
+      },
+      new_values: updateData,
+    })
+
+    // 7. Revalidate
     revalidatePath('/admin/users')
     revalidatePath(`/admin/users/${input.clientId}`)
 

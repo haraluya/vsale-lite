@@ -3,11 +3,13 @@
 /**
  * Products Management Server Actions
  * Feature: 002-product-management & 003-series-and-pricing
+ * Feature 008: 整合操作日誌記錄
  */
 
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { checkAuth } from './helpers'
+import { logAudit } from './audit'
 import { createProductSchema, updateProductSchema } from '@/lib/validations/product.schema'
 import type { ActionResult, Product } from '@/types'
 
@@ -241,7 +243,21 @@ export async function createProduct(
       // 不中斷商品建立流程
     }
 
-    // 7. 重新驗證快取
+    // 7. 記錄操作日誌 (Feature 008)
+    await logAudit({
+      target_type: 'product',
+      target_id: newProduct.id,
+      action_type: 'created',
+      new_values: {
+        series_id: data.series_id,
+        name: data.name,
+        retail_price: data.retail_price,
+        stock: data.stock,
+        stock_status: data.stock_status,
+      },
+    })
+
+    // 8. 重新驗證快取
     revalidatePath('/admin/products')
     revalidatePath('/store')
 
@@ -307,10 +323,10 @@ export async function updateProduct(
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
-    // 4. 檢查商品是否存在
+    // 4. 檢查商品是否存在並取得舊值 (用於 audit log)
     const { data: existingProduct } = await adminClient
       .from('products')
-      .select('id')
+      .select('series_id, name, description, retail_price, stock, stock_status, unit, status')
       .eq('id', id)
       .single()
 
@@ -351,7 +367,16 @@ export async function updateProduct(
       }
     }
 
-    // 7. 重新驗證快取
+    // 7. 記錄操作日誌 (Feature 008)
+    await logAudit({
+      target_type: 'product',
+      target_id: id,
+      action_type: 'updated',
+      old_values: existingProduct,
+      new_values: data,
+    })
+
+    // 8. 重新驗證快取
     revalidatePath('/admin/products')
     revalidatePath(`/admin/products/${id}`)
 
@@ -385,7 +410,21 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
-    // 2. 檢查是否已有訂單記錄 (未來實作訂單功能時)
+    // 2. 取得商品資料用於 audit log
+    const { data: product } = await adminClient
+      .from('products')
+      .select('series_id, code, name, retail_price, stock')
+      .eq('id', id)
+      .single()
+
+    if (!product) {
+      return {
+        success: false,
+        message: '商品不存在',
+      }
+    }
+
+    // 3. 檢查是否已有訂單記錄 (未來實作訂單功能時)
     // const { count } = await adminClient
     //   .from('order_items')
     //   .select('*', { count: 'exact', head: true })
@@ -408,6 +447,16 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
           message: '停用商品失敗',
         }
       }
+
+      // 記錄操作日誌 (Feature 008)
+      await logAudit({
+        target_type: 'product',
+        target_id: id,
+        action_type: 'updated',
+        old_values: { status: 'active' },
+        new_values: { status: 'inactive' },
+        notes: '商品已有訂單記錄,執行軟刪除',
+      })
 
       revalidatePath('/admin/products')
 
@@ -435,6 +484,15 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
           message: '刪除商品失敗',
         }
       }
+
+      // 記錄操作日誌 (Feature 008)
+      await logAudit({
+        target_type: 'product',
+        target_id: id,
+        action_type: 'deleted',
+        old_values: product,
+        notes: '硬刪除商品',
+      })
 
       revalidatePath('/admin/products')
 
@@ -481,10 +539,10 @@ export async function updateProductStock(
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
-    // 3. 檢查商品是否存在
+    // 3. 檢查商品是否存在並取得舊庫存 (用於 audit log)
     const { data: existingProduct } = await adminClient
       .from('products')
-      .select('id')
+      .select('stock')
       .eq('id', id)
       .single()
 
@@ -509,7 +567,17 @@ export async function updateProductStock(
       }
     }
 
-    // 5. 重新驗證快取
+    // 5. 記錄操作日誌 (Feature 008)
+    await logAudit({
+      target_type: 'product',
+      target_id: id,
+      action_type: 'stock_adjusted',
+      old_values: { stock: existingProduct.stock },
+      new_values: { stock },
+      notes: `庫存調整: ${existingProduct.stock} → ${stock}`,
+    })
+
+    // 6. 重新驗證快取
     revalidatePath('/admin/products')
 
     return {
