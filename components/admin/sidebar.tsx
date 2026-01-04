@@ -105,7 +105,6 @@ export function Sidebar() {
             className="hidden lg:block"
           />
         </div>
-        <p className="hidden lg:block text-sm text-gray-600 mt-2">管理後台</p>
       </div>
 
       {/* Navigation */}

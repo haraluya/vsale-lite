@@ -65,7 +65,6 @@ export function Navbar({ user }: NavbarProps) {
           <div className="flex items-center gap-4">
             <Logo variant="full" href="/store" className="hidden sm:block" />
             <Logo variant="icon" href="/store" className="block sm:hidden" />
-            <span className="hidden text-sm text-gray-600 lg:block">批發訂貨系統</span>
           </div>
 
           {/* 用戶資訊與登出 */}

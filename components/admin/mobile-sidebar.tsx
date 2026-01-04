@@ -92,7 +92,6 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
       {/* Logo */}
       <div className="mb-6">
         <Logo variant="full" href="/admin/dashboard" />
-        <p className="text-sm text-gray-600 mt-2">管理後台</p>
       </div>
 
       {/* Navigation */}
