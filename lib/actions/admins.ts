@@ -71,13 +71,13 @@ export async function loginWithUsername(
     if (signInError) {
       return { success: false, message: '帳號或密碼錯誤' }
     }
-
-    // 3. 登入成功，導向後台首頁
-    redirect('/admin/dashboard')
   } catch (error) {
     console.error('[loginWithUsername] 錯誤:', error)
     return { success: false, message: '登入失敗' }
   }
+
+  // 3. 登入成功，導向後台首頁（在 try-catch 外，避免捕獲 redirect 錯誤）
+  redirect('/admin/dashboard')
 }
 
 // ===================================
