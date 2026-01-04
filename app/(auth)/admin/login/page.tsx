@@ -38,7 +38,7 @@ export default async function AdminLoginPage() {
 
           <div className="space-y-3">
             <h1 className="text-4xl md:text-5xl font-black text-black leading-tight">
-              Vsale 管理後台
+              管理後台
             </h1>
             <p className="text-lg md:text-xl font-bold text-gray-800">
               訂單管理、客戶管理、一站搞定
@@ -65,7 +65,7 @@ export default async function AdminLoginPage() {
               </div>
             </div>
             <h3 className="font-black text-center mb-1">客戶管理</h3>
-            <p className="text-xs font-medium text-gray-700 text-center">等級設定與價格權限控制</p>
+            <p className="text-xs font-medium text-gray-700 text-center">細膩的客戶管理系統</p>
           </div>
 
           <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">

@@ -38,7 +38,7 @@ export default async function LoginPage() {
 
           <div className="space-y-3">
             <h1 className="text-4xl md:text-5xl font-black text-black leading-tight">
-              Vsale 下單系統
+              快速下單系統
             </h1>
             <p className="text-lg md:text-xl font-bold text-gray-800">
               批發訂貨，隨時隨地輕鬆搞定
@@ -75,7 +75,7 @@ export default async function LoginPage() {
               </div>
             </div>
             <h3 className="font-black text-center mb-1">專屬價格</h3>
-            <p className="text-xs font-medium text-gray-700 text-center">會員等級綁定批發優惠</p>
+            <p className="text-xs font-medium text-gray-700 text-center">會員專屬優惠</p>
           </div>
         </div>
 
