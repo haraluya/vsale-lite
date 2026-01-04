@@ -47,9 +47,10 @@ export async function loginWithUsername(
     const validatedInput = loginWithUsernameSchema.parse(input)
 
     const supabase = await createClient()
+    const adminClient = createAdminClient()
 
-    // 1. 根據 username 查詢 email
-    const { data: profile, error: profileError } = await supabase
+    // 1. 使用 Admin Client 查詢 username 對應的 email（繞過 RLS）
+    const { data: profile, error: profileError } = await adminClient
       .from('profiles')
       .select('email, role')
       .eq('username', validatedInput.username)
@@ -61,7 +62,7 @@ export async function loginWithUsername(
       return { success: false, message: '帳號或密碼錯誤' }
     }
 
-    // 2. 使用 email 與密碼進行 Supabase Auth 登入
+    // 2. 使用一般 Client 進行登入（建立 session cookie）
     const { error: signInError } = await supabase.auth.signInWithPassword({
       email: profile.email,
       password: validatedInput.password,
