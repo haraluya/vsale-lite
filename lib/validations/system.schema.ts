@@ -23,7 +23,7 @@ export type UpdateSettingInput = z.infer<typeof updateSettingSchema>
 // Logo 上傳驗證
 export const uploadLogoSchema = z.object({
   logo_type: z.enum(['logo', 'logo_icon', 'favicon'], {
-    errorMap: () => ({ message: '無效的 Logo 類型' }),
+    message: '無效的 Logo 類型',
   }),
   file: z.instanceof(File, { message: '請選擇圖片檔案' }),
 })
@@ -39,7 +39,9 @@ export const getAuditLogsSchema = z.object({
   target_type: z.string().optional(),
   target_id: z.string().optional(),
   action_type: z
-    .enum(['created', 'updated', 'deleted', 'stock_adjusted', 'comment_added'])
+    .enum(['created', 'updated', 'deleted', 'stock_adjusted', 'comment_added'], {
+      message: '無效的操作類型',
+    })
     .optional(),
   actor_id: z.string().uuid().optional(),
   date_from: z
@@ -60,9 +62,11 @@ export type GetAuditLogsInput = z.infer<typeof getAuditLogsSchema>
 export const logAuditSchema = z.object({
   target_type: z.string().min(1, '目標實體類型不可為空'),
   target_id: z.string().min(1, '目標實體 ID 不可為空'),
-  action_type: z.enum(['created', 'updated', 'deleted', 'stock_adjusted', 'comment_added']),
-  old_values: z.record(z.any()).optional().nullable(),
-  new_values: z.record(z.any()).optional().nullable(),
+  action_type: z.enum(['created', 'updated', 'deleted', 'stock_adjusted', 'comment_added'], {
+    message: '無效的操作類型',
+  }),
+  old_values: z.record(z.string(), z.any()).optional().nullable(),
+  new_values: z.record(z.string(), z.any()).optional().nullable(),
   notes: z.string().optional().nullable(),
 })
 

@@ -14,7 +14,7 @@ export const metadata = {
 
 async function AdminsContent() {
   // 權限檢查
-  const { user } = await checkAuth('admin')
+  const authContext = await checkAuth('admin')
 
   // 查詢管理員列表
   const result = await getAdmins({ page: 1, limit: 100 })
@@ -34,7 +34,7 @@ async function AdminsContent() {
 
   const { admins } = result.data
 
-  return <AdminListClient admins={admins} currentUserId={user.userId} />
+  return <AdminListClient admins={admins} currentUserId={authContext.userId} />
 }
 
 export default async function AdminsPage() {

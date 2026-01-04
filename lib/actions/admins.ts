@@ -381,13 +381,13 @@ export async function resetPassword(
 export async function deleteAdmin(input: DeleteAdminInput): Promise<ActionResult> {
   try {
     // 權限檢查：僅管理員可刪除管理員帳號
-    const { user } = await checkAuth('admin')
+    const authContext = await checkAuth('admin')
 
     // 驗證輸入
     const validatedInput = deleteAdminSchema.parse(input)
 
     // 防止刪除自己
-    if (validatedInput.admin_id === user.userId) {
+    if (validatedInput.admin_id === authContext.userId) {
       return { success: false, message: '無法刪除自己的帳號' }
     }
 

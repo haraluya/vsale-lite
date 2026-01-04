@@ -30,7 +30,7 @@ export async function logAudit(input: LogAuditInput): Promise<ActionResult> {
     const validatedInput = logAuditSchema.parse(input)
 
     // 權限檢查：僅已認證使用者可記錄操作
-    const { user } = await checkAuth()
+    const authContext = await checkAuth()
 
     const supabase = await createClient()
 
@@ -38,7 +38,7 @@ export async function logAudit(input: LogAuditInput): Promise<ActionResult> {
     const { data: profile } = await supabase
       .from('profiles')
       .select('username, display_name, email, phone')
-      .eq('id', user.userId)
+      .eq('id', authContext.userId)
       .single()
 
     const actorDisplayName =
@@ -53,8 +53,8 @@ export async function logAudit(input: LogAuditInput): Promise<ActionResult> {
       target_type: validatedInput.target_type,
       target_id: validatedInput.target_id,
       action_type: validatedInput.action_type,
-      actor_id: user.userId,
-      actor_role: user.role,
+      actor_id: authContext.userId,
+      actor_role: authContext.role,
       actor_display_name: actorDisplayName,
       old_values: validatedInput.old_values || null,
       new_values: validatedInput.new_values || null,
