@@ -148,13 +148,17 @@ export async function getAuditLogs(
       query = query.eq('actor_id', validatedParams.actor_id)
     }
 
-    // 日期範圍篩選
+    // 日期範圍篩選（轉換為 UTC+8 時區）
     if (validatedParams.date_from) {
-      query = query.gte('created_at', `${validatedParams.date_from}T00:00:00`)
+      // 將本地日期轉換為 UTC 時間（台灣時區 UTC+8，所以減 8 小時）
+      const fromDate = new Date(`${validatedParams.date_from}T00:00:00+08:00`)
+      query = query.gte('created_at', fromDate.toISOString())
     }
 
     if (validatedParams.date_to) {
-      query = query.lte('created_at', `${validatedParams.date_to}T23:59:59`)
+      // 將本地日期轉換為 UTC 時間（台灣時區 UTC+8，所以減 8 小時）
+      const toDate = new Date(`${validatedParams.date_to}T23:59:59+08:00`)
+      query = query.lte('created_at', toDate.toISOString())
     }
 
     // 排序（最新在前）
