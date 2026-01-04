@@ -19,12 +19,12 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar - 平板/桌面版 (隱藏在手機版) */}
+    <div className="min-h-screen bg-background">
+      {/* Sidebar - 平板/桌面版 (固定在左側) */}
       <Sidebar />
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 md:p-6 lg:p-8">
+      {/* Main Content - 為固定的 Sidebar 留出空間 */}
+      <main className="md:ml-16 lg:ml-64 p-4 md:p-6 lg:p-8">
         {/* Mobile Nav - 手機版漢堡菜單 */}
         <div className="mb-4 md:hidden">
           <MobileNav />

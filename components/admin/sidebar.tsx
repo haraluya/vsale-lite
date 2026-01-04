@@ -90,9 +90,9 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex md:w-16 lg:w-64 border-r-2 md:border-r-3 border-black bg-white p-3 md:p-4 lg:p-6 flex-col min-h-screen">
+    <aside className="hidden md:flex md:w-16 lg:w-64 border-r-2 md:border-r-3 border-black bg-white flex-col fixed top-0 left-0 h-screen overflow-y-auto">
       {/* Logo - 平板顯示 icon / 桌面顯示 full */}
-      <div className="mb-6 md:mb-8">
+      <div className="mb-6 md:mb-8 p-3 md:p-4 lg:p-6">
         <div className="md:flex md:justify-center lg:block">
           <Logo
             variant="icon"
@@ -108,7 +108,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-3 md:space-y-4 lg:space-y-6">
+      <nav className="flex-1 space-y-3 md:space-y-4 lg:space-y-6 px-3 md:px-4 lg:px-6 pb-6">
         {navSections.map((section, sectionIndex) => (
           <div key={section.title}>
             {/* 分隔線（除了第一個區塊） */}
