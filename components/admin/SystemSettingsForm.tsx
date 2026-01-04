@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import { ParsedSetting } from '@/types'
+import { Button } from '@/components/ui/button'
 
 interface SystemSettingsFormProps {
   settings: ParsedSetting[]
@@ -14,20 +15,37 @@ interface SystemSettingsFormProps {
 }
 
 export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFormProps) {
-  const [loading, setLoading] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [changes, setChanges] = useState<Record<string, { value: string | number | boolean; valueType: string }>>({})
 
-  const handleSubmit = async (key: string, value: string | number | boolean, valueType: string) => {
-    setLoading(key)
+  const handleChange = (key: string, value: string | number | boolean, valueType: string) => {
+    setChanges((prev) => ({
+      ...prev,
+      [key]: { value, valueType },
+    }))
+  }
+
+  const handleSave = async () => {
+    setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('key', key)
-      formData.append('value', String(value))
-      formData.append('valueType', valueType)
-      await updateAction(formData)
+      // 依序更新所有變更的設定
+      for (const [key, { value, valueType }] of Object.entries(changes)) {
+        const formData = new FormData()
+        formData.append('key', key)
+        formData.append('value', String(value))
+        formData.append('valueType', valueType)
+        await updateAction(formData)
+      }
+      // 清空變更記錄
+      setChanges({})
+    } catch (error) {
+      console.error('儲存設定失敗:', error)
     } finally {
-      setLoading(null)
+      setLoading(false)
     }
   }
+
+  const hasChanges = Object.keys(changes).length > 0
 
   return (
     <div className="space-y-4">
@@ -47,56 +65,78 @@ export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFor
               {setting.value_type === 'boolean' && (
                 <input
                   type="checkbox"
-                  defaultChecked={setting.value as boolean}
+                  defaultChecked={
+                    changes[setting.key]?.value !== undefined
+                      ? (changes[setting.key].value as boolean)
+                      : (setting.value as boolean)
+                  }
                   className="h-5 w-5 rounded border-2 border-black"
-                  onChange={(e) => handleSubmit(setting.key, e.target.checked, setting.value_type)}
-                  disabled={loading === setting.key}
+                  onChange={(e) => handleChange(setting.key, e.target.checked, setting.value_type)}
+                  disabled={loading}
                 />
               )}
 
               {setting.value_type === 'number' && (
                 <input
                   type="number"
-                  defaultValue={setting.value as number}
+                  defaultValue={
+                    changes[setting.key]?.value !== undefined
+                      ? (changes[setting.key].value as number)
+                      : (setting.value as number)
+                  }
                   className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
-                  onBlur={(e) => handleSubmit(setting.key, parseFloat(e.target.value), setting.value_type)}
-                  disabled={loading === setting.key}
+                  onChange={(e) => handleChange(setting.key, parseFloat(e.target.value), setting.value_type)}
+                  disabled={loading}
                 />
               )}
 
               {setting.value_type === 'text' && (
                 <input
                   type="text"
-                  defaultValue={setting.value as string}
+                  defaultValue={
+                    changes[setting.key]?.value !== undefined
+                      ? (changes[setting.key].value as string)
+                      : (setting.value as string)
+                  }
                   className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
-                  onBlur={(e) => handleSubmit(setting.key, e.target.value, setting.value_type)}
-                  disabled={loading === setting.key}
+                  onChange={(e) => handleChange(setting.key, e.target.value, setting.value_type)}
+                  disabled={loading}
                 />
               )}
 
               {setting.value_type === 'json' && (
                 <textarea
-                  defaultValue={JSON.stringify(setting.value, null, 2)}
+                  defaultValue={
+                    changes[setting.key]?.value !== undefined
+                      ? JSON.stringify(changes[setting.key].value, null, 2)
+                      : JSON.stringify(setting.value, null, 2)
+                  }
                   className="w-full rounded-none border-2 border-black px-3 py-2 font-mono text-sm"
                   rows={4}
-                  onBlur={(e) => {
+                  onChange={(e) => {
                     try {
-                      handleSubmit(setting.key, JSON.parse(e.target.value), setting.value_type)
+                      handleChange(setting.key, JSON.parse(e.target.value), setting.value_type)
                     } catch {
-                      alert('JSON 格式錯誤')
+                      // JSON 格式錯誤時不更新
                     }
                   }}
-                  disabled={loading === setting.key}
+                  disabled={loading}
                 />
               )}
             </div>
-
-            {loading === setting.key && (
-              <div className="ml-4 text-sm text-gray-500">更新中...</div>
-            )}
           </div>
         </div>
       ))}
+
+      {/* 儲存按鈕 */}
+      <div className="flex justify-end gap-4 pt-4 border-t-3 border-black">
+        <Button type="button" variant="outline" onClick={() => setChanges({})} disabled={!hasChanges || loading}>
+          取消變更
+        </Button>
+        <Button type="button" onClick={handleSave} disabled={!hasChanges || loading}>
+          {loading ? '儲存中...' : `儲存設定 (${Object.keys(changes).length})`}
+        </Button>
+      </div>
     </div>
   )
 }

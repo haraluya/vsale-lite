@@ -62,6 +62,12 @@ export function LogoUploader({
     favicon: 'Favicon',
   }
 
+  const logoRecommendedSizes = {
+    logo: '200 × 60 像素',
+    'logo-icon': '60 × 60 像素',
+    favicon: '60 × 60 像素',
+  }
+
   return (
     <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo">
       <h3 className="text-lg font-black mb-4">{logoTypeLabels[logoType]}</h3>
@@ -120,7 +126,7 @@ export function LogoUploader({
       </div>
 
       <p className="mt-2 text-xs text-gray-500">
-        支援格式：JPG, PNG, WebP, SVG | 最大 2MB
+        建議尺寸：{logoRecommendedSizes[logoType]} | 支援格式：JPG, PNG, WebP, SVG | 最大 2MB
       </p>
     </div>
   )
