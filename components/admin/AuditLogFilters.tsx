@@ -1,18 +1,22 @@
 'use client'
 
-import { AuditActionType } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Filter } from 'lucide-react'
 
 interface AuditLogFiltersProps {
   currentFilters: {
-    action_type?: AuditActionType
+    action_type?: string | string[] // 接收可能的陣列
     date_from?: string
     date_to?: string
   }
 }
 
 export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
+  // 清理 currentFilters 防止顯示陣列
+  const cleanAction = Array.isArray(currentFilters.action_type)
+    ? currentFilters.action_type[0]
+    : currentFilters.action_type
+
   return (
     <form className="rounded-none border-3 border-black bg-white p-4 shadow-neo space-y-4">
       <div className="flex items-center gap-2 mb-4">
@@ -26,7 +30,7 @@ export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
           <label className="block text-sm font-bold mb-2">操作類型</label>
           <select
             name="action_type"
-            defaultValue={currentFilters.action_type || ''}
+            defaultValue={cleanAction || ''} // 使用清理後的值
             className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
           >
             <option value="">全部</option>

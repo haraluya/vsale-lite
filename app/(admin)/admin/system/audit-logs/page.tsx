@@ -2,7 +2,6 @@ import { getAuditLogs } from '@/lib/actions/audit'
 import { AuditLogList } from '@/components/admin/AuditLogList'
 import { AuditLogFilters } from '@/components/admin/AuditLogFilters'
 import { checkAuth } from '@/lib/actions/helpers'
-import { AuditActionType } from '@/types'
 
 import { generatePageMetadata } from '@/lib/metadata'
 
@@ -14,7 +13,7 @@ export default async function AuditLogsPage({
   searchParams,
 }: {
   searchParams: Promise<{
-    action_type?: AuditActionType
+    action_type?: string | string[] // 接收可能的陣列
     date_from?: string
     date_to?: string
     page?: string
@@ -25,9 +24,12 @@ export default async function AuditLogsPage({
 
   const params = await searchParams
 
+  // 處理可能的陣列值（取第一個元素）
+  const action_type = Array.isArray(params.action_type) ? params.action_type[0] : params.action_type
+
   // 查詢操作日誌
   const result = await getAuditLogs({
-    action_type: params.action_type,
+    action_type, // 傳遞清理後的值
     date_from: params.date_from,
     date_to: params.date_to,
     page: params.page ? parseInt(params.page) : 1,

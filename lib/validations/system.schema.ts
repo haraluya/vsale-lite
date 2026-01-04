@@ -34,16 +34,31 @@ export type UploadLogoInput = z.infer<typeof uploadLogoSchema>
 // 操作日誌驗證
 // ===================================
 
-// 操作日誌查詢參數
+// 操作日誌查詢參數（改進版：處理空字串與陣列）
 export const getAuditLogsSchema = z.object({
-  target_type: z.string().optional(),
-  target_id: z.string().optional(),
+  target_type: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v === '' ? undefined : v)),
+  target_id: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v === '' ? undefined : v)),
   action_type: z
-    .enum(['created', 'updated', 'deleted', 'stock_adjusted', 'comment_added'], {
-      message: '無效的操作類型',
-    })
-    .optional(),
-  actor_id: z.string().uuid().optional(),
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v === '' ? undefined : v))
+    .pipe(
+      z
+        .enum(['created', 'updated', 'deleted', 'stock_adjusted', 'comment_added'], {
+          message: '無效的操作類型',
+        })
+        .optional()
+    ),
+  actor_id: z.string().uuid({ message: '無效的使用者 ID 格式' }).optional(),
   date_from: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, '日期格式應為 YYYY-MM-DD')

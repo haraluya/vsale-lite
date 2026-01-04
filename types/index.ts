@@ -368,12 +368,12 @@ export type AuditLog = {
 export type GetAuditLogsParams = {
   target_type?: string  // 篩選實體類型
   target_id?: string  // 篩選特定實體
-  action_type?: AuditActionType  // 篩選操作類型
+  action_type?: string | string[] | AuditActionType  // 篩選操作類型（支援 URL 查詢參數的陣列形式）
   actor_id?: string  // 篩選操作者
   date_from?: string  // 起始日期 (YYYY-MM-DD)
   date_to?: string  // 結束日期 (YYYY-MM-DD)
-  page?: number  // 頁碼 (預設 1)
-  limit?: number  // 每頁筆數 (預設 20)
+  page?: number | string  // 頁碼 (預設 1，支援 URL 查詢參數的字串形式)
+  limit?: number | string  // 每頁筆數 (預設 20，支援 URL 查詢參數的字串形式)
 }
 
 // 操作日誌列表回應

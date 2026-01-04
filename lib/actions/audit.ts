@@ -17,6 +17,29 @@ import type {
 import { logAuditSchema, getAuditLogsSchema, type LogAuditInput } from '@/lib/validations/system.schema'
 
 // ===================================
+// 工具函式
+// ===================================
+
+/**
+ * 強制轉換 action_type 參數
+ * 處理陣列、空字串、undefined 的情況
+ */
+function coerceActionType(value: any): string | undefined {
+  // 處理陣列（取第一個值）
+  if (Array.isArray(value)) {
+    value = value[0]
+  }
+
+  // 跳過空字串、undefined、null
+  if (value === '' || value === undefined || value === null) {
+    return undefined
+  }
+
+  // 回傳字串值
+  return String(value).trim()
+}
+
+// ===================================
 // 核心操作日誌記錄函式
 // ===================================
 
@@ -88,8 +111,20 @@ export async function getAuditLogs(
     // 權限檢查：僅管理員可查詢操作日誌
     await checkAuth('admin')
 
-    // 驗證輸入
-    const validatedParams = getAuditLogsSchema.parse(params)
+    // 第 1 層防禦：清理並強制轉換參數
+    const cleanedParams = {
+      action_type: coerceActionType(params.action_type),
+      target_type: params.target_type === '' ? undefined : params.target_type,
+      target_id: params.target_id === '' ? undefined : params.target_id,
+      actor_id: params.actor_id,
+      date_from: params.date_from,
+      date_to: params.date_to,
+      page: typeof params.page === 'string' ? parseInt(params.page, 10) : params.page,
+      limit: typeof params.limit === 'string' ? parseInt(params.limit, 10) : params.limit,
+    }
+
+    // 第 2 層防禦：Zod 驗證
+    const validatedParams = getAuditLogsSchema.parse(cleanedParams)
 
     const supabase = await createClient()
 
