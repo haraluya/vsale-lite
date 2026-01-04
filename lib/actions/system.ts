@@ -13,8 +13,9 @@ import type { ActionResult, SystemSetting, ParsedSetting, SettingValueType, Sett
 
 /**
  * 解析設定值（TEXT → 實際型別）
+ * 內部輔助函式，不需要 export
  */
-export function parseSettingValue(
+function parseSettingValue(
   value: string,
   valueType: SettingValueType
 ): string | number | boolean | object {
@@ -32,8 +33,9 @@ export function parseSettingValue(
 
 /**
  * 序列化設定值（實際型別 → TEXT）
+ * 內部輔助函式，不需要 export
  */
-export function serializeSettingValue(
+function serializeSettingValue(
   value: string | number | boolean | object,
   valueType: SettingValueType
 ): string {
