@@ -1125,3 +1125,379 @@ export async function deleteProductImage(productId: string): Promise<ActionResul
     }
   }
 }
+
+// ============================================================
+// Excel 匯入匯出功能
+// ============================================================
+
+import { productImportSchema, productExportFiltersSchema, type ProductImportRow, type ProductExportFilters } from '@/lib/validations/excel.schema'
+import { jsonToExcelBuffer, excelBufferToJson, validateExcelFile, generateExcelFileName } from '@/lib/utils/excel'
+
+/**
+ * 匯出商品為 Excel 檔案
+ * @param filters 選填的篩選條件
+ * @returns Excel 檔案 Buffer 與檔案名稱
+ */
+export async function exportProducts(
+  filters?: ProductExportFilters
+): Promise<ActionResult<{ file_buffer: number[]; file_name: string }>> {
+  try {
+    // 1. 驗證管理員權限
+    await checkAuth('admin')
+
+    // 2. 驗證篩選條件
+    const validatedFilters = filters ? productExportFiltersSchema.parse(filters) : {}
+
+    const adminClient = createAdminClient()
+
+    // 3. 查詢商品資料（含系列名稱）
+    let query = adminClient
+      .from('products')
+      .select('code, name, series:series(name), retail_price, stock, unit, description, created_at')
+      .order('created_at', { ascending: false })
+
+    // 套用篩選條件
+    if (validatedFilters.series_id) {
+      query = query.eq('series_id', validatedFilters.series_id)
+    }
+    if (validatedFilters.status) {
+      query = query.eq('status', validatedFilters.status)
+    }
+    if (validatedFilters.search) {
+      query = query.or(`name.ilike.%${validatedFilters.search}%,code.ilike.%${validatedFilters.search}%`)
+    }
+
+    const { data: products, error } = await query
+
+    if (error) {
+      console.error('查詢商品失敗:', error)
+      return { success: false, message: '查詢商品失敗' }
+    }
+
+    if (!products || products.length === 0) {
+      return { success: false, message: '沒有符合條件的商品資料' }
+    }
+
+    // 4. 轉換為 Excel 格式
+    const excelData = products.map((p: any) => ({
+      '商品編號': p.code || '',
+      '商品名稱': p.name || '',
+      '所屬系列': p.series?.name || '',
+      '零售價格': p.retail_price || 0,
+      '庫存數量': p.stock || 0,
+      '單位': p.unit || '件',
+      '描述': p.description || '',
+      '建立時間': new Date(p.created_at).toLocaleDateString('zh-TW'),
+    }))
+
+    // 5. 產生 Excel Buffer
+    const excelBuffer = jsonToExcelBuffer(excelData, '商品資料')
+
+    // 6. 回傳 Buffer 陣列與檔案名稱
+    const fileName = generateExcelFileName('商品資料')
+
+    return {
+      success: true,
+      data: {
+        file_buffer: Array.from(excelBuffer),
+        file_name: fileName,
+      },
+      message: `成功匯出 ${products.length} 筆商品資料`,
+    }
+  } catch (error) {
+    console.error('exportProducts 錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '匯出失敗',
+    }
+  }
+}
+
+/**
+ * 匯入商品 Excel 檔案
+ * @param file Excel 檔案
+ * @param options 匯入選項（試算模式、跳過錯誤）
+ * @returns 匯入結果統計與錯誤明細
+ */
+export async function importProducts(
+  file: File,
+  options?: { dry_run?: boolean; skip_errors?: boolean }
+): Promise<ActionResult<{
+  total_rows: number
+  success_count: number
+  error_count: number
+  errors: Array<{
+    row_number: number
+    field: string
+    value: any
+    message: string
+  }>
+  dry_run: boolean
+}>> {
+  try {
+    // 1. 驗證管理員權限
+    await checkAuth('admin')
+
+    // 2. 驗證檔案格式與大小
+    const fileValidation = validateExcelFile(file)
+    if (!fileValidation.valid) {
+      return { success: false, message: fileValidation.error! }
+    }
+
+    // 3. 解析 Excel 為 JSON
+    const arrayBuffer = await file.arrayBuffer()
+    let rawData = await excelBufferToJson(arrayBuffer)
+
+    if (!rawData || rawData.length === 0) {
+      return { success: false, message: 'Excel 檔案為空' }
+    }
+
+    // 4. 檢查資料筆數上限（最多 1000 筆，超過自動截取並警告）
+    if (rawData.length > 1000) {
+      console.warn(`檔案包含 ${rawData.length} 筆資料，僅匯入前 1000 筆`)
+      rawData = rawData.slice(0, 1000)
+    }
+
+    const errors: Array<{
+      row_number: number
+      field: string
+      value: any
+      message: string
+    }> = []
+    const validRows: ProductImportRow[] = []
+
+    // 5. 逐列驗證 Zod Schema
+    for (let i = 0; i < rawData.length; i++) {
+      const row = rawData[i]
+      const rowNumber = i + 2 // Excel 第 1 列為標題
+
+      const validatedRow = productImportSchema.safeParse(row)
+      if (!validatedRow.success) {
+        const zodErrors = validatedRow.error.flatten().fieldErrors
+        for (const [field, messages] of Object.entries(zodErrors)) {
+          errors.push({
+            row_number: rowNumber,
+            field,
+            value: row[field],
+            message: messages?.[0] || '格式錯誤',
+          })
+        }
+        continue
+      }
+
+      validRows.push(validatedRow.data)
+    }
+
+    // 6. 批次查詢現有資料（效能優化，避免 N+1 查詢）
+    const adminClient = createAdminClient()
+
+    const allNames = validRows.map(row => row.商品名稱)
+
+    const { data: existingProducts } = await adminClient
+      .from('products')
+      .select('name')
+      .in('name', allNames)
+
+    // 建立 Set 快速查詢
+    const nameSet = new Set(existingProducts?.map(p => p.name) || [])
+
+    // 查詢系列（含狀態）並建立 Map
+    const { data: series } = await adminClient
+      .from('series')
+      .select('id, name, status')
+
+    const seriesMap = new Map(series?.map(s => [s.name, { id: s.id, status: s.status }]) || [])
+
+    // 7. 逐列驗證業務邏輯
+    const validProducts: any[] = []
+
+    for (let i = 0; i < validRows.length; i++) {
+      const row = validRows[i]
+      const rowNumber = i + 2
+
+      // 檢查商品名稱重複
+      if (nameSet.has(row.商品名稱)) {
+        errors.push({
+          row_number: rowNumber,
+          field: '商品名稱',
+          value: row.商品名稱,
+          message: '商品名稱已存在',
+        })
+        continue
+      }
+
+      // 檢查系列是否存在
+      const seriesInfo = seriesMap.get(row.所屬系列)
+      if (!seriesInfo) {
+        errors.push({
+          row_number: rowNumber,
+          field: '所屬系列',
+          value: row.所屬系列,
+          message: '系列不存在',
+        })
+        continue
+      }
+
+      // 檢查系列狀態
+      if (seriesInfo.status !== 'active') {
+        errors.push({
+          row_number: rowNumber,
+          field: '所屬系列',
+          value: row.所屬系列,
+          message: '系列已停用，無法新增商品',
+        })
+        continue
+      }
+
+      // 建立有效的商品資料（code 欄位由 Trigger 自動產生）
+      validProducts.push({
+        name: row.商品名稱,
+        series_id: seriesInfo.id,
+        retail_price: row.零售價格,
+        stock: row.庫存數量 !== undefined ? row.庫存數量 : 0,
+        unit: row.單位 || '件',
+        description: row.描述 || null,
+        status: 'active',
+      })
+    }
+
+    // 8. 試算模式 - 僅驗證不寫入
+    if (options?.dry_run) {
+      return {
+        success: true,
+        data: {
+          total_rows: rawData.length,
+          success_count: validProducts.length,
+          error_count: errors.length,
+          errors,
+          dry_run: true,
+        },
+        message: `試算驗證完成：${validProducts.length} 筆有效，${errors.length} 筆錯誤`,
+      }
+    }
+
+    // 9. 正式匯入 - 批次 INSERT + 處理 Trigger 失敗錯誤
+    if (validProducts.length === 0) {
+      return {
+        success: false,
+        message: `沒有有效的資料可匯入（共 ${rawData.length} 筆，${errors.length} 筆錯誤）`,
+      }
+    }
+
+    try {
+      const { error: insertError } = await adminClient
+        .from('products')
+        .insert(validProducts)
+
+      if (insertError) {
+        console.error('批次匯入失敗:', insertError)
+
+        // 檢查是否為唯一性約束違反（PostgreSQL 錯誤碼 23505）
+        if (insertError.code === '23505') {
+          return {
+            success: false,
+            message: '匯入失敗：部分商品名稱已存在（可能被其他管理員同時新增）',
+          }
+        }
+
+        // 檢查是否為商品編號產生失敗
+        if (insertError.message.includes('code') || insertError.message.includes('trigger')) {
+          return {
+            success: false,
+            message: `商品編號產生失敗: ${insertError.message}，請聯絡系統管理員`,
+          }
+        }
+
+        return {
+          success: false,
+          message: `匯入失敗: ${insertError.message}`,
+        }
+      }
+
+      // 10. 更新快取
+      revalidatePath('/admin/products')
+
+      return {
+        success: true,
+        data: {
+          total_rows: rawData.length,
+          success_count: validProducts.length,
+          error_count: errors.length,
+          errors,
+          dry_run: false,
+        },
+        message: `成功匯入 ${validProducts.length} 筆商品資料，請前往「價格管理」設定等級價格`,
+      }
+    } catch (error) {
+      console.error('importProducts 異常:', error)
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : '匯入過程發生錯誤',
+      }
+    }
+  } catch (error) {
+    console.error('importProducts 錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '匯入失敗',
+    }
+  }
+}
+
+/**
+ * 下載商品匯入範本
+ * @returns Excel 檔案 Buffer 與檔案名稱
+ */
+export async function downloadProductTemplate(): Promise<
+  ActionResult<{ file_buffer: number[]; file_name: string }>
+> {
+  try {
+    // 1. 驗證管理員權限
+    await checkAuth('admin')
+
+    const adminClient = createAdminClient()
+
+    // 2. 查詢第一個系列作為範例
+    const { data: series } = await adminClient
+      .from('series')
+      .select('name')
+      .eq('status', 'active')
+      .order('sort_order', { ascending: true })
+      .limit(1)
+
+    const firstSeries = series?.[0]
+
+    // 3. 建立範本資料
+    const templateData = [
+      {
+        '商品名稱': '範例商品名稱',
+        '所屬系列': firstSeries?.name || '範例系列',
+        '零售價格': 100,
+        '庫存數量': 50,
+        '單位': '件',
+        '描述': '這是範例描述',
+      },
+    ]
+
+    // 4. 產生 Excel Buffer
+    const excelBuffer = jsonToExcelBuffer(templateData, '商品匯入範本')
+
+    // 5. 回傳 Buffer 陣列與檔案名稱
+    const fileName = '商品匯入範本.xlsx'
+
+    return {
+      success: true,
+      data: {
+        file_buffer: Array.from(excelBuffer),
+        file_name: fileName,
+      },
+      message: '範本下載成功，請注意：商品編號將由系統自動產生',
+    }
+  } catch (error) {
+    console.error('downloadProductTemplate 錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '下載範本失敗',
+    }
+  }
+}
