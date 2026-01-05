@@ -230,6 +230,54 @@ vsale/
 - Phase 7: 📋 UI 可選（操作歷史時間軸）
 - Phase 8: ✅ 核心完成（TypeScript 型別檢查通過）
 
+#### 6. **系列與商品管理 Excel 匯入匯出功能** ✅ **NEW!**
+**狀態**: Phase 1-5 完成 (2026-01-05)
+
+**核心功能**:
+1. ✅ 資料庫 Migration（系列與商品名稱唯一性約束）
+2. ✅ 系列管理匯入匯出（範本下載、匯出、雙階段匯入）
+3. ✅ 商品管理匯入匯出（範本下載、匯出、雙階段匯入）
+4. ✅ 批次查詢優化（避免 N+1 查詢問題）
+5. ✅ 完整錯誤處理（唯一性約束違反、Trigger 失敗、試算驗證）
+
+**資料庫變更**:
+- `series.name`: 新增 UNIQUE 約束與索引
+- `products.name`: 新增 UNIQUE 約束與索引
+- Migration: `20260116_add_unique_name_constraints.sql`
+
+**Server Actions** (`lib/actions/series.ts`, `lib/actions/products.ts`):
+- `exportSeries()` / `exportProducts()`: 匯出為 Excel（含篩選支援）
+- `importSeries()` / `importProducts()`: 批次匯入（試算模式 + 正式匯入）
+- `downloadSeriesTemplate()` / `downloadProductTemplate()`: 下載匯入範本
+
+**UI 元件** (`components/admin/series/`, `components/admin/products/`):
+- `ExcelExport`: 匯出按鈕（白色、Neo-Brutalism 風格）
+- `ExcelImport`: 匯入區塊（可收合、即時結果顯示、錯誤明細）
+- `ExcelTemplateDownload`: 範本下載按鈕（藍色）
+
+**頁面整合**:
+- `/admin/series`: 系列管理頁面（新增三個按鈕 + 匯入區塊）
+- `/admin/products`: 商品管理頁面（新增三個按鈕 + 匯入區塊）
+
+**特色**:
+- ✅ 名稱重複檢查：匯入時禁止名稱重複
+- ✅ 商品編號自動產生：由 PostgreSQL Trigger 自動產生
+- ✅ 系列狀態檢查：僅允許匯入到 active 系列
+- ✅ 批次查詢優化：使用 Set/Map 避免 N+1 查詢
+- ✅ 雙階段匯入：試算驗證 → 正式匯入
+- ✅ 匯入成功提示：提醒管理員設定等級價格
+
+**實作檔案**:
+| 類型 | 檔案數量 | 位置 |
+|------|---------|------|
+| Migration | 1 | `supabase/migrations/20260116_add_unique_name_constraints.sql` |
+| Zod Schema | 1 | `lib/validations/excel.schema.ts` |
+| Server Actions | 6 函式 | `lib/actions/series.ts`, `lib/actions/products.ts` |
+| UI 元件 | 6 | `components/admin/series/`, `components/admin/products/` |
+| 頁面整合 | 2 | `app/(admin)/admin/series/page.tsx`, `app/(admin)/admin/products/page.tsx` |
+
+---
+
 ### 🚀 待開發功能
 目前所有核心功能已完成，以下是可能的擴充方向：
 - 🎨 **Phase 6-7 UI**: 系統設定前端介面、操作歷史時間軸元件
@@ -364,6 +412,23 @@ supabase migration list
 
 **Migration 檔案位置**:
 - `supabase/migrations/*.sql` - 按時間戳排序 (20260101, 20260102, 20260103...)
+
+**⚠️ Migration 安全原則** - **必讀！**
+
+在建立 Migration 前，請務必參考以下文件：
+- 📖 **完整指南**: [`docs/SAFE_MIGRATION_GUIDE.md`](docs/SAFE_MIGRATION_GUIDE.md) - 詳細說明安全與危險操作
+- 🚀 **快速參考**: [`docs/BACKUP_RESTORE_CHEATSHEET.md`](docs/BACKUP_RESTORE_CHEATSHEET.md) - 部署檢查清單與指令
+
+**黃金守則**:
+1. ✅ **優先使用新增操作**（ADD COLUMN, CREATE TABLE, CREATE INDEX）
+2. ⚠️ **避免刪除操作**（DROP COLUMN, DROP TABLE）- 先重新命名，保留 30 天
+3. 🛡️ **部署前必須備份**（使用 `pg_dump`）
+4. 🔄 **複雜變更分階段執行**（新增 → 遷移 → 清理）
+5. 📊 **準備回滾計畫**（備份檔案或反向 Migration）
+
+**Migration 範本位置**:
+- `supabase/migrations/_TEMPLATE_safe_migration.sql` - 安全新增功能範本
+- `supabase/migrations/_CHECKLIST.md` - 部署前檢查清單
 
 ---
 
