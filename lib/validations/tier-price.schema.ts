@@ -4,7 +4,7 @@ import { z } from 'zod'
 export const setTierPriceSchema = z.object({
   product_id: z.string().uuid("商品 ID 格式錯誤"),
   tier_id: z.string().uuid("等級 ID 格式錯誤"),
-  price: z.number().min(0, "價格不可為負數")
+  price: z.number().min(0, "價格不可為負數").nullable()
 })
 
 // 批量設定價格
@@ -13,7 +13,7 @@ export const batchSetTierPricesSchema = z.object({
     z.object({
       product_id: z.string().uuid(),
       tier_id: z.string().uuid(),
-      price: z.number().min(0)
+      price: z.number().min(0).nullable()
     })
   ).min(1, "至少需要設定一個價格")
 })

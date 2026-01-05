@@ -53,11 +53,9 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
     setSuccess(false)
 
     try {
-      // 過濾出有設定價格且非零售等級的價格 (零售價格由 retail_price 控制)
+      // 過濾出非零售等級的價格（允許 null，這樣可以清空價格）
       const priceData = Object.entries(prices)
-        .filter(([key, price]) => {
-          // 檢查價格是否為有效數字
-          if (price === null || price === undefined || isNaN(price)) return false
+        .filter(([key]) => {
           // 檢查是否為零售等級 (零售等級價格不允許手動設定)
           const [productId, tierId] = key.split('_')
           const product = products.find((p) => p.id === productId)
@@ -66,18 +64,21 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
         })
         .map(([key, price]) => {
           const [product_id, tier_id] = key.split('_')
-          return { product_id, tier_id, price: Number(price) }
+          return { product_id, tier_id, price: price === null ? null : Number(price) }
         })
 
       if (priceData.length === 0) {
-        setError('請至少設定一個非零售等級的價格')
+        setError('請至少選擇一個非零售等級的商品進行設定')
         setLoading(false)
         return
       }
 
-      // 驗證所有價格資料的格式
+      // 驗證所有價格資料的格式（允許 null）
       const invalidData = priceData.find(
-        (item) => !item.product_id || !item.tier_id || typeof item.price !== 'number' || item.price < 0
+        (item) =>
+          !item.product_id ||
+          !item.tier_id ||
+          (item.price !== null && (typeof item.price !== 'number' || item.price < 0 || isNaN(item.price)))
       )
       if (invalidData) {
         setError(`資料格式錯誤: ${JSON.stringify(invalidData)}`)
@@ -241,7 +242,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
             <p>💡 提示:</p>
             <ul className="ml-4 mt-1 list-disc space-y-1">
               <li>零售等級價格自動同步商品的零售價格,無法手動修改</li>
-              <li>留空表示該等級尚未設定價格</li>
+              <li>留空的價格欄位，客戶端會自動顯示原價（零售價格）</li>
               <li>支援批量設定,一次儲存所有變更</li>
             </ul>
           </div>
