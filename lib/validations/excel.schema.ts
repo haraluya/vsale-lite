@@ -58,3 +58,68 @@ export type ClientImportData = z.infer<typeof clientImportSchema>;
 export type BatchImportData = z.infer<typeof batchImportSchema>;
 export type ImportOptions = z.infer<typeof importOptionsSchema>;
 export type ClientExportFilters = z.infer<typeof clientExportFiltersSchema>;
+
+// ============================================================
+// 系列管理匯入匯出 Schema
+// ============================================================
+
+/**
+ * 系列匯入單筆資料 Schema
+ */
+export const seriesImportSchema = z.object({
+  系列名稱: z.string().min(1, '系列名稱不可為空'),
+  系列代碼: z.string()
+    .min(3, '系列代碼至少 3 個字元')
+    .max(10, '系列代碼最多 10 個字元')
+    .regex(/^[A-Z]{3,10}$/, '系列代碼必須為 3-10 個大寫英文字母'),
+  所屬分類: z.string().optional(),
+  排序: z.union([z.string(), z.number()])
+    .transform(val => Number(val))
+    .pipe(z.number().int('排序必須為整數').min(0, '排序不可為負數'))
+    .optional(),
+  描述: z.string().max(500, '描述最多 500 個字元').optional(),
+});
+
+/**
+ * 系列匯出篩選 Schema
+ */
+export const seriesExportFiltersSchema = z.object({
+  category_id: z.string().uuid().optional(),
+  status: z.enum(['active', 'inactive']).optional(),
+});
+
+export type SeriesImportRow = z.infer<typeof seriesImportSchema>;
+export type SeriesExportFilters = z.infer<typeof seriesExportFiltersSchema>;
+
+// ============================================================
+// 商品管理匯入匯出 Schema
+// ============================================================
+
+/**
+ * 商品匯入單筆資料 Schema
+ */
+export const productImportSchema = z.object({
+  商品名稱: z.string().min(1, '商品名稱不可為空'),
+  所屬系列: z.string().min(1, '所屬系列不可為空'),
+  零售價格: z.union([z.string(), z.number()])
+    .transform(val => Number(val))
+    .pipe(z.number().min(0, '零售價格不可為負數')),
+  庫存數量: z.union([z.string(), z.number()])
+    .transform(val => Number(val))
+    .pipe(z.number().int('庫存必須為整數'))
+    .optional(),
+  單位: z.string().max(20, '單位最多 20 個字元').optional(),
+  描述: z.string().max(1000, '描述最多 1000 個字元').optional(),
+});
+
+/**
+ * 商品匯出篩選 Schema
+ */
+export const productExportFiltersSchema = z.object({
+  series_id: z.string().uuid().optional(),
+  search: z.string().optional(),
+  status: z.enum(['active', 'inactive']).optional(),
+});
+
+export type ProductImportRow = z.infer<typeof productImportSchema>;
+export type ProductExportFilters = z.infer<typeof productExportFiltersSchema>;

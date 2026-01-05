@@ -354,3 +354,362 @@ export async function uploadSeriesImage(
     return { success: false, message: error instanceof Error ? error.message : '上傳失敗' }
   }
 }
+
+// ============================================================
+// Excel 匯入匯出功能
+// ============================================================
+
+import { seriesImportSchema, seriesExportFiltersSchema, type SeriesImportRow, type SeriesExportFilters } from '@/lib/validations/excel.schema'
+import { jsonToExcelBuffer, excelBufferToJson, validateExcelFile, generateExcelFileName } from '@/lib/utils/excel'
+
+/**
+ * 匯出系列為 Excel 檔案
+ * @param filters 選填的篩選條件
+ * @returns Excel 檔案 Buffer 與檔案名稱
+ */
+export async function exportSeries(
+  filters?: SeriesExportFilters
+): Promise<ActionResult<{ file_buffer: number[]; file_name: string }>> {
+  try {
+    // 1. 驗證管理員權限
+    await checkAuth('admin')
+
+    // 2. 驗證篩選條件
+    const validatedFilters = filters ? seriesExportFiltersSchema.parse(filters) : {}
+
+    const adminClient = createAdminClient()
+
+    // 3. 查詢系列資料（含分類名稱）
+    let query = adminClient
+      .from('series')
+      .select('name, code, category:categories(name), sort_order, description, created_at')
+      .order('sort_order', { ascending: true })
+
+    // 套用篩選條件
+    if (validatedFilters.category_id) {
+      query = query.eq('category_id', validatedFilters.category_id)
+    }
+    if (validatedFilters.status) {
+      query = query.eq('status', validatedFilters.status)
+    }
+
+    const { data: series, error } = await query
+
+    if (error) {
+      console.error('查詢系列失敗:', error)
+      return { success: false, message: '查詢系列失敗' }
+    }
+
+    if (!series || series.length === 0) {
+      return { success: false, message: '沒有符合條件的系列資料' }
+    }
+
+    // 4. 轉換為 Excel 格式
+    const excelData = series.map((s: any) => ({
+      '系列名稱': s.name || '',
+      '系列代碼': s.code || '',
+      '所屬分類': s.category?.name || '',
+      '排序': s.sort_order || 0,
+      '描述': s.description || '',
+      '建立時間': new Date(s.created_at).toLocaleDateString('zh-TW'),
+    }))
+
+    // 5. 產生 Excel Buffer
+    const excelBuffer = jsonToExcelBuffer(excelData, '系列資料')
+
+    // 6. 回傳 Buffer 陣列與檔案名稱
+    const fileName = generateExcelFileName('系列資料')
+
+    return {
+      success: true,
+      data: {
+        file_buffer: Array.from(excelBuffer),
+        file_name: fileName,
+      },
+      message: `成功匯出 ${series.length} 筆系列資料`,
+    }
+  } catch (error) {
+    console.error('exportSeries 錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '匯出失敗',
+    }
+  }
+}
+
+/**
+ * 匯入系列 Excel 檔案
+ * @param file Excel 檔案
+ * @param options 匯入選項（試算模式、跳過錯誤）
+ * @returns 匯入結果統計與錯誤明細
+ */
+export async function importSeries(
+  file: File,
+  options?: { dry_run?: boolean; skip_errors?: boolean }
+): Promise<ActionResult<{
+  total_rows: number
+  success_count: number
+  error_count: number
+  errors: Array<{
+    row_number: number
+    field: string
+    value: any
+    message: string
+  }>
+  dry_run: boolean
+}>> {
+  try {
+    // 1. 驗證管理員權限
+    await checkAuth('admin')
+
+    // 2. 驗證檔案格式與大小
+    const fileValidation = validateExcelFile(file)
+    if (!fileValidation.valid) {
+      return { success: false, message: fileValidation.error! }
+    }
+
+    // 3. 解析 Excel 為 JSON
+    const arrayBuffer = await file.arrayBuffer()
+    let rawData = await excelBufferToJson(arrayBuffer)
+
+    if (!rawData || rawData.length === 0) {
+      return { success: false, message: 'Excel 檔案為空' }
+    }
+
+    // 4. 檢查資料筆數上限（最多 1000 筆，超過自動截取並警告）
+    if (rawData.length > 1000) {
+      console.warn(`檔案包含 ${rawData.length} 筆資料，僅匯入前 1000 筆`)
+      rawData = rawData.slice(0, 1000)
+    }
+
+    const errors: Array<{
+      row_number: number
+      field: string
+      value: any
+      message: string
+    }> = []
+    const validRows: SeriesImportRow[] = []
+
+    // 5. 逐列驗證 Zod Schema
+    for (let i = 0; i < rawData.length; i++) {
+      const row = rawData[i]
+      const rowNumber = i + 2 // Excel 第 1 列為標題
+
+      const validatedRow = seriesImportSchema.safeParse(row)
+      if (!validatedRow.success) {
+        const zodErrors = validatedRow.error.flatten().fieldErrors
+        for (const [field, messages] of Object.entries(zodErrors)) {
+          errors.push({
+            row_number: rowNumber,
+            field,
+            value: row[field],
+            message: messages?.[0] || '格式錯誤',
+          })
+        }
+        continue
+      }
+
+      validRows.push(validatedRow.data)
+    }
+
+    // 6. 批次查詢現有資料（效能優化，避免 N+1 查詢）
+    const adminClient = createAdminClient()
+
+    const allNames = validRows.map(row => row.系列名稱)
+    const allCodes = validRows.map(row => row.系列代碼)
+
+    const { data: existingSeries } = await adminClient
+      .from('series')
+      .select('name, code')
+      .or(`name.in.(${allNames.join(',')}),code.in.(${allCodes.join(',')})`)
+
+    // 建立 Set 快速查詢
+    const nameSet = new Set(existingSeries?.map(s => s.name) || [])
+    const codeSet = new Set(existingSeries?.map(s => s.code) || [])
+
+    // 查詢分類並建立 Map
+    const { data: categories } = await adminClient
+      .from('categories')
+      .select('id, name')
+      .eq('status', 'active')
+
+    const categoryMap = new Map(categories?.map(c => [c.name, c.id]) || [])
+
+    // 7. 逐列驗證業務邏輯
+    const validSeries: any[] = []
+
+    for (let i = 0; i < validRows.length; i++) {
+      const row = validRows[i]
+      const rowNumber = i + 2
+
+      // 檢查系列名稱重複
+      if (nameSet.has(row.系列名稱)) {
+        errors.push({
+          row_number: rowNumber,
+          field: '系列名稱',
+          value: row.系列名稱,
+          message: '系列名稱已存在',
+        })
+        continue
+      }
+
+      // 檢查系列代碼重複
+      if (codeSet.has(row.系列代碼)) {
+        errors.push({
+          row_number: rowNumber,
+          field: '系列代碼',
+          value: row.系列代碼,
+          message: '系列代碼已存在',
+        })
+        continue
+      }
+
+      // 檢查分類是否存在
+      let categoryId: string | null = null
+      if (row.所屬分類) {
+        categoryId = categoryMap.get(row.所屬分類) || null
+        if (!categoryId) {
+          errors.push({
+            row_number: rowNumber,
+            field: '所屬分類',
+            value: row.所屬分類,
+            message: '分類不存在或已停用',
+          })
+          continue
+        }
+      }
+
+      // 建立有效的系列資料
+      validSeries.push({
+        name: row.系列名稱,
+        code: row.系列代碼,
+        category_id: categoryId,
+        sort_order: row.排序 || 0,
+        description: row.描述 || null,
+        status: 'active',
+      })
+    }
+
+    // 8. 試算模式 - 僅驗證不寫入
+    if (options?.dry_run) {
+      return {
+        success: true,
+        data: {
+          total_rows: rawData.length,
+          success_count: validSeries.length,
+          error_count: errors.length,
+          errors,
+          dry_run: true,
+        },
+        message: `試算驗證完成：${validSeries.length} 筆有效，${errors.length} 筆錯誤`,
+      }
+    }
+
+    // 9. 正式匯入 - 批次 INSERT + 處理資料庫約束違反錯誤
+    if (validSeries.length === 0) {
+      return {
+        success: false,
+        message: `沒有有效的資料可匯入（共 ${rawData.length} 筆，${errors.length} 筆錯誤）`,
+      }
+    }
+
+    const { error: insertError } = await adminClient
+      .from('series')
+      .insert(validSeries)
+
+    if (insertError) {
+      console.error('批次匯入失敗:', insertError)
+
+      // 檢查是否為唯一性約束違反（PostgreSQL 錯誤碼 23505）
+      if (insertError.code === '23505') {
+        return {
+          success: false,
+          message: '匯入失敗：部分系列名稱或代碼已存在（可能被其他管理員同時新增）',
+        }
+      }
+
+      return {
+        success: false,
+        message: `匯入失敗: ${insertError.message}`,
+      }
+    }
+
+    // 10. 更新快取
+    revalidatePath('/admin/series')
+
+    return {
+      success: true,
+      data: {
+        total_rows: rawData.length,
+        success_count: validSeries.length,
+        error_count: errors.length,
+        errors,
+        dry_run: false,
+      },
+      message: `成功匯入 ${validSeries.length} 筆系列資料`,
+    }
+  } catch (error) {
+    console.error('importSeries 錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '匯入失敗',
+    }
+  }
+}
+
+/**
+ * 下載系列匯入範本
+ * @returns Excel 檔案 Buffer 與檔案名稱
+ */
+export async function downloadSeriesTemplate(): Promise<
+  ActionResult<{ file_buffer: number[]; file_name: string }>
+> {
+  try {
+    // 1. 驗證管理員權限
+    await checkAuth('admin')
+
+    const adminClient = createAdminClient()
+
+    // 2. 查詢第一個分類作為範例
+    const { data: categories } = await adminClient
+      .from('categories')
+      .select('name')
+      .eq('status', 'active')
+      .order('sort_order', { ascending: true })
+      .limit(1)
+
+    const firstCategory = categories?.[0]
+
+    // 3. 建立範本資料
+    const templateData = [
+      {
+        '系列名稱': '範例系列名稱',
+        '系列代碼': 'EXAMPLE',
+        '所屬分類': firstCategory?.name || '',  // 允許空值（未分類）
+        '排序': 0,
+        '描述': '這是範例描述',
+      },
+    ]
+
+    // 4. 產生 Excel Buffer
+    const excelBuffer = jsonToExcelBuffer(templateData, '系列匯入範本')
+
+    // 5. 回傳 Buffer 陣列與檔案名稱
+    const fileName = '系列匯入範本.xlsx'
+
+    return {
+      success: true,
+      data: {
+        file_buffer: Array.from(excelBuffer),
+        file_name: fileName,
+      },
+      message: '範本下載成功',
+    }
+  } catch (error) {
+    console.error('downloadSeriesTemplate 錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '下載範本失敗',
+    }
+  }
+}
