@@ -496,6 +496,8 @@ export async function confirmOrder(
       p_actor_id: userId,
     })
 
+    console.log('confirmOrder - RPC 回傳:', { data, error })
+
     if (error || !data) {
       console.error('確認訂單錯誤:', error)
       return {
@@ -506,7 +508,10 @@ export async function confirmOrder(
 
     // 檢查 Function 回傳結果
     const result = data as { success: boolean; error?: string; order_id?: string }
+    console.log('confirmOrder - Function 結果:', result)
+
     if (!result.success) {
+      console.error('confirmOrder - Function 回傳失敗:', result.error)
       return {
         success: false,
         message: result.error || '確認訂單失敗',
