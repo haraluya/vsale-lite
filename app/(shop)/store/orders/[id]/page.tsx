@@ -84,7 +84,7 @@ export default function CustomerOrderDetailPage() {
         "min-h-screen bg-gray-50",
         designTokens.spacing.page.padding
       )}>
-        <div className={designTokens.container.narrow}>
+        <div className={designTokens.container.default}>
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="mb-4 text-6xl">⏳</div>
@@ -103,7 +103,7 @@ export default function CustomerOrderDetailPage() {
         "min-h-screen bg-gray-50",
         designTokens.spacing.page.padding
       )}>
-        <div className={designTokens.container.narrow}>
+        <div className={designTokens.container.default}>
           <div className="flex flex-col items-center justify-center py-20">
             <div className="mb-6 text-6xl md:text-8xl">❌</div>
             <h2 className={cn(
@@ -148,7 +148,7 @@ export default function CustomerOrderDetailPage() {
       designTokens.spacing.page.padding
     )}>
       <div className={cn(
-        designTokens.container.narrow,
+        designTokens.container.default,
         designTokens.spacing.page.gap
       )}>
         {/* 成功訊息 */}

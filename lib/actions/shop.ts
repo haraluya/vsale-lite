@@ -90,11 +90,12 @@ export async function getSeriesProductsWithPrice(
     }
 
     // 整合價格資料
+    // 🆕 若沒有設定等級價格，則預設使用零售價格 (retail_price)
     const products: ProductWithPrice[] = (data || []).map((product: any) => {
       const tierPrice = product.tier_prices?.[0]
       return {
         ...product,
-        user_price: tierPrice?.price || null,
+        user_price: tierPrice?.price ?? product.retail_price ?? null,
         tier_prices: undefined, // 移除 JOIN 資料
       }
     })

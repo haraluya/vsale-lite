@@ -180,7 +180,7 @@ export default function CheckoutPage() {
       designTokens.spacing.page.padding
     )}>
       <div className={cn(
-        designTokens.container.narrow,
+        designTokens.container.default,
         designTokens.spacing.page.gap
       )}>
         {/* 頁面標題 */}

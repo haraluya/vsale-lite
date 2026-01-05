@@ -51,7 +51,7 @@ export async function validateCartItem(
       }
     }
 
-    // 檢查是否有設定等級價格
+    // 檢查是否有設定等級價格，若無則使用零售價格
     const { data: tierPrice } = await supabase
       .from('tier_prices')
       .select('price')
@@ -59,10 +59,19 @@ export async function validateCartItem(
       .eq('tier_id', tierId!)
       .single()
 
+    // 若沒有等級價格，檢查是否有零售價格
     if (!tierPrice || tierPrice.price === null) {
-      return {
-        success: false,
-        message: '此商品價格未設定,無法加入購物車',
+      const { data: productData } = await supabase
+        .from('products')
+        .select('retail_price')
+        .eq('id', productId)
+        .single()
+
+      if (!productData || productData.retail_price === null || productData.retail_price === undefined) {
+        return {
+          success: false,
+          message: '此商品價格未設定,無法加入購物車',
+        }
       }
     }
 
@@ -106,15 +115,16 @@ export async function getCartItemsWithPrices(
 
     const productIds = cartItems.map(item => item.productId)
 
-    // 批次查詢商品與價格
+    // 批次查詢商品與價格（LEFT JOIN tier_prices，以支援使用零售價格）
     const { data: products, error } = await supabase
       .from('products')
       .select(`
         id,
         name,
         image_url,
+        retail_price,
         status,
-        tier_prices!inner(price)
+        tier_prices!left(price)
       `)
       .in('id', productIds)
       .eq('tier_prices.tier_id', tierId!)
@@ -129,9 +139,11 @@ export async function getCartItemsWithPrices(
     }
 
     // 合併數量資訊並計算小計
+    // 若沒有等級價格，則使用零售價格 (retail_price)
     const itemsWithPrices: CartItemWithProduct[] = products.map(product => {
       const cartItem = cartItems.find(item => item.productId === product.id)
-      const price = (product.tier_prices as any)[0]?.price || null
+      const tierPrice = (product.tier_prices as any)?.[0]?.price
+      const price = tierPrice ?? product.retail_price ?? null
       const quantity = cartItem?.quantity || 1
 
       return {
@@ -200,7 +212,8 @@ export async function validateCartBeforeCheckout(
           id,
           name,
           status,
-          tier_prices!inner(price)
+          retail_price,
+          tier_prices!left(price)
         `)
         .eq('id', productId)
         .eq('tier_prices.tier_id', tierId!)
@@ -211,8 +224,11 @@ export async function validateCartBeforeCheckout(
         continue
       }
 
-      const price = (product.tier_prices as any)[0]?.price
-      if (price === null || price === undefined) {
+      // 若沒有等級價格，檢查是否有零售價格
+      const tierPrice = (product.tier_prices as any)?.[0]?.price
+      const finalPrice = tierPrice ?? product.retail_price
+
+      if (finalPrice === null || finalPrice === undefined) {
         invalidItems.push(productId)
       }
     }
