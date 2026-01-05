@@ -4,9 +4,6 @@ import { getProducts } from '@/lib/actions/products'
 import { getCategories } from '@/lib/actions/categories'
 import { ProductTable } from '@/components/admin/product-table'
 import { ProductTableWithTags } from '@/components/admin/product-table-with-tags'
-import { ExcelTemplateDownload } from '@/components/admin/products/excel-template-download'
-import { ExcelExport } from '@/components/admin/products/excel-export'
-import { ExcelImport } from '@/components/admin/products/excel-import'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
@@ -45,8 +42,6 @@ export default async function ProductsPage({
         </div>
 
         <div className="flex gap-3">
-          <ExcelTemplateDownload />
-          <ExcelExport />
           <Link href="/admin/products/new">
             <Button>
               <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />
@@ -55,9 +50,6 @@ export default async function ProductsPage({
           </Link>
         </div>
       </div>
-
-      {/* Excel 匯入區塊 */}
-      <ExcelImport />
 
       {/* Products Table with Tags Management */}
       <ProductTableWithTags

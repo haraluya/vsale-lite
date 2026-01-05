@@ -114,7 +114,6 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
         code: validation.data.code,
         name: validation.data.name,
         description: validation.data.description || null,
-        sort_order: validation.data.sort_order,
         status: 'active',
       })
       .select()
@@ -584,7 +583,6 @@ export async function importSeries(
         name: row.系列名稱,
         code: row.系列代碼,
         category_id: categoryId,
-        sort_order: row.排序 || 0,
         description: row.描述 || null,
         status: 'active',
       })
@@ -686,7 +684,6 @@ export async function downloadSeriesTemplate(): Promise<
         '系列名稱': '範例系列名稱',
         '系列代碼': 'EXAMPLE',
         '所屬分類': firstCategory?.name || '',  // 允許空值（未分類）
-        '排序': 0,
         '描述': '這是範例描述',
       },
     ]

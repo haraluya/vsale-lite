@@ -73,10 +73,6 @@ export const seriesImportSchema = z.object({
     .max(10, '系列代碼最多 10 個字元')
     .regex(/^[A-Z]{3,10}$/, '系列代碼必須為 3-10 個大寫英文字母'),
   所屬分類: z.string().optional(),
-  排序: z.union([z.string(), z.number()])
-    .transform(val => Number(val))
-    .pipe(z.number().int('排序必須為整數').min(0, '排序不可為負數'))
-    .optional(),
   描述: z.string().max(500, '描述最多 500 個字元').optional(),
 });
 

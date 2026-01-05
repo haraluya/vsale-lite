@@ -13,9 +13,6 @@ import { Plus, Edit } from 'lucide-react'
 import { getSeries } from '@/lib/actions/series'
 import { Button } from '@/components/ui/button'
 import { SeriesDeleteButton } from '@/components/admin/series-delete-button'
-import { ExcelTemplateDownload } from '@/components/admin/series/excel-template-download'
-import { ExcelExport } from '@/components/admin/series/excel-export'
-import { ExcelImport } from '@/components/admin/series/excel-import'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
@@ -34,8 +31,6 @@ export default async function SeriesPage() {
         </div>
 
         <div className="flex gap-3">
-          <ExcelTemplateDownload />
-          <ExcelExport />
           <Link href="/admin/series/new">
             <Button>
               <Plus className="mr-2 h-4 w-4 md:h-5 md:w-5" />
@@ -44,9 +39,6 @@ export default async function SeriesPage() {
           </Link>
         </div>
       </div>
-
-      {/* Excel 匯入區塊 */}
-      <ExcelImport />
 
       {/* Series List */}
       {!series || series.length === 0 ? (
@@ -112,10 +104,6 @@ export default async function SeriesPage() {
                 {s.description && (
                   <p className={cn(designTokens.typography.caption, "line-clamp-2 text-gray-600")}>{s.description}</p>
                 )}
-
-                <div className={cn(designTokens.typography.caption, "mt-2 md:mt-3 text-gray-500")}>
-                  排序順序: {s.sort_order}
-                </div>
 
                 {/* 操作按鈕 */}
                 <div className="mt-3 md:mt-4 flex gap-2">

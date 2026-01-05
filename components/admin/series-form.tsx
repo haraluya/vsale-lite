@@ -5,7 +5,6 @@
  * 系列表單元件 (管理員用)
  * - 建立/編輯系列資訊
  * - 選擇分類
- * - 設定排序順序
  * - 上傳系列圖片
  */
 
@@ -77,7 +76,6 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
       name: formData.get('name') as string,
       description: formData.get('description') as string || '',
       status: formData.get('status') as 'active' | 'inactive',
-      sort_order: parseInt(formData.get('sort_order') as string) || 0,
     }
 
     try {
@@ -198,22 +196,6 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               rows={4}
               className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-
-          {/* 排序順序 */}
-          <div>
-            <label htmlFor="sort_order" className="mb-2 block font-bold">
-              排序順序
-            </label>
-            <input
-              type="number"
-              id="sort_order"
-              name="sort_order"
-              defaultValue={series?.sort_order || 0}
-              min="0"
-              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <p className="mt-1 text-sm text-gray-500">數字越小,排序越前面</p>
           </div>
 
           {/* 狀態 */}
