@@ -2,7 +2,7 @@
 
 **專案名稱**: Vsale-lite
 **專案類型**: B2B 批發訂貨系統
-**最後更新**: 2026-01-03
+**最後更新**: 2026-01-06
 
 ## 專案概述
 
@@ -276,13 +276,74 @@ vsale/
 | UI 元件 | 6 | `components/admin/series/`, `components/admin/products/` |
 | 頁面整合 | 2 | `app/(admin)/admin/series/page.tsx`, `app/(admin)/admin/products/page.tsx` |
 
+#### 7. **009-coupon-system**: 優惠券系統 ✅ **NEW!**
+**狀態**: Phase 1-8 核心功能完成 (2026-01-06)
+
+**核心功能**:
+1. ✅ 客戶領取與使用優惠券（輸入口令、購物車應用、訂單折扣）
+2. ✅ 管理員建立與管理優惠券（代碼、折扣方式、使用限制、生效時間）
+3. ✅ 優惠券使用限制與驗證（等級限制、最低金額、系列限制）
+4. ✅ 訂單優惠券快照（永久保留，即使優惠券被刪除）
+5. ✅ 優惠券代碼唯一性與大小寫處理（自動轉大寫、重複檢查）
+6. ✅ 購物車商品變更時自動重新驗證優惠券
+
+**資料庫實體**:
+- `coupons`: 優惠券主表（代碼、折扣方式、折扣值、使用限制、生效時間）
+- `coupon_tier_restrictions`: 優惠券等級限制表（多對多關聯）
+- `coupon_series_restrictions`: 優惠券系列限制表（多對多關聯）
+- `user_coupons`: 客戶優惠券領取記錄表（領取時間、使用狀態）
+- `order_coupons`: 訂單優惠券快照表（代碼、折扣方式、折扣金額）
+- `active_coupons`: 有效優惠券 View（自動過濾過期與已刪除）
+
+**Server Actions** (`lib/actions/coupons.ts`):
+- 管理員: `createCoupon()`, `updateCoupon()`, `deleteCoupon()`, `getCoupons()`, `getCouponById()`, `getCouponStats()`
+- 客戶: `claimCoupon()`, `getUserCoupons()`, `validateCoupon()`
+- 工具函式: `calculateCouponDiscount()`, `validateCouponConditions()` (`lib/utils/coupon-helpers.ts`)
+
+**UI 元件**:
+- 前台：`CouponCard` (Coupang 風格)、`CouponCodeInput` (Foodpanda 風格)、`CouponSelector`
+- 後台：`CouponForm`、`CouponList`、`CouponFilters`
+
+**Zustand Store 擴充** (`stores/cart.ts`):
+- 新增優惠券狀態：`appliedCoupon`, `couponDiscount`, `couponValidationCallback`
+- 新增方法：`applyCoupon()`, `removeCoupon()`, `setCouponValidationCallback()`, `triggerCouponRevalidation()`
+- 購物車商品變更時自動重新驗證優惠券並移除不符合條件的優惠券
+
+**文件位置**:
+- 規格: `specs/009-coupon-system/spec.md`
+- 技術研究: `specs/009-coupon-system/research.md`
+- 資料模型: `specs/009-coupon-system/data-model.md`
+- API 合約: `specs/009-coupon-system/contracts/coupons.ts`
+- 任務清單: `specs/009-coupon-system/tasks.md`
+- 快速上手: `specs/009-coupon-system/quickstart.md`
+- 測試資料: `specs/009-coupon-system/seed-test-data.sql`
+
+**進度**: 49/55 任務完成 (89%)
+- Phase 1-2 (Setup & Foundational): ✅ 完整
+- Phase 3-4 (US1-US2 - MVP): ✅ 完整（客戶領取使用 + 管理員 CRUD）
+- Phase 5 (US3 - 使用限制驗證): ✅ 完整
+- Phase 6 (US4 - 視覺化設計): 🔄 基礎完成（可選優化）
+- Phase 7 (US5 - 訂單快照): ✅ 完整
+- Phase 8 (US6 - 代碼唯一性): ✅ 完整
+- Phase 9 (US7 - 刪除清理): 🔄 基礎完成（可選優化）
+- Phase 10 (Polish): 🔄 進行中（統計功能可選）
+
+**特色亮點**:
+- ✅ 優惠券代碼大小寫不敏感（使用 Generated Column `code_normalized`）
+- ✅ 購物車商品變更時自動重新驗證優惠券
+- ✅ 訂單優惠券快照永久保留（不使用 FK，保留歷史記錄）
+- ✅ 支援現金折扣與百分比折扣
+- ✅ 支援等級限制、最低金額限制、系列限制
+- ✅ RLS Policy 確保客戶僅能查看有效優惠券
+- ✅ Coupang 風格優惠券卡片 + Foodpanda 風格輸入口令
+
 ---
 
 ### 🚀 待開發功能
 目前所有核心功能已完成，以下是可能的擴充方向：
-- 🎨 **Phase 6-7 UI**: 系統設定前端介面、操作歷史時間軸元件
-- 📊 **報表與分析**: 銷售報表、庫存分析、操作日誌統計
-- 🔔 **通知系統**: 訂單狀態通知、庫存警示
+- 📊 **報表與分析**: 銷售報表、庫存分析、優惠券使用統計
+- 🎨 **視覺化優化**: 優惠券卡片鋸齒狀切口、領取動畫效果
+- 🔔 **通知系統**: 訂單狀態通知、庫存警示、優惠券過期提醒
 - 💳 **付款整合**: 金流串接
 - 🚚 **物流整合**: 出貨與追蹤
 
