@@ -154,15 +154,15 @@
 
 ### Migration 3: 修改歷程擴展
 
-- [ ] T034 建立 Migration 檔案 `supabase/migrations/20260108_extend_order_timelines.sql`
-- [ ] T035 在 Migration 中擴展 `order_timelines` 表（新增 `modifications` JSONB 欄位與 GIN 索引）
-- [ ] T036 在 Migration 中擴展 `order_timelines.action_type` CHECK 約束（新增 'order_modified'）
-- [ ] T037 在 Migration 中建立 PostgreSQL Function `update_order_with_modifications(p_order_id, p_modifications, p_actor_id)`（批次修改訂單）
-- [ ] T038 執行 Migration 3 並驗證修改歷程擴展正確（本地環境）
+- [X] T034 建立 Migration 檔案 `supabase/migrations/20260124_extend_order_timelines.sql` ✅
+- [X] T035 在 Migration 中擴展 `order_timelines` 表（新增 `modifications` JSONB 欄位與 GIN 索引）✅
+- [X] T036 在 Migration 中擴展 `order_timelines.action_type` CHECK 約束（新增 'order_modified'）✅
+- [X] T037 在 Migration 中建立 PostgreSQL Function `update_order_with_modifications(p_order_id, p_modifications, p_actor_id)`（批次修改訂單）✅
+- [X] T038 執行 Migration 3 並驗證修改歷程擴展正確（本地環境）✅
 
 ### Server Actions
 
-- [ ] T039 [P] [US3] 在 `lib/actions/orders.ts` 新增 `updateOrderDetails()` Server Action（呼叫 `update_order_with_modifications` RPC，傳遞 JSONB 格式修改資料）
+- [X] T039 [P] [US3] 在 `lib/actions/orders.ts` 新增 `updateOrderDetails()` Server Action（呼叫 `update_order_with_modifications` RPC，傳遞 JSONB 格式修改資料）✅
 - [ ] T040 [P] [US3] 在 `lib/actions/orders.ts` 新增 `addOrderItem()` Server Action（新增商品至訂單，驗證商品存在性）
 - [ ] T041 [P] [US3] 在 `lib/actions/orders.ts` 新增 `removeOrderItem()` Server Action（移除訂單商品，檢查至少保留一個商品）
 - [ ] T042 [P] [US3] 在 `lib/actions/orders.ts` 新增 `addCustomFee()` Server Action（新增自訂費用項目）

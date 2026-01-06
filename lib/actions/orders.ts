@@ -6,9 +6,11 @@ import { revalidatePath } from 'next/cache'
 import {
   createOrderSchema,
   addOrderCommentSchema,
+  orderModificationsSchema,
   type CreateOrderInput,
   type GetOrdersInput,
   type AddOrderCommentInput,
+  type OrderModificationsInput,
 } from '@/lib/validations/order.schema'
 import { deleteOrderSchema, type DeleteOrderInput } from '@/lib/validations/tags.schema'
 import type {
@@ -1105,6 +1107,118 @@ export async function deleteOrder(
     return {
       success: false,
       message: error instanceof Error ? error.message : '刪除訂單時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 批次修改訂單 (Feature 011 US3 - 管理員)
+ * - 支援修改商品單價、數量、加入/移除商品
+ * - 支援新增/移除自訂費用項目
+ * - 支援修改運費
+ * - 支援移除優惠券
+ * - 呼叫 PostgreSQL Function 確保原子性操作
+ * - 自動重新計算訂單總金額
+ * - 記錄完整修改歷程於 order_timelines
+ *
+ * @param orderId - 訂單 ID
+ * @param modifications - 修改內容 (JSONB 格式)
+ * @returns 修改結果與新總金額
+ */
+export async function updateOrderDetails(
+  orderId: string,
+  modifications: OrderModificationsInput
+): Promise<ActionResult<{ new_total: number; coupon_warning?: string }>> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 僅管理員可修改訂單
+    if (role !== 'admin') {
+      return {
+        success: false,
+        message: '僅管理員可執行此操作',
+      }
+    }
+
+    // 驗證輸入
+    const validated = orderModificationsSchema.safeParse(modifications)
+    if (!validated.success) {
+      return {
+        success: false,
+        message: '訂單修改資料驗證失敗',
+        errors: validated.error.flatten().fieldErrors,
+      }
+    }
+
+    // 檢查訂單是否存在且可修改
+    const { data: order, error: fetchError } = await supabase
+      .from('orders')
+      .select('id, status')
+      .eq('id', orderId)
+      .single()
+
+    if (fetchError || !order) {
+      console.error('查詢訂單錯誤:', fetchError)
+      return {
+        success: false,
+        message: '訂單不存在',
+      }
+    }
+
+    if (order.status !== 'pending') {
+      return {
+        success: false,
+        message: `僅待確認訂單可修改，此訂單狀態為「${order.status === 'shipping' ? '出貨中' : order.status === 'completed' ? '已完成' : '已取消'}」`,
+      }
+    }
+
+    // 呼叫 PostgreSQL Function 進行批次修改
+    const { data, error } = await supabase.rpc('update_order_with_modifications', {
+      p_order_id: orderId,
+      p_modifications: validated.data as any,
+      p_actor_id: userId,
+    })
+
+    if (error || !data) {
+      console.error('批次修改訂單錯誤:', error)
+      return {
+        success: false,
+        message: error?.message || '批次修改訂單時發生錯誤',
+      }
+    }
+
+    // 檢查 Function 回傳結果
+    const result = data as { success: boolean; message: string; new_total: number }
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message || '訂單修改失敗',
+      }
+    }
+
+    // 記錄操作日誌
+    await logAudit({
+      target_type: 'order',
+      target_id: orderId,
+      action_type: 'updated',
+      new_values: modifications as any,
+    })
+
+    // 重新驗證相關頁面
+    revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    return {
+      success: true,
+      data: { new_total: result.new_total },
+      message: result.message,
+    }
+  } catch (error) {
+    console.error('updateOrderDetails error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '批次修改訂單時發生未知錯誤',
     }
   }
 }
