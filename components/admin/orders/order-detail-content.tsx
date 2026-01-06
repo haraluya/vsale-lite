@@ -7,6 +7,7 @@ import { OrderStatusBadge } from '@/components/shop/order-status-badge'
 import { OrderActions } from '@/components/admin/order-actions'
 import { OrderCommentSection } from '@/components/admin/order-comment-section'
 import { OrderEditor } from './order-editor'
+import { ClientQuickViewDialog } from '@/components/admin/client-quick-view-dialog'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, User, Phone, Award, Calendar, FileText, Edit } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -23,6 +24,7 @@ export function OrderDetailContent({ order: initialOrder, timelines }: OrderDeta
   const [isPending, startTransition] = useTransition()
   const [editMode, setEditMode] = useState(false)
   const [order, setOrder] = useState(initialOrder)
+  const [showClientDialog, setShowClientDialog] = useState(false)
 
   // 檢查訂單是否可編輯（僅 pending 狀態）
   const canEdit = order.status === 'pending'
@@ -126,7 +128,16 @@ export function OrderDetailContent({ order: initialOrder, timelines }: OrderDeta
                 <User className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
                 <div>
                   <div className={cn(designTokens.typography.caption, 'text-gray-600')}>客戶姓名</div>
-                  <div className={cn(designTokens.typography.body.base, 'font-bold')}>{order.user.name}</div>
+                  <button
+                    onClick={() => setShowClientDialog(true)}
+                    className={cn(
+                      designTokens.typography.body.base,
+                      'font-bold text-blue-600 hover:text-blue-800 hover:underline',
+                      'transition-colors cursor-pointer text-left'
+                    )}
+                  >
+                    {order.user.name}
+                  </button>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -326,6 +337,25 @@ export function OrderDetailContent({ order: initialOrder, timelines }: OrderDeta
           </div>
         </>
       )}
+
+      {/* 客戶快速檢視 Dialog */}
+      <ClientQuickViewDialog
+        open={showClientDialog}
+        onOpenChange={setShowClientDialog}
+        client={{
+          id: order.user.id,
+          name: order.user.name,
+          phone: order.user.phone,
+          tier_name: order.user.tier_name,
+          address: order.user.address || null,
+          admin_notes: order.user.admin_notes || null,
+        }}
+        onUpdate={() => {
+          startTransition(() => {
+            router.refresh()
+          })
+        }}
+      />
     </div>
   )
 }

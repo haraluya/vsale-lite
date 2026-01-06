@@ -17,6 +17,7 @@
 import { useEffect, useState } from 'react'
 import { useCartStore } from '@/stores/cart'
 import { getCartItemsWithPrices } from '@/lib/actions/cart'
+import { validateCoupon } from '@/lib/actions/coupons'
 import { CartItem } from '@/components/shop/cart-item'
 import { CartSummary } from '@/components/shop/cart-summary'
 import { CouponSelector } from '@/components/shop/coupons/CouponSelector'
@@ -28,12 +29,13 @@ import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 export default function CartPage() {
-  const { items, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
+  const { items, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount, removeCoupon, applyCoupon } = useCartStore()
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCouponSelector, setShowCouponSelector] = useState(false)
 
+  // 載入購物車商品
   useEffect(() => {
     async function loadCartItems() {
       if (items.length === 0) {
@@ -70,6 +72,61 @@ export default function CartPage() {
 
     loadCartItems()
   }, [items, removeInvalidItems])
+
+  // 🆕 自動驗證已套用的優惠券（頁面載入時 + 購物車商品變更時）
+  useEffect(() => {
+    async function validateAppliedCoupon() {
+      // 若沒有已套用的優惠券，跳過驗證
+      if (!appliedCoupon) {
+        return
+      }
+
+      // 若購物車沒有商品，移除優惠券
+      if (cartItemsWithPrices.length === 0) {
+        removeCoupon()
+        return
+      }
+
+      try {
+        // 驗證優惠券
+        const validationResult = await validateCoupon({
+          couponCode: appliedCoupon.code_normalized,
+          cartItems: cartItemsWithPrices.map(item => ({
+            product_id: item.productId,
+            series_id: item.series_id || '',
+            price: item.price || 0,
+            quantity: item.quantity,
+          })),
+        })
+
+        if (validationResult.success && validationResult.data) {
+          const { valid, error, discountAmount } = validationResult.data
+
+          if (!valid) {
+            // 優惠券無效（過期、已使用、已刪除、不符合條件等）
+            removeCoupon()
+            toast.error(`優惠券已失效：${error || '無法使用此優惠券'}`, {
+              duration: 5000,
+            })
+          } else if (discountAmount !== couponDiscount) {
+            // 優惠券有效，但折扣金額改變（購物車商品變更）
+            applyCoupon(appliedCoupon, discountAmount || 0)
+          }
+        } else {
+          // 驗證失敗，移除優惠券
+          removeCoupon()
+          toast.error('優惠券驗證失敗，已自動移除', { duration: 5000 })
+        }
+      } catch (error) {
+        console.error('驗證優惠券錯誤:', error)
+        // 發生錯誤時移除優惠券（安全起見）
+        removeCoupon()
+        toast.error('優惠券驗證失敗，已自動移除', { duration: 5000 })
+      }
+    }
+
+    validateAppliedCoupon()
+  }, [cartItemsWithPrices, appliedCoupon?.id]) // 當購物車商品或優惠券 ID 改變時觸發
 
   // 計算總金額
   const totalAmount = cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)

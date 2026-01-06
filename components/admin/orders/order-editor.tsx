@@ -95,7 +95,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
     )
   }
 
-  // 修改商品數量
+  // 修改商品數量（按鈕操作）
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) return // 數量至少為 1
 
@@ -110,6 +110,29 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           : item
       )
     )
+  }
+
+  // 修改商品數量（輸入欄位）
+  const handleQuantityInputChange = (itemId: string, value: string) => {
+    // 只允許數字
+    if (value !== '' && !/^\d+$/.test(value)) {
+      return
+    }
+
+    const newQuantity = parseInt(value, 10)
+
+    // 驗證數量
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      alert('數量必須大於 0')
+      return
+    }
+
+    if (newQuantity > 99999) {
+      alert('數量不可超過 99,999')
+      return
+    }
+
+    handleQuantityChange(itemId, newQuantity)
   }
 
   // 標記商品為已移除
@@ -376,24 +399,25 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                         size="sm"
                         onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1 || loading}
-                        className="border-2 border-black"
+                        className="border-2 border-black min-h-[40px] min-w-[40px]"
                       >
                         -
                       </Button>
                       <Input
-                        type="number"
-                        min="1"
+                        type="text"
+                        inputMode="numeric"
                         value={item.quantity}
-                        onChange={e => handleQuantityChange(item.id, parseInt(e.target.value) || 1)}
-                        className="w-20 text-center border-2 border-black"
+                        onChange={e => handleQuantityInputChange(item.id, e.target.value)}
+                        className="w-24 text-center border-2 border-black font-bold min-h-[40px]"
                         disabled={loading}
+                        placeholder="數量"
                       />
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                         disabled={loading}
-                        className="border-2 border-black"
+                        className="border-2 border-black min-h-[40px] min-w-[40px]"
                       >
                         +
                       </Button>

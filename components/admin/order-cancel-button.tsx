@@ -62,7 +62,15 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
 
       {/* 確認對話框 */}
       {showConfirmDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
+          onClick={(e) => {
+            // 點擊背景關閉對話框
+            if (e.target === e.currentTarget && !isPending) {
+              setShowConfirmDialog(false)
+            }
+          }}
+        >
           <div className="mx-4 max-w-md rounded-none border-3 border-black bg-white p-6 shadow-neo">
             <h3 className="mb-4 text-xl font-bold">確認取消訂單</h3>
             <p className="mb-6 text-gray-700">
@@ -76,6 +84,7 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
               <button
                 onClick={handleCancel}
                 disabled={isPending}
+                type="button"
                 className="flex-1 rounded-none border-3 border-black bg-red-400 px-4 py-2 font-bold shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
               >
                 {isPending ? '處理中...' : '確認取消'}
@@ -83,9 +92,10 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
               <button
                 onClick={() => setShowConfirmDialog(false)}
                 disabled={isPending}
+                type="button"
                 className="flex-1 rounded-none border-3 border-black bg-gray-200 px-4 py-2 font-bold shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
               >
-                取消
+                返回
               </button>
             </div>
           </div>

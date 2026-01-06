@@ -10,12 +10,14 @@
  * - Neo-Brutalism 設計風格
  */
 
+import { useState, useEffect } from 'react'
 import type { CartItemWithProduct } from '@/types'
 import Image from 'next/image'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { toast } from 'sonner'
 
 interface CartItemProps {
   item: CartItemWithProduct
@@ -23,6 +25,12 @@ interface CartItemProps {
 
 export function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeItem } = useCartStore()
+  const [inputValue, setInputValue] = useState(item.quantity.toString())
+
+  // 當商品數量變更時同步更新輸入框
+  useEffect(() => {
+    setInputValue(item.quantity.toString())
+  }, [item.quantity])
 
   const handleDecrease = () => {
     if (item.quantity > 1) {
@@ -32,6 +40,48 @@ export function CartItem({ item }: CartItemProps) {
 
   const handleIncrease = () => {
     updateQuantity(item.productId, item.quantity + 1)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    // 允許空白（方便清除重新輸入）
+    if (value === '') {
+      setInputValue('')
+      return
+    }
+    // 只允許數字
+    if (!/^\d+$/.test(value)) {
+      return
+    }
+    setInputValue(value)
+  }
+
+  const handleInputBlur = () => {
+    const newQuantity = parseInt(inputValue, 10)
+
+    // 驗證數量
+    if (isNaN(newQuantity) || newQuantity < 1) {
+      toast.error('數量必須大於 0')
+      setInputValue(item.quantity.toString())
+      return
+    }
+
+    if (newQuantity > 99999) {
+      toast.error('數量不可超過 99,999')
+      setInputValue(item.quantity.toString())
+      return
+    }
+
+    // 更新數量
+    if (newQuantity !== item.quantity) {
+      updateQuantity(item.productId, newQuantity)
+    }
+  }
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur() // 觸發 blur 事件
+    }
   }
 
   const handleRemove = () => {
@@ -111,12 +161,23 @@ export function CartItem({ item }: CartItemProps) {
                 <Minus className="h-4 w-4" />
               </button>
 
-              <span className={cn(
-                "min-w-[2.5rem] md:min-w-[3rem] text-center font-bold",
-                designTokens.typography.body.large
-              )}>
-                {item.quantity}
-              </span>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={inputValue}
+                onChange={handleInputChange}
+                onBlur={handleInputBlur}
+                onKeyDown={handleInputKeyDown}
+                className={cn(
+                  "w-16 md:w-20 text-center font-bold rounded-none",
+                  "border-2 border-black",
+                  "px-2 py-1.5 md:py-2",
+                  "min-h-[40px]", // WCAG 2.1 AA
+                  "focus:outline-none focus:ring-2 focus:ring-blue-500",
+                  designTokens.typography.body.large
+                )}
+                aria-label="商品數量"
+              />
 
               <button
                 onClick={handleIncrease}

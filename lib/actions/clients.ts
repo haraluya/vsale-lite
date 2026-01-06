@@ -1196,3 +1196,90 @@ export async function updateClientV2(
     }
   }
 }
+
+/**
+ * 快速更新客戶備註與地址 (用於訂單詳情頁面快速編輯)
+ * Feature: 訂單詳情頁面客戶資訊快速查看與編輯
+ */
+export async function updateClientQuickInfo(
+  id: string,
+  data: {
+    address?: string | null
+    admin_notes?: string | null
+  }
+): Promise<ActionResult<{ id: string }>> {
+  try {
+    // 1. 驗證權限
+    const { userId } = await checkAuth('admin')
+
+    // 2. 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    // 3. 檢查客戶是否存在
+    const { data: existingClient } = await adminClient
+      .from('profiles')
+      .select('id, role, phone, display_name')
+      .eq('id', id)
+      .single()
+
+    if (!existingClient) {
+      return {
+        success: false,
+        message: '客戶不存在',
+      }
+    }
+
+    if (existingClient.role !== 'client') {
+      return {
+        success: false,
+        message: '此帳號不是客戶',
+      }
+    }
+
+    // 4. 更新客戶資料
+    const { error } = await adminClient
+      .from('profiles')
+      .update({
+        address: data.address,
+        admin_notes: data.admin_notes,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+
+    if (error) {
+      console.error('更新客戶快速資訊失敗:', error)
+      return {
+        success: false,
+        message: '更新失敗,請稍後再試',
+      }
+    }
+
+    // 5. 記錄操作日誌
+    await logAudit({
+      action_type: 'updated',
+      target_type: 'client',
+      target_id: id,
+      new_values: {
+        address: data.address,
+        admin_notes: data.admin_notes,
+      },
+      notes: '快速更新客戶備註與地址',
+    })
+
+    // 6. Revalidate
+    revalidatePath('/admin/clients')
+    revalidatePath('/admin/orders')
+
+    return {
+      success: true,
+      data: { id },
+      message: '客戶資料已更新',
+    }
+  } catch (error) {
+    console.error('updateClientQuickInfo error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '更新失敗',
+    }
+  }
+}
