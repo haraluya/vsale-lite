@@ -65,6 +65,9 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   const [selectedSeries, setSelectedSeries] = useState<string[]>(
     coupon?.series_restrictions || []
   )
+  const [claimLimit, setClaimLimit] = useState<number>(
+    coupon?.claim_limit || 1
+  )
 
   // 載入等級與系列資料
   useEffect(() => {
@@ -124,6 +127,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         min_order_amount: minOrderAmount ? Number(minOrderAmount) : null,
         valid_from: new Date(validFrom).toISOString(),
         valid_until: new Date(validUntil).toISOString(),
+        claim_limit: Number(claimLimit),
         tier_restrictions: selectedTiers,
         series_restrictions: selectedSeries,
       }
@@ -291,6 +295,29 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
           </div>
           <p className="mt-1 text-sm text-gray-600">
             不填寫表示無最低金額限制
+          </p>
+        </div>
+
+        {/* 領取張數限制 */}
+        <div className="mb-4">
+          <label htmlFor="claim_limit" className="mb-2 block font-bold">
+            每位客戶可領取張數 <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            id="claim_limit"
+            value={claimLimit || ''}
+            onChange={(e) => setClaimLimit(Number(e.target.value))}
+            placeholder="1"
+            className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+            required
+            min={1}
+            max={99}
+            step={1}
+            disabled={loading}
+          />
+          <p className="mt-1 text-sm text-gray-600">
+            設定客戶可領取此優惠券的張數上限（預設 1 張，輸入一次代碼即可領取所有張數）
           </p>
         </div>
       </div>

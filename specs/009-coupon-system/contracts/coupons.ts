@@ -24,6 +24,7 @@ export interface Coupon {
   discount_type: 'fixed' | 'percentage';
   discount_value: number;
   min_order_amount: number | null;
+  claim_limit: number;  // 每位客戶可領取張數上限（預設 1）
   valid_from: string;  // ISO 8601 格式
   valid_until: string;
   status: 'active' | 'inactive' | 'deleted';

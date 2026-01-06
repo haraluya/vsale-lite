@@ -71,6 +71,13 @@ export const createCouponSchema = z
       .nonnegative('最低金額不可為負數')
       .optional()
       .nullable(),
+    claim_limit: z
+      .number()
+      .int('領取張數必須為整數')
+      .min(1, '每位客戶至少可領取 1 張')
+      .max(99, '每位客戶最多可領取 99 張')
+      .optional()
+      .default(1),
     valid_from: z.string().datetime('生效開始時間格式錯誤'),
     valid_until: z.string().datetime('生效結束時間格式錯誤'),
     tier_restrictions: z.array(z.string().uuid()).optional().default([]),
@@ -111,6 +118,12 @@ export const updateCouponSchema = z.object({
   discount_type: discountTypeSchema.optional(),
   discount_value: z.number().optional(),
   min_order_amount: z.number().nonnegative().optional().nullable(),
+  claim_limit: z
+    .number()
+    .int('領取張數必須為整數')
+    .min(1, '每位客戶至少可領取 1 張')
+    .max(99, '每位客戶最多可領取 99 張')
+    .optional(),
   valid_from: z.string().datetime().optional(),
   valid_until: z.string().datetime().optional(),
   status: z.enum(['active', 'inactive']).optional(),
