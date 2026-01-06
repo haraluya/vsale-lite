@@ -337,6 +337,68 @@ vsale/
 - ✅ RLS Policy 確保客戶僅能查看有效優惠券
 - ✅ Coupang 風格優惠券卡片 + Foodpanda 風格輸入口令
 
+
+#### 8. **011-shipping-and-order-edit**: 運費設定與訂單修改系統 ✅ **NEW!**
+**狀態**: Phase 1-6 核心功能完成 (2026-01-06)
+
+**核心功能**:
+1. ✅ 會員等級運費設定（基本運費、滿額免運門檻）
+2. ✅ 訂單建立時自動計算運費（RPC 函數、購物車預覽）
+3. ✅ 訂單狀態流程簡化（移除 confirmed 狀態，pending → shipping → completed）
+4. ✅ 庫存扣減時機調整（從確認訂單移至標記出貨階段）
+5. ✅ 訂單修改核心功能（商品單價、數量、運費、自訂費用）
+6. ✅ 批次修改原子性保證（PostgreSQL Transaction）
+
+**資料庫實體**:
+- `tiers`: 擴展運費欄位（shipping_fee, free_shipping_threshold）
+- `orders`: 擴展運費欄位（shipping_fee）
+- `order_custom_fees`: 訂單自訂費用表（手續費、包裝費、總額調整）
+- `order_timelines`: 擴展修改歷程欄位（modifications JSONB）
+
+**PostgreSQL Functions**:
+- `calculate_shipping_fee()`: 計算運費（依會員等級與訂單金額）
+- `mark_order_as_shipping()`: 標記出貨並扣減庫存（原子性操作）
+- `update_order_with_modifications()`: 批次修改訂單（商品、費用、運費）
+
+**Server Actions** (`lib/actions/orders.ts`, `lib/actions/tiers.ts`):
+- 訂單管理: `markAsShipping()`, `updateOrderDetails()`, `updateOrderStatus()` (更新)
+- 等級管理: `updateTier()` (擴展運費欄位)
+
+**UI 元件**:
+- 前台：`CartSummary` (運費預覽)、`ShippingFeeDisplay`
+- 後台：`TierForm` (運費設定)、`OrderEditor` (訂單編輯器)、`OrderActions` (標記出貨按鈕)
+
+**文件位置**:
+- 規格: `specs/011-shipping-and-order-edit/spec.md`
+- 實作計畫: `specs/011-shipping-and-order-edit/plan.md`
+- 資料模型: `specs/011-shipping-and-order-edit/data-model.md`
+- API 合約: `specs/011-shipping-and-order-edit/contracts/`
+- 任務清單: `specs/011-shipping-and-order-edit/tasks.md`
+- 快速上手: `specs/011-shipping-and-order-edit/quickstart.md`
+- 測試資料: `specs/011-shipping-and-order-edit/seed-test-data.sql`
+
+**進度**: 63/101 任務完成 (62%)
+- Phase 1 (Setup): ✅ 完整
+- Phase 2 (Foundational): ✅ 完整（資料庫 Migration、型別定義）
+- Phase 3 (US1 - 運費設定): ✅ 完整
+- Phase 4 (US2 - 運費計算): ✅ 完整
+- Phase 5 (US6 - 狀態流程調整): ✅ 完整
+- Phase 6 (US3 - 訂單修改核心): ✅ 完整
+- Phase 7 (US4 - 修改歷程顯示): 📋 可選（P2 優先級）
+- Phase 8 (US5 - 優惠券互動): 📋 可選（P2 優先級）
+- Phase 9 (Polish): ✅ 完整（程式碼品質檢查、TypeScript 型別檢查、權限驗證、RLS Policy、錯誤訊息規範）
+- Phase 10 (Deployment): 📋 待部署
+
+**特色亮點**:
+- ✅ 運費自動化計算（依會員等級與訂單金額）
+- ✅ 滿額免運機制（支援不同等級設定不同門檻）
+- ✅ 訂單狀態流程簡化（pending → shipping → completed）
+- ✅ 庫存扣減時機優化（從確認訂單移至出貨階段）
+- ✅ 訂單修改原子性保證（PostgreSQL Transaction 確保資料一致性）
+- ✅ 支援負庫存（預購/欠貨場景）
+- ✅ 自訂費用支援（手續費、包裝費、額外運費、總額調整）
+- ✅ 批次修改功能（商品單價、數量、運費一次性提交）
+
 ---
 
 ### 🚀 待開發功能
@@ -377,24 +439,38 @@ vsale/
 
 **標準開發流程（SOP）**:
 1. **本機優先**: 確保本機 Supabase 正在執行（`supabase start`），先在本機環境測試
-2. **生成遷移**: 執行 `supabase db diff -f <描述性名稱>`（範例：`supabase db diff -f add_user_nickname`）
-3. **檢查 SQL**: 檢查生成的 SQL 檔案，確保沒有意外的 `DROP` 指令
-4. **安全部署**: 使用 `supabase db push` 推送到遠端
-5. **例外處理**: 若 `db push` 提示衝突並要求 reset，**立即停止並尋求人工審查**
+2. **生成遷移**: 執行 `supabase migration new <描述性名稱>` 或使用安全腳本 `.\scripts\safe-migration.ps1 -Name "add_feature"`
+3. **編輯 SQL**: 編輯生成的 Migration 檔案，檢查是否有意外的 `DROP` 指令
+4. **安全部署**: 使用 `supabase db push` 推送變更（**保留現有資料**）
+5. **本機開發禁令**: **絕對禁止**使用 `supabase db reset`，除非獲得使用者明確同意
+
+**🚨 重要：本機開發資料保護**:
+- ❌ **絕對禁止**: 在本機環境執行 `supabase db reset`（會清空測試資料）
+- ✅ **必須使用**: `supabase db push` 推送 Migration（保留現有資料）
+- ⚠️ **例外情況**: 若必須重置，**必須先詢問使用者**並獲得明確同意
+- 📝 **使用者測試資料**: 使用者在測試過程中會建立資料（訂單、商品、客戶），這些資料必須被保留
 
 **指令管控**:
-- ✅ **推薦使用**: `supabase db diff`, `supabase db push`, `supabase db pull`
-- ⚠️ **謹慎使用**: `supabase db reset` **僅限本機**環境，且需明確指示
-- ❌ **嚴格禁止**: 在遠端/生產環境執行任何重置指令
+- ✅ **推薦使用**:
+  - `supabase migration new <name>` - 建立新 Migration
+  - `supabase db push` - 推送 Migration (保留資料)
+  - `.\scripts\safe-migration.ps1` - 安全 Migration 輔助腳本
+- ⚠️ **謹慎使用**:
+  - `supabase db reset` - **必須先詢問使用者同意**
+- ❌ **嚴格禁止**:
+  - 在遠端/生產環境執行任何重置指令
+  - 未經使用者同意在本機執行 `supabase db reset`
 
-**三層安全機制**:
-1. **預防層**: Migration 流程 + 本機優先測試 + Git Pre-commit Hook
-2. **檢查層**: 部署前檢查清單（6 Phase） + 自動備份腳本
-3. **回滾層**: 完整備份（pg_dump） + 回滾程序
+**四層安全機制**:
+1. **預防層**: Migration 流程 + 增量式更新 + Git Pre-commit Hook
+2. **提示層**: Pre-DB-Reset Hook (需雙重確認)
+3. **檢查層**: 部署前檢查清單（6 Phase） + 自動備份腳本
+4. **回滾層**: 完整備份（pg_dump） + 回滾程序
 
 📖 **完整安全指南**: [docs/SAFE_MIGRATION_GUIDE.md](docs/SAFE_MIGRATION_GUIDE.md)
 🚀 **快速參考**: [docs/BACKUP_RESTORE_CHEATSHEET.md](docs/BACKUP_RESTORE_CHEATSHEET.md)
 ⚡ **協議全文**: [docs/DATABASE_SAFETY_PROTOCOL.md](docs/DATABASE_SAFETY_PROTOCOL.md)
+🛠️ **安全腳本**: `.\scripts\safe-migration.ps1` - 增量式 Migration 工作流程
 
 ---
 

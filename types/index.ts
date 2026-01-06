@@ -24,6 +24,8 @@ export type Tier = {
   name: string
   rank: number
   is_protected?: boolean  // 🆕 Feature 003 Enhancement: 系統預設等級保護
+  shipping_fee?: number  // 🆕 Feature 011: 基本運費金額（0 表示不收運費）
+  free_shipping_threshold?: number | null  // 🆕 Feature 011: 滿額免運門檻（NULL 表示不提供免運）
   created_at: string
   updated_at: string
 }
@@ -211,7 +213,9 @@ export type CartItemWithProduct = {
 }
 
 // 訂單狀態
-export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled'
+// Feature 011: 移除 'confirmed' 狀態，簡化訂單流程
+// 新流程: pending → shipping → completed (可取消: pending→cancelled, shipping→cancelled)
+export type OrderStatus = 'pending' | 'shipping' | 'completed' | 'cancelled'
 
 // 訂單主表
 export type Order = {
@@ -219,6 +223,7 @@ export type Order = {
   order_number: string  // 格式: ORD-YYYYMMDD-XXXX
   user_id: string
   total_amount: number
+  shipping_fee: number  // 🆕 Feature 011: 訂單運費金額（建立時快照儲存）
   status: OrderStatus
   notes: string | null
   created_at: string
@@ -248,12 +253,13 @@ export type OrderItem = {
 export type OrderTimeline = {
   id: string
   order_id: string
-  action_type: 'created' | 'confirmed' | 'status_updated' | 'cancelled' | 'comment'  // 🆕 Feature 007: 新增 comment 類型
+  action_type: 'created' | 'confirmed' | 'status_updated' | 'cancelled' | 'comment' | 'order_modified'  // 🆕 Feature 007: comment | Feature 011: order_modified
   actor_id: string | null
   actor_role: 'client' | 'admin' | null
   content: string | null  // 🆕 Feature 007: 留言內容（當 action_type = 'comment'）
   old_status: string | null
   new_status: string | null
+  modifications: any | null  // 🆕 Feature 011: 訂單修改內容（當 action_type = 'order_modified'）
   created_at: string
 }
 
@@ -273,6 +279,16 @@ export type OrderCoupon = {
   created_at: string
 }
 
+// 訂單自訂費用項目 (Feature 011)
+export type OrderCustomFee = {
+  id: string
+  order_id: string
+  fee_name: string  // 費用名稱（如「手續費」、「包裝費」、「額外運費」）
+  amount: number  // 費用金額（正數=收費、負數=減免）
+  created_at: string
+  created_by: string | null  // 建立者 ID（管理員）
+}
+
 // 訂單詳情 (含明細與操作歷史)
 export type OrderDetail = Order & {
   user: {
@@ -286,6 +302,7 @@ export type OrderDetail = Order & {
   items: OrderItem[]
   timelines?: OrderTimelineWithActor[]
   coupon?: OrderCoupon | null  // 🆕 Feature 009: 優惠券快照（選填）
+  custom_fees?: OrderCustomFee[]  // 🆕 Feature 011: 自訂費用項目（選填）
 }
 
 // 訂單查詢參數

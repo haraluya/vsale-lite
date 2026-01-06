@@ -22,11 +22,21 @@ import { useRouter } from 'next/navigation'
 
 interface CouponListProps {
   coupons: Coupon[]
+  showArchived?: boolean // ✅ 新增：是否為彙整區模式
 }
 
-export function CouponList({ coupons }: CouponListProps) {
+export function CouponList({ coupons, showArchived = false }: CouponListProps) {
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
+
+  // 過濾優惠券（主列表隱藏已刪除/已過期，彙整區全部顯示）
+  const now = new Date()
+  const filteredCoupons = showArchived
+    ? coupons // 彙整區顯示所有
+    : coupons.filter((c) => {
+        const validUntil = new Date(c.valid_until)
+        return c.status !== 'deleted' && now <= validUntil // 主列表隱藏已刪除與已過期
+      })
 
   const handleDelete = async (couponId: string, couponCode: string) => {
     if (!confirm(`確定要刪除優惠券「${couponCode}」嗎？`)) {
@@ -112,10 +122,12 @@ export function CouponList({ coupons }: CouponListProps) {
     })
   }
 
-  if (coupons.length === 0) {
+  if (filteredCoupons.length === 0) {
     return (
       <div className="border-3 border-black bg-white p-12 text-center shadow-neo">
-        <p className="text-gray-500">目前沒有優惠券</p>
+        <p className="text-gray-500">
+          {showArchived ? '目前沒有已刪除或已過期的優惠券' : '目前沒有有效的優惠券'}
+        </p>
       </div>
     )
   }
@@ -151,7 +163,7 @@ export function CouponList({ coupons }: CouponListProps) {
             </tr>
           </thead>
           <tbody>
-            {coupons.map((coupon) => (
+            {filteredCoupons.map((coupon) => (
               <tr key={coupon.id} className="border-b-3 border-black last:border-b-0 bg-white">
                 <td className={cn('px-6 py-4 font-mono font-bold', designTokens.typography.body.base)}>
                   {coupon.code_normalized}
@@ -213,7 +225,7 @@ export function CouponList({ coupons }: CouponListProps) {
 
       {/* 手機版卡片 */}
       <div className="md:hidden space-y-4">
-        {coupons.map((coupon) => (
+        {filteredCoupons.map((coupon) => (
           <div
             key={coupon.id}
             className="border-3 border-black bg-white p-4 shadow-neo"

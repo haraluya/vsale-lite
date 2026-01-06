@@ -19,51 +19,95 @@ import { cn } from '@/lib/utils'
 
 interface PageProps {
   searchParams: Promise<{
-    status?: 'active' | 'inactive'
+    status?: 'active' | 'inactive' | 'deleted'
     discountType?: 'fixed' | 'percentage'
     search?: string
+    showArchived?: string // ✅ 新增：顯示彙整區（已刪除/已過期）
   }>
 }
 
 async function CouponsContent({ searchParams }: PageProps) {
   const params = await searchParams
+  const showArchived = params.showArchived === 'true'
+
+  // 根據 showArchived 決定查詢哪些優惠券
   const result = await getCoupons({
-    status: params.status,
+    status: showArchived ? 'deleted' : params.status, // 彙整區僅顯示已刪除
     discount_type: params.discountType,
     search: params.search,
   })
 
-  const coupons = result.success && result.data ? result.data : []
+  const allCoupons = result.success && result.data ? result.data : []
+
+  // 分類優惠券
+  const now = new Date()
+  const activeCoupons = allCoupons.filter((c) => {
+    if (showArchived) return false // 彙整區不顯示
+    const validFrom = new Date(c.valid_from)
+    const validUntil = new Date(c.valid_until)
+    return c.status === 'active' && now >= validFrom && now <= validUntil
+  })
+
+  const expiredCoupons = allCoupons.filter((c) => {
+    const validUntil = new Date(c.valid_until)
+    return c.status !== 'deleted' && now > validUntil
+  })
+
+  const deletedCoupons = allCoupons.filter((c) => c.status === 'deleted')
 
   return (
     <>
       {/* 統計資訊 */}
-      <div className="mb-6 grid gap-4 md:grid-cols-3">
+      <div className="mb-6 grid gap-4 md:grid-cols-4">
         <div className="border-3 border-black bg-white p-4 shadow-neo">
           <p className="text-sm text-gray-600">總優惠券數</p>
-          <p className="text-3xl font-black">{coupons.length}</p>
+          <p className="text-3xl font-black">{allCoupons.length}</p>
         </div>
         <div className="border-3 border-black bg-green-100 p-4 shadow-neo">
-          <p className="text-sm text-gray-600">啟用中</p>
-          <p className="text-3xl font-black">
-            {coupons.filter((c) => c.status === 'active').length}
-          </p>
+          <p className="text-sm text-gray-600">有效中</p>
+          <p className="text-3xl font-black">{activeCoupons.length}</p>
         </div>
-        <div className="border-3 border-black bg-gray-100 p-4 shadow-neo">
-          <p className="text-sm text-gray-600">已停用</p>
-          <p className="text-3xl font-black">
-            {coupons.filter((c) => c.status === 'inactive').length}
-          </p>
+        <div className="border-3 border-black bg-orange-100 p-4 shadow-neo">
+          <p className="text-sm text-gray-600">已過期</p>
+          <p className="text-3xl font-black">{expiredCoupons.length}</p>
+        </div>
+        <div className="border-3 border-black bg-red-100 p-4 shadow-neo">
+          <p className="text-sm text-gray-600">已刪除</p>
+          <p className="text-3xl font-black">{deletedCoupons.length}</p>
         </div>
       </div>
 
-      {/* 篩選器 */}
-      <div className="mb-6">
+      {/* 篩選器與彙整區切換 */}
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <CouponFilters />
+
+        {/* 彙整區切換按鈕 */}
+        <Link
+          href={`/admin/coupons${showArchived ? '' : '?showArchived=true'}`}
+          className={cn(
+            'inline-flex items-center gap-2 font-bold transition-all',
+            showArchived
+              ? 'bg-white text-black'
+              : 'bg-gray-400 text-white',
+            designTokens.neoBrutalism.border.full,
+            designTokens.neoBrutalism.shadow.mobile,
+            designTokens.neoBrutalism.hover,
+            designTokens.button.md
+          )}
+        >
+          {showArchived ? '返回主列表' : '查看彙整區'}
+        </Link>
       </div>
 
       {/* 優惠券列表 */}
-      <CouponList coupons={coupons} />
+      {showArchived ? (
+        <div className="space-y-4">
+          <h2 className="text-xl font-black">彙整區：已刪除/已過期優惠券</h2>
+          <CouponList coupons={allCoupons} showArchived={true} />
+        </div>
+      ) : (
+        <CouponList coupons={allCoupons} showArchived={false} />
+      )}
     </>
   )
 }

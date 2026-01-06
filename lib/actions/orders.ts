@@ -6,9 +6,11 @@ import { revalidatePath } from 'next/cache'
 import {
   createOrderSchema,
   addOrderCommentSchema,
+  orderModificationsSchema,
   type CreateOrderInput,
   type GetOrdersInput,
   type AddOrderCommentInput,
+  type OrderModificationsInput,
 } from '@/lib/validations/order.schema'
 import { deleteOrderSchema, type DeleteOrderInput } from '@/lib/validations/tags.schema'
 import type {
@@ -219,10 +221,27 @@ export async function createOrder(
 
     const orderNumber = orderNumberData as string
 
-    // 7. 建立訂單主表（訂單總額已扣除優惠券折扣）
+    // 7. 計算運費（使用原始商品金額，不扣除優惠券折扣）
+    const { data: shippingFeeData, error: shippingFeeError } = await supabase
+      .rpc('calculate_shipping_fee', {
+        p_user_id: userId,
+        p_subtotal: totalAmount,
+      })
+
+    if (shippingFeeError) {
+      console.error('計算運費錯誤:', shippingFeeError)
+      return {
+        success: false,
+        message: '計算運費時發生錯誤',
+      }
+    }
+
+    const shippingFee = (shippingFeeData as number) || 0
+
+    // 8. 建立訂單主表（訂單總額 = 商品金額 - 優惠券折扣 + 運費）
     const finalTotalAmount = couponData
-      ? totalAmount - couponData.discount_amount
-      : totalAmount
+      ? totalAmount - couponData.discount_amount + shippingFee
+      : totalAmount + shippingFee
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -230,6 +249,7 @@ export async function createOrder(
         order_number: orderNumber,
         user_id: userId,
         total_amount: finalTotalAmount,
+        shipping_fee: shippingFee,
         status: 'pending',
         notes: notes || null,
       })
@@ -254,7 +274,7 @@ export async function createOrder(
       }
     }
 
-    // 8. 建立訂單明細
+    // 9. 建立訂單明細
     const orderItems = orderItemsData.map(item => ({
       order_id: order.id,
       ...item,
@@ -274,7 +294,7 @@ export async function createOrder(
       }
     }
 
-    // 9. 建立優惠券快照（如果有使用優惠券）
+    // 10. 建立優惠券快照（如果有使用優惠券）
     if (couponData && userCouponId) {
       // 建立 order_coupons 記錄
       const { error: couponSnapshotError } = await supabase
@@ -312,7 +332,7 @@ export async function createOrder(
       }
     }
 
-    // 10. 建立訂單歷史記錄
+    // 11. 建立訂單歷史記錄
     const { error: timelineError } = await supabase
       .from('order_timelines')
       .insert({
@@ -328,12 +348,17 @@ export async function createOrder(
       // 不回滾,僅記錄錯誤 (歷史記錄失敗不應阻止訂單建立)
     }
 
-    // 11. 重新驗證相關頁面
+    // 12. 重新驗證相關頁面
     revalidatePath('/store/orders')
     revalidatePath('/admin/orders')
 
     // 建立成功訊息
     let successMessage = `訂單建立成功!訂單編號: ${order.order_number}`
+    if (shippingFee > 0) {
+      successMessage += `，運費 NT$ ${shippingFee}`
+    } else {
+      successMessage += `，免運`
+    }
     if (couponData) {
       successMessage += `，已使用優惠券「${couponData.code}」折扣 NT$ ${couponData.discount_amount}`
     }
@@ -432,6 +457,7 @@ export async function getOrders(
         order_number: order.order_number,
         user_id: order.user_id,
         total_amount: order.total_amount,
+        shipping_fee: order.shipping_fee || 0,  // Feature 011: 運費
         status: order.status,
         notes: order.notes,
         created_at: order.created_at,
@@ -529,6 +555,13 @@ export async function getOrderById(
       .eq('order_id', orderId)
       .maybeSingle()  // 使用 maybeSingle 避免無優惠券時報錯
 
+    // 查詢訂單自訂費用 (Feature 011)
+    const { data: customFees } = await supabase
+      .from('order_custom_fees')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true })
+
     // 批次查詢操作者資料（用於時間軸）
     const actorIds = (orderTimelines || []).map(t => t.actor_id).filter(Boolean)
     const { data: actors } = await supabase
@@ -545,6 +578,7 @@ export async function getOrderById(
       order_number: order.order_number,
       user_id: order.user_id,
       total_amount: order.total_amount,
+      shipping_fee: order.shipping_fee || 0,  // Feature 011: 運費
       status: order.status,
       notes: order.notes,
       created_at: order.created_at,
@@ -578,6 +612,7 @@ export async function getOrderById(
           old_status: timeline.old_status,
           new_status: timeline.new_status,
           content: timeline.content,
+          modifications: timeline.modifications,
           created_at: timeline.created_at,
           actor_name: actor?.display_name || actor?.phone || '系統',
         }
@@ -592,6 +627,15 @@ export async function getOrderById(
         discount_amount: orderCoupon.discount_amount,
         created_at: orderCoupon.created_at,
       } : null,
+      // 🆕 Feature 011: 自訂費用項目
+      custom_fees: (customFees || []).map((fee: any) => ({
+        id: fee.id,
+        order_id: fee.order_id,
+        fee_name: fee.fee_name,
+        amount: fee.amount,
+        created_at: fee.created_at,
+        created_by: fee.created_by,
+      })),
     }
 
     return {
@@ -608,20 +652,21 @@ export async function getOrderById(
 }
 
 /**
- * 確認訂單並扣減庫存 (US3 - 管理員)
+ * 標記訂單為出貨中並扣減庫存 (Feature 011 US6 - 管理員)
+ * - 取代 confirmOrder() 函數
  * - 呼叫 PostgreSQL Function 確保原子性操作
- * - 訂單狀態從 pending → confirmed
+ * - 訂單狀態從 pending → shipping
  * - 扣減商品庫存（支援負庫存）
  * - 自動記錄操作歷史
  */
-export async function confirmOrder(
+export async function markAsShipping(
   orderId: string
 ): Promise<ActionResult<{ orderId: string }>> {
   try {
     const supabase = await createClient()
     const { userId, role } = await checkAuth()
 
-    // 僅管理員可確認訂單
+    // 僅管理員可標記出貨
     if (role !== 'admin') {
       return {
         success: false,
@@ -630,16 +675,16 @@ export async function confirmOrder(
     }
 
     // 呼叫 PostgreSQL Function 進行原子性操作
-    const { data, error } = await supabase.rpc('confirm_order_and_deduct_stock', {
+    const { data, error } = await supabase.rpc('mark_order_as_shipping', {
       p_order_id: orderId,
       p_actor_id: userId,
     })
 
     if (error || !data) {
-      console.error('確認訂單錯誤:', error)
+      console.error('標記出貨錯誤:', error)
       return {
         success: false,
-        message: error?.message || '確認訂單時發生錯誤',
+        message: error?.message || '標記出貨時發生錯誤',
       }
     }
 
@@ -648,7 +693,7 @@ export async function confirmOrder(
     if (!result.success) {
       return {
         success: false,
-        message: result.error || '確認訂單失敗',
+        message: result.error || '標記出貨失敗',
       }
     }
 
@@ -660,26 +705,28 @@ export async function confirmOrder(
     return {
       success: true,
       data: { orderId: result.order_id || orderId },
-      message: '訂單已確認，庫存已扣減',
+      message: '訂單已標記為出貨中，庫存已扣減',
     }
   } catch (error) {
-    console.error('confirmOrder error:', error)
+    console.error('markAsShipping error:', error)
     return {
       success: false,
-      message: error instanceof Error ? error.message : '確認訂單時發生未知錯誤',
+      message: error instanceof Error ? error.message : '標記出貨時發生未知錯誤',
     }
   }
 }
 
 /**
- * 更新訂單狀態 (US3 - 管理員)
- * - confirmed → shipping → completed
+ * 更新訂單狀態 (Feature 011 US6 - 管理員)
+ * - 簡化版，移除 confirmed 相關邏輯
+ * - 允許的狀態轉換: shipping → completed, pending → cancelled, shipping → cancelled
  * - 呼叫 PostgreSQL Function 確保原子性操作
  * - 自動記錄操作歷史
+ * - 注意: pending → shipping 必須使用 markAsShipping() 函數
  */
 export async function updateOrderStatus(
   orderId: string,
-  newStatus: 'confirmed' | 'shipping' | 'completed'
+  newStatus: 'shipping' | 'completed' | 'cancelled'
 ): Promise<ActionResult<{ orderId: string; newStatus: string }>> {
   try {
     const supabase = await createClient()
@@ -723,10 +770,9 @@ export async function updateOrderStatus(
     revalidatePath('/store/orders')
     revalidatePath(`/store/orders/${orderId}`)
 
-    // 狀態標籤映射
+    // 狀態標籤映射（移除 confirmed）
     const statusLabels: Record<string, string> = {
       pending: '待確認',
-      confirmed: '已確認',
       shipping: '出貨中',
       completed: '已完成',
       cancelled: '已取消',
@@ -968,6 +1014,7 @@ export async function getOrderTimeline(
         actor_name: actor?.display_name || actor?.phone || null,
         old_status: item.old_status,
         new_status: item.new_status,
+        modifications: item.modifications,
         created_at: item.created_at,
       }
     })
@@ -1078,6 +1125,204 @@ export async function deleteOrder(
     return {
       success: false,
       message: error instanceof Error ? error.message : '刪除訂單時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 批次修改訂單 (Feature 011 US3 - 管理員)
+ * - 支援修改商品單價、數量、加入/移除商品
+ * - 支援新增/移除自訂費用項目
+ * - 支援修改運費
+ * - 支援移除優惠券
+ * - 呼叫 PostgreSQL Function 確保原子性操作
+ * - 自動重新計算訂單總金額
+ * - 記錄完整修改歷程於 order_timelines
+ *
+ * @param orderId - 訂單 ID
+ * @param modifications - 修改內容 (JSONB 格式)
+ * @returns 修改結果與新總金額
+ */
+export async function updateOrderDetails(
+  orderId: string,
+  modifications: OrderModificationsInput
+): Promise<ActionResult<{ new_total: number; coupon_warning?: string }>> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 僅管理員可修改訂單
+    if (role !== 'admin') {
+      return {
+        success: false,
+        message: '僅管理員可執行此操作',
+      }
+    }
+
+    // 驗證輸入
+    const validated = orderModificationsSchema.safeParse(modifications)
+    if (!validated.success) {
+      return {
+        success: false,
+        message: '訂單修改資料驗證失敗',
+        errors: validated.error.flatten().fieldErrors,
+      }
+    }
+
+    // 檢查訂單是否存在且可修改（包含優惠券資訊）
+    const { data: order, error: fetchError } = await supabase
+      .from('orders')
+      .select('id, status, user_id')
+      .eq('id', orderId)
+      .single()
+
+    if (fetchError || !order) {
+      console.error('查詢訂單錯誤:', fetchError)
+      return {
+        success: false,
+        message: '訂單不存在',
+      }
+    }
+
+    if (order.status !== 'pending') {
+      return {
+        success: false,
+        message: `僅待確認訂單可修改，此訂單狀態為「${order.status === 'shipping' ? '出貨中' : order.status === 'completed' ? '已完成' : '已取消'}」`,
+      }
+    }
+
+    // Phase 8 (US5): 查詢訂單優惠券與客戶等級資訊（用於修改後驗證）
+    const { data: orderCoupon } = await supabase
+      .from('order_coupons')
+      .select('*')
+      .eq('order_id', orderId)
+      .maybeSingle()
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('tier_id')
+      .eq('id', order.user_id)
+      .single()
+
+    const userTierId = profile?.tier_id
+
+    // 呼叫 PostgreSQL Function 進行批次修改
+    const { data, error } = await supabase.rpc('update_order_with_modifications', {
+      p_order_id: orderId,
+      p_modifications: validated.data as any,
+      p_actor_id: userId,
+    })
+
+    if (error) {
+      console.error('批次修改訂單 RPC 錯誤:', error)
+      return {
+        success: false,
+        message: error?.message || '批次修改訂單時發生錯誤',
+      }
+    }
+
+    // PostgreSQL Function 返回 TABLE，data 是陣列
+    const result = Array.isArray(data) ? data[0] : data
+
+    if (!result) {
+      console.error('批次修改訂單無回傳資料')
+      return {
+        success: false,
+        message: '訂單修改失敗：伺服器無回傳資料',
+      }
+    }
+
+    // 檢查 Function 回傳結果
+    if (!result.success) {
+      console.error('批次修改訂單失敗:', result.message)
+      return {
+        success: false,
+        message: result.message || '訂單修改失敗',
+      }
+    }
+
+    // Phase 8 (US5): 訂單修改後驗證優惠券條件
+    let couponWarning: string | undefined
+
+    if (orderCoupon && userTierId && !modifications.coupon?.action) {
+      // 查詢優惠券完整資訊（含限制條件）
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select(`
+          *,
+          tier_restrictions:coupon_tier_restrictions(tier_id),
+          series_restrictions:coupon_series_restrictions(series_id)
+        `)
+        .eq('code_normalized', orderCoupon.coupon_code)
+        .single()
+
+      if (coupon) {
+        // 查詢修改後的訂單明細（用於驗證優惠券條件）
+        const { data: updatedItems } = await supabase
+          .from('order_items')
+          .select(`
+            id,
+            product_id,
+            deal_price,
+            quantity,
+            products(series_id)
+          `)
+          .eq('order_id', orderId)
+
+        if (updatedItems && updatedItems.length > 0) {
+          // 轉換為 CartItemForCoupon 格式
+          const cartItems = updatedItems.map((item: any) => ({
+            product_id: item.product_id,
+            series_id: item.products?.series_id || '',
+            price: item.deal_price,
+            quantity: item.quantity,
+          }))
+
+          // 使用 coupon-helpers 驗證優惠券條件
+          const { validateCouponConditions } = await import('@/lib/utils/coupon-helpers')
+          const validationResult = validateCouponConditions({
+            coupon: {
+              ...coupon,
+              tier_restrictions: coupon.tier_restrictions?.map((r: any) => r.tier_id) || [],
+              series_restrictions: coupon.series_restrictions?.map((r: any) => r.series_id) || [],
+            } as any,
+            cartItems,
+            userTierId,
+          })
+
+          // 若優惠券不符合條件，回傳警告
+          if (!validationResult.valid) {
+            couponWarning = validationResult.error || '訂單修改後不符合優惠券使用條件'
+          }
+        }
+      }
+    }
+
+    // 記錄操作日誌
+    await logAudit({
+      target_type: 'order',
+      target_id: orderId,
+      action_type: 'updated',
+      new_values: modifications as any,
+    })
+
+    // 重新驗證相關頁面
+    revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${orderId}`)
+
+    return {
+      success: true,
+      data: {
+        new_total: result.new_total,
+        coupon_warning: couponWarning,
+      },
+      message: result.message,
+    }
+  } catch (error) {
+    console.error('updateOrderDetails error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '批次修改訂單時發生未知錯誤',
     }
   }
 }

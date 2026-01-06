@@ -7,9 +7,9 @@ import type { OrderStatus } from '@/types'
 
 /**
  * 訂單狀態更新器元件
- * Feature: 004-cart-and-orders / US3
+ * Feature: 011-shipping-and-order-edit / US6
  *
- * - 允許管理員更新訂單狀態（confirmed → shipping → completed）
+ * - 允許管理員更新訂單狀態（shipping → completed）
  * - Neo-Brutalism 設計風格
  * - 顯示載入狀態與錯誤處理
  */
@@ -19,8 +19,7 @@ interface OrderStatusUpdaterProps {
   currentStatus: OrderStatus
 }
 
-const NEXT_STATUS_MAP: Partial<Record<OrderStatus, { status: 'confirmed' | 'shipping' | 'completed'; label: string }>> = {
-  confirmed: { status: 'shipping', label: '標記為出貨中' },
+const NEXT_STATUS_MAP: Partial<Record<OrderStatus, { status: 'shipping' | 'completed'; label: string }>> = {
   shipping: { status: 'completed', label: '標記為已完成' },
 }
 

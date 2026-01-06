@@ -41,6 +41,8 @@ export async function createTier(
     const validatedFields = createTierSchema.safeParse({
       name: formData.get('name'),
       rank: formData.get('rank'),
+      shipping_fee: formData.get('shipping_fee') || '0',  // Feature 011: 運費
+      free_shipping_threshold: formData.get('free_shipping_threshold') || null,  // Feature 011: 免運門檻
     })
 
     if (!validatedFields.success) {
@@ -114,6 +116,8 @@ export async function updateTier(
     const validatedFields = updateTierSchema.safeParse({
       name: formData.get('name') || undefined,
       rank: formData.get('rank') || undefined,
+      shipping_fee: formData.get('shipping_fee') || undefined,  // Feature 011: 運費
+      free_shipping_threshold: formData.get('free_shipping_threshold') || undefined,  // Feature 011: 免運門檻
     })
 
     if (!validatedFields.success) {

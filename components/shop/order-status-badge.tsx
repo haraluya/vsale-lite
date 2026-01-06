@@ -29,14 +29,9 @@ const statusConfig: Record<
     colorClass: 'bg-yellow-400 border-yellow-600 text-yellow-900',
     emoji: '⏳',
   },
-  confirmed: {
-    label: '已確認',
-    colorClass: 'bg-blue-400 border-blue-600 text-blue-900',
-    emoji: '✅',
-  },
   shipping: {
     label: '出貨中',
-    colorClass: 'bg-purple-400 border-purple-600 text-purple-900',
+    colorClass: 'bg-blue-400 border-blue-600 text-blue-900',
     emoji: '🚚',
   },
   completed: {

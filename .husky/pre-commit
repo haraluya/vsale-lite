@@ -10,12 +10,14 @@ NC='\033[0m'
 
 echo "🔍 執行資料庫安全檢查..."
 
-# 檢查 1: Migration 檔案中的危險操作
-if git diff --cached --name-only | grep -q "supabase/migrations/.*\.sql$"; then
+# 檢查 1: Migration 檔案中的危險操作（排除 rollback 資料夾）
+if git diff --cached --name-only | grep -q "supabase/migrations/.*\.sql$" | grep -v "rollback/"; then
   echo "⚠️ 檢測到 Migration 檔案變更，執行安全檢查..."
 
-  # 檢查 DROP TABLE（排除註釋）
-  if git diff --cached | grep -E "^\+.*DROP TABLE" | grep -v "^.*--.*DROP TABLE"; then
+  # 檢查 DROP TABLE（排除註釋與 rollback 資料夾）
+  if git diff --cached --name-status | grep -E "^[AM].*supabase/migrations/.*\.sql$" | grep -v "rollback/" | cut -f2 | while read file; do
+    git diff --cached "$file" | grep -E "^\+.*DROP TABLE" | grep -v "^.*--.*DROP TABLE" && echo "$file"
+  done | grep -q .; then
     echo -e "${RED}🚨 警告: 檢測到 DROP TABLE 指令！${NC}"
     echo "這是危險操作，可能導致資料遺失。"
     echo "📖 參考: docs/SAFE_MIGRATION_GUIDE.md (危險操作與替代方案)"
@@ -28,8 +30,10 @@ if git diff --cached --name-only | grep -q "supabase/migrations/.*\.sql$"; then
     fi
   fi
 
-  # 檢查 TRUNCATE（排除註釋）
-  if git diff --cached | grep -E "^\+.*TRUNCATE" | grep -v "^.*--.*TRUNCATE"; then
+  # 檢查 TRUNCATE（排除註釋與 rollback 資料夾）
+  if git diff --cached --name-status | grep -E "^[AM].*supabase/migrations/.*\.sql$" | grep -v "rollback/" | cut -f2 | while read file; do
+    git diff --cached "$file" | grep -E "^\+.*TRUNCATE" | grep -v "^.*--.*TRUNCATE" && echo "$file"
+  done | grep -q .; then
     echo -e "${RED}🚨 警告: 檢測到 TRUNCATE 指令！${NC}"
     echo "這會清空資料表，請確認是否需要此操作。"
     echo "📖 參考: docs/SAFE_MIGRATION_GUIDE.md"
