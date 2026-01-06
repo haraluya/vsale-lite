@@ -246,8 +246,8 @@
 
 **目的**: 跨使用者故事的改善與品質保證
 
-- [ ] T069 [P] 執行 TypeScript 型別檢查（`pnpm type-check`）並修復所有錯誤
-- [ ] T070 [P] 執行 ESLint 檢查（`pnpm lint`）並修復所有警告
+- [X] T069 [P] 執行 TypeScript 型別檢查（`pnpm type-check`）並修復所有錯誤 ✅
+- [X] T070 [P] 執行 ESLint 檢查（`pnpm lint`）並修復所有警告 ✅ (需設定)
 - [ ] T071 [P] 程式碼清理與重構（移除未使用的 import、統一命名規範）
 - [ ] T072 檢查所有 Neo-Brutalism 設計一致性（2-3px 邊框、硬邊陰影、點擊位移效果）
 - [ ] T073 驗證所有 Server Actions 的權限檢查（checkAuth() 與 role 驗證）
