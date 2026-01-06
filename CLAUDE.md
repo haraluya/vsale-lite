@@ -377,7 +377,7 @@ vsale/
 - 快速上手: `specs/011-shipping-and-order-edit/quickstart.md`
 - 測試資料: `specs/011-shipping-and-order-edit/seed-test-data.sql`
 
-**進度**: 57/101 任務完成 (56%)
+**進度**: 63/101 任務完成 (62%)
 - Phase 1 (Setup): ✅ 完整
 - Phase 2 (Foundational): ✅ 完整（資料庫 Migration、型別定義）
 - Phase 3 (US1 - 運費設定): ✅ 完整
@@ -386,7 +386,7 @@ vsale/
 - Phase 6 (US3 - 訂單修改核心): ✅ 完整
 - Phase 7 (US4 - 修改歷程顯示): 📋 可選（P2 優先級）
 - Phase 8 (US5 - 優惠券互動): 📋 可選（P2 優先級）
-- Phase 9 (Polish): ✅ TypeScript 型別檢查通過
+- Phase 9 (Polish): ✅ 完整（程式碼品質檢查、TypeScript 型別檢查、權限驗證、RLS Policy、錯誤訊息規範）
 - Phase 10 (Deployment): 📋 待部署
 
 **特色亮點**:
