@@ -53,6 +53,9 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 COMMENT ON FUNCTION delete_order_pending(UUID, UUID, TEXT) IS '刪除 pending 狀態訂單 (原子性操作，繞過 RLS)';
 
+-- 授予 authenticated 角色執行權限
+GRANT EXECUTE ON FUNCTION delete_order_pending(UUID, UUID, TEXT) TO authenticated;
+
 -- ============================================================
 -- Migration 完成
 -- ============================================================
