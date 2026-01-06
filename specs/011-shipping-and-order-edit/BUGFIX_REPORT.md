@@ -833,9 +833,29 @@ SELECT * FROM update_order_with_modifications(
 
 **修復人員**: Claude Sonnet 4.5
 **審核人員**: _______________
-**部署狀態**: ⏳ 待部署 (Migration 20260125)
-**文件版本**: v1.1.0
+**部署狀態**: ⏳ 待部署 (Migration 20260125 + Frontend 修復)
+**文件版本**: v1.2.0
 
 ---
 
-**附註**: 此 Bug 為 BUG-011-001 修復後發現的深層問題，涉及 PostgreSQL Function 錯誤處理機制。
+## 補充修復：操作歷史顯示問題 (2026-01-06)
+
+### 問題
+使用者回報：訂單修改成功，但操作歷史顯示「未知操作」
+
+### 根本原因
+1. `order-timeline.tsx` 未處理 `order_modified` action type
+2. `OrderTimeline` 型別缺少 `modifications` 欄位
+3. 所有 timeline 查詢未 SELECT `modifications` 欄位
+
+### 修復內容
+1. ✅ 新增 `order_modified` 支援（✏️ emoji、紫色背景）
+2. ✅ 新增 `formatModifications()` 格式化函數
+3. ✅ 新增修改明細顯示區塊（紫色背景卡片）
+4. ✅ 更新 TypeScript 型別定義
+
+**Commit**: 00eb9e2
+
+---
+
+**附註**: 此 Bug 為 BUG-011-001 修復後發現的深層問題，涉及 PostgreSQL Function 錯誤處理機制與前端顯示邏輯。
