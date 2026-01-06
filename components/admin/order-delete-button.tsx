@@ -47,11 +47,10 @@ export function OrderDeleteButton({
 
       if (result.success) {
         toast.success(result.message || '訂單已成功刪除')
-        // 延遲導向,讓 toast 有時間顯示
+        // 延遲導向,讓 toast 有時間顯示，然後強制重新載入訂單列表
         setTimeout(() => {
-          router.push('/admin/orders')
-          router.refresh()
-        }, 500)
+          window.location.href = '/admin/orders'
+        }, 800)
       } else {
         toast.error(result.message || '訂單刪除失敗')
       }
