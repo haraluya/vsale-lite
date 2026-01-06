@@ -82,12 +82,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T018 [P] [US2] 建立優惠券表單元件 `components/admin/coupons/CouponForm.tsx`（建立/編輯表單、等級限制選擇器、系列限制選擇器、生效時間選擇器）
-- [ ] T019 [P] [US2] 建立優惠券列表元件 `components/admin/coupons/CouponList.tsx`（表格顯示、狀態 Badge、操作按鈕）
-- [ ] T020 [P] [US2] 建立優惠券篩選器元件 `components/admin/coupons/CouponFilters.tsx`（狀態篩選、折扣方式篩選、代碼搜尋）
-- [ ] T021 [US2] 建立後台優惠券管理頁面 `app/(admin)/admin/coupons/page.tsx`（優惠券列表 + 篩選器 + 新增按鈕）
-- [ ] T022 [US2] 建立後台優惠券編輯頁面 `app/(admin)/admin/coupons/[id]/page.tsx`（載入優惠券詳情、編輯表單、保存更新）
-- [ ] T023 [US2] 實作優惠券刪除邏輯在 `lib/actions/coupons.ts`（檢查已領取數量、顯示確認提示、軟刪除 + CASCADE 清理）
+- [X] T018 [P] [US2] 建立優惠券表單元件 `components/admin/coupons/CouponForm.tsx`（建立/編輯表單、等級限制選擇器、系列限制選擇器、生效時間選擇器）
+- [X] T019 [P] [US2] 建立優惠券列表元件 `components/admin/coupons/CouponList.tsx`（表格顯示、狀態 Badge、操作按鈕）
+- [X] T020 [P] [US2] 建立優惠券篩選器元件 `components/admin/coupons/CouponFilters.tsx`（狀態篩選、折扣方式篩選、代碼搜尋）
+- [X] T021 [US2] 建立後台優惠券管理頁面 `app/(admin)/admin/coupons/page.tsx`（優惠券列表 + 篩選器 + 新增按鈕）
+- [X] T022 [US2] 建立後台優惠券編輯頁面 `app/(admin)/admin/coupons/[id]/page.tsx`（載入優惠券詳情、編輯表單、保存更新）
+- [X] T023 [US2] 實作優惠券刪除邏輯在 `lib/actions/coupons.ts`（檢查已領取數量、顯示確認提示、軟刪除 + CASCADE 清理）
 
 **Checkpoint**: 此階段完成後，User Story 2 應完全可用且可獨立測試（管理員可建立、編輯、刪除優惠券）
 

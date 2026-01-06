@@ -101,9 +101,7 @@ export const couponCodeSchema = z
 /**
  * 折扣方式驗證
  */
-export const discountTypeSchema = z.enum(['fixed', 'percentage'], {
-  errorMap: () => ({ message: '折扣方式必須為 fixed 或 percentage' }),
-});
+export const discountTypeSchema = z.enum(['fixed', 'percentage']);
 
 /**
  * 現金折扣值驗證（必須 > 0）
