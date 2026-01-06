@@ -13,7 +13,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ShoppingCart, Plus } from 'lucide-react'
@@ -31,9 +31,24 @@ interface ProductWithPriceCardProps {
 }
 
 export function ProductWithPriceCard({ product, tierName, onImageClick }: ProductWithPriceCardProps) {
-  const { addItem, getItemQuantity } = useCartStore()
+  const { addItem, getItemQuantity, items } = useCartStore()
   const [isAdding, setIsAdding] = useState(false)
-  const cartQuantity = getItemQuantity(product.id)
+
+  // 使用 mounted 狀態避免 hydration 不一致
+  const [mounted, setMounted] = useState(false)
+  const [cartQuantity, setCartQuantity] = useState(0)
+
+  useEffect(() => {
+    setMounted(true)
+    setCartQuantity(getItemQuantity(product.id))
+  }, [product.id, getItemQuantity])
+
+  // 監聽購物車變更，即時更新數量
+  useEffect(() => {
+    if (mounted) {
+      setCartQuantity(getItemQuantity(product.id))
+    }
+  }, [mounted, items, product.id, getItemQuantity])
 
   // 計算折扣百分比
   const discountPercent =
@@ -210,15 +225,17 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             '加入中...'
           ) : !product.user_price ? (
             '價格未設定'
-          ) : cartQuantity > 0 ? (
-            <span className="flex items-center justify-center gap-2">
-              <ShoppingCart className="h-5 w-5" />
-              再加一件 (已有 {cartQuantity} 件)
-            </span>
-          ) : (
+          ) : !mounted || cartQuantity === 0 ? (
+            // SSR 時與首次渲染時統一顯示 Plus 圖示
             <span className="flex items-center justify-center gap-2">
               <Plus className="h-5 w-5" />
               加入購物車
+            </span>
+          ) : (
+            // 客戶端 hydration 完成且購物車有商品時顯示 ShoppingCart 圖示
+            <span className="flex items-center justify-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              再加一件 (已有 {cartQuantity} 件)
             </span>
           )}
         </button>
