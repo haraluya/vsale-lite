@@ -10,24 +10,7 @@ import type { OrderModificationsInput } from '@/lib/validations/order.schema'
 import { Loader2, Trash2, Plus, X } from 'lucide-react'
 
 interface OrderEditorProps {
-  order: OrderDetail & {
-    order_items?: Array<{
-      id: string
-      product_id: string
-      product_name_snapshot: string
-      deal_price: number
-      quantity: number
-      subtotal: number
-    }>
-    order_custom_fees?: Array<{
-      id: string
-      fee_name: string
-      amount: number
-    }>
-    order_coupons?: Array<{
-      discount_amount: number
-    }>
-  }
+  order: OrderDetail
   onSave: () => void
   onCancel: () => void
 }
@@ -52,8 +35,8 @@ interface EditedFee {
 }
 
 export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
-  const originalItems = order.order_items || []
-  const originalFees = order.order_custom_fees || []
+  const originalItems = order.items || []
+  const originalFees = order.custom_fees || []
 
   // 初始化編輯狀態
   const [editedItems, setEditedItems] = useState<EditedItem[]>(
@@ -89,7 +72,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
 
   // 計算優惠券折扣（從訂單中取得）
   const couponDiscount = useMemo(() => {
-    return order.order_coupons?.[0]?.discount_amount || 0
+    return order.coupon?.discount_amount || 0
   }, [order])
 
   // 計算新總額

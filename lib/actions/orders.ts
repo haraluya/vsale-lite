@@ -555,6 +555,13 @@ export async function getOrderById(
       .eq('order_id', orderId)
       .maybeSingle()  // 使用 maybeSingle 避免無優惠券時報錯
 
+    // 查詢訂單自訂費用 (Feature 011)
+    const { data: customFees } = await supabase
+      .from('order_custom_fees')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true })
+
     // 批次查詢操作者資料（用於時間軸）
     const actorIds = (orderTimelines || []).map(t => t.actor_id).filter(Boolean)
     const { data: actors } = await supabase
@@ -619,6 +626,15 @@ export async function getOrderById(
         discount_amount: orderCoupon.discount_amount,
         created_at: orderCoupon.created_at,
       } : null,
+      // 🆕 Feature 011: 自訂費用項目
+      custom_fees: (customFees || []).map((fee: any) => ({
+        id: fee.id,
+        order_id: fee.order_id,
+        fee_name: fee.fee_name,
+        amount: fee.amount,
+        created_at: fee.created_at,
+        created_by: fee.created_by,
+      })),
     }
 
     return {

@@ -248,6 +248,28 @@ export function OrderDetailContent({ order: initialOrder, timelines }: OrderDeta
                 </div>
               )}
 
+              {/* 自訂費用 (Feature 011) */}
+              {order.custom_fees && order.custom_fees.length > 0 && (
+                <>
+                  {order.custom_fees.map((fee) => (
+                    <div key={fee.id} className="grid grid-cols-12 gap-2 md:gap-4 bg-purple-50 p-3 md:p-4">
+                      <div className={cn('col-span-6 md:col-span-8 text-right font-bold', designTokens.typography.body.base)}>
+                        💵 {fee.fee_name}
+                      </div>
+                      <div
+                        className={cn(
+                          'col-span-6 md:col-span-4 text-right font-bold',
+                          designTokens.typography.body.large,
+                          fee.amount >= 0 ? '' : 'text-red-600'
+                        )}
+                      >
+                        {fee.amount >= 0 ? '+' : ''} {formatAmount(fee.amount)}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+
               {/* 優惠券折扣 (Feature 009) */}
               {order.coupon && (
                 <div className="grid grid-cols-12 gap-2 md:gap-4 bg-orange-50 border-t-2 border-black p-3 md:p-4">
