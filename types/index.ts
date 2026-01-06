@@ -213,7 +213,9 @@ export type CartItemWithProduct = {
 }
 
 // 訂單狀態
-export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'completed' | 'cancelled'
+// Feature 011: 移除 'confirmed' 狀態，簡化訂單流程
+// 新流程: pending → shipping → completed (可取消: pending→cancelled, shipping→cancelled)
+export type OrderStatus = 'pending' | 'shipping' | 'completed' | 'cancelled'
 
 // 訂單主表
 export type Order = {

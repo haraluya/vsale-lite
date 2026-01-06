@@ -6,9 +6,9 @@ import { z } from 'zod'
  */
 
 // 訂單狀態列舉
+// Feature 011: 移除 'confirmed' 狀態，簡化訂單流程
 export const orderStatusSchema = z.enum([
   'pending',
-  'confirmed',
   'shipping',
   'completed',
   'cancelled',
@@ -38,9 +38,10 @@ export const createOrderSchema = z.object({
 })
 
 // 更新訂單狀態
+// Feature 011: 僅允許特定狀態轉換 (shipping→completed)
 export const updateOrderStatusSchema = z.object({
   orderId: z.string().uuid('無效的訂單 ID'),
-  newStatus: z.enum(['confirmed', 'shipping', 'completed'], {
+  newStatus: z.enum(['shipping', 'completed'], {
     message: '無效的訂單狀態',
   }),
 })

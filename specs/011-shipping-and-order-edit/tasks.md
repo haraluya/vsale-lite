@@ -92,10 +92,10 @@
 ### Implementation for US2
 
 - [X] T017 [P] [US2] 擴展 `lib/actions/orders.ts` 的 `createOrder()` Server Action（新增運費計算邏輯：呼叫 `calculate_shipping_fee()` RPC，更新總金額公式）✅
-- [ ] T018 [US2] 擴展 `components/shop/cart-summary.tsx`（新增運費預覽顯示：計算中/免運/收費，使用 `useEffect` 呼叫 RPC）
-- [ ] T019 [P] [US2] 建立 `lib/utils/shipping-calculator.ts`（前端工具函式：格式化運費顯示文字、驗證運費金額）
+- [X] T018 [US2] 擴展 `components/shop/cart-summary.tsx`（新增運費預覽顯示：計算中/免運/收費，使用 `useEffect` 呼叫 RPC）✅
+- [X] T019 [P] [US2] 建立 `lib/utils/shipping-calculator.ts`（前端工具函式：格式化運費顯示文字、驗證運費金額）✅
 
-**Checkpoint**: 🔄 訂單建立已整合運費計算，購物車 UI 待完成
+**Checkpoint**: ✅ Phase 4 (US2 - 運費計算) 完成！
 
 ---
 
@@ -113,18 +113,18 @@
 
 ### Migration 2: 移除 confirmed 狀態
 
-- [ ] T020 建立 Migration 檔案 `supabase/migrations/20260107_remove_confirmed_status.sql`
-- [ ] T021 在 Migration 中更新現有訂單狀態（`UPDATE orders SET status = 'shipping' WHERE status = 'confirmed'`）
-- [ ] T022 在 Migration 中修改 `orders.status` CHECK 約束（移除 'confirmed'）
-- [ ] T023 [P] 在 Migration 中刪除舊函數 `confirm_order_and_deduct_stock()`
-- [ ] T024 [P] 在 Migration 中建立新函數 `mark_order_as_shipping(p_order_id, p_actor_id)`（標記出貨並扣減庫存）
-- [ ] T025 [P] 在 Migration 中建立新函數 `update_order_status(p_order_id, p_new_status, p_actor_id)`（簡化版，移除 confirmed 邏輯）
-- [ ] T026 執行 Migration 2 並驗證現有訂單狀態轉換正確（本地環境）
+- [X] T020 建立 Migration 檔案 `supabase/migrations/20260123_remove_confirmed_status.sql` ✅
+- [X] T021 在 Migration 中更新現有訂單狀態（`UPDATE orders SET status = 'shipping' WHERE status = 'confirmed'`）✅
+- [X] T022 在 Migration 中修改 `orders.status` CHECK 約束（移除 'confirmed'）✅
+- [X] T023 [P] 在 Migration 中刪除舊函數 `confirm_order_and_deduct_stock()` ✅
+- [X] T024 [P] 在 Migration 中建立新函數 `mark_order_as_shipping(p_order_id, p_actor_id)`（標記出貨並扣減庫存）✅
+- [X] T025 [P] 在 Migration 中建立新函數 `update_order_status(p_order_id, p_new_status, p_actor_id)`（簡化版，移除 confirmed 邏輯）✅
+- [X] T026 執行 Migration 2 並驗證現有訂單狀態轉換正確（本地環境）✅
 
 ### TypeScript 型別更新
 
-- [ ] T027 [P] 更新 `types/index.ts`（修改 `OrderStatus` 型別，移除 'confirmed'）
-- [ ] T028 [P] 更新 `lib/validations/order.schema.ts`（移除 confirmed 相關驗證規則）
+- [X] T027 [P] 更新 `types/index.ts`（修改 `OrderStatus` 型別，移除 'confirmed'）✅
+- [X] T028 [P] 更新 `lib/validations/order.schema.ts`（移除 confirmed 相關驗證規則）✅
 
 ### Server Actions 更新
 
