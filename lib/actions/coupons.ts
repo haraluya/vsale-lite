@@ -85,6 +85,7 @@ export async function createCoupon(
         discount_type: data.discount_type,
         discount_value: data.discount_value,
         min_order_amount: data.min_order_amount,
+        claim_limit: data.claim_limit,
         valid_from: data.valid_from,
         valid_until: data.valid_until,
       })
@@ -316,6 +317,9 @@ export async function updateCoupon(
     }
     if (data.min_order_amount !== undefined) {
       updateData.min_order_amount = data.min_order_amount
+    }
+    if (data.claim_limit !== undefined) {
+      updateData.claim_limit = data.claim_limit
     }
     if (data.valid_from) {
       updateData.valid_from = data.valid_from
