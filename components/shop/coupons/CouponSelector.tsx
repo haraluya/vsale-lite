@@ -93,7 +93,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   }
 
   /**
-   * 應用優惠券
+   * 應用優惠券（追蹤特定領取記錄 ID）
    */
   const handleApplyCoupon = async (userCoupon: UserCoupon) => {
     if (!userCoupon.coupon) return
@@ -105,10 +105,15 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
       return
     }
 
-    setApplying(userCoupon.coupon.id)
+    setApplying(userCoupon.id)
 
     try {
-      applyCoupon(userCoupon.coupon, validation.discountAmount || 0)
+      // 將 user_coupon_id 傳遞給 coupon 物件
+      const couponWithUserCouponId = {
+        ...userCoupon.coupon,
+        user_coupon_id: userCoupon.id,
+      }
+      applyCoupon(couponWithUserCouponId, validation.discountAmount || 0)
       toast.success('優惠券已套用！')
       onClose?.()
     } catch (error) {
@@ -170,7 +175,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
         )}
       </div>
 
-      {/* 優惠券列表 */}
+      {/* 優惠券列表（每張獨立顯示） */}
       <div className="p-4 space-y-3 max-h-96 overflow-y-auto">
         {availableCoupons.map((userCoupon) => {
           const coupon = userCoupon.coupon
@@ -178,7 +183,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
 
           const validation = validationResults[coupon.id]
           const isValid = validation?.valid || false
-          const isApplied = appliedCoupon?.id === coupon.id
+          const isApplied = appliedCoupon?.id === coupon.id && appliedCoupon?.user_coupon_id === userCoupon.id
 
           const discountDisplay =
             coupon.discount_type === 'fixed'
@@ -231,7 +236,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                   ) : (
                     <button
                       onClick={() => handleApplyCoupon(userCoupon)}
-                      disabled={!isValid || applying === coupon.id}
+                      disabled={!isValid || applying === userCoupon.id}
                       className="px-3 py-1 bg-orange-400 text-black font-bold
                                  border-2 border-black text-sm
                                  shadow-neo-sm hover:translate-x-[1px]
@@ -242,7 +247,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                                  disabled:hover:translate-y-0
                                  disabled:hover:shadow-neo-sm"
                     >
-                      {applying === coupon.id ? '套用中...' : '使用'}
+                      {applying === userCoupon.id ? '套用中...' : '使用'}
                     </button>
                   )}
                 </div>

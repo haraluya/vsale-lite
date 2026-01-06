@@ -140,10 +140,10 @@ export const useCartStore = create<CartState>()(
         return item?.quantity || 0
       },
 
-      // 🆕 Feature 009: 套用優惠券
+      // 🆕 Feature 009: 套用優惠券（追蹤特定領取記錄 ID）
       applyCoupon: (coupon, discountAmount) => {
         set({
-          appliedCoupon: coupon,
+          appliedCoupon: coupon,  // coupon 物件包含 user_coupon_id
           couponDiscount: discountAmount,
         })
       },

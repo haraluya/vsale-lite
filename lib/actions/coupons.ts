@@ -448,14 +448,14 @@ export async function deleteCoupon(
 // ============================================================================
 
 /**
- * 客戶領取優惠券
+ * 客戶領取優惠券（一次領取所有可領取張數）
  *
  * @param input - 優惠券代碼
- * @returns ActionResult<UserCoupon>
+ * @returns ActionResult<{ claimed: number, total: number }>
  */
 export async function claimCoupon(
   input: unknown
-): Promise<ActionResult<UserCoupon>> {
+): Promise<ActionResult<{ claimed: number; total: number }>> {
   try {
     // 1. 權限檢查
     const { userId } = await checkAuth()
@@ -477,7 +477,7 @@ export async function claimCoupon(
     const normalizedCode = normalizeCouponCode(data.couponCode)
     const { data: coupon, error: couponError } = await supabase
       .from('active_coupons')
-      .select('*')
+      .select('*, claim_limit')
       .eq('code_normalized', normalizedCode)
       .single()
 
@@ -485,27 +485,36 @@ export async function claimCoupon(
       return { success: false, message: COUPON_ERROR_MESSAGES.COUPON_EXPIRED }
     }
 
-    // 4. 檢查是否已領取
-    const { data: existing } = await supabase
+    // 4. 檢查已領取的張數
+    const { count: alreadyClaimed } = await supabase
       .from('user_coupons')
-      .select('id')
+      .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('coupon_id', coupon.id)
-      .single()
 
-    if (existing) {
-      return { success: false, message: COUPON_ERROR_MESSAGES.ALREADY_CLAIMED }
+    const claimedCount = alreadyClaimed || 0
+    const claimLimit = coupon.claim_limit || 1
+
+    // 5. 檢查是否已達上限
+    if (claimedCount >= claimLimit) {
+      return {
+        success: false,
+        message: `您已領取此優惠券（${claimedCount}/${claimLimit} 張）`,
+      }
     }
 
-    // 5. 建立領取記錄
-    const { data: userCoupon, error } = await supabase
+    // 6. 計算可領取的張數（一次領取所有剩餘張數）
+    const remainingCount = claimLimit - claimedCount
+
+    // 7. 批次建立領取記錄
+    const insertRecords = Array.from({ length: remainingCount }, () => ({
+      user_id: userId,
+      coupon_id: coupon.id,
+    }))
+
+    const { error } = await supabase
       .from('user_coupons')
-      .insert({
-        user_id: userId,
-        coupon_id: coupon.id,
-      })
-      .select()
-      .single()
+      .insert(insertRecords)
 
     if (error) {
       console.error('領取優惠券失敗:', error)
@@ -515,8 +524,11 @@ export async function claimCoupon(
     revalidatePath('/store/coupons')
     return {
       success: true,
-      data: userCoupon,
-      message: COUPON_SUCCESS_MESSAGES.CLAIMED,
+      data: { claimed: remainingCount, total: claimLimit },
+      message:
+        remainingCount === 1
+          ? COUPON_SUCCESS_MESSAGES.CLAIMED
+          : `成功領取 ${remainingCount} 張優惠券！`,
     }
   } catch (error) {
     console.error('領取優惠券錯誤:', error)

@@ -42,8 +42,13 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
     try {
       const result = await claimCoupon({ couponCode: code.trim() })
 
-      if (result.success) {
-        toast.success(result.message || '優惠券領取成功！')
+      if (result.success && result.data) {
+        const { claimed, total } = result.data
+        const message = claimed === 1
+          ? '領取成功！'
+          : `成功領取 ${claimed} 張優惠券！（共可領取 ${total} 張）`
+
+        toast.success(message)
         setCode('')
         onClaimSuccess?.()
       } else {

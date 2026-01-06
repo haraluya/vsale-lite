@@ -336,12 +336,14 @@ export type Coupon = {
   valid_until: string
   status: 'active' | 'inactive' | 'deleted'
   deleted_at: string | null
+  claim_limit: number  // 🆕 每位客戶可領取張數上限（預設 1）
   created_at: string
   updated_at: string
 
   // 關聯資料（JOIN 查詢時包含）
   tier_restrictions?: string[]  // tier_id 陣列
   series_restrictions?: string[]  // series_id 陣列
+  user_coupon_id?: string  // 🆕 購物車套用時追蹤特定領取記錄 ID
 }
 
 // 客戶優惠券領取記錄
