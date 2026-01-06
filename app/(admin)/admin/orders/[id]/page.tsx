@@ -19,6 +19,9 @@ import { OrderDetailContent } from '@/components/admin/orders/order-detail-conte
  * - 響應式布局（手機/平板/桌面）
  */
 
+// 🔧 修復：強制動態渲染，確保取消/修改訂單後顯示最新資料
+export const dynamic = 'force-dynamic'
+
 interface AdminOrderDetailPageProps {
   params: Promise<{ id: string }>
 }

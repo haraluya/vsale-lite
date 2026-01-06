@@ -16,6 +16,9 @@ import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@
  * - Neo-Brutalism 設計風格
  */
 
+// 🔧 修復：強制動態渲染，避免快取問題（刪除訂單後需要立即顯示最新資料）
+export const dynamic = 'force-dynamic'
+
 export default async function AdminOrdersPage() {
   // 驗證管理員權限
   const supabase = await createClient()
