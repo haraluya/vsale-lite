@@ -64,17 +64,20 @@ export async function createCoupon(
     const data = validation.data
     const supabase = await createClient()
 
-    // 3. 檢查代碼唯一性（大小寫不敏感）
+    // 3. 檢查代碼唯一性（大小寫不敏感，僅檢查非刪除狀態）
     const normalizedCode = normalizeCouponCode(data.code)
     const { data: existing } = await supabase
       .from('coupons')
-      .select('id')
+      .select('id, status')
       .eq('code_normalized', normalizedCode)
-      .neq('status', 'deleted')
+      .in('status', ['active', 'inactive']) // ✅ 僅檢查 active 和 inactive，允許與 deleted 優惠券重複
       .single()
 
     if (existing) {
-      return { success: false, message: COUPON_ERROR_MESSAGES.DUPLICATE_CODE }
+      return {
+        success: false,
+        message: `優惠券代碼 ${normalizedCode} 已存在（狀態：${existing.status === 'active' ? '啟用中' : '已停用'}）`
+      }
     }
 
     // 4. 建立優惠券
@@ -295,7 +298,7 @@ export async function updateCoupon(
     // 3. 檢查優惠券是否存在
     const { data: existing } = await supabase
       .from('coupons')
-      .select('id')
+      .select('id, code_normalized')
       .eq('id', couponId)
       .single()
 
@@ -303,7 +306,30 @@ export async function updateCoupon(
       return { success: false, message: COUPON_ERROR_MESSAGES.COUPON_NOT_FOUND }
     }
 
-    // 4. 準備更新資料
+    // 4. 如果更新代碼，檢查唯一性（僅檢查非刪除狀態）
+    if (data.code) {
+      const normalizedCode = normalizeCouponCode(data.code)
+
+      // 如果代碼有變更，檢查是否與其他非刪除優惠券重複
+      if (normalizedCode !== existing.code_normalized) {
+        const { data: duplicate } = await supabase
+          .from('coupons')
+          .select('id, status')
+          .eq('code_normalized', normalizedCode)
+          .in('status', ['active', 'inactive']) // ✅ 僅檢查 active 和 inactive
+          .neq('id', couponId) // 排除自己
+          .single()
+
+        if (duplicate) {
+          return {
+            success: false,
+            message: `優惠券代碼 ${normalizedCode} 已存在（狀態：${duplicate.status === 'active' ? '啟用中' : '已停用'}）`
+          }
+        }
+      }
+    }
+
+    // 5. 準備更新資料
     const updateData: any = {}
 
     if (data.code) {
@@ -331,7 +357,7 @@ export async function updateCoupon(
       updateData.status = data.status
     }
 
-    // 5. 更新優惠券
+    // 6. 更新優惠券
     const { data: coupon, error } = await supabase
       .from('coupons')
       .update(updateData)
@@ -344,7 +370,7 @@ export async function updateCoupon(
       return { success: false, message: `更新失敗: ${error.message}` }
     }
 
-    // 6. 更新等級限制（如果有提供）
+    // 7. 更新等級限制（如果有提供）
     if (data.tier_restrictions !== undefined) {
       // 刪除舊的限制
       await supabase
@@ -363,7 +389,7 @@ export async function updateCoupon(
       }
     }
 
-    // 7. 更新系列限制（如果有提供）
+    // 8. 更新系列限制（如果有提供）
     if (data.series_restrictions !== undefined) {
       // 刪除舊的限制
       await supabase
@@ -555,14 +581,15 @@ export async function getUserCoupons(filters?: {
 
     const supabase = await createClient()
 
-    // 2. 建立查詢
+    // 2. 建立查詢（使用 inner join 確保優惠券存在且狀態正確）
     let query = supabase
       .from('user_coupons')
       .select(`
         *,
-        coupon:coupons(*)
+        coupon:coupons!inner(*)
       `)
       .eq('user_id', userId)
+      .neq('coupon.status', 'deleted') // ✅ 過濾已刪除的優惠券
       .order('claimed_at', { ascending: false })
 
     // 3. 套用篩選條件
@@ -579,7 +606,20 @@ export async function getUserCoupons(filters?: {
       return { success: false, message: '查詢優惠券失敗' }
     }
 
-    return { success: true, data: userCoupons || [] }
+    // 4. 前端額外過濾：隱藏過期的優惠券（僅顯示有效期內的）
+    const now = new Date()
+    const filteredCoupons = (userCoupons || []).filter((uc: any) => {
+      const coupon = uc.coupon
+      if (!coupon) return false
+
+      const validFrom = new Date(coupon.valid_from)
+      const validUntil = new Date(coupon.valid_until)
+
+      // 僅顯示有效期內的優惠券
+      return now >= validFrom && now <= validUntil
+    })
+
+    return { success: true, data: filteredCoupons }
   } catch (error) {
     console.error('查詢客戶優惠券錯誤:', error)
     return { success: false, message: '查詢優惠券時發生錯誤' }
@@ -686,6 +726,84 @@ export async function validateCoupon(
   } catch (error) {
     console.error('驗證優惠券錯誤:', error)
     return { success: false, message: '驗證優惠券時發生錯誤' }
+  }
+}
+
+/**
+ * 查詢優惠券領取用戶列表（管理員）
+ *
+ * @param couponId - 優惠券 ID
+ * @returns ActionResult<{ user_id, user_name, user_phone, claimed_at, used_at, order_id }[]>
+ */
+export async function getCouponUsers(
+  couponId: string
+): Promise<ActionResult<Array<{
+  user_id: string
+  user_name: string
+  user_phone: string
+  claimed_at: string
+  used_at: string | null
+  order_id: string | null
+}>>> {
+  try {
+    // 1. 權限檢查
+    const { role } = await checkAuth()
+    if (role !== 'admin') {
+      return { success: false, message: COUPON_ERROR_MESSAGES.PERMISSION_DENIED }
+    }
+
+    const supabase = await createClient()
+
+    // 2. 查詢領取記錄並關聯用戶資料
+    const { data: userCoupons, error } = await supabase
+      .from('user_coupons')
+      .select(`
+        user_id,
+        claimed_at,
+        used_at,
+        order_id
+      `)
+      .eq('coupon_id', couponId)
+      .order('claimed_at', { ascending: false })
+
+    if (error) {
+      console.error('查詢優惠券領取用戶失敗:', error)
+      return { success: false, message: '查詢領取用戶失敗' }
+    }
+
+    if (!userCoupons || userCoupons.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    // 3. 批次查詢用戶資料
+    const userIds = [...new Set(userCoupons.map((uc) => uc.user_id))]
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, phone, display_name')
+      .in('id', userIds)
+
+    // 4. 建立 user_id -> profile 對應表
+    const profileMap = new Map(
+      (profiles || []).map((profile: any) => [profile.id, profile])
+    )
+
+    // 5. 組合資料
+    const users = userCoupons.map((uc: any) => {
+      const profile = profileMap.get(uc.user_id)
+      return {
+        user_id: uc.user_id,
+        user_name: profile?.display_name || profile?.phone || '未知客戶',
+        user_phone: profile?.phone || '',
+        claimed_at: uc.claimed_at,
+        used_at: uc.used_at,
+        order_id: uc.order_id,
+      }
+    })
+
+    return { success: true, data: users }
+  } catch (error) {
+    console.error('查詢優惠券領取用戶錯誤:', error)
+    return { success: false, message: '查詢領取用戶時發生錯誤' }
   }
 }
 

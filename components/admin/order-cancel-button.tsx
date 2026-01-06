@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { cancelOrder } from '@/lib/actions/orders'
 import { toast } from 'sonner'
 import { Trash2, X } from 'lucide-react'
@@ -22,6 +23,7 @@ interface OrderCancelButtonProps {
 }
 
 export function OrderCancelButton({ orderId, currentStatus, orderNumber }: OrderCancelButtonProps) {
+  const router = useRouter()
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [isPending, startTransition] = useTransition()
 
@@ -39,6 +41,7 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
       if (result.success) {
         toast.success(result.message)
         setShowConfirmDialog(false)
+        router.refresh() // ✅ 重新整理頁面以更新訂單狀態
       } else {
         toast.error(result.message || '取消訂單失敗')
       }
