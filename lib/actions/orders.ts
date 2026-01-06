@@ -1169,10 +1169,10 @@ export async function updateOrderDetails(
       }
     }
 
-    // 檢查訂單是否存在且可修改
+    // 檢查訂單是否存在且可修改（包含優惠券資訊）
     const { data: order, error: fetchError } = await supabase
       .from('orders')
-      .select('id, status')
+      .select('id, status, user_id')
       .eq('id', orderId)
       .single()
 
@@ -1190,6 +1190,21 @@ export async function updateOrderDetails(
         message: `僅待確認訂單可修改，此訂單狀態為「${order.status === 'shipping' ? '出貨中' : order.status === 'completed' ? '已完成' : '已取消'}」`,
       }
     }
+
+    // Phase 8 (US5): 查詢訂單優惠券與客戶等級資訊（用於修改後驗證）
+    const { data: orderCoupon } = await supabase
+      .from('order_coupons')
+      .select('*')
+      .eq('order_id', orderId)
+      .maybeSingle()
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('tier_id')
+      .eq('id', order.user_id)
+      .single()
+
+    const userTierId = profile?.tier_id
 
     // 呼叫 PostgreSQL Function 進行批次修改
     const { data, error } = await supabase.rpc('update_order_with_modifications', {
@@ -1226,6 +1241,63 @@ export async function updateOrderDetails(
       }
     }
 
+    // Phase 8 (US5): 訂單修改後驗證優惠券條件
+    let couponWarning: string | undefined
+
+    if (orderCoupon && userTierId && !modifications.coupon?.action) {
+      // 查詢優惠券完整資訊（含限制條件）
+      const { data: coupon } = await supabase
+        .from('coupons')
+        .select(`
+          *,
+          tier_restrictions:coupon_tier_restrictions(tier_id),
+          series_restrictions:coupon_series_restrictions(series_id)
+        `)
+        .eq('code_normalized', orderCoupon.coupon_code)
+        .single()
+
+      if (coupon) {
+        // 查詢修改後的訂單明細（用於驗證優惠券條件）
+        const { data: updatedItems } = await supabase
+          .from('order_items')
+          .select(`
+            id,
+            product_id,
+            deal_price,
+            quantity,
+            products(series_id)
+          `)
+          .eq('order_id', orderId)
+
+        if (updatedItems && updatedItems.length > 0) {
+          // 轉換為 CartItemForCoupon 格式
+          const cartItems = updatedItems.map((item: any) => ({
+            product_id: item.product_id,
+            series_id: item.products?.series_id || '',
+            price: item.deal_price,
+            quantity: item.quantity,
+          }))
+
+          // 使用 coupon-helpers 驗證優惠券條件
+          const { validateCouponConditions } = await import('@/lib/utils/coupon-helpers')
+          const validationResult = validateCouponConditions({
+            coupon: {
+              ...coupon,
+              tier_restrictions: coupon.tier_restrictions?.map((r: any) => r.tier_id) || [],
+              series_restrictions: coupon.series_restrictions?.map((r: any) => r.series_id) || [],
+            } as any,
+            cartItems,
+            userTierId,
+          })
+
+          // 若優惠券不符合條件，回傳警告
+          if (!validationResult.valid) {
+            couponWarning = validationResult.error || '訂單修改後不符合優惠券使用條件'
+          }
+        }
+      }
+    }
+
     // 記錄操作日誌
     await logAudit({
       target_type: 'order',
@@ -1240,7 +1312,10 @@ export async function updateOrderDetails(
 
     return {
       success: true,
-      data: { new_total: result.new_total },
+      data: {
+        new_total: result.new_total,
+        coupon_warning: couponWarning,
+      },
       message: result.message,
     }
   } catch (error) {

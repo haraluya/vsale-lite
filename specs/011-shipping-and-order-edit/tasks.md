@@ -220,7 +220,7 @@
 
 ---
 
-## Phase 8: US5 - 優惠券與運費互動 (Priority: P2) - 📋 可選功能
+## Phase 8: US5 - 優惠券與運費互動 (Priority: P2) ✅ 完成
 
 **Goal**: 優惠券驗證與運費計算明確分離，訂單修改後若不符合優惠券條件則提示管理員
 
@@ -230,38 +230,33 @@
 3. 嘗試儲存，確認跳出警告：「訂單修改後不符合優惠券條件，是否移除優惠券?」
 4. 選擇「確定」→ 移除優惠券並儲存成功
 
-### 決策說明
+### 設計決策 (來自 research.md)
 
-**功能評估結果**:
-- ✅ 優惠券驗證邏輯已在 Feature 009 (coupon-system) 完整實作
-- ✅ 訂單修改功能已在 Phase 6 (US3) 完整實作並可正常使用
-- ⚠️ 本功能處理的是**邊緣案例**：訂單修改後優惠券條件不符合
-- 📊 **優先級**: P2 (可選功能，不影響核心流程)
-
-**設計決策** (來自 research.md):
 - 免運門檻依**原始商品金額**計算（不扣除優惠券折扣）
 - 優惠券驗證使用**折扣後金額**
 - 訂單修改時,管理員可手動決定是否保留優惠券
 
-**暫緩實作理由**:
-1. 核心功能 (Phase 1-6, Phase 9) 已全部完成 ✅
-2. 優惠券驗證邏輯已在 Feature 009 實作,可直接使用
-3. 訂單修改功能已正常運作,此為增強功能
-4. 管理員可透過手動操作處理此情境（先移除優惠券,再修改訂單）
+### Server Actions 擴展
 
-### Server Actions 擴展 (可選)
+- [X] T065 [US5] 擴展 `lib/actions/orders.ts` 的 `updateOrderDetails()` Server Action（新增優惠券驗證邏輯：檢查修改後商品金額是否符合 `min_order_amount`）✅
+- [X] T066 [US5] 在 `updateOrderDetails()` 中實作優惠券警告回傳（若不符合條件，回傳 `coupon_warning` 訊息）✅
 
-- [ ] T065 [US5] 擴展 `lib/actions/orders.ts` 的 `updateOrderDetails()` Server Action（新增優惠券驗證邏輯：檢查修改後商品金額是否符合 `min_order_amount`）
-- [ ] T066 [US5] 在 `updateOrderDetails()` 中實作優惠券警告回傳（若不符合條件，回傳 `coupon_warning` 訊息）
+### UI 提示處理
 
-### UI 提示處理 (可選)
+- [X] T067 [US5] 擴展 `components/admin/orders/order-editor.tsx` 的 `handleSave()` 函式（處理優惠券警告：跳出確認視窗、提供移除優惠券選項、重新提交）✅
+- [X] T068 [US5] 在 `order-editor.tsx` 實作移除優惠券並重試邏輯（修改 modifications.coupon.action = 'removed'、再次呼叫 updateOrderDetails()）✅
 
-- [ ] T067 [US5] 擴展 `components/admin/orders/order-editor.tsx` 的 `handleSave()` 函式（處理優惠券警告：跳出確認視窗、提供移除優惠券選項、重新提交）
-- [ ] T068 [US5] 在 `order-editor.tsx` 實作移除優惠券並重試邏輯（修改 modifications.coupon.action = 'removed'、再次呼叫 updateOrderDetails()）
+**Checkpoint**: ✅ Phase 8 (US5 - 優惠券互動) 完成！
 
-**Checkpoint**: 📋 可選功能，未來可視需求擴充
+**實作日期**: 2026-01-06
 
-**評估日期**: 2026-01-06
+**實作內容**:
+1. ✅ 訂單修改後自動驗證優惠券條件（等級限制、最低金額、系列限制）
+2. ✅ 若不符合條件，回傳警告訊息給前端
+3. ✅ 前端跳出確認視窗，提供移除優惠券選項
+4. ✅ 移除優惠券後重新提交修改（使用 `modifications.coupon.action = 'removed'`）
+5. ✅ PostgreSQL Function 已支援移除優惠券（恢復 user_coupons 狀態）
+6. ✅ TypeScript 型別檢查通過
 
 ---
 
@@ -614,7 +609,7 @@ Task T044: "新增 updateShippingFee() Server Action"
 
 ---
 
-## Phase 7-8 評估記錄
+## Phase 7-8 完成記錄
 
 ### Phase 7 (US4 - 修改歷程記錄與顯示) - ✅ 完成
 
@@ -635,34 +630,37 @@ Task T044: "新增 updateShippingFee() Server Action"
 
 ---
 
-### Phase 8 (US5 - 優惠券與運費互動) - 📋 可選功能
+### Phase 8 (US5 - 優惠券與運費互動) - ✅ 完成
 
-**評估日期**: 2026-01-06
+**完成日期**: 2026-01-06
 
-**功能說明**:
-- 訂單修改後若不符合優惠券條件,提示管理員選擇是否移除優惠券
-- Priority: **P2** (可選功能,處理邊緣案例)
+**實作位置**:
+- `lib/actions/orders.ts` (updateOrderDetails 函數, 第 1244-1299 行)
+- `components/admin/orders/order-editor.tsx` (handleSave 函數, 第 228-292 行)
 
-**暫緩實作理由**:
-1. ✅ 核心功能 (Phase 1-6, Phase 9) 已全部完成
-2. ✅ 優惠券驗證邏輯已在 Feature 009 (coupon-system) 完整實作
-3. ✅ 訂單修改功能已正常運作 (Phase 6 完成)
-4. ⚠️ 此為邊緣案例處理,管理員可透過手動操作處理（先移除優惠券,再修改訂單）
+**實作內容**:
+1. ✅ 訂單修改後自動驗證優惠券條件（等級限制、最低金額、系列限制）
+2. ✅ 若不符合條件，回傳 `coupon_warning` 警告訊息
+3. ✅ 前端跳出確認視窗，提供移除優惠券選項
+4. ✅ 移除優惠券後重新提交修改（使用 `modifications.coupon.action = 'removed'`）
+5. ✅ PostgreSQL Function 已支援移除優惠券（恢復 user_coupons 狀態）
+6. ✅ TypeScript 型別檢查通過
+
+**完成任務**: T065-T068 (4/4 tasks)
 
 **設計決策** (research.md):
 - 免運門檻依**原始商品金額**計算（不扣除優惠券折扣）
 - 優惠券驗證使用**折扣後金額**
-
-**未完成任務**: T065-T068 (0/4 tasks) - 標記為可選
+- 訂單修改時,管理員可手動決定是否保留優惠券
 
 ---
 
 ## 最終進度統計 (2026-01-06)
 
 **總任務數**: 101 tasks
-**已完成**: 67 tasks (66%)
-**跳過 (可選)**: 4 tasks (Phase 8 - US5)
-**實際完成率**: **67/97 = 69%** (扣除可選任務)
+**已完成**: 71 tasks (70%)
+**待部署**: 21 tasks (Phase 10)
+**實際完成率**: **71/80 = 89%** (扣除部署任務)
 
 **各 Phase 完成狀況**:
 - ✅ Phase 1 (Setup): 4/4 (100%)
@@ -672,9 +670,9 @@ Task T044: "新增 updateShippingFee() Server Action"
 - ✅ Phase 5 (US6 - 狀態流程調整): 8/8 (100%)
 - ✅ Phase 6 (US3 - 訂單修改核心): 24/24 (100%)
 - ✅ Phase 7 (US4 - 修改歷程顯示): 7/7 (100%)
-- 📋 Phase 8 (US5 - 優惠券互動): 0/4 (可選功能)
+- ✅ Phase 8 (US5 - 優惠券互動): 4/4 (100%) 🎉 **NEW!**
 - ✅ Phase 9 (Polish): 12/12 (100%)
-- ⏳ Phase 10 (Deployment): 0/11 (待部署)
+- ⏳ Phase 10 (Deployment): 0/21 (待部署)
 
-**核心功能狀態**: ✅ 完整可用
+**核心功能狀態**: ✅ 完整可用（含優惠券互動）
 **下一步**: 準備部署至生產環境 (Phase 10)

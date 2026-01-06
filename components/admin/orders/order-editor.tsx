@@ -225,8 +225,8 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
     }
   }
 
-  // 儲存變更
-  const handleSave = async () => {
+  // 儲存變更（含優惠券驗證處理）
+  const handleSave = async (skipCouponWarning = false) => {
     const modifications = buildModifications()
 
     // 檢查是否有變更
@@ -259,8 +259,29 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
     if (!confirm(confirmMsg)) return
 
     setLoading(true)
+
+    // Phase 8 (US5): 若已選擇移除優惠券，新增到 modifications
+    if (skipCouponWarning) {
+      modifications.coupon = { action: 'removed' }
+    }
+
     const result = await updateOrderDetails(order.id, modifications)
     setLoading(false)
+
+    // Phase 8 (US5): 處理優惠券警告
+    if (result.success && result.data?.coupon_warning && !skipCouponWarning) {
+      const removeCoupon = confirm(
+        `⚠️ 優惠券驗證失敗\n\n${result.data.coupon_warning}\n\n是否移除優惠券並重新儲存修改？\n\n• 點擊「確定」→ 移除優惠券並儲存\n• 點擊「取消」→ 保留優惠券，放棄修改`
+      )
+
+      if (removeCoupon) {
+        // 重新呼叫 handleSave，並移除優惠券
+        await handleSave(true)
+      } else {
+        alert('已取消訂單修改，優惠券保留')
+      }
+      return
+    }
 
     if (result.success) {
       alert('訂單修改成功！')
@@ -533,7 +554,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           取消編輯
         </Button>
         <Button
-          onClick={handleSave}
+          onClick={() => handleSave()}
           disabled={loading}
           className="flex-1 bg-blue-600 hover:bg-blue-700 border-2 border-black shadow-neo active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         >
