@@ -309,6 +309,92 @@ export type Announcement = {
 }
 
 // ===================================
+// 優惠券型別 (Feature 009)
+// ===================================
+
+// 優惠券
+export type Coupon = {
+  id: string
+  code: string  // 原始代碼（管理員輸入）
+  code_normalized: string  // 自動轉大寫的代碼
+  discount_type: 'fixed' | 'percentage'
+  discount_value: number
+  min_order_amount: number | null
+  valid_from: string  // ISO 8601 格式
+  valid_until: string
+  status: 'active' | 'inactive' | 'deleted'
+  deleted_at: string | null
+  created_at: string
+  updated_at: string
+
+  // 關聯資料（JOIN 查詢時包含）
+  tier_restrictions?: string[]  // tier_id 陣列
+  series_restrictions?: string[]  // series_id 陣列
+}
+
+// 客戶優惠券領取記錄
+export type UserCoupon = {
+  id: string
+  user_id: string
+  coupon_id: string
+  claimed_at: string
+  used_at: string | null
+  order_id: string | null
+
+  // 關聯資料（JOIN 查詢時包含）
+  coupon?: Coupon
+}
+
+// 訂單優惠券快照
+export type OrderCoupon = {
+  id: string
+  order_id: string
+  coupon_code: string
+  discount_type: 'fixed' | 'percentage'
+  discount_value: number
+  discount_amount: number  // 實際折扣金額
+  created_at: string
+}
+
+// 優惠券折扣計算結果
+export type CouponDiscountResult = {
+  valid: boolean
+  error?: string
+  discountAmount?: number  // 實際折扣金額
+  originalAmount?: number  // 折扣前金額
+  finalAmount?: number  // 折扣後金額
+}
+
+// 優惠券統計
+export type CouponStats = {
+  claimCount: number  // 領取次數
+  usedCount: number  // 使用次數
+  totalDiscountAmount: number  // 總折扣金額
+}
+
+// 優惠券查詢參數
+export type GetCouponsParams = {
+  status?: 'active' | 'inactive' | 'deleted'
+  discount_type?: 'fixed' | 'percentage'
+  search?: string  // 搜尋優惠券代碼
+  page?: number  // 頁碼 (預設 1)
+  limit?: number  // 每頁筆數 (預設 20)
+}
+
+// 優惠券列表回應
+export type GetCouponsResponse = {
+  coupons: Coupon[]
+  total: number
+  page: number
+  limit: number
+}
+
+// 客戶優惠券查詢參數
+export type GetUserCouponsParams = {
+  used?: boolean  // true: 已使用, false: 未使用
+}
+
+// ===================================
 // 系統管理型別 (Feature 008)
 // ===================================
 

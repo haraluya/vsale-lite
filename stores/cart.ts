@@ -1,17 +1,25 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { CartItem } from '@/types'
+import type { CartItem, Coupon } from '@/types'
 
 /**
  * 購物車狀態管理
- * Feature: 004-cart-and-orders
+ * Feature: 004-cart-and-orders, 009-coupon-system
  *
  * 使用 Zustand persist middleware 將購物車資料儲存於 localStorage
  * 資料結構: { productId, quantity } - 最小化儲存,價格即時查詢
+ *
+ * 🆕 Feature 009: 新增優惠券支援
+ * - appliedCoupon: 已套用的優惠券
+ * - couponDiscount: 優惠券折扣金額
  */
 
 interface CartState {
   items: CartItem[]
+
+  // 🆕 Feature 009: 優惠券相關狀態
+  appliedCoupon: Coupon | null
+  couponDiscount: number
 
   // 新增商品到購物車
   addItem: (productId: string, quantity: number) => void
@@ -33,12 +41,25 @@ interface CartState {
 
   // 取得特定商品的數量
   getItemQuantity: (productId: string) => number
+
+  // 🆕 Feature 009: 套用優惠券
+  applyCoupon: (coupon: Coupon, discountAmount: number) => void
+
+  // 🆕 Feature 009: 移除優惠券
+  removeCoupon: () => void
+
+  // 🆕 Feature 009: 清空購物車（含優惠券）
+  clearCartWithCoupon: () => void
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+
+      // 🆕 Feature 009: 優惠券狀態初始化
+      appliedCoupon: null,
+      couponDiscount: 0,
 
       addItem: (productId, quantity) => {
         const items = get().items
@@ -99,10 +120,35 @@ export const useCartStore = create<CartState>()(
         const item = get().items.find(item => item.productId === productId)
         return item?.quantity || 0
       },
+
+      // 🆕 Feature 009: 套用優惠券
+      applyCoupon: (coupon, discountAmount) => {
+        set({
+          appliedCoupon: coupon,
+          couponDiscount: discountAmount,
+        })
+      },
+
+      // 🆕 Feature 009: 移除優惠券
+      removeCoupon: () => {
+        set({
+          appliedCoupon: null,
+          couponDiscount: 0,
+        })
+      },
+
+      // 🆕 Feature 009: 清空購物車（含優惠券）
+      clearCartWithCoupon: () => {
+        set({
+          items: [],
+          appliedCoupon: null,
+          couponDiscount: 0,
+        })
+      },
     }),
     {
       name: 'vsale-cart-storage', // localStorage key
-      version: 1, // 版本控制,未來可用於資料遷移
+      version: 2, // 🆕 Feature 009: 版本升級（新增優惠券欄位）
     }
   )
 )
