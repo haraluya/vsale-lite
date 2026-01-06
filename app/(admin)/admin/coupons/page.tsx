@@ -18,18 +18,19 @@ import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     status?: 'active' | 'inactive'
     discountType?: 'fixed' | 'percentage'
     search?: string
-  }
+  }>
 }
 
 async function CouponsContent({ searchParams }: PageProps) {
+  const params = await searchParams
   const result = await getCoupons({
-    status: searchParams.status,
-    discount_type: searchParams.discountType,
-    search: searchParams.search,
+    status: params.status,
+    discount_type: params.discountType,
+    search: params.search,
   })
 
   const coupons = result.success && result.data ? result.data : []

@@ -248,6 +248,11 @@ CREATE POLICY "Admins can view all user coupons"
     )
   );
 
+CREATE POLICY "Clients can claim coupons"
+  ON user_coupons FOR INSERT
+  TO authenticated
+  WITH CHECK (user_id = auth.uid());
+
 -- 12. 建立 RLS Policies - order_coupons
 -- ============================================================================
 

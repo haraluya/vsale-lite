@@ -10,13 +10,14 @@ import { getCouponById } from '@/lib/actions/coupons'
 import { CouponForm } from '@/components/admin/coupons/CouponForm'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function EditCouponPage({ params }: PageProps) {
-  const result = await getCouponById(params.id)
+  const { id } = await params
+  const result = await getCouponById(id)
 
   if (!result.success || !result.data) {
     notFound()
