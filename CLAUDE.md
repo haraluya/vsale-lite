@@ -337,6 +337,68 @@ vsale/
 - ✅ RLS Policy 確保客戶僅能查看有效優惠券
 - ✅ Coupang 風格優惠券卡片 + Foodpanda 風格輸入口令
 
+
+#### 8. **011-shipping-and-order-edit**: 運費設定與訂單修改系統 ✅ **NEW!**
+**狀態**: Phase 1-6 核心功能完成 (2026-01-06)
+
+**核心功能**:
+1. ✅ 會員等級運費設定（基本運費、滿額免運門檻）
+2. ✅ 訂單建立時自動計算運費（RPC 函數、購物車預覽）
+3. ✅ 訂單狀態流程簡化（移除 confirmed 狀態，pending → shipping → completed）
+4. ✅ 庫存扣減時機調整（從確認訂單移至標記出貨階段）
+5. ✅ 訂單修改核心功能（商品單價、數量、運費、自訂費用）
+6. ✅ 批次修改原子性保證（PostgreSQL Transaction）
+
+**資料庫實體**:
+- `tiers`: 擴展運費欄位（shipping_fee, free_shipping_threshold）
+- `orders`: 擴展運費欄位（shipping_fee）
+- `order_custom_fees`: 訂單自訂費用表（手續費、包裝費、總額調整）
+- `order_timelines`: 擴展修改歷程欄位（modifications JSONB）
+
+**PostgreSQL Functions**:
+- `calculate_shipping_fee()`: 計算運費（依會員等級與訂單金額）
+- `mark_order_as_shipping()`: 標記出貨並扣減庫存（原子性操作）
+- `update_order_with_modifications()`: 批次修改訂單（商品、費用、運費）
+
+**Server Actions** (`lib/actions/orders.ts`, `lib/actions/tiers.ts`):
+- 訂單管理: `markAsShipping()`, `updateOrderDetails()`, `updateOrderStatus()` (更新)
+- 等級管理: `updateTier()` (擴展運費欄位)
+
+**UI 元件**:
+- 前台：`CartSummary` (運費預覽)、`ShippingFeeDisplay`
+- 後台：`TierForm` (運費設定)、`OrderEditor` (訂單編輯器)、`OrderActions` (標記出貨按鈕)
+
+**文件位置**:
+- 規格: `specs/011-shipping-and-order-edit/spec.md`
+- 實作計畫: `specs/011-shipping-and-order-edit/plan.md`
+- 資料模型: `specs/011-shipping-and-order-edit/data-model.md`
+- API 合約: `specs/011-shipping-and-order-edit/contracts/`
+- 任務清單: `specs/011-shipping-and-order-edit/tasks.md`
+- 快速上手: `specs/011-shipping-and-order-edit/quickstart.md`
+- 測試資料: `specs/011-shipping-and-order-edit/seed-test-data.sql`
+
+**進度**: 57/101 任務完成 (56%)
+- Phase 1 (Setup): ✅ 完整
+- Phase 2 (Foundational): ✅ 完整（資料庫 Migration、型別定義）
+- Phase 3 (US1 - 運費設定): ✅ 完整
+- Phase 4 (US2 - 運費計算): ✅ 完整
+- Phase 5 (US6 - 狀態流程調整): ✅ 完整
+- Phase 6 (US3 - 訂單修改核心): ✅ 完整
+- Phase 7 (US4 - 修改歷程顯示): 📋 可選（P2 優先級）
+- Phase 8 (US5 - 優惠券互動): 📋 可選（P2 優先級）
+- Phase 9 (Polish): ✅ TypeScript 型別檢查通過
+- Phase 10 (Deployment): 📋 待部署
+
+**特色亮點**:
+- ✅ 運費自動化計算（依會員等級與訂單金額）
+- ✅ 滿額免運機制（支援不同等級設定不同門檻）
+- ✅ 訂單狀態流程簡化（pending → shipping → completed）
+- ✅ 庫存扣減時機優化（從確認訂單移至出貨階段）
+- ✅ 訂單修改原子性保證（PostgreSQL Transaction 確保資料一致性）
+- ✅ 支援負庫存（預購/欠貨場景）
+- ✅ 自訂費用支援（手續費、包裝費、額外運費、總額調整）
+- ✅ 批次修改功能（商品單價、數量、運費一次性提交）
+
 ---
 
 ### 🚀 待開發功能
