@@ -24,7 +24,7 @@ import { designTokens } from '@/lib/design-tokens'
 
 export default function CheckoutPage() {
   const router = useRouter()
-  const { items, clearCart, getTotalItems, removeInvalidItems } = useCartStore()
+  const { items, clearCart, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
 
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
   const [notes, setNotes] = useState('')
@@ -71,6 +71,7 @@ export default function CheckoutPage() {
 
   // 計算總金額
   const totalAmount = cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)
+  const finalAmount = totalAmount - couponDiscount // 扣除優惠券折扣
   const totalItems = getTotalItems()
   const isEmpty = items.length === 0
 
@@ -92,10 +93,11 @@ export default function CheckoutPage() {
         return
       }
 
-      // 2. 建立訂單
+      // 2. 建立訂單（含優惠券資訊）
       const result = await createOrder({
         items,
         notes: notes.trim() || null,
+        userCouponId: appliedCoupon?.user_coupon_id || null,
       })
 
       if (!result.success) {
@@ -253,11 +255,37 @@ export default function CheckoutPage() {
               "md:border-t-3",
               "border-t-black"
             )}>
-              <div className="flex items-center justify-between">
-                <p className={designTokens.typography.h3}>訂單總金額</p>
-                <p className="text-2xl md:text-3xl font-bold text-green-600">
-                  {formatCurrency(totalAmount)}
-                </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className={designTokens.typography.body.large}>商品總額</p>
+                  <p className="text-lg font-bold">
+                    {formatCurrency(totalAmount)}
+                  </p>
+                </div>
+
+                {/* 優惠券折扣 */}
+                {appliedCoupon && couponDiscount > 0 && (
+                  <div className="flex items-center justify-between text-orange-600">
+                    <p className={designTokens.typography.body.base}>
+                      優惠券折扣 ({appliedCoupon.code_normalized})
+                    </p>
+                    <p className="text-lg font-bold">
+                      -{formatCurrency(couponDiscount)}
+                    </p>
+                  </div>
+                )}
+
+                <div className={cn(
+                  "flex items-center justify-between pt-2",
+                  designTokens.neoBrutalism.border.mobile,
+                  "md:border-t-2",
+                  "border-t-gray-300"
+                )}>
+                  <p className={designTokens.typography.h3}>訂單總金額</p>
+                  <p className="text-2xl md:text-3xl font-bold text-green-600">
+                    {formatCurrency(finalAmount)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

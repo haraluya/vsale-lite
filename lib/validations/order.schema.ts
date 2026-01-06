@@ -32,7 +32,7 @@ export const createOrderSchema = z.object({
     .nullable(),
 
   // Feature 009: 優惠券系統
-  couponId: z.string().uuid('無效的優惠券 ID')
+  userCouponId: z.string().uuid('無效的優惠券 ID')
     .optional()
     .nullable(),
 })

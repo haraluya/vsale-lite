@@ -367,6 +367,7 @@ export type CouponDiscountResult = {
   discountAmount?: number  // 實際折扣金額
   originalAmount?: number  // 折扣前金額
   finalAmount?: number  // 折扣後金額
+  availableUserCouponId?: string  // 可用的 user_coupon_id（驗證時回傳）
 }
 
 // 優惠券統計

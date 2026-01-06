@@ -641,30 +641,20 @@ export async function validateCoupon(
       }
     }
 
-    // 4. 檢查客戶是否已領取
-    const { data: userCoupon } = await supabase
+    // 4. 檢查客戶是否已領取（查詢未使用的優惠券，支援多張領取）
+    const { data: userCoupons } = await supabase
       .from('user_coupons')
       .select('id, used_at')
       .eq('user_id', userId)
       .eq('coupon_id', coupon.id)
-      .single()
+      .is('used_at', null) // 僅查詢未使用的優惠券
 
-    if (!userCoupon) {
+    if (!userCoupons || userCoupons.length === 0) {
       return {
         success: true,
         data: {
           valid: false,
-          error: '您尚未領取此優惠券',
-        },
-      }
-    }
-
-    if (userCoupon.used_at) {
-      return {
-        success: true,
-        data: {
-          valid: false,
-          error: '此優惠券已使用',
+          error: '您尚未領取此優惠券，或所有優惠券已使用',
         },
       }
     }
@@ -686,7 +676,13 @@ export async function validateCoupon(
       userTierId: tierId,
     })
 
-    return { success: true, data: result }
+    return {
+      success: true,
+      data: {
+        ...result,
+        availableUserCouponId: userCoupons[0].id, // 回傳第一張未使用的 user_coupon_id
+      },
+    }
   } catch (error) {
     console.error('驗證優惠券錯誤:', error)
     return { success: false, message: '驗證優惠券時發生錯誤' }
