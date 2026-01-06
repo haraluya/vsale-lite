@@ -1,10 +1,11 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { createTier, updateTier } from '@/lib/actions/tiers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { Tier, ActionResult } from '@/types'
@@ -19,6 +20,11 @@ type TierFormProps = {
 export function TierForm({ tier, mode }: TierFormProps) {
   const router = useRouter()
   const isEdit = mode === 'edit'
+
+  // Feature 011: 運費設定狀態
+  const [chargeShipping, setChargeShipping] = useState(
+    tier?.shipping_fee ? tier.shipping_fee > 0 : false
+  )
 
   const [state, formAction, pending] = useActionState<ActionResult<{ id: string }> | null, FormData>(
     isEdit && tier ? updateTier.bind(null, tier.id) : createTier,
@@ -65,6 +71,69 @@ export function TierForm({ tier, mode }: TierFormProps) {
         {state && 'errors' in state && state.errors?.rank && (
           <p className="mt-2 text-sm text-red-500">{state.errors.rank[0]}</p>
         )}
+      </div>
+
+      {/* Feature 011: 運費設定區塊 */}
+      <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+        <h3 className="mb-4 text-lg font-bold">運費設定</h3>
+
+        <div className="space-y-4">
+          <Checkbox
+            id="charge_shipping"
+            label="收取運費"
+            checked={chargeShipping}
+            onChange={(e) => setChargeShipping(e.target.checked)}
+          />
+
+          {chargeShipping && (
+            <div className="ml-6 space-y-4 border-l-2 border-gray-300 pl-4">
+              <div>
+                <Label htmlFor="shipping_fee">基本運費 (元) *</Label>
+                <Input
+                  id="shipping_fee"
+                  name="shipping_fee"
+                  type="number"
+                  defaultValue={tier?.shipping_fee || 0}
+                  placeholder="例: 100"
+                  required={chargeShipping}
+                  min="0"
+                  step="0.01"
+                  className="mt-2"
+                />
+                {state && 'errors' in state && state.errors?.shipping_fee && (
+                  <p className="mt-2 text-sm text-red-500">{state.errors.shipping_fee[0]}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-600">
+                  設定為 0 表示不收運費
+                </p>
+              </div>
+
+              <div>
+                <Label htmlFor="free_shipping_threshold">滿額免運門檻 (元)</Label>
+                <Input
+                  id="free_shipping_threshold"
+                  name="free_shipping_threshold"
+                  type="number"
+                  defaultValue={tier?.free_shipping_threshold || ''}
+                  placeholder="例: 1000 (留空表示不提供免運)"
+                  min="1"
+                  step="0.01"
+                  className="mt-2"
+                />
+                {state && 'errors' in state && state.errors?.free_shipping_threshold && (
+                  <p className="mt-2 text-sm text-red-500">{state.errors.free_shipping_threshold[0]}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-600">
+                  留空表示不提供滿額免運優惠
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!chargeShipping && (
+            <input type="hidden" name="shipping_fee" value="0" />
+          )}
+        </div>
       </div>
 
       {state?.message && !state.success && (

@@ -432,6 +432,7 @@ export async function getOrders(
         order_number: order.order_number,
         user_id: order.user_id,
         total_amount: order.total_amount,
+        shipping_fee: order.shipping_fee || 0,  // Feature 011: 運費
         status: order.status,
         notes: order.notes,
         created_at: order.created_at,
@@ -545,6 +546,7 @@ export async function getOrderById(
       order_number: order.order_number,
       user_id: order.user_id,
       total_amount: order.total_amount,
+      shipping_fee: order.shipping_fee || 0,  // Feature 011: 運費
       status: order.status,
       notes: order.notes,
       created_at: order.created_at,
