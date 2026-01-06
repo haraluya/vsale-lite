@@ -340,6 +340,9 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               required
               disabled={loading}
             />
+            <p className="mt-1 text-sm text-gray-600">
+              預設為現在時間
+            </p>
           </div>
 
           <div>
@@ -355,7 +358,23 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               required
               disabled={loading}
             />
+            <p className="mt-1 text-sm text-gray-600">
+              預設為 30 天後（建議設定較長期限避免過期）
+            </p>
           </div>
+        </div>
+
+        {/* 日期範圍提示 */}
+        <div className="mt-4 rounded border-2 border-orange-400 bg-orange-50 p-4">
+          <p className="text-sm font-bold text-orange-800">
+            ⚠️ 重要提示：優惠券過期後將無法領取！
+          </p>
+          <p className="mt-1 text-sm text-orange-700">
+            • 請確保「結束時間」設定在未來，建議至少 30-90 天
+          </p>
+          <p className="text-sm text-orange-700">
+            • 優惠券過期後，客戶將無法輸入口令領取
+          </p>
         </div>
       </div>
 

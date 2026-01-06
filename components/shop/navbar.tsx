@@ -13,7 +13,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { CurrentUser } from '@/types'
 import { LogOut, User, ShoppingCart, Package, Ticket } from 'lucide-react'
@@ -28,8 +28,13 @@ interface NavbarProps {
 
 export function Navbar({ user }: NavbarProps) {
   const [loading, setLoading] = useState(false)
+  const [cartItemsCount, setCartItemsCount] = useState(0)
   const { getTotalItems } = useCartStore()
-  const cartItemsCount = getTotalItems()
+
+  // 修復 Hydration Error：在客戶端載入後才讀取購物車數量
+  useEffect(() => {
+    setCartItemsCount(getTotalItems())
+  }, [getTotalItems])
 
   const handleLogout = async () => {
     if (!confirm('確定要登出嗎?')) return
