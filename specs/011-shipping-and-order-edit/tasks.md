@@ -1,457 +1,504 @@
-# Tasks: Feature 011 - 運費設定與訂單修改系統
+# Tasks: 運費設定與訂單修改系統
 
 **專案**: Vsale-lite
-**功能**: 運費設定與訂單修改系統
-**輸入文件**: spec.md, plan.md, data-model.md, research.md, contracts/
-**最後更新**: 2026-01-06
-**總任務數**: 91 個
-**預估工作量**: 15-16 小時
+**功能**: Feature 011 - 運費設定與訂單修改系統
+**建立日期**: 2026-01-06
+**優先級**: P0（核心功能）
+
+**Input**: 設計文件來自 `/specs/spec-011-shipping-and-order-edit/`
+**Prerequisites**: plan.md (✅), spec.md (✅), research.md (✅), data-model.md (✅), contracts/ (✅)
+
+**Tests**: 本功能**不包含**單元測試任務（依據專案慣例，P0 功能優先交付，測試為可選）
+
+**Organization**: 任務依使用者故事（US1-US6）分組，每個故事可獨立實作與測試
 
 ---
 
-## 格式說明
+## Format: `[ID] [P?] [Story] Description`
 
-- **[P]**: 可並行執行（不同檔案、無相依性）
-- **[Story]**: 所屬使用者故事（US1, US2, US3...）
-- 所有任務包含明確的檔案路徑
-
----
-
-## Phase 1: Setup（專案準備）
-
-**目的**: 環境準備與相依性檢查
-
-- [ ] T001 確認本地 Supabase 正常運行（supabase start）
-- [ ] T002 檢查現有訂單資料（確認是否有 confirmed 狀態訂單）
-- [ ] T003 [P] 備份生產環境資料庫（pg_dump）
-- [ ] T004 [P] 建立 Feature Branch: feature/011-shipping-and-order-edit
-
-**Checkpoint**: 環境準備完成，可開始開發
+- **[P]**: 可並行執行（不同檔案、無依賴）
+- **[Story]**: 使用者故事標籤（US1, US2, US3...）
+- 任務描述包含明確的檔案路徑
 
 ---
 
-## Phase 2: Foundational（資料庫基礎建設）
+## Phase 1: Setup (專案準備)
 
-**目的**: 核心資料表結構與函數，所有使用者故事的前置條件
+**目的**: 環境準備與依賴檢查
 
-**⚠️ CRITICAL**: 此階段必須完成後，所有使用者故事才能開始實作
+- [X] T001 確認本地 Supabase 正常運行（執行 `supabase start`）✅
+- [X] T002 檢查現有訂單資料（確認是否有 `confirmed` 狀態訂單）✅
+- [X] T003 備份生產環境資料庫（執行 `pg_dump` 或使用備份腳本）✅ 本地開發，跳過
+- [X] T004 建立 Feature Branch: `feature/011-shipping-and-order-edit` ✅ 分支: spec-011-shipping-and-order-edit
 
-### 資料庫 Migration
-
-- [ ] T005 建立 Migration: supabase/migrations/20260106_add_shipping_features.sql
-- [ ] T006 [P] 在 Migration 中新增 tiers.shipping_fee, tiers.free_shipping_threshold 欄位
-- [ ] T007 [P] 在 Migration 中新增 orders.shipping_fee 欄位
-- [ ] T008 在 Migration 中建立 order_custom_fees 表（含索引與 RLS）
-- [ ] T009 在 Migration 中建立 calculate_shipping_fee() PostgreSQL Function
-- [ ] T010 建立 Migration: supabase/migrations/20260107_remove_confirmed_status.sql
-- [ ] T011 在 Migration 中更新現有訂單狀態（confirmed → shipping）
-- [ ] T012 在 Migration 中修改 orders.status CHECK 約束（移除 confirmed）
-- [ ] T013 在 Migration 中刪除 confirm_order_and_deduct_stock() 函數
-- [ ] T014 在 Migration 中建立 mark_order_as_shipping() PostgreSQL Function
-- [ ] T015 建立 Migration: supabase/migrations/20260108_extend_order_timelines.sql
-- [ ] T016 在 Migration 中新增 order_timelines.modifications JSONB 欄位
-- [ ] T017 在 Migration 中擴展 order_timelines.action_type CHECK 約束（新增 order_modified）
-- [ ] T018 在 Migration 中建立 update_order_with_modifications() PostgreSQL Function
-- [ ] T019 在 Migration 中建立 GIN 索引於 order_timelines.modifications
-
-### TypeScript 型別定義
-
-- [ ] T020 [P] 在 types/index.ts 新增 OrderCustomFee 型別
-- [ ] T021 [P] 在 types/index.ts 新增 OrderModifications 型別（含 JSONB 結構）
-- [ ] T022 [P] 在 types/index.ts 移除 OrderStatus 的 'confirmed' 狀態
-- [ ] T023 [P] 在 types/index.ts 新增 ShippingFeeResult 型別
-
-### Zod Schema 驗證
-
-- [ ] T024 [P] 在 lib/validations/order.schema.ts 新增 orderCustomFeeSchema
-- [ ] T025 [P] 在 lib/validations/order.schema.ts 新增 orderModificationsSchema
-- [ ] T026 [P] 在 lib/validations/tier.schema.ts 擴展 tierSchema（新增 shipping_fee, free_shipping_threshold）
-
-### Migration 測試
-
-- [ ] T027 執行 supabase db reset（本地環境）
-- [ ] T028 測試 calculate_shipping_fee() 函數（3 種情境：未滿門檻、滿門檻、免運）
-
-**Checkpoint**: 資料庫結構完成，所有使用者故事可開始並行實作
+**Checkpoint**: ✅ 環境就緒，可開始實作
 
 ---
 
-## Phase 3: US1 - 運費設定管理（管理員）🎯 MVP
+## Phase 2: Foundational (基礎建設 - 阻塞所有使用者故事)
 
-**目標**: 管理員可為不同會員等級設定運費規則
-**優先級**: P0
-**獨立測試**: 進入會員等級編輯頁面，設定運費後儲存，檢查資料庫 tiers 表是否正確更新
+**目的**: 資料庫 Migration、型別定義、核心函數（所有使用者故事的前置條件）
+
+**⚠️ 重要**: 此階段完成前，無法開始任何使用者故事的實作
+
+### Migration 1: 運費功能基礎建設
+
+- [X] T005 建立 Migration 檔案 `supabase/migrations/20260122_add_shipping_features.sql` ✅
+- [X] T006 在 Migration 中擴展 `tiers` 表（新增 `shipping_fee`, `free_shipping_threshold` 欄位與 CHECK 約束）✅
+- [X] T007 在 Migration 中擴展 `orders` 表（新增 `shipping_fee` 欄位與 CHECK 約束）✅
+- [X] T008 [P] 在 Migration 中建立 `order_custom_fees` 表（含 RLS Policy 與索引）✅
+- [X] T009 [P] 在 Migration 中建立 PostgreSQL Function `calculate_shipping_fee(p_user_id, p_subtotal)` ✅
+- [X] T010 執行 Migration 1 並驗證資料表結構正確（本地環境）✅ 已執行 supabase db reset
+
+### TypeScript 型別定義與 Schema
+
+- [X] T011 [P] 擴展 `types/index.ts`（新增 `Tier.shipping_fee`, `Tier.free_shipping_threshold`, `Order.shipping_fee`, `OrderCustomFee` 型別）✅
+- [X] T012 [P] 擴展 `lib/validations/tier.schema.ts`（新增 `shipping_fee`, `free_shipping_threshold` 驗證規則）✅
+- [X] T013 [P] 建立 `lib/validations/order.schema.ts` 擴展（新增 `orderCustomFeeSchema`, `orderModificationsSchema`）✅
+
+**Checkpoint**: ✅ 基礎建設完成，使用者故事可並行開發
+
+---
+
+## Phase 3: US1 - 運費設定管理（管理員）(Priority: P1) 🎯
+
+**Goal**: 管理員可為不同會員等級設定運費規則（收費金額、滿額免運門檻）
+
+**Independent Test**:
+1. 進入會員等級編輯頁面，勾選「收取運費」
+2. 設定基本運費 100 元，滿額免運 1000 元
+3. 儲存後檢查資料庫 `tiers` 表欄位正確更新
+
+### Implementation for US1
+
+- [X] T014 [P] [US1] 擴展 `lib/actions/tiers.ts` 的 `updateTier()` Server Action（新增 `shipping_fee`, `free_shipping_threshold` 參數與驗證）✅
+- [X] T015 [US1] 擴展 `components/admin/tier-form.tsx`（新增運費設定區塊 UI：Checkbox、基本運費輸入、免運門檻輸入）✅
+- [X] T016 [US1] 更新 `app/(admin)/admin/tiers/page.tsx`（確保新欄位正確顯示與傳遞）✅
+
+**Checkpoint**: ✅ 管理員可設定會員等級運費規則，設定正確儲存至資料庫
+
+---
+
+## Phase 4: US2 - 訂單建立時自動計算運費（客戶 + 系統）(Priority: P1) 🎯
+
+**Goal**: 客戶結帳時系統自動計算運費並顯示，訂單建立後運費儲存為快照
+
+**Independent Test**:
+1. 客戶登入（零售等級，運費 100 元，滿 1000 免運）
+2. 加入商品至購物車（總額 800 元）
+3. 檢查購物車摘要：運費 NT$100，總額 NT$900
+4. 修改商品至 1200 元，檢查運費顯示「免運」
+
+### Implementation for US2
+
+- [X] T017 [P] [US2] 擴展 `lib/actions/orders.ts` 的 `createOrder()` Server Action（新增運費計算邏輯：呼叫 `calculate_shipping_fee()` RPC，更新總金額公式）✅
+- [ ] T018 [US2] 擴展 `components/shop/cart-summary.tsx`（新增運費預覽顯示：計算中/免運/收費，使用 `useEffect` 呼叫 RPC）
+- [ ] T019 [P] [US2] 建立 `lib/utils/shipping-calculator.ts`（前端工具函式：格式化運費顯示文字、驗證運費金額）
+
+**Checkpoint**: 🔄 訂單建立已整合運費計算，購物車 UI 待完成
+
+---
+
+## Phase 5: US6 - 訂單狀態流程調整（移除 confirmed）(Priority: P0) 🎯
+
+**Goal**: 移除 `confirmed` 狀態，簡化訂單流程為 pending → shipping → completed，庫存扣減時機移至出貨階段
+
+**Independent Test**:
+1. 建立測試訂單（pending 狀態）
+2. 點擊「標記出貨」按鈕，確認庫存扣減且狀態變為 shipping
+3. 點擊「標記完成」按鈕，狀態變為 completed
+4. 取消 shipping 訂單，確認庫存回補
+
+**⚠️ 重要**: 此階段涉及資料遷移與函數重構，需謹慎處理
+
+### Migration 2: 移除 confirmed 狀態
+
+- [ ] T020 建立 Migration 檔案 `supabase/migrations/20260107_remove_confirmed_status.sql`
+- [ ] T021 在 Migration 中更新現有訂單狀態（`UPDATE orders SET status = 'shipping' WHERE status = 'confirmed'`）
+- [ ] T022 在 Migration 中修改 `orders.status` CHECK 約束（移除 'confirmed'）
+- [ ] T023 [P] 在 Migration 中刪除舊函數 `confirm_order_and_deduct_stock()`
+- [ ] T024 [P] 在 Migration 中建立新函數 `mark_order_as_shipping(p_order_id, p_actor_id)`（標記出貨並扣減庫存）
+- [ ] T025 [P] 在 Migration 中建立新函數 `update_order_status(p_order_id, p_new_status, p_actor_id)`（簡化版，移除 confirmed 邏輯）
+- [ ] T026 執行 Migration 2 並驗證現有訂單狀態轉換正確（本地環境）
+
+### TypeScript 型別更新
+
+- [ ] T027 [P] 更新 `types/index.ts`（修改 `OrderStatus` 型別，移除 'confirmed'）
+- [ ] T028 [P] 更新 `lib/validations/order.schema.ts`（移除 confirmed 相關驗證規則）
+
+### Server Actions 更新
+
+- [ ] T029 [P] [US6] 在 `lib/actions/orders.ts` 新增 `markAsShipping()` Server Action（呼叫 `mark_order_as_shipping` RPC）
+- [ ] T030 [P] [US6] 更新 `lib/actions/orders.ts` 的 `updateOrderStatus()` Server Action（移除 confirmed 相關邏輯，僅允許 shipping→completed, pending→cancelled, shipping→cancelled）
+- [ ] T031 [P] [US6] 刪除 `lib/actions/orders.ts` 的 `confirmOrder()` Server Action（已由 markAsShipping 取代）
+
+### UI 元件更新
+
+- [ ] T032 [US6] 更新 `components/admin/orders/order-actions.tsx`（移除「確認訂單」按鈕，新增「標記出貨（扣減庫存）」按鈕）
+- [ ] T033 [P] [US6] 更新 `components/shop/order-status-badge.tsx`（移除 confirmed 狀態顯示）
+
+**Checkpoint**: 訂單狀態流程正確（pending→shipping→completed），庫存扣減時機移至出貨階段
+
+---
+
+## Phase 6: US3 - 管理員修改訂單（核心功能）(Priority: P1) 🎯
+
+**Goal**: 管理員可修改待確認訂單的商品、價格、運費、自訂費用，所有修改一次性提交
+
+**Independent Test**:
+1. 進入待確認訂單詳情頁，點擊「編輯訂單」
+2. 修改商品單價（50→40）、數量（10→8）
+3. 新增自訂費用（手續費 50 元）
+4. 修改運費（100→0）
+5. 儲存變更，確認訂單總額正確更新且修改歷程記錄完整
+
+### Migration 3: 修改歷程擴展
+
+- [ ] T034 建立 Migration 檔案 `supabase/migrations/20260108_extend_order_timelines.sql`
+- [ ] T035 在 Migration 中擴展 `order_timelines` 表（新增 `modifications` JSONB 欄位與 GIN 索引）
+- [ ] T036 在 Migration 中擴展 `order_timelines.action_type` CHECK 約束（新增 'order_modified'）
+- [ ] T037 在 Migration 中建立 PostgreSQL Function `update_order_with_modifications(p_order_id, p_modifications, p_actor_id)`（批次修改訂單）
+- [ ] T038 執行 Migration 3 並驗證修改歷程擴展正確（本地環境）
 
 ### Server Actions
 
-- [ ] T029 [P] [US1] 在 lib/actions/tiers.ts 擴展 updateTier() 函數（處理 shipping_fee, free_shipping_threshold）
-- [ ] T030 [P] [US1] 在 lib/actions/tiers.ts 新增運費欄位驗證（非負數檢查、門檻大於 0）
+- [ ] T039 [P] [US3] 在 `lib/actions/orders.ts` 新增 `updateOrderDetails()` Server Action（呼叫 `update_order_with_modifications` RPC，傳遞 JSONB 格式修改資料）
+- [ ] T040 [P] [US3] 在 `lib/actions/orders.ts` 新增 `addOrderItem()` Server Action（新增商品至訂單，驗證商品存在性）
+- [ ] T041 [P] [US3] 在 `lib/actions/orders.ts` 新增 `removeOrderItem()` Server Action（移除訂單商品，檢查至少保留一個商品）
+- [ ] T042 [P] [US3] 在 `lib/actions/orders.ts` 新增 `addCustomFee()` Server Action（新增自訂費用項目）
+- [ ] T043 [P] [US3] 在 `lib/actions/orders.ts` 新增 `adjustTotalAmount()` Server Action（直接修改總金額，自動計算差額）
+- [ ] T044 [P] [US3] 在 `lib/actions/orders.ts` 新增 `updateShippingFee()` Server Action（單獨修改訂單運費）
 
-### UI 元件
+### UI 元件：訂單編輯器
 
-- [ ] T031 [US1] 建立 components/admin/tiers/shipping-fee-settings.tsx（運費設定元件）
-- [ ] T032 [US1] 在 app/(admin)/admin/tiers/page.tsx 整合運費設定區塊（含條件顯示）
+- [ ] T045 [US3] 建立 `components/admin/orders/order-editor.tsx`（訂單編輯器核心元件：React State 管理編輯狀態、商品列表編輯、費用管理、運費調整、即時總額計算）
+- [ ] T046 [US3] 在 `order-editor.tsx` 實作商品單價編輯功能（Input 輸入、即時小計更新、刪除線標記）
+- [ ] T047 [US3] 在 `order-editor.tsx` 實作商品數量編輯功能（+/- 按鈕、Input 輸入、即時小計更新）
+- [ ] T048 [US3] 在 `order-editor.tsx` 實作移除商品功能（刪除線標記、暫存於 State、儲存後實際移除）
+- [ ] T049 [US3] 在 `order-editor.tsx` 實作新增商品功能（搜尋商品、輸入數量與單價、綠色標記）
+- [ ] T050 [US3] 在 `order-editor.tsx` 實作新增自訂費用功能（費用名稱與金額輸入、支援負數）
+- [ ] T051 [US3] 在 `order-editor.tsx` 實作修改運費功能（Input 輸入、免運標記）
+- [ ] T052 [US3] 在 `order-editor.tsx` 實作直接修改總金額功能（計算差額、自動新增「總額調整」項目）
+- [ ] T053 [US3] 在 `order-editor.tsx` 實作儲存變更功能（建構 OrderModifications JSONB、跳出確認視窗、呼叫 updateOrderDetails()、成功後重新載入）
+- [ ] T054 [US3] 在 `order-editor.tsx` 實作取消編輯功能（重置 State、退出編輯模式）
 
-### 測試資料
+### 訂單詳情頁整合
 
-- [ ] T033 [US1] 執行種子資料 SQL（設定零售、批發、經銷商運費）
+- [ ] T055 [US3] 擴展 `app/(admin)/admin/orders/[id]/page.tsx`（新增 `editMode` State、顯示「編輯訂單」按鈕（僅 pending 狀態）、整合 OrderEditor 元件）
+- [ ] T056 [US3] 在訂單詳情頁實作編輯模式切換（點擊「編輯訂單」進入編輯模式、儲存/取消後退出）
+- [ ] T057 [US3] 在訂單詳情頁新增離開確認提示（使用 `beforeunload` 事件，提示未儲存的修改）
 
-**Checkpoint**: 管理員可在會員等級頁面設定運費，資料正確儲存於資料庫
-
----
-
-## Phase 4: US2 - 訂單建立時自動計算運費（客戶 + 系統）
-
-**目標**: 客戶結帳時自動計算運費，顯示免運提示
-**優先級**: P0
-**獨立測試**: 客戶加入商品至購物車，檢查運費顯示是否正確（未滿門檻收費、滿額免運、優惠券不影響免運門檻）
-
-### Server Actions
-
-- [ ] T034 [P] [US2] 在 lib/actions/orders.ts 擴展 createOrder() 函數（新增運費計算）
-- [ ] T035 [P] [US2] 在 lib/actions/orders.ts 新增 calculateShippingFee() Server Action（呼叫 PostgreSQL Function）
-- [ ] T036 [US2] 在 lib/actions/orders.ts 實作優惠券與運費互動邏輯（免運門檻依原始商品金額）
-
-### UI 元件
-
-- [ ] T037 [P] [US2] 建立 components/shop/cart/shipping-fee-preview.tsx（運費預覽元件）
-- [ ] T038 [US2] 在 components/shop/cart-summary.tsx 整合運費顯示（含免運提示、差額顯示）
-- [ ] T039 [US2] 在 app/(shop)/cart/page.tsx 整合運費預覽元件
-
-**Checkpoint**: 客戶購物車顯示正確運費，訂單建立後 shipping_fee 欄位正確儲存
+**Checkpoint**: 管理員可修改待確認訂單，所有修改一次性提交，總金額正確更新
 
 ---
 
-## Phase 5: US3 - 管理員修改訂單（核心功能）
+## Phase 7: US4 - 修改歷程記錄與顯示 (Priority: P2)
 
-**目標**: 管理員可修改待確認訂單的商品、價格、運費
-**優先級**: P0
-**獨立測試**: 管理員進入訂單詳情頁，進入編輯模式，修改商品單價與數量，儲存後檢查訂單總額與修改歷程
+**Goal**: 客戶與管理員可查看訂單的完整修改歷程，與留言歷程視覺上區分
 
-### Server Actions
+**Independent Test**:
+1. 修改訂單後，進入訂單詳情頁
+2. 查看「訂單操作歷史」區塊
+3. 確認修改歷程以黃色背景顯示，包含所有變更項目（商品、費用、運費、總額）
 
-- [ ] T040 [P] [US3] 在 lib/actions/orders.ts 新增 updateOrderDetails() Server Action（批次修改訂單）
-- [ ] T041 [P] [US3] 在 lib/actions/orders.ts 新增 addOrderItem() Server Action（加入商品至訂單）
-- [ ] T042 [P] [US3] 在 lib/actions/orders.ts 新增 removeOrderItem() Server Action（移除訂單商品）
-- [ ] T043 [P] [US3] 在 lib/actions/orders.ts 新增 addCustomFee() Server Action（新增自訂費用）
-- [ ] T044 [P] [US3] 在 lib/actions/orders.ts 新增 adjustTotalAmount() Server Action（直接修改總金額）
-- [ ] T045 [P] [US3] 在 lib/actions/orders.ts 新增 updateShippingFee() Server Action（修改訂單運費）
+### UI 元件：修改歷程顯示器
 
-### UI 元件
+- [ ] T058 [P] [US4] 建立 `components/admin/orders/order-modification-timeline.tsx`（修改歷程顯示器：解析 JSONB modifications、格式化顯示各類修改）
+- [ ] T059 [US4] 在 `order-modification-timeline.tsx` 實作商品修改顯示（price_changed, quantity_changed, removed, added）
+- [ ] T060 [US4] 在 `order-modification-timeline.tsx` 實作費用修改顯示（added, removed）
+- [ ] T061 [US4] 在 `order-modification-timeline.tsx` 實作運費修改顯示（舊運費 → 新運費、免運標記）
+- [ ] T062 [US4] 在 `order-modification-timeline.tsx` 實作總額變更顯示（修改前後總額對比）
 
-- [ ] T046 [US3] 建立 components/admin/orders/order-editor.tsx（訂單編輯器核心元件）
-- [ ] T047 [P] [US3] 建立 components/admin/orders/order-item-editor.tsx（商品明細編輯器）
-- [ ] T048 [P] [US3] 建立 components/admin/orders/order-custom-fees.tsx（自訂費用元件）
-- [ ] T049 [P] [US3] 建立 components/admin/orders/shipping-fee-editor.tsx（運費編輯器）
-- [ ] T050 [US3] 在 components/admin/orders/order-editor.tsx 實作即時總額計算邏輯
-- [ ] T051 [US3] 在 components/admin/orders/order-editor.tsx 實作編輯確認視窗（顯示變更摘要）
-- [ ] T052 [US3] 在 app/(admin)/admin/orders/[id]/page.tsx 整合訂單編輯器（新增編輯模式切換）
+### 訂單詳情頁整合
 
-### 狀態限制
+- [ ] T063 [US4] 擴展 `app/(admin)/admin/orders/[id]/page.tsx`（整合 OrderModificationTimeline 元件，與留言歷程區分顯示）
+- [ ] T064 [US4] 更新訂單操作歷史區塊樣式（修改歷程黃色背景、留言歷程藍色背景、狀態變更灰色背景）
 
-- [ ] T053 [US3] 在 components/admin/orders/order-editor.tsx 實作狀態檢查（僅 pending 可編輯）
-
-**Checkpoint**: 管理員可完整修改待確認訂單，所有變更正確儲存並記錄於修改歷程
+**Checkpoint**: 修改歷程清晰可讀，視覺上與留言區分
 
 ---
 
-## Phase 6: US4 - 修改歷程記錄與顯示
+## Phase 8: US5 - 優惠券與運費互動 (Priority: P2)
 
-**目標**: 客戶與管理員可查看訂單的完整修改歷程
-**優先級**: P1
-**獨立測試**: 修改訂單後，進入訂單詳情頁，檢查操作歷史是否顯示修改內容（含商品變更、費用新增、運費調整）
+**Goal**: 優惠券驗證與運費計算明確分離，訂單修改後若不符合優惠券條件則提示管理員
 
-### UI 元件
+**Independent Test**:
+1. 建立訂單（商品 1200 元，使用優惠券 SAVE200，折扣後 1000 元）
+2. 進入編輯模式，移除部分商品（商品金額降至 800 元）
+3. 嘗試儲存，確認跳出警告：「訂單修改後不符合優惠券條件，是否移除優惠券?」
+4. 選擇「確定」→ 移除優惠券並儲存成功
 
-- [ ] T054 [P] [US4] 建立 components/admin/orders/order-modification-timeline.tsx（修改歷程顯示器）
-- [ ] T055 [US4] 在 order-modification-timeline.tsx 實作 JSONB 格式化邏輯（顯示修改項目）
-- [ ] T056 [US4] 在 order-modification-timeline.tsx 實作視覺區分（修改歷程 vs 留言，黃色 vs 藍色背景）
-- [ ] T057 [US4] 在 app/(admin)/admin/orders/[id]/page.tsx 整合修改歷程顯示器
+### Server Actions 擴展
 
-### 工具函式
+- [ ] T065 [US5] 擴展 `lib/actions/orders.ts` 的 `updateOrderDetails()` Server Action（新增優惠券驗證邏輯：檢查修改後商品金額是否符合 `min_order_amount`）
+- [ ] T066 [US5] 在 `updateOrderDetails()` 中實作優惠券警告回傳（若不符合條件，回傳 `coupon_warning` 訊息）
 
-- [ ] T058 [P] [US4] 建立 lib/utils/order-modification-formatter.ts（修改歷程格式化工具）
-- [ ] T059 [US4] 在 order-modification-formatter.ts 實作 formatModificationItem() 函數（格式化修改項目）
+### UI 提示處理
 
-**Checkpoint**: 訂單操作歷史正確顯示所有修改，內容清晰易讀
+- [ ] T067 [US5] 擴展 `components/admin/orders/order-editor.tsx` 的 `handleSave()` 函式（處理優惠券警告：跳出確認視窗、提供移除優惠券選項、重新提交）
+- [ ] T068 [US5] 在 `order-editor.tsx` 實作移除優惠券並重試邏輯（修改 modifications.coupon.action = 'removed'、再次呼叫 updateOrderDetails()）
 
----
-
-## Phase 7: US5 - 優惠券與運費互動
-
-**目標**: 優惠券驗證與運費計算明確分離
-**優先級**: P1
-**獨立測試**: 建立包含優惠券的訂單，修改訂單後檢查優惠券驗證邏輯（若不符合條件顯示警告）
-
-### Server Actions
-
-- [ ] T060 [US5] 在 lib/actions/orders.ts 的 updateOrderDetails() 中實作優惠券驗證邏輯
-- [ ] T061 [US5] 在 lib/actions/orders.ts 的 updateOrderDetails() 中實作優惠券移除提示機制
-
-### UI 元件
-
-- [ ] T062 [US5] 在 components/admin/orders/order-editor.tsx 實作優惠券警告視窗（顯示不符合條件訊息）
-- [ ] T063 [US5] 在 components/admin/orders/order-editor.tsx 實作優惠券保留/移除選項
-
-### 工具函式
-
-- [ ] T064 [P] [US5] 建立 lib/utils/shipping-calculator.ts（運費計算工具）
-- [ ] T065 [US5] 在 shipping-calculator.ts 實作 calculateShippingFee() 函數（本地運費計算）
-- [ ] T066 [US5] 在 shipping-calculator.ts 實作 validateShippingFee() 函數（運費驗證）
-
-**Checkpoint**: 訂單修改後優惠券驗證正確，不符合條件時顯示警告並允許管理員選擇
+**Checkpoint**: 訂單修改後優惠券驗證正確，管理員可選擇移除優惠券或保留
 
 ---
 
-## Phase 8: US6 - 訂單狀態流程調整
+## Phase 9: Polish & Cross-Cutting Concerns
 
-**目標**: 移除 confirmed 狀態，簡化訂單流程
-**優先級**: P0
-**獨立測試**: 建立訂單後標記出貨，檢查庫存扣減是否正確，取消出貨中訂單檢查庫存回補
+**目的**: 跨使用者故事的改善與品質保證
 
-### Server Actions
+- [ ] T069 [P] 執行 TypeScript 型別檢查（`pnpm type-check`）並修復所有錯誤
+- [ ] T070 [P] 執行 ESLint 檢查（`pnpm lint`）並修復所有警告
+- [ ] T071 [P] 程式碼清理與重構（移除未使用的 import、統一命名規範）
+- [ ] T072 檢查所有 Neo-Brutalism 設計一致性（2-3px 邊框、硬邊陰影、點擊位移效果）
+- [ ] T073 驗證所有 Server Actions 的權限檢查（checkAuth() 與 role 驗證）
+- [ ] T074 驗證所有 RLS Policy 正確設定（order_custom_fees, order_timelines）
+- [ ] T075 檢查所有錯誤訊息符合規範（plan.md 第五章：使用繁體中文、明確說明問題與解決方案、避免技術術語）
+- [ ] T076 驗證所有 Server Actions 錯誤處理（回傳 `ActionResult<T>`、Zod 錯誤轉換、PostgreSQL 錯誤轉換、錯誤日誌記錄）
+- [ ] T077 驗證所有 UI 元件錯誤處理（即時表單驗證、Loading/Error 狀態、重試/返回操作）
+- [ ] T078 [P] 執行本地環境完整測試流程（quickstart.md 所有測試案例）
+- [ ] T079 建立 Rollback SQL 腳本（每個 Migration 對應的回滾 SQL）
+- [ ] T080 更新專案 CLAUDE.md（新增 Feature 011 完成狀態與功能摘要）
 
-- [ ] T067 [P] [US6] 在 lib/actions/orders.ts 新增 markAsShipping() Server Action（標記出貨並扣減庫存）
-- [ ] T068 [P] [US6] 在 lib/actions/orders.ts 修改 updateOrderStatus() 函數（移除 confirmed 邏輯）
-- [ ] T069 [P] [US6] 在 lib/actions/orders.ts 修改 cancelOrder() 函數（支援 shipping 狀態回補庫存）
-- [ ] T070 [US6] 在 lib/actions/orders.ts 刪除 confirmOrder() 函數（由 markAsShipping 取代）
-
-### UI 元件
-
-- [ ] T071 [US6] 在 components/admin/orders/order-actions.tsx 移除「確認訂單」按鈕
-- [ ] T072 [US6] 在 components/admin/orders/order-actions.tsx 新增「標記出貨（扣減庫存）」按鈕
-- [ ] T073 [US6] 在 components/admin/orders/order-actions.tsx 修改取消訂單邏輯（支援 shipping 狀態回補庫存）
-- [ ] T074 [US6] 在 app/(admin)/admin/orders/[id]/page.tsx 更新按鈕顯示邏輯（依新狀態流程）
-
-### 狀態轉換邏輯
-
-- [ ] T075 [P] [US6] 建立 lib/utils/order-status-helpers.ts（訂單狀態輔助函式）
-- [ ] T076 [US6] 在 order-status-helpers.ts 實作 isValidStatusTransition() 函數
-- [ ] T077 [US6] 在 order-status-helpers.ts 實作 getOrderStatusLabel() 函數
-- [ ] T078 [US6] 在 order-status-helpers.ts 實作 getOrderStatusColor() 函數
-
-**Checkpoint**: 訂單狀態流程正確（pending → shipping → completed），庫存扣減與回補邏輯正確
+**Checkpoint**: 所有品質檢查通過，準備部署
 
 ---
 
-## Phase 9: Polish & Cross-Cutting Concerns（優化與整合）
+## Phase 10: 部署準備與執行
 
-**目的**: 跨故事優化、文件更新、完整測試
+**目的**: 安全部署到生產環境
 
-### TypeScript 型別檢查
+**⚠️ 重要**: 嚴格遵循資料庫安全協議，每個步驟部署前必須備份
 
-- [ ] T079 [P] 執行 pnpm type-check，修復所有 TypeScript 錯誤
-- [ ] T080 [P] 檢查所有 Server Actions 回傳型別為 ActionResult
+### 部署 Phase 1: 運費功能
 
-### RLS Policy 驗證
+- [ ] T081 備份生產環境資料庫（執行 `pg_dump` 或使用 `pnpm deploy:db`）
+- [ ] T082 推送 Migration 1 到雲端（`supabase db push` 推送 `20260106_add_shipping_features.sql`）
+- [ ] T083 驗證 Migration 1 成功執行（檢查 tiers, orders, order_custom_fees 表結構）
+- [ ] T084 測試運費計算函數（手動呼叫 `calculate_shipping_fee()` RPC）
+- [ ] T085 部署前端程式碼（會員等級運費設定 UI、購物車運費預覽）
+- [ ] T086 驗證運費功能正常運作（建立測試訂單、檢查運費計算正確）
 
-- [ ] T081 [P] 驗證 order_custom_fees 表的 RLS Policy（客戶僅能查看自己的訂單費用）
-- [ ] T082 [P] 驗證 order_timelines 表的 RLS Policy（modifications 欄位權限）
+### 部署 Phase 2: 移除 confirmed 狀態
 
-### UI/UX 優化
+- [ ] T087 再次備份生產環境資料庫
+- [ ] T088 推送 Migration 2 到雲端（`supabase db push` 推送 `20260107_remove_confirmed_status.sql`）
+- [ ] T089 驗證現有訂單狀態轉換正確（檢查 confirmed → shipping 的訂單數量）
+- [ ] T090 測試新的狀態流程（標記出貨、標記完成、取消訂單）
+- [ ] T091 部署前端程式碼（訂單操作 UI、狀態 Badge）
+- [ ] T092 驗證狀態流程正常運作（建立測試訂單、執行完整狀態轉換）
 
-- [ ] T083 [P] 在 components/admin/orders/order-editor.tsx 實作離開確認提示（beforeunload）
-- [ ] T084 [P] 在 components/admin/orders/order-editor.tsx 實作鍵盤操作支援（Tab、Enter）
-- [ ] T085 [P] 在 components/admin/orders/order-modification-timeline.tsx 實作摺疊/展開功能（避免資訊過載）
+### 部署 Phase 3: 訂單修改功能
 
-### 效能優化
+- [ ] T093 再次備份生產環境資料庫
+- [ ] T094 推送 Migration 3 到雲端（`supabase db push` 推送 `20260108_extend_order_timelines.sql`）
+- [ ] T095 測試批次修改訂單函數（手動呼叫 `update_order_with_modifications()` RPC）
+- [ ] T096 部署前端程式碼（訂單編輯器、修改歷程顯示器）
+- [ ] T097 驗證訂單修改功能正常運作（修改測試訂單、檢查修改歷程記錄）
 
-- [ ] T086 [P] 在 lib/actions/orders.ts 的 updateOrderDetails() 中加入 Transaction 超時設定（10s）
-- [ ] T087 [P] 檢查 calculate_shipping_fee() PostgreSQL Function 查詢效能（< 200ms）
+### 部署後驗證
 
-### 錯誤處理
+- [ ] T098 執行生產環境完整測試流程（所有 quickstart.md 測試案例）
+- [ ] T099 監控生產環境錯誤日誌（Supabase Logs、前端 Console）
+- [ ] T100 驗證效能目標達成（運費計算 < 200ms、訂單修改 < 1s、修改歷程查詢 < 300ms）
+- [ ] T101 建立部署報告（記錄部署時間、執行步驟、驗證結果）
 
-- [ ] T088 [P] 在所有 Server Actions 新增詳細錯誤訊息（例：「運費不可為負數」）
-- [ ] T089 [P] 在 updateOrderDetails() 中實作 Transaction 失敗 ROLLBACK 錯誤訊息
-
-### 文件更新
-
-- [ ] T090 [P] 更新 CLAUDE.md 的「當前開發狀態」章節（新增 Feature 011）
-- [ ] T091 [P] 更新 specs/011-shipping-and-order-edit/README.md（實作完成摘要）
+**Checkpoint**: Feature 011 成功部署到生產環境，所有功能正常運作
 
 ---
 
-## 相依性與執行順序
+## Dependencies & Execution Order
 
-### Phase 相依性
+### Phase Dependencies
 
-- **Setup (Phase 1)**: 無相依 - 立即開始
-- **Foundational (Phase 2)**: 依賴 Setup - **阻擋所有使用者故事**
-- **US1-US6 (Phase 3-8)**: 全部依賴 Foundational 完成
-  - US1, US2, US5 可完全並行（不同檔案）
-  - US3 必須在 US2 完成後（擴展 orders.ts）
-  - US4 必須在 US3 完成後（需要修改歷程資料）
-  - US6 可並行於 US1-US5（獨立的狀態流程）
+- **Setup (Phase 1)**: 無依賴 - 可立即開始
+- **Foundational (Phase 2)**: 依賴 Setup 完成 - **阻塞所有使用者故事**
+- **US1, US2 (Phase 3-4)**: 依賴 Foundational 完成 - 可並行開發
+- **US6 (Phase 5)**: 依賴 Foundational 完成 - **建議優先執行**（涉及資料遷移）
+- **US3 (Phase 6)**: 依賴 US6 完成（需要新的狀態流程）
+- **US4, US5 (Phase 7-8)**: 依賴 US3 完成（需要訂單修改功能）
 - **Polish (Phase 9)**: 依賴所有使用者故事完成
+- **Deployment (Phase 10)**: 依賴 Polish 完成
 
-### 使用者故事相依性
+### User Story Dependencies
 
-- **US1 (運費設定)**: 可在 Foundational 完成後立即開始 - 無相依
-- **US2 (運費計算)**: 可在 Foundational 完成後立即開始 - 無相依
-- **US3 (訂單修改)**: 建議在 US2 完成後（共用 orders.ts）
-- **US4 (修改歷程)**: 必須在 US3 完成後（需要修改資料）
-- **US5 (優惠券互動)**: 可在 Foundational 完成後立即開始 - 無相依
-- **US6 (狀態流程)**: 可在 Foundational 完成後立即開始 - 無相依
-
-### 單一使用者故事內執行順序
-
-**US1 範例**:
-1. T029, T030 (Server Actions) - 可並行
-2. T031 (UI 元件)
-3. T032 (頁面整合)
-4. T033 (測試資料)
-
-**US3 範例**:
-1. T040-T045 (Server Actions) - 全部可並行
-2. T046-T049 (UI 元件) - 可並行
-3. T050-T052 (編輯器邏輯與整合) - 依序執行
-4. T053 (狀態檢查)
-
-### 並行執行機會
-
-**Foundational Phase (Phase 2)**:
-```bash
-# 並行執行所有資料庫 Migration 任務
-Task: "在 Migration 中新增 tiers.shipping_fee, tiers.free_shipping_threshold 欄位"
-Task: "在 Migration 中新增 orders.shipping_fee 欄位"
-
-# 並行執行所有型別定義任務
-Task: "在 types/index.ts 新增 OrderCustomFee 型別"
-Task: "在 types/index.ts 新增 OrderModifications 型別"
-Task: "在 types/index.ts 移除 OrderStatus 的 'confirmed' 狀態"
-
-# 並行執行所有 Zod Schema 任務
-Task: "在 lib/validations/order.schema.ts 新增 orderCustomFeeSchema"
-Task: "在 lib/validations/order.schema.ts 新增 orderModificationsSchema"
+```
+Foundational (Phase 2) - MUST完成
+    ↓
+US1 (運費設定) ←---┐
+    ↓              │ 可並行
+US2 (運費計算) ←---┘
+    ↓
+US6 (狀態流程調整) - 建議優先（涉及資料遷移）
+    ↓
+US3 (訂單修改) - 核心功能
+    ↓
+US4 (修改歷程顯示) ←---┐
+    ↓                  │ 可並行
+US5 (優惠券互動) ←-----┘
 ```
 
-**US1 並行範例**:
+### Within Each User Story
+
+- Migration 檔案必須依序執行（20260106 → 20260107 → 20260108）
+- TypeScript 型別定義優先於 Server Actions
+- Server Actions 優先於 UI 元件
+- 核心功能優先於 UI 優化
+
+### Parallel Opportunities
+
+- **Phase 2 Foundational**:
+  - T008 (建立 order_custom_fees 表) || T009 (建立 calculate_shipping_fee 函數)
+  - T011 (型別定義) || T012 (tier schema) || T013 (order schema)
+
+- **Phase 3 US1**:
+  - T014 (Server Action) || T015 (UI 元件) - 需協調避免衝突
+
+- **Phase 4 US2**:
+  - T017 (Server Action) || T019 (工具函式)
+  - T018 (購物車 UI) 依賴 T017 完成
+
+- **Phase 5 US6**:
+  - T023 (刪除舊函數) || T024 (新函數 mark_order_as_shipping) || T025 (新函數 update_order_status)
+  - T027 (型別更新) || T028 (Schema 更新)
+  - T029 (markAsShipping) || T030 (updateOrderStatus) || T031 (刪除 confirmOrder)
+  - T032 (UI 按鈕) || T033 (狀態 Badge)
+
+- **Phase 6 US3**:
+  - T039-T044 (6 個 Server Actions) - 可並行開發（不同函數）
+  - T045-T054 (訂單編輯器) - 必須依序（同一元件）
+
+- **Phase 7 US4**:
+  - T058-T062 (修改歷程顯示器) - 可依功能模組拆分並行
+
+- **Phase 9 Polish**:
+  - T069 (型別檢查) || T070 (ESLint) || T071 (程式碼清理) || T075 (測試)
+
+---
+
+## Parallel Example: Phase 2 Foundational
+
 ```bash
-Task: "在 lib/actions/tiers.ts 擴展 updateTier() 函數"
-Task: "在 lib/actions/tiers.ts 新增運費欄位驗證"
+# 可同時執行（不同檔案，無依賴）:
+Task T008: "建立 order_custom_fees 表（含 RLS Policy 與索引）"
+Task T009: "建立 PostgreSQL Function calculate_shipping_fee()"
+Task T011: "擴展 types/index.ts（新增運費相關型別）"
+Task T012: "擴展 lib/validations/tier.schema.ts"
+Task T013: "擴展 lib/validations/order.schema.ts"
 ```
 
-**US3 並行範例**:
-```bash
-# 所有 Server Actions 可並行
-Task: "新增 updateOrderDetails() Server Action"
-Task: "新增 addOrderItem() Server Action"
-Task: "新增 removeOrderItem() Server Action"
-Task: "新增 addCustomFee() Server Action"
-Task: "新增 adjustTotalAmount() Server Action"
-Task: "新增 updateShippingFee() Server Action"
+---
 
-# UI 元件可並行
-Task: "建立 order-item-editor.tsx"
-Task: "建立 order-custom-fees.tsx"
-Task: "建立 shipping-fee-editor.tsx"
+## Parallel Example: Phase 6 US3 - Server Actions
+
+```bash
+# 可同時執行（不同 Server Actions，無依賴）:
+Task T039: "新增 updateOrderDetails() Server Action"
+Task T040: "新增 addOrderItem() Server Action"
+Task T041: "新增 removeOrderItem() Server Action"
+Task T042: "新增 addCustomFee() Server Action"
+Task T043: "新增 adjustTotalAmount() Server Action"
+Task T044: "新增 updateShippingFee() Server Action"
 ```
 
 ---
 
-## 實作策略
+## Implementation Strategy
 
-### MVP First（僅 US1 + US2 + US6）
+### MVP First (US1 + US2 Only)
 
-1. 完成 Phase 1: Setup
-2. 完成 Phase 2: Foundational（**CRITICAL - 阻擋所有故事**）
-3. 完成 Phase 3: US1（運費設定）
-4. 完成 Phase 4: US2（運費計算）
-5. 完成 Phase 8: US6（狀態流程）
-6. **STOP 並驗證**: 測試運費設定與計算、訂單狀態流程
-7. 部署/展示 MVP
+若需快速交付 MVP，建議執行順序：
 
-### 漸進式交付
+1. **完成 Phase 1 (Setup)** - 0.5 小時
+2. **完成 Phase 2 (Foundational)** - 2 小時（關鍵阻塞階段）
+3. **完成 Phase 3 (US1 - 運費設定)** - 1.5 小時
+4. **完成 Phase 4 (US2 - 運費計算)** - 2 小時
+5. **STOP and VALIDATE**: 測試運費功能獨立運作
+6. 部署/展示（若就緒）
 
-1. 完成 Setup + Foundational → 基礎完成
-2. 新增 US1 → 測試運費設定 → 部署
-3. 新增 US2 → 測試運費計算 → 部署
-4. 新增 US6 → 測試狀態流程 → 部署（**MVP 完成**）
-5. 新增 US3 → 測試訂單修改 → 部署
-6. 新增 US4 → 測試修改歷程 → 部署
-7. 新增 US5 → 測試優惠券互動 → 部署
-8. 完成 Polish → 最終測試 → 正式發布
-
-### 並行團隊策略
-
-若有多位開發者：
-
-1. 團隊共同完成 Setup + Foundational
-2. Foundational 完成後：
-   - **開發者 A**: US1（運費設定）+ US2（運費計算）
-   - **開發者 B**: US6（狀態流程）
-   - **開發者 C**: US5（優惠券互動）
-3. US1-US6 完成後：
-   - **開發者 A + B**: US3（訂單修改，複雜度高）
-   - **開發者 C**: US4（修改歷程）
-4. 所有故事完成後共同執行 Polish
+**MVP 交付**: 6 小時可完成基本運費功能
 
 ---
 
-## 注意事項
+### Incremental Delivery (推薦)
 
-### 資料庫安全
+1. **Foundation Ready** (Phase 1-2) - 2.5 小時
+2. **Add US1 + US2** (運費功能) - 3.5 小時 → 測試 → 部署 (MVP!)
+3. **Add US6** (狀態流程調整) - 2.5 小時 → 測試 → 部署
+4. **Add US3** (訂單修改核心) - 3.5 小時 → 測試 → 部署
+5. **Add US4 + US5** (修改歷程 + 優惠券) - 2.5 小時 → 測試 → 部署
+6. **Polish & Deploy** (品質保證 + 部署) - 2 小時
 
-- **絕對禁止**在遠端/生產環境執行 `supabase db reset`
-- 所有 Migration 必須先在本地測試
-- 部署前必須備份生產環境資料庫（使用 `pnpm deploy:db` 或 `pg_dump`）
-- 詳見 [資料庫安全協議](../../docs/DATABASE_SAFETY_PROTOCOL.md)
+**總計**: 16-17 小時（與 plan.md 預估一致）
 
-### Migration 檢查清單
-
-每個 Migration 必須包含：
-1. ✅ IF NOT EXISTS / IF EXISTS 檢查（避免重複執行錯誤）
-2. ✅ DEFAULT 值設定（確保向下相容）
-3. ✅ CHECK 約束（資料驗證）
-4. ✅ 索引建立（效能優化）
-5. ✅ RLS Policy（安全性）
-6. ✅ 註解說明（可讀性）
-
-### 測試策略
-
-- Phase 2 完成後：測試所有 PostgreSQL Functions（使用 Supabase Studio SQL Editor）
-- 每個使用者故事完成後：執行對應的獨立測試（見各 Phase 的 Checkpoint）
-- 全部完成後：執行 quickstart.md 的完整測試流程
-
-### Commit 規範
-
-- 每個任務或相關任務群組完成後 commit
-- Commit message 使用繁體中文
-- 格式: `feat: 新增運費計算功能` 或 `fix: 修復訂單修改歷程顯示錯誤`
-- Commit 結尾自動加入 Claude Code 署名
-
-### 避免的錯誤
-
-- ❌ 模糊的任務描述（例：「建立訂單相關功能」）
-- ❌ 相同檔案的並行衝突（例：同時修改 orders.ts 的不同函數標記為 [P]）
-- ❌ 跨故事的強相依（破壞獨立性）
-- ❌ 未測試即部署（每個 Checkpoint 都需驗證）
+每個階段都是獨立可交付的增量，不會破壞先前功能
 
 ---
 
-## 進度統計
+### Parallel Team Strategy
 
-**總任務數**: 91 個任務
-**MVP 範圍**: US1 + US2 + US6（約 40 個任務，8-9 小時）
-**完整範圍**: US1-US6 + Polish（91 個任務，15-16 小時）
+若有多位開發者，建議分工：
 
-### 各 Phase 任務數
+1. **Team 完成 Setup + Foundational** (Phase 1-2) - 2.5 小時
+2. **並行開發**:
+   - **Developer A**: US1 + US2（運費功能）- 3.5 小時
+   - **Developer B**: US6（狀態流程調整）- 2.5 小時
+   - **Developer C**: 準備 US3 的 UI 元件骨架 - 2 小時
+3. **依序整合**:
+   - Developer B 完成 US6 → Developer C 接續 US3
+   - Developer A 完成 US1+US2 → 協助 US4+US5
 
-| Phase | 名稱 | 任務數 | 預估時間 |
-|-------|------|--------|---------|
-| Phase 1 | Setup | 4 | 0.5 小時 |
-| Phase 2 | Foundational | 24 | 3 小時 |
-| Phase 3 | US1 - 運費設定 | 5 | 1 小時 |
-| Phase 4 | US2 - 運費計算 | 6 | 1.5 小時 |
-| Phase 5 | US3 - 訂單修改 | 14 | 3 小時 |
-| Phase 6 | US4 - 修改歷程 | 6 | 1.5 小時 |
-| Phase 7 | US5 - 優惠券互動 | 7 | 1.5 小時 |
-| Phase 8 | US6 - 狀態流程 | 12 | 2 小時 |
-| Phase 9 | Polish | 13 | 2 小時 |
-| **總計** | - | **91** | **15-16 小時** |
+**優勢**: 縮短總交付時間至約 10-12 小時（並行執行）
 
 ---
+
+## Risk Mitigation
+
+### 高風險項目
+
+1. **狀態遷移失敗（US6）**:
+   - 緩解: 完整備份 + 本地測試 + Rollback 計畫（T076）
+   - 驗證: T026, T086
+
+2. **Transaction 超時（US3）**:
+   - 緩解: 設定 10s 超時、前端顯示載入狀態
+   - 監控: T096
+
+3. **優惠券驗證錯誤（US5）**:
+   - 緩解: 提示管理員移除優惠券並重新提交
+   - 測試: T065-T068
+
+### 中風險項目
+
+4. **JSONB 結構不一致（US3, US4）**:
+   - 緩解: TypeScript 型別檢查（T013, T069）
+   - 驗證: 單元測試（可選）
+
+5. **RLS Policy 權限錯誤**:
+   - 緩解: T074 完整驗證
+   - 測試: T098
+
+6. **錯誤訊息不一致或暴露內部資訊**:
+   - 緩解: T075 錯誤訊息規範檢查
+   - 驗證: T076 (Server Actions) + T077 (UI 元件)
+
+---
+
+## Notes
+
+- **[P] 任務**: 不同檔案、無依賴，可並行執行
+- **[Story] 標籤**: 追溯任務至特定使用者故事
+- **獨立性**: 每個使用者故事應可獨立完成與測試
+- **提交策略**: 每完成一個任務或邏輯群組後提交
+- **驗證點**: 在每個 Checkpoint 停下來驗證故事獨立運作
+- **避免**: 模糊任務、同檔案衝突、破壞獨立性的跨故事依賴
+
+---
+
+**總任務數**: 101 個任務
+**預估工作量**: 16-18 小時（與 plan.md 一致，新增錯誤處理檢查約 +1 小時）
+**關鍵路徑**: Phase 1 → Phase 2 (Foundational) → Phase 5 (US6) → Phase 6 (US3) → Phase 7-8 (US4, US5) → Phase 9 (Polish)
+**並行機會**: 28 個任務標記 [P]，可並行執行以縮短總時間
 
 **最後更新**: 2026-01-06
-**狀態**: ✅ 任務規劃完成
-**版本**: v2.0.0（依使用者故事重組）
+**版本**: v1.1.0 (新增錯誤處理規範檢查任務)
+**狀態**: ✅ 完成
