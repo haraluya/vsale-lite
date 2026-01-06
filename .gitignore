@@ -46,3 +46,13 @@ next-env.d.ts
 *.swo
 *~
 node_modules
+
+# Debug & Temporary Files
+DEBUG-*.md
+check-*.sql
+diagnose-*.sql
+fix-*.sql
+setup-*.sql
+
+# Supabase Local
+supabase/snippets/
