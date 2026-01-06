@@ -219,10 +219,27 @@ export async function createOrder(
 
     const orderNumber = orderNumberData as string
 
-    // 7. 建立訂單主表（訂單總額已扣除優惠券折扣）
+    // 7. 計算運費（使用原始商品金額，不扣除優惠券折扣）
+    const { data: shippingFeeData, error: shippingFeeError } = await supabase
+      .rpc('calculate_shipping_fee', {
+        p_user_id: userId,
+        p_subtotal: totalAmount,
+      })
+
+    if (shippingFeeError) {
+      console.error('計算運費錯誤:', shippingFeeError)
+      return {
+        success: false,
+        message: '計算運費時發生錯誤',
+      }
+    }
+
+    const shippingFee = (shippingFeeData as number) || 0
+
+    // 8. 建立訂單主表（訂單總額 = 商品金額 - 優惠券折扣 + 運費）
     const finalTotalAmount = couponData
-      ? totalAmount - couponData.discount_amount
-      : totalAmount
+      ? totalAmount - couponData.discount_amount + shippingFee
+      : totalAmount + shippingFee
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -230,6 +247,7 @@ export async function createOrder(
         order_number: orderNumber,
         user_id: userId,
         total_amount: finalTotalAmount,
+        shipping_fee: shippingFee,
         status: 'pending',
         notes: notes || null,
       })
@@ -254,7 +272,7 @@ export async function createOrder(
       }
     }
 
-    // 8. 建立訂單明細
+    // 9. 建立訂單明細
     const orderItems = orderItemsData.map(item => ({
       order_id: order.id,
       ...item,
@@ -274,7 +292,7 @@ export async function createOrder(
       }
     }
 
-    // 9. 建立優惠券快照（如果有使用優惠券）
+    // 10. 建立優惠券快照（如果有使用優惠券）
     if (couponData && userCouponId) {
       // 建立 order_coupons 記錄
       const { error: couponSnapshotError } = await supabase
@@ -312,7 +330,7 @@ export async function createOrder(
       }
     }
 
-    // 10. 建立訂單歷史記錄
+    // 11. 建立訂單歷史記錄
     const { error: timelineError } = await supabase
       .from('order_timelines')
       .insert({
@@ -328,12 +346,17 @@ export async function createOrder(
       // 不回滾,僅記錄錯誤 (歷史記錄失敗不應阻止訂單建立)
     }
 
-    // 11. 重新驗證相關頁面
+    // 12. 重新驗證相關頁面
     revalidatePath('/store/orders')
     revalidatePath('/admin/orders')
 
     // 建立成功訊息
     let successMessage = `訂單建立成功!訂單編號: ${order.order_number}`
+    if (shippingFee > 0) {
+      successMessage += `，運費 NT$ ${shippingFee}`
+    } else {
+      successMessage += `，免運`
+    }
     if (couponData) {
       successMessage += `，已使用優惠券「${couponData.code}」折扣 NT$ ${couponData.discount_amount}`
     }
