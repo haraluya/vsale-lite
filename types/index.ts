@@ -24,6 +24,8 @@ export type Tier = {
   name: string
   rank: number
   is_protected?: boolean  // 🆕 Feature 003 Enhancement: 系統預設等級保護
+  shipping_fee?: number  // 🆕 Feature 011: 基本運費金額（0 表示不收運費）
+  free_shipping_threshold?: number | null  // 🆕 Feature 011: 滿額免運門檻（NULL 表示不提供免運）
   created_at: string
   updated_at: string
 }
@@ -219,6 +221,7 @@ export type Order = {
   order_number: string  // 格式: ORD-YYYYMMDD-XXXX
   user_id: string
   total_amount: number
+  shipping_fee: number  // 🆕 Feature 011: 訂單運費金額（建立時快照儲存）
   status: OrderStatus
   notes: string | null
   created_at: string
@@ -273,6 +276,16 @@ export type OrderCoupon = {
   created_at: string
 }
 
+// 訂單自訂費用項目 (Feature 011)
+export type OrderCustomFee = {
+  id: string
+  order_id: string
+  fee_name: string  // 費用名稱（如「手續費」、「包裝費」、「額外運費」）
+  amount: number  // 費用金額（正數=收費、負數=減免）
+  created_at: string
+  created_by: string | null  // 建立者 ID（管理員）
+}
+
 // 訂單詳情 (含明細與操作歷史)
 export type OrderDetail = Order & {
   user: {
@@ -286,6 +299,7 @@ export type OrderDetail = Order & {
   items: OrderItem[]
   timelines?: OrderTimelineWithActor[]
   coupon?: OrderCoupon | null  // 🆕 Feature 009: 優惠券快照（選填）
+  custom_fees?: OrderCustomFee[]  // 🆕 Feature 011: 自訂費用項目（選填）
 }
 
 // 訂單查詢參數
