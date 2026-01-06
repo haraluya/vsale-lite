@@ -85,9 +85,12 @@ export async function createOrder(
         .single()
 
       if (userCouponError || !userCoupon || !userCoupon.coupon) {
+        console.error('查詢優惠券錯誤:', userCouponError)
         return {
           success: false,
-          message: '優惠券不存在或無效',
+          message: userCouponError
+            ? `查詢優惠券時發生錯誤: ${userCouponError.message}`
+            : '優惠券不存在或無效',
         }
       }
 
@@ -290,7 +293,7 @@ export async function createOrder(
         await supabase.from('orders').delete().eq('id', order.id)
         return {
           success: false,
-          message: '建立優惠券快照時發生錯誤',
+          message: `建立優惠券快照時發生錯誤: ${couponSnapshotError.message || '未知錯誤'}`,
         }
       }
 
