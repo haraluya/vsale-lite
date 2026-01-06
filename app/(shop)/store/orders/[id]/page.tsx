@@ -243,13 +243,57 @@ export default function CustomerOrderDetailPage() {
               ))}
             </div>
 
-            {/* 總計與優惠券 */}
+            {/* 總計、運費、自訂費用與優惠券 */}
             <div className={cn(
               "mt-4 md:mt-6 pt-3 md:pt-4",
               designTokens.neoBrutalism.border.mobile,
               "md:border-t-3",
               "border-t-black"
             )}>
+              {/* 運費 (Feature 011) */}
+              {order.shipping_fee !== undefined && order.shipping_fee !== null && (
+                <div className="mb-3 flex items-center justify-between">
+                  <p className={cn(
+                    designTokens.typography.body.base,
+                    "font-bold flex items-center gap-2"
+                  )}>
+                    <span>🚚</span>
+                    <span>運費</span>
+                  </p>
+                  <p className={cn(
+                    designTokens.typography.body.large,
+                    "font-bold",
+                    order.shipping_fee === 0 ? 'text-green-600' : ''
+                  )}>
+                    {order.shipping_fee === 0 ? '免運' : `+ ${formatCurrency(order.shipping_fee)}`}
+                  </p>
+                </div>
+              )}
+
+              {/* 自訂費用 (Feature 011) */}
+              {order.custom_fees && order.custom_fees.length > 0 && (
+                <div className="mb-3 space-y-2">
+                  {order.custom_fees.map((fee) => (
+                    <div key={fee.id} className="flex items-center justify-between">
+                      <p className={cn(
+                        designTokens.typography.body.base,
+                        "font-bold flex items-center gap-2"
+                      )}>
+                        <span>💵</span>
+                        <span>{fee.fee_name}</span>
+                      </p>
+                      <p className={cn(
+                        designTokens.typography.body.large,
+                        "font-bold",
+                        fee.amount < 0 ? 'text-red-600' : ''
+                      )}>
+                        {fee.amount >= 0 ? '+' : ''} {formatCurrency(fee.amount)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               {/* 優惠券折扣 (Feature 009) */}
               {order.coupon && (
                 <div className="mb-3 space-y-2">
