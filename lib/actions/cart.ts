@@ -124,6 +124,7 @@ export async function getCartItemsWithPrices(
         image_url,
         retail_price,
         status,
+        series_id,
         tier_prices!left(price)
       `)
       .in('id', productIds)
@@ -153,6 +154,7 @@ export async function getCartItemsWithPrices(
         quantity,
         price,
         subtotal: price ? price * quantity : 0,
+        series_id: product.series_id, // 新增 series_id 欄位（優惠券系列限制驗證需要）
       }
     })
 

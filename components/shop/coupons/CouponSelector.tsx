@@ -77,10 +77,10 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
       const validationResult = await validateCoupon({
         couponCode: userCoupon.coupon.code_normalized,
         cartItems: cartItems.map(item => ({
-          productId: item.productId,
-          price: item.price,
+          product_id: item.productId,
+          series_id: item.series_id || '', // 確保 series_id 存在
+          price: item.price || 0,
           quantity: item.quantity,
-          series_id: item.series_id,
         })),
       })
 

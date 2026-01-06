@@ -207,6 +207,7 @@ export type CartItemWithProduct = {
   quantity: number
   price: number | null  // 當前用戶等級價格
   subtotal: number
+  series_id?: string    // 系列 ID（優惠券系列限制驗證需要）
 }
 
 // 訂單狀態

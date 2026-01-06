@@ -186,6 +186,7 @@ export default function CartPage() {
                 productId: item.productId,
                 price: item.price ?? 0,
                 quantity: item.quantity,
+                series_id: item.series_id, // 傳遞 series_id 用於優惠券系列限制驗證
               }))}
               onClose={() => setShowCouponSelector(false)}
             />
