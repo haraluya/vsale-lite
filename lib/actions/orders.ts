@@ -1196,17 +1196,28 @@ export async function updateOrderDetails(
       p_actor_id: userId,
     })
 
-    if (error || !data) {
-      console.error('批次修改訂單錯誤:', error)
+    if (error) {
+      console.error('批次修改訂單 RPC 錯誤:', error)
       return {
         success: false,
         message: error?.message || '批次修改訂單時發生錯誤',
       }
     }
 
+    // PostgreSQL Function 返回 TABLE，data 是陣列
+    const result = Array.isArray(data) ? data[0] : data
+
+    if (!result) {
+      console.error('批次修改訂單無回傳資料')
+      return {
+        success: false,
+        message: '訂單修改失敗：伺服器無回傳資料',
+      }
+    }
+
     // 檢查 Function 回傳結果
-    const result = data as { success: boolean; message: string; new_total: number }
     if (!result.success) {
+      console.error('批次修改訂單失敗:', result.message)
       return {
         success: false,
         message: result.message || '訂單修改失敗',
