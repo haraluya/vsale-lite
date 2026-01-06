@@ -213,7 +213,187 @@ types/
 
 ---
 
-## 五、Phase 劃分
+## 五、錯誤處理規範 (Error Handling Standards)
+
+### 5.1 錯誤訊息設計原則
+
+**核心原則**:
+- ✅ 使用繁體中文，避免技術術語
+- ✅ 明確說明「發生什麼問題」+「如何解決」
+- ✅ 避免暴露系統內部資訊（如 SQL 錯誤、堆疊追蹤）
+- ✅ 提供可操作的下一步建議
+
+### 5.2 錯誤訊息範本
+
+#### A. 表單驗證錯誤
+
+**情境**: 使用者輸入不符合格式要求
+
+```typescript
+// ❌ 不良範例
+"Invalid input"
+"Field is required"
+
+// ✅ 良好範例
+"運費金額不可為負數，請輸入 0 或正數"
+"免運門檻必須大於 0，請輸入有效金額"
+"等級名稱不可為空，請輸入等級名稱"
+```
+
+#### B. 權限錯誤
+
+**情境**: 使用者嘗試執行無權限的操作
+
+```typescript
+// ❌ 不良範例
+"Access denied"
+"Unauthorized"
+
+// ✅ 良好範例
+"您沒有權限修改訂單，請聯絡管理員"
+"此操作僅限管理員使用"
+```
+
+#### C. 狀態錯誤
+
+**情境**: 訂單狀態不允許執行某操作
+
+```typescript
+// ❌ 不良範例
+"Invalid state transition"
+"Operation not allowed"
+
+// ✅ 良好範例
+"僅待確認訂單可修改，此訂單已出貨無法編輯"
+"訂單已完成，無法取消"
+"僅出貨中訂單可標記為已完成"
+```
+
+#### D. 資料不存在錯誤
+
+**情境**: 使用者查詢的資料不存在
+
+```typescript
+// ❌ 不良範例
+"Not found"
+"Record does not exist"
+
+// ✅ 良好範例
+"找不到此訂單，請確認訂單編號是否正確"
+"此商品不存在或已被刪除"
+```
+
+#### E. 業務邏輯錯誤
+
+**情境**: 違反業務規則
+
+```typescript
+// ❌ 不良範例
+"Validation failed"
+"Business rule violation"
+
+// ✅ 良好範例
+"訂單修改後商品金額 (NT$800) 不符合優惠券條件 (需滿 NT$1000)"
+"訂單至少需保留一個商品，無法全部移除"
+"運費不可為負數"
+```
+
+#### F. 系統錯誤
+
+**情境**: 伺服器內部錯誤或意外錯誤
+
+```typescript
+// ❌ 不良範例
+"Internal server error"
+"Database connection failed"
+
+// ✅ 良好範例
+"系統處理失敗，請稍後再試或聯絡客服"
+"訂單修改失敗，請重新嘗試"
+"資料儲存失敗，請檢查網路連線後重試"
+```
+
+### 5.3 錯誤訊息結構
+
+**標準格式**:
+```typescript
+interface ErrorMessage {
+  // 簡短摘要（顯示在 alert 或 toast）
+  message: string;
+
+  // 詳細說明（可選，顯示在錯誤頁面）
+  detail?: string;
+
+  // 錯誤代碼（用於日誌追蹤）
+  code?: string;
+
+  // 建議操作（可選）
+  suggestion?: string;
+}
+```
+
+**範例**:
+```typescript
+{
+  message: "訂單修改失敗",
+  detail: "訂單修改後商品金額 (NT$800) 不符合優惠券條件 (需滿 NT$1000)",
+  code: "COUPON_MIN_AMOUNT_NOT_MET",
+  suggestion: "您可以選擇移除優惠券並繼續修改，或增加商品金額至 1000 元"
+}
+```
+
+### 5.4 前端顯示規範
+
+**Toast 通知** (成功/一般錯誤):
+- 簡短訊息（< 50 字）
+- 顯示 3-5 秒後自動消失
+- 使用色彩區分（綠色=成功、紅色=錯誤、黃色=警告）
+
+**Modal 彈窗** (需使用者確認的錯誤):
+- 完整錯誤訊息 + 詳細說明
+- 提供明確的操作按鈕（「確定」、「取消」、「重試」）
+- 使用 Neo-Brutalism 風格（2-3px 黑邊框）
+
+**Inline 驗證** (表單欄位錯誤):
+- 即時顯示於欄位下方
+- 紅色文字 + 驚嘆號圖示
+- 不等到提交才顯示錯誤
+
+### 5.5 實作檢查清單
+
+**Server Actions 錯誤處理**:
+- [ ] 所有 Server Actions 回傳 `ActionResult<T>`
+- [ ] 使用 Zod 驗證輸入，將 `ZodError` 轉換為友善訊息
+- [ ] 捕捉 PostgreSQL 錯誤，轉換為使用者可理解的訊息
+- [ ] 記錄詳細錯誤至 `console.error`（含堆疊追蹤）
+
+**UI 元件錯誤處理**:
+- [ ] 所有表單驗證使用即時反饋
+- [ ] 所有 API 呼叫包含 Loading 與 Error 狀態
+- [ ] 錯誤訊息遵循設計系統（Neo-Brutalism 風格）
+- [ ] 提供「重試」或「返回」操作
+
+### 5.6 錯誤日誌記錄
+
+**日誌等級**:
+- `ERROR`: 系統錯誤、資料庫錯誤、意外例外
+- `WARN`: 業務邏輯錯誤、驗證失敗
+- `INFO`: 正常操作記錄（訂單建立、狀態變更）
+
+**記錄內容**:
+```typescript
+console.error('[訂單修改失敗]', {
+  orderId: 'order-123',
+  error: error.message,
+  stack: error.stack, // 僅開發環境
+  userId: user.id,
+  timestamp: new Date().toISOString(),
+});
+```
+
+---
+
+## 六、Phase 劃分
 
 ### Phase 0: 準備工作（Setup）
 **目標**: 環境準備與依賴檢查
