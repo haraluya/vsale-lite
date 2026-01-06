@@ -1,5 +1,19 @@
 # 文檔目錄
 
+## 🛡️ 資料庫安全與 Migration（⚠️ 最高優先級 - 必讀！）
+
+| 文件 | 用途 | 閱讀時機 |
+|------|------|---------|
+| **[資料庫管理與遷移協議](DATABASE_SAFETY_PROTOCOL.md)** | ⚡ 最高指導原則（簡潔版） | **執行任何資料庫操作前必讀** |
+| **[SAFE_MIGRATION_GUIDE.md](SAFE_MIGRATION_GUIDE.md)** | 完整安全指南（7 種操作類型） | 建立 Migration 前參考 |
+| **[BACKUP_RESTORE_CHEATSHEET.md](BACKUP_RESTORE_CHEATSHEET.md)** | 快速參考與部署檢查清單 | 部署到生產環境前使用 |
+| **[Migration 檢查清單](../supabase/migrations/_CHECKLIST.md)** | 6 Phase 完整驗證流程 | 部署過程中逐項勾選 |
+| **[Migration 範本](../supabase/migrations/_TEMPLATE_safe_migration.sql)** | 可直接複製的安全範本 | 建立新 Migration 時使用 |
+
+**🚨 緊急提醒**: 如果你看到「衝突需要 reset」的提示，**立即停止**並參考協議文件，絕不自動執行重置！
+
+---
+
 ## PostgreSQL 最佳實踐研究
 
 ### 日期範圍查詢優化 (2026-01-03 新增)

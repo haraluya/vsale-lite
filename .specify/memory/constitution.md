@@ -152,6 +152,38 @@ Follow-up TODOs:
 
 ---
 
+### VIII. 資料庫安全至上 (Database Safety First)
+
+**最高指導原則**:
+- **絕對禁止**在遠端/生產環境執行 `supabase db reset`
+- **必須**嚴格遵守 Migration 流程（本機測試 → 生成 Migration → 安全部署）
+- **必須**在所有危險操作前執行備份（`pg_dump`）
+- **必須**準備回滾計畫（備份檔案或反向 Migration）
+
+**三層安全機制**:
+1. **預防層**: 使用 Migration 流程，避免手動修改生產資料庫
+2. **檢查層**: 部署前執行 6 Phase 檢查清單（見 `supabase/migrations/_CHECKLIST.md`）
+3. **回滾層**: 完整備份 + 回滾程序（見 `docs/BACKUP_RESTORE_CHEATSHEET.md`）
+
+**指令管控**:
+- ✅ **推薦使用**: `supabase db diff`, `supabase db push`, `supabase db pull`
+- ⚠️ **謹慎使用**: `supabase db reset` **僅限本機**環境，且需明確指示
+- ❌ **嚴格禁止**: 任何會清除生產資料的操作（除非經過審批 + 完整備份）
+
+**詳細指南**:
+- 📖 完整安全指南: `docs/SAFE_MIGRATION_GUIDE.md`
+- 🚀 快速參考: `docs/BACKUP_RESTORE_CHEATSHEET.md`
+- 📋 部署檢查清單: `supabase/migrations/_CHECKLIST.md`
+- 📝 Migration 範本: `supabase/migrations/_TEMPLATE_safe_migration.sql`
+- ⚡ 最高指導原則: `docs/DATABASE_SAFETY_PROTOCOL.md`
+
+**例外處理**:
+若 Migration 部署過程中提示「衝突」並要求 reset，**必須立即停止**並尋求人工審查，絕不允許自動執行重置。
+
+**理由**: 資料庫是系統的核心資產，資料遺失是災難性且不可逆的。採用三層安全機制與嚴格的 Migration 流程，確保每次變更都可追蹤、可回滾、可審查。
+
+---
+
 ## 技術規範
 
 ### 開發框架與工具
@@ -264,6 +296,11 @@ Follow-up TODOs:
 - **MINOR**: 新增原則或擴充重要指導方針。
 - **PATCH**: 文字修正、釐清說明,非語義性變更。
 
+**資料庫安全審查**:
+- 任何違反「第 VIII 號原則」的操作 **必須** 經過團隊審查。
+- 生產環境資料庫操作 **必須** 雙人確認（操作者 + 審查者）。
+- 緊急情況需執行資料庫重置時，**必須** 完成完整備份並記錄操作理由。
+
 ### 合規性審查
 
 **審查要求**:
@@ -279,4 +316,4 @@ Follow-up TODOs:
 
 ---
 
-**Version**: 1.1.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-03
+**Version**: 1.2.0 | **Ratified**: 2026-01-01 | **Last Amended**: 2026-01-06

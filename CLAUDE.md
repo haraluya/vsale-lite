@@ -369,6 +369,35 @@ vsale/
 
 ## 重要提醒
 
+### ⚠️ 資料庫安全最高指導原則
+
+**🛡️ 絕對禁止在遠端/生產環境執行 `supabase db reset`**
+
+此指令會**清除所有資料庫資料**。若需要更新資料庫結構，必須嚴格遵守以下流程：
+
+**標準開發流程（SOP）**:
+1. **本機優先**: 確保本機 Supabase 正在執行（`supabase start`），先在本機環境測試
+2. **生成遷移**: 執行 `supabase db diff -f <描述性名稱>`（範例：`supabase db diff -f add_user_nickname`）
+3. **檢查 SQL**: 檢查生成的 SQL 檔案，確保沒有意外的 `DROP` 指令
+4. **安全部署**: 使用 `supabase db push` 推送到遠端
+5. **例外處理**: 若 `db push` 提示衝突並要求 reset，**立即停止並尋求人工審查**
+
+**指令管控**:
+- ✅ **推薦使用**: `supabase db diff`, `supabase db push`, `supabase db pull`
+- ⚠️ **謹慎使用**: `supabase db reset` **僅限本機**環境，且需明確指示
+- ❌ **嚴格禁止**: 在遠端/生產環境執行任何重置指令
+
+**三層安全機制**:
+1. **預防層**: Migration 流程 + 本機優先測試 + Git Pre-commit Hook
+2. **檢查層**: 部署前檢查清單（6 Phase） + 自動備份腳本
+3. **回滾層**: 完整備份（pg_dump） + 回滾程序
+
+📖 **完整安全指南**: [docs/SAFE_MIGRATION_GUIDE.md](docs/SAFE_MIGRATION_GUIDE.md)
+🚀 **快速參考**: [docs/BACKUP_RESTORE_CHEATSHEET.md](docs/BACKUP_RESTORE_CHEATSHEET.md)
+⚡ **協議全文**: [docs/DATABASE_SAFETY_PROTOCOL.md](docs/DATABASE_SAFETY_PROTOCOL.md)
+
+---
+
 ### 設計風格
 採用 **Neo-Brutalism** 風格,所有 UI 元件必須符合:
 - 2-3px 實心黑邊框
@@ -417,6 +446,12 @@ pnpm test:ui          # 啟動 Vitest UI 介面
 
 #### 本地開發環境（Docker）✅ 當前使用
 
+**⚠️ 安全提醒**:
+- `supabase db reset` **僅限本機環境**使用
+- **絕不**在遠端/生產環境執行此指令
+- 遠端部署**必須**使用 `supabase db push`（Migration 流程）
+- 詳見 [資料庫管理與遷移協議](docs/DATABASE_SAFETY_PROTOCOL.md)
+
 ```bash
 # 1. 啟動本地 Supabase（首次或重啟電腦後執行）
 supabase start
@@ -460,6 +495,11 @@ psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f specs/003-series-and-prici
 
 #### Migration 管理
 
+**⚠️ Migration 安全提醒**:
+- 新增 Migration 前**必須**參考 [安全 Migration 指南](docs/SAFE_MIGRATION_GUIDE.md)
+- 使用 [Migration 範本](supabase/migrations/_TEMPLATE_safe_migration.sql) 確保正確格式
+- 部署前使用 [檢查清單](supabase/migrations/_CHECKLIST.md) 逐項驗證
+
 ```bash
 # 執行所有 Migrations（開發時常用）
 supabase db reset
@@ -480,10 +520,11 @@ supabase migration list
 - 📖 **完整指南**: [`docs/SAFE_MIGRATION_GUIDE.md`](docs/SAFE_MIGRATION_GUIDE.md) - 詳細說明安全與危險操作
 - 🚀 **快速參考**: [`docs/BACKUP_RESTORE_CHEATSHEET.md`](docs/BACKUP_RESTORE_CHEATSHEET.md) - 部署檢查清單與指令
 
-**黃金守則**:
+**黃金守則（按優先級排序）**:
+0. **🛡️ 資料庫安全至上**: 絕對禁止在遠端/生產環境執行 `supabase db reset`（見 [資料庫安全協議](docs/DATABASE_SAFETY_PROTOCOL.md)）
 1. ✅ **優先使用新增操作**（ADD COLUMN, CREATE TABLE, CREATE INDEX）
 2. ⚠️ **避免刪除操作**（DROP COLUMN, DROP TABLE）- 先重新命名，保留 30 天
-3. 🛡️ **部署前必須備份**（使用 `pg_dump`）
+3. 🛡️ **部署前必須備份**（使用 `pnpm deploy:db` 或手動 `pg_dump`）
 4. 🔄 **複雜變更分階段執行**（新增 → 遷移 → 清理）
 5. 📊 **準備回滾計畫**（備份檔案或反向 Migration）
 
@@ -494,6 +535,12 @@ supabase migration list
 ---
 
 #### 雲端部署（生產環境）- 僅部署時使用
+
+**🔴 危險區域 - 生產環境操作**:
+- 執行任何操作前**必須**先備份（使用 `pnpm deploy:db` 或手動 `pg_dump`）
+- **絕對禁止**執行 `supabase db reset`
+- Migration 推送前**必須**完成 6 Phase 檢查清單
+- 詳見 [備份與還原快速參考](docs/BACKUP_RESTORE_CHEATSHEET.md)
 
 ```bash
 # 1. 連結雲端專案
