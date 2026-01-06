@@ -253,12 +253,13 @@ export type OrderItem = {
 export type OrderTimeline = {
   id: string
   order_id: string
-  action_type: 'created' | 'confirmed' | 'status_updated' | 'cancelled' | 'comment'  // 🆕 Feature 007: 新增 comment 類型
+  action_type: 'created' | 'confirmed' | 'status_updated' | 'cancelled' | 'comment' | 'order_modified'  // 🆕 Feature 007: comment | Feature 011: order_modified
   actor_id: string | null
   actor_role: 'client' | 'admin' | null
   content: string | null  // 🆕 Feature 007: 留言內容（當 action_type = 'comment'）
   old_status: string | null
   new_status: string | null
+  modifications: any | null  // 🆕 Feature 011: 訂單修改內容（當 action_type = 'order_modified'）
   created_at: string
 }
 

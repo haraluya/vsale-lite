@@ -51,6 +51,11 @@ const ACTION_TYPE_CONFIG: Record<
     emoji: '💬',
     colorClass: 'bg-yellow-200 border-yellow-600',
   },
+  order_modified: {
+    label: '訂單已修改',
+    emoji: '✏️',
+    colorClass: 'bg-purple-200 border-purple-600',
+  },
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -85,9 +90,63 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
         return `${timeline.actor_name} 取消訂單`
       case 'comment':
         return null // 留言不需要標題訊息，直接顯示內容
+      case 'order_modified':
+        return `${timeline.actor_name} 修改訂單內容`
       default:
         return '未知操作'
     }
+  }
+
+  // 格式化訂單修改內容（Feature 011）
+  const formatModifications = (modifications: any) => {
+    if (!modifications) return null
+
+    const changes: string[] = []
+
+    // 商品變更
+    if (modifications.items && modifications.items.length > 0) {
+      modifications.items.forEach((item: any) => {
+        switch (item.type) {
+          case 'price_changed':
+            changes.push(`• 商品「${item.product_name}」單價: ${item.old_price} → ${item.new_price}`)
+            break
+          case 'quantity_changed':
+            changes.push(`• 商品「${item.product_name}」數量: ${item.old_quantity} → ${item.new_quantity}`)
+            break
+          case 'removed':
+            changes.push(`• 移除商品「${item.product_name}」`)
+            break
+          case 'added':
+            changes.push(`• 新增商品「${item.product_name}」(單價 ${item.new_price}, 數量 ${item.new_quantity})`)
+            break
+        }
+      })
+    }
+
+    // 運費變更
+    if (modifications.shipping) {
+      changes.push(`• 運費: ${modifications.shipping.old_fee} → ${modifications.shipping.new_fee}`)
+    }
+
+    // 自訂費用變更
+    if (modifications.fees && modifications.fees.length > 0) {
+      modifications.fees.forEach((fee: any) => {
+        if (fee.type === 'added') {
+          changes.push(`• 新增費用「${fee.fee_name}」: ${fee.amount}`)
+        } else if (fee.type === 'removed') {
+          changes.push(`• 移除費用「${fee.fee_name}」`)
+        }
+      })
+    }
+
+    // 優惠券變更
+    if (modifications.coupon) {
+      if (modifications.coupon.action === 'removed') {
+        changes.push(`• 移除優惠券「${modifications.coupon.coupon_code}」`)
+      }
+    }
+
+    return changes.length > 0 ? changes.join('\n') : null
   }
 
   if (timelines.length === 0) {
@@ -171,6 +230,16 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
                 </div>
 
                 {timeline.content && <div className="text-sm text-gray-600">{timeline.content}</div>}
+
+                {/* 訂單修改詳細內容 (Feature 011) */}
+                {timeline.action_type === 'order_modified' && timeline.modifications && (
+                  <div className="mt-3 rounded-none border-2 border-purple-300 bg-purple-50 p-3">
+                    <div className="mb-1 text-xs font-bold text-purple-700">修改明細：</div>
+                    <div className="whitespace-pre-line text-sm text-gray-700">
+                      {formatModifications(timeline.modifications)}
+                    </div>
+                  </div>
+                )}
 
                 <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
                   <User className="h-3 w-3" />

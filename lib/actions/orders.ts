@@ -612,6 +612,7 @@ export async function getOrderById(
           old_status: timeline.old_status,
           new_status: timeline.new_status,
           content: timeline.content,
+          modifications: timeline.modifications,
           created_at: timeline.created_at,
           actor_name: actor?.display_name || actor?.phone || '系統',
         }
@@ -1013,6 +1014,7 @@ export async function getOrderTimeline(
         actor_name: actor?.display_name || actor?.phone || null,
         old_status: item.old_status,
         new_status: item.new_status,
+        modifications: item.modifications,
         created_at: item.created_at,
       }
     })

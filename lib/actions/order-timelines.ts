@@ -34,6 +34,7 @@ export async function getOrderTimelines(
         old_status,
         new_status,
         content,
+        modifications,
         created_at,
         profiles(display_name, phone)
       `)
@@ -68,6 +69,7 @@ export async function getOrderTimelines(
       old_status: timeline.old_status,
       new_status: timeline.new_status,
       content: timeline.content,
+      modifications: timeline.modifications,
       created_at: timeline.created_at,
       actor_name: timeline.profiles?.display_name || timeline.profiles?.phone || '系統',
     }))
