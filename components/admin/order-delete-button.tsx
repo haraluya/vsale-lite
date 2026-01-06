@@ -37,7 +37,9 @@ export function OrderDeleteButton({
     return null
   }
 
-  const handleDelete = async () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     setShowDialog(false)
 
     startTransition(async () => {
@@ -71,8 +73,21 @@ export function OrderDeleteButton({
 
       {/* 刪除確認對話框 */}
       {showDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-none border-3 border-black bg-white p-6 shadow-neo">
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4"
+          onClick={(e) => {
+            // 點擊背景關閉對話框
+            if (e.target === e.currentTarget && !isPending) {
+              setShowDialog(false)
+            }
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-none border-3 border-black bg-white p-6 shadow-neo"
+            onClick={(e) => {
+              e.stopPropagation() // 防止事件冒泡到背景
+            }}
+          >
             <div className="mb-4 flex items-start gap-3">
               <AlertTriangle className="h-6 w-6 flex-shrink-0 text-red-600" />
               <div>
@@ -86,15 +101,19 @@ export function OrderDeleteButton({
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDialog(false)}
-                className="flex-1 rounded-none border-3 border-black bg-gray-200 px-4 py-3 font-bold shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                disabled={isPending}
+                type="button"
+                className="flex-1 rounded-none border-3 border-black bg-gray-200 px-4 py-3 font-bold shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
               >
-                取消
+                返回
               </button>
               <button
                 onClick={handleDelete}
-                className="flex-1 rounded-none border-3 border-black bg-red-400 px-4 py-3 font-bold shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                disabled={isPending}
+                type="button"
+                className="flex-1 rounded-none border-3 border-black bg-red-400 px-4 py-3 font-bold shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
               >
-                確認刪除
+                {isPending ? '刪除中...' : '確認刪除'}
               </button>
             </div>
           </div>

@@ -34,14 +34,18 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
     return null
   }
 
-  const handleCancel = () => {
+  const handleCancel = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
     startTransition(async () => {
       const result = await cancelOrder(orderId)
 
       if (result.success) {
         toast.success(result.message)
         setShowConfirmDialog(false)
-        router.refresh() // ✅ 重新整理頁面以更新訂單狀態
+        // ✅ 使用 window.location.reload() 強制重新載入頁面
+        window.location.reload()
       } else {
         toast.error(result.message || '取消訂單失敗')
       }
@@ -71,7 +75,12 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
             }
           }}
         >
-          <div className="mx-4 max-w-md rounded-none border-3 border-black bg-white p-6 shadow-neo">
+          <div
+            className="mx-4 max-w-md rounded-none border-3 border-black bg-white p-6 shadow-neo"
+            onClick={(e) => {
+              e.stopPropagation() // 防止事件冒泡到背景
+            }}
+          >
             <h3 className="mb-4 text-xl font-bold">確認取消訂單</h3>
             <p className="mb-6 text-gray-700">
               您確定要取消訂單 <span className="font-mono font-bold">{orderNumber}</span> 嗎？
