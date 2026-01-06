@@ -261,6 +261,17 @@ export type OrderTimelineWithActor = OrderTimeline & {
   actor_name: string | null
 }
 
+// 訂單優惠券快照 (Feature 009)
+export type OrderCoupon = {
+  id: string
+  order_id: string
+  coupon_code: string  // 優惠券代碼快照
+  discount_type: 'fixed' | 'percentage'  // 折扣方式
+  discount_value: number  // 折扣值
+  discount_amount: number  // 實際折扣金額
+  created_at: string
+}
+
 // 訂單詳情 (含明細與操作歷史)
 export type OrderDetail = Order & {
   user: {
@@ -273,6 +284,7 @@ export type OrderDetail = Order & {
   }
   items: OrderItem[]
   timelines?: OrderTimelineWithActor[]
+  coupon?: OrderCoupon | null  // 🆕 Feature 009: 優惠券快照（選填）
 }
 
 // 訂單查詢參數
@@ -343,17 +355,6 @@ export type UserCoupon = {
 
   // 關聯資料（JOIN 查詢時包含）
   coupon?: Coupon
-}
-
-// 訂單優惠券快照
-export type OrderCoupon = {
-  id: string
-  order_id: string
-  coupon_code: string
-  discount_type: 'fixed' | 'percentage'
-  discount_value: number
-  discount_amount: number  // 實際折扣金額
-  created_at: string
 }
 
 // 優惠券折扣計算結果

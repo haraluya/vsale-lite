@@ -209,6 +209,37 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
               </div>
             </div>
           ))}
+          {/* 優惠券折扣 (Feature 009) */}
+          {order.coupon && (
+            <div className="grid grid-cols-12 gap-2 md:gap-4 bg-orange-50 border-t-2 border-black p-3 md:p-4">
+              <div className={cn(
+                "col-span-12 md:col-span-6 font-bold text-orange-700",
+                designTokens.typography.body.base
+              )}>
+                🎫 優惠券折扣 ({order.coupon.coupon_code})
+              </div>
+              <div className={cn(
+                "col-span-12 md:col-span-6 text-left md:text-right text-orange-700",
+                designTokens.typography.caption
+              )}>
+                {order.coupon.discount_type === 'fixed'
+                  ? `現金折扣 NT$ ${order.coupon.discount_value}`
+                  : `百分比折扣 ${order.coupon.discount_value}%`}
+              </div>
+              <div className={cn(
+                "col-span-6 md:col-span-8 text-right font-bold text-orange-700",
+                designTokens.typography.body.base
+              )}>
+                折扣金額
+              </div>
+              <div className={cn(
+                "col-span-6 md:col-span-4 text-right font-bold text-orange-700",
+                designTokens.typography.body.large
+              )}>
+                - {formatAmount(order.coupon.discount_amount)}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-12 gap-2 md:gap-4 bg-yellow-100 p-3 md:p-4">
             <div className={cn(
               "col-span-6 md:col-span-8 text-right font-bold",

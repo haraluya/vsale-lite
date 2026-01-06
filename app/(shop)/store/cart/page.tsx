@@ -1,12 +1,14 @@
 /**
  * Cart Page
  * Feature: 004-cart-and-orders (US1 - 客戶加入商品到購物車)
+ * Feature: 009-coupon-system (優惠券整合)
  * Route: /store/cart
  *
  * 購物車頁面
  * - 顯示購物車商品列表
  * - 支援數量調整、移除商品
  * - 顯示總金額與結帳按鈕
+ * - 支援優惠券選擇與折扣計算
  * - 支援購物車持久化 (Zustand persist)
  */
 
@@ -17,6 +19,7 @@ import { useCartStore } from '@/stores/cart'
 import { getCartItemsWithPrices } from '@/lib/actions/cart'
 import { CartItem } from '@/components/shop/cart-item'
 import { CartSummary } from '@/components/shop/cart-summary'
+import { CouponSelector } from '@/components/shop/coupons/CouponSelector'
 import type { CartItemWithProduct } from '@/types'
 import { ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
@@ -25,10 +28,11 @@ import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 export default function CartPage() {
-  const { items, getTotalItems, removeInvalidItems } = useCartStore()
+  const { items, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showCouponSelector, setShowCouponSelector] = useState(false)
 
   useEffect(() => {
     async function loadCartItems() {
@@ -164,11 +168,30 @@ export default function CartPage() {
                 totalAmount={totalAmount}
                 totalItems={totalItems}
                 isEmpty={isEmpty}
+                couponDiscount={couponDiscount}
+                couponCode={appliedCoupon?.code_normalized}
+                onOpenCouponSelector={() => setShowCouponSelector(true)}
               />
             </div>
           </div>
         )}
       </div>
+
+      {/* 優惠券選擇器 Modal */}
+      {showCouponSelector && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <CouponSelector
+              cartItems={cartItemsWithPrices.map(item => ({
+                productId: item.productId,
+                price: item.price ?? 0,
+                quantity: item.quantity,
+              }))}
+              onClose={() => setShowCouponSelector(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

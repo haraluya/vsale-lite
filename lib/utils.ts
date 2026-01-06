@@ -16,3 +16,17 @@ export function formatCurrency(amount: number): string {
     maximumFractionDigits: 0,
   })}`
 }
+
+/**
+ * 格式化日期為顯示格式
+ * @param date 日期字串（ISO 8601 格式）
+ * @returns 格式化後的日期字串 (例: 2026/01/31)
+ */
+export function formatDate(date: string): string {
+  const d = new Date(date)
+  return d.toLocaleDateString('zh-TW', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).replace(/\//g, '/')
+}

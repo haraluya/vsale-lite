@@ -243,13 +243,41 @@ export default function CustomerOrderDetailPage() {
               ))}
             </div>
 
-            {/* 總計 */}
+            {/* 總計與優惠券 */}
             <div className={cn(
               "mt-4 md:mt-6 pt-3 md:pt-4",
               designTokens.neoBrutalism.border.mobile,
               "md:border-t-3",
               "border-t-black"
             )}>
+              {/* 優惠券折扣 (Feature 009) */}
+              {order.coupon && (
+                <div className="mb-3 space-y-2">
+                  <div className="flex items-center justify-between text-orange-600">
+                    <p className={cn(
+                      designTokens.typography.body.base,
+                      "font-bold flex items-center gap-2"
+                    )}>
+                      <span>🎫</span>
+                      <span>優惠券折扣 ({order.coupon.coupon_code})</span>
+                    </p>
+                    <p className={cn(
+                      designTokens.typography.body.large,
+                      "font-bold"
+                    )}>
+                      - {formatCurrency(order.coupon.discount_amount)}
+                    </p>
+                  </div>
+                  <p className={cn(
+                    designTokens.typography.caption,
+                    "text-gray-500 pl-8"
+                  )}>
+                    {order.coupon.discount_type === 'fixed'
+                      ? `現金折扣 NT$ ${order.coupon.discount_value}`
+                      : `百分比折扣 ${order.coupon.discount_value}%`}
+                  </p>
+                </div>
+              )}
               <div className="flex items-center justify-between">
                 <p className={cn(
                   designTokens.typography.h3

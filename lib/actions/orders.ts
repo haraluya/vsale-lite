@@ -60,9 +60,63 @@ export async function createOrder(
       }
     }
 
-    const { items, notes } = validated.data
+    const { items, notes, couponId } = validated.data
 
-    // 1. 批次查詢商品與價格
+    // 1. 驗證並查詢優惠券（如果有）
+    let couponData: {
+      code: string
+      discount_type: string
+      discount_value: number
+      discount_amount: number
+    } | null = null
+
+    if (couponId) {
+      // 查詢優惠券資訊
+      const { data: coupon, error: couponError } = await supabase
+        .from('coupons')
+        .select('id, code_normalized, discount_type, discount_value')
+        .eq('id', couponId)
+        .eq('status', 'active')
+        .single()
+
+      if (couponError || !coupon) {
+        return {
+          success: false,
+          message: '優惠券不存在或已失效',
+        }
+      }
+
+      // 驗證客戶是否已領取該優惠券
+      const { data: userCoupon, error: userCouponError } = await supabase
+        .from('user_coupons')
+        .select('id, used_at')
+        .eq('user_id', userId)
+        .eq('coupon_id', couponId)
+        .single()
+
+      if (userCouponError || !userCoupon) {
+        return {
+          success: false,
+          message: '您尚未領取此優惠券',
+        }
+      }
+
+      if (userCoupon.used_at) {
+        return {
+          success: false,
+          message: '此優惠券已使用過',
+        }
+      }
+
+      couponData = {
+        code: coupon.code_normalized,
+        discount_type: coupon.discount_type,
+        discount_value: coupon.discount_value,
+        discount_amount: 0, // 稍後計算
+      }
+    }
+
+    // 2. 批次查詢商品與價格
     const productIds = items.map(item => item.productId)
     const { data: products, error: productsError } = await supabase
       .from('products')
@@ -84,7 +138,7 @@ export async function createOrder(
       }
     }
 
-    // 2. 驗證所有商品都有價格
+    // 3. 驗證所有商品都有價格
     if (products.length !== items.length) {
       return {
         success: false,
@@ -92,7 +146,7 @@ export async function createOrder(
       }
     }
 
-    // 3. 計算訂單總金額與建立訂單明細資料
+    // 4. 計算訂單總金額與建立訂單明細資料
     let totalAmount = 0
     const orderItemsData: Array<{
       product_id: string
@@ -131,7 +185,24 @@ export async function createOrder(
       })
     }
 
-    // 4. 產生訂單編號 (呼叫 PostgreSQL Function)
+    // 5. 計算優惠券折扣（如果有）
+    if (couponData) {
+      if (couponData.discount_type === 'fixed') {
+        // 現金折扣：取優惠券金額與訂單總額的較小值
+        couponData.discount_amount = Math.min(couponData.discount_value, totalAmount)
+      } else if (couponData.discount_type === 'percentage') {
+        // 百分比折扣：計算百分比
+        couponData.discount_amount = Math.round(totalAmount * (couponData.discount_value / 100))
+      }
+
+      // 確保折扣後金額不為負數
+      const finalAmount = totalAmount - couponData.discount_amount
+      if (finalAmount < 0) {
+        couponData.discount_amount = totalAmount
+      }
+    }
+
+    // 6. 產生訂單編號 (呼叫 PostgreSQL Function)
     const { data: orderNumberData, error: orderNumberError } = await supabase
       .rpc('generate_order_number')
 
@@ -145,13 +216,17 @@ export async function createOrder(
 
     const orderNumber = orderNumberData as string
 
-    // 5. 建立訂單主表
+    // 7. 建立訂單主表（訂單總額已扣除優惠券折扣）
+    const finalTotalAmount = couponData
+      ? totalAmount - couponData.discount_amount
+      : totalAmount
+
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .insert({
         order_number: orderNumber,
         user_id: userId,
-        total_amount: totalAmount,
+        total_amount: finalTotalAmount,
         status: 'pending',
         notes: notes || null,
       })
@@ -176,7 +251,7 @@ export async function createOrder(
       }
     }
 
-    // 6. 建立訂單明細
+    // 8. 建立訂單明細
     const orderItems = orderItemsData.map(item => ({
       order_id: order.id,
       ...item,
@@ -196,7 +271,46 @@ export async function createOrder(
       }
     }
 
-    // 7. 建立訂單歷史記錄
+    // 9. 建立優惠券快照（如果有使用優惠券）
+    if (couponData && couponId) {
+      // 建立 order_coupons 記錄
+      const { error: couponSnapshotError } = await supabase
+        .from('order_coupons')
+        .insert({
+          order_id: order.id,
+          coupon_code: couponData.code,
+          discount_type: couponData.discount_type,
+          discount_value: couponData.discount_value,
+          discount_amount: couponData.discount_amount,
+        })
+
+      if (couponSnapshotError) {
+        console.error('建立優惠券快照錯誤:', couponSnapshotError)
+        // 回滾訂單與訂單明細
+        await supabase.from('orders').delete().eq('id', order.id)
+        return {
+          success: false,
+          message: '建立優惠券快照時發生錯誤',
+        }
+      }
+
+      // 更新 user_coupons.used_at 與 order_id
+      const { error: updateUserCouponError } = await supabase
+        .from('user_coupons')
+        .update({
+          used_at: new Date().toISOString(),
+          order_id: order.id,
+        })
+        .eq('user_id', userId)
+        .eq('coupon_id', couponId)
+
+      if (updateUserCouponError) {
+        console.error('更新客戶優惠券使用狀態錯誤:', updateUserCouponError)
+        // 不回滾，僅記錄錯誤（優惠券快照已建立，不影響訂單）
+      }
+    }
+
+    // 10. 建立訂單歷史記錄
     const { error: timelineError } = await supabase
       .from('order_timelines')
       .insert({
@@ -212,9 +326,15 @@ export async function createOrder(
       // 不回滾,僅記錄錯誤 (歷史記錄失敗不應阻止訂單建立)
     }
 
-    // 8. 重新驗證相關頁面
+    // 11. 重新驗證相關頁面
     revalidatePath('/store/orders')
     revalidatePath('/admin/orders')
+
+    // 建立成功訊息
+    let successMessage = `訂單建立成功!訂單編號: ${order.order_number}`
+    if (couponData) {
+      successMessage += `，已使用優惠券「${couponData.code}」折扣 NT$ ${couponData.discount_amount}`
+    }
 
     return {
       success: true,
@@ -222,7 +342,7 @@ export async function createOrder(
         orderId: order.id,
         orderNumber: order.order_number,
       },
-      message: `訂單建立成功!訂單編號: ${order.order_number}`,
+      message: successMessage,
     }
   } catch (error) {
     console.error('createOrder error:', error)
@@ -400,6 +520,13 @@ export async function getOrderById(
       .eq('order_id', orderId)
       .order('created_at', { ascending: true })
 
+    // 查詢訂單優惠券快照 (Feature 009)
+    const { data: orderCoupon } = await supabase
+      .from('order_coupons')
+      .select('*')
+      .eq('order_id', orderId)
+      .maybeSingle()  // 使用 maybeSingle 避免無優惠券時報錯
+
     // 批次查詢操作者資料（用於時間軸）
     const actorIds = (orderTimelines || []).map(t => t.actor_id).filter(Boolean)
     const { data: actors } = await supabase
@@ -453,6 +580,16 @@ export async function getOrderById(
           actor_name: actor?.display_name || actor?.phone || '系統',
         }
       }),
+      // 🆕 Feature 009: 優惠券快照
+      coupon: orderCoupon ? {
+        id: orderCoupon.id,
+        order_id: orderCoupon.order_id,
+        coupon_code: orderCoupon.coupon_code,
+        discount_type: orderCoupon.discount_type as 'fixed' | 'percentage',
+        discount_value: orderCoupon.discount_value,
+        discount_amount: orderCoupon.discount_amount,
+        created_at: orderCoupon.created_at,
+      } : null,
     }
 
     return {

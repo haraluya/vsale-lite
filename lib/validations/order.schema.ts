@@ -30,6 +30,11 @@ export const createOrderSchema = z.object({
     .max(500, '備註不得超過 500 字')
     .optional()
     .nullable(),
+
+  // Feature 009: 優惠券系統
+  couponId: z.string().uuid('無效的優惠券 ID')
+    .optional()
+    .nullable(),
 })
 
 // 更新訂單狀態

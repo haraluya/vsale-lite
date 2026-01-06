@@ -59,16 +59,16 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] 實作 Server Action `claimCoupon` 在 `lib/actions/coupons.ts`（優惠券領取、重複檢查、有效性驗證）
-- [ ] T009 [P] [US1] 實作 Server Action `getUserCoupons` 在 `lib/actions/coupons.ts`（查詢客戶已領取優惠券列表）
-- [ ] T010 [P] [US1] 實作 Server Action `validateCoupon` 在 `lib/actions/coupons.ts`（驗證優惠券使用條件與計算折扣）
-- [ ] T011 [P] [US1] 建立優惠券卡片元件 `components/shop/coupons/CouponCard.tsx`（Coupang 風格設計、Neo-Brutalism 樣式）
-- [ ] T012 [P] [US1] 建立優惠券輸入口令元件 `components/shop/coupons/CouponCodeInput.tsx`（Foodpanda 風格設計、大寫轉換、即時驗證）
-- [ ] T013 [P] [US1] 建立優惠券選擇器元件 `components/shop/coupons/CouponSelector.tsx`（購物車使用、顯示可用優惠券、應用/移除邏輯）
-- [ ] T014 [US1] 建立前台優惠券頁面 `app/(shop)/store/coupons/page.tsx`（顯示已領取優惠券列表 + 輸入口令入口）
-- [ ] T015 [US1] 整合購物車頁面 `app/(shop)/store/cart/page.tsx`（新增「可使用優惠券」提示按鈕、整合 CouponSelector、顯示折扣摘要）
-- [ ] T016 [US1] 修改訂單建立 Server Action `lib/actions/orders.ts`（新增優惠券快照邏輯、建立 order_coupons 記錄、更新 user_coupons.used_at）
-- [ ] T017 [US1] 修改訂單詳情頁面 `app/(shop)/store/orders/[id]/page.tsx`（顯示使用的優惠券代碼與折扣金額）
+- [X] T008 [P] [US1] 實作 Server Action `claimCoupon` 在 `lib/actions/coupons.ts`（優惠券領取、重複檢查、有效性驗證）
+- [X] T009 [P] [US1] 實作 Server Action `getUserCoupons` 在 `lib/actions/coupons.ts`（查詢客戶已領取優惠券列表）
+- [X] T010 [P] [US1] 實作 Server Action `validateCoupon` 在 `lib/actions/coupons.ts`（驗證優惠券使用條件與計算折扣）
+- [X] T011 [P] [US1] 建立優惠券卡片元件 `components/shop/coupons/CouponCard.tsx`（Coupang 風格設計、Neo-Brutalism 樣式）
+- [X] T012 [P] [US1] 建立優惠券輸入口令元件 `components/shop/coupons/CouponCodeInput.tsx`（Foodpanda 風格設計、大寫轉換、即時驗證）
+- [X] T013 [P] [US1] 建立優惠券選擇器元件 `components/shop/coupons/CouponSelector.tsx`（購物車使用、顯示可用優惠券、應用/移除邏輯）
+- [X] T014 [US1] 建立前台優惠券頁面 `app/(shop)/store/coupons/page.tsx`（顯示已領取優惠券列表 + 輸入口令入口）
+- [X] T015 [US1] 整合購物車頁面 `app/(shop)/store/cart/page.tsx`（新增「可使用優惠券」提示按鈕、整合 CouponSelector、顯示折扣摘要）
+- [X] T016 [US1] 修改訂單建立 Server Action `lib/actions/orders.ts`（新增優惠券快照邏輯、建立 order_coupons 記錄、更新 user_coupons.used_at）
+- [X] T017 [US1] 修改訂單詳情頁面 `app/(shop)/store/orders/[id]/page.tsx`（顯示使用的優惠券代碼與折扣金額）
 
 **Checkpoint**: 此階段完成後，User Story 1 應完全可用且可獨立測試（客戶可領取、使用優惠券並在訂單中看到快照）
 
