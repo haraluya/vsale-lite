@@ -101,12 +101,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] 實作等級限制驗證邏輯在 `lib/utils/coupon-helpers.ts`（檢查客戶等級是否在 coupon_tier_restrictions 列表中）
-- [ ] T025 [US3] 實作最低金額驗證邏輯在 `lib/utils/coupon-helpers.ts`（計算購物車總額、比對 min_order_amount）
-- [ ] T026 [US3] 實作系列限制驗證邏輯在 `lib/utils/coupon-helpers.ts`（篩選限定系列商品、計算適用金額）
-- [ ] T027 [US3] 實作購物車商品變更監聽在 `stores/cart.ts`（addItem, removeItem, updateQuantity 時自動重新驗證優惠券）
-- [ ] T028 [US3] 實作優惠券自動移除邏輯在 `stores/cart.ts`（條件不符時移除優惠券並顯示 toast 提示）
-- [ ] T029 [US3] 修改 CouponSelector 元件 `components/shop/coupons/CouponSelector.tsx`（顯示「不符合條件」狀態、顯示錯誤原因）
+- [X] T024 [US3] 實作等級限制驗證邏輯在 `lib/utils/coupon-helpers.ts`（檢查客戶等級是否在 coupon_tier_restrictions 列表中）
+- [X] T025 [US3] 實作最低金額驗證邏輯在 `lib/utils/coupon-helpers.ts`（計算購物車總額、比對 min_order_amount）
+- [X] T026 [US3] 實作系列限制驗證邏輯在 `lib/utils/coupon-helpers.ts`（篩選限定系列商品、計算適用金額）
+- [X] T027 [US3] 實作購物車商品變更監聽在 `stores/cart.ts`（addItem, removeItem, updateQuantity 時自動重新驗證優惠券）
+- [X] T028 [US3] 實作優惠券自動移除邏輯在 `stores/cart.ts`（條件不符時移除優惠券並顯示 toast 提示）
+- [X] T029 [US3] 修改 CouponSelector 元件 `components/shop/coupons/CouponSelector.tsx`（顯示「不符合條件」狀態、顯示錯誤原因）
 
 **Checkpoint**: 此階段完成後，User Story 3 應完全可用且可獨立測試（優惠券使用限制自動驗證並即時提示）
 
@@ -139,10 +139,10 @@
 
 ### Implementation for User Story 5
 
-- [ ] T036 [US5] 修改訂單建立 Server Action `lib/actions/orders.ts`（建立 order_coupons 記錄、儲存優惠券快照）
-- [ ] T037 [US5] 修改訂單詳情 Server Action `lib/actions/orders.ts`（JOIN order_coupons 表、回傳優惠券快照資料）
-- [ ] T038 [US5] 修改訂單詳情頁面 `app/(shop)/store/orders/[id]/page.tsx`（顯示優惠券快照資訊）
-- [ ] T039 [US5] 修改後台訂單詳情頁面 `app/(admin)/admin/orders/[id]/page.tsx`（顯示優惠券快照資訊）
+- [X] T036 [US5] 修改訂單建立 Server Action `lib/actions/orders.ts`（建立 order_coupons 記錄、儲存優惠券快照）
+- [X] T037 [US5] 修改訂單詳情 Server Action `lib/actions/orders.ts`（JOIN order_coupons 表、回傳優惠券快照資料）
+- [X] T038 [US5] 修改訂單詳情頁面 `app/(shop)/store/orders/[id]/page.tsx`（顯示優惠券快照資訊）
+- [X] T039 [US5] 修改後台訂單詳情頁面 `app/(admin)/admin/orders/[id]/page.tsx`（顯示優惠券快照資訊）
 
 **Checkpoint**: 此階段完成後，User Story 5 應完全可用且可獨立測試（訂單優惠券快照永久保留）
 
@@ -156,10 +156,10 @@
 
 ### Implementation for User Story 6
 
-- [ ] T040 [US6] 修改 createCoupon Server Action `lib/actions/coupons.ts`（檢查 code_normalized 唯一性、自動轉大寫）
-- [ ] T041 [US6] 修改 claimCoupon Server Action `lib/actions/coupons.ts`（查詢時使用 UPPER() 函式轉大寫）
-- [ ] T042 [US6] 修改 CouponForm 元件 `components/admin/coupons/CouponForm.tsx`（輸入時即時轉大寫、顯示預覽）
-- [ ] T043 [US6] 修改 CouponCodeInput 元件 `components/shop/coupons/CouponCodeInput.tsx`（輸入時即時轉大寫）
+- [X] T040 [US6] 修改 createCoupon Server Action `lib/actions/coupons.ts`（檢查 code_normalized 唯一性、自動轉大寫）
+- [X] T041 [US6] 修改 claimCoupon Server Action `lib/actions/coupons.ts`（查詢時使用 UPPER() 函式轉大寫）
+- [X] T042 [US6] 修改 CouponForm 元件 `components/admin/coupons/CouponForm.tsx`（輸入時即時轉大寫、顯示預覽）
+- [X] T043 [US6] 修改 CouponCodeInput 元件 `components/shop/coupons/CouponCodeInput.tsx`（輸入時即時轉大寫）
 
 **Checkpoint**: 此階段完成後，User Story 6 應完全可用且可獨立測試（優惠券代碼唯一性與大小寫處理正確）
 
