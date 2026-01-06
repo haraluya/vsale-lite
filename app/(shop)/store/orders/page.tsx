@@ -22,7 +22,6 @@ import { cn } from '@/lib/utils'
 const statusOptions: { value: OrderStatus | 'all'; label: string }[] = [
   { value: 'all', label: '全部訂單' },
   { value: 'pending', label: '待確認' },
-  { value: 'confirmed', label: '已確認' },
   { value: 'shipping', label: '出貨中' },
   { value: 'completed', label: '已完成' },
   { value: 'cancelled', label: '已取消' },

@@ -633,20 +633,21 @@ export async function getOrderById(
 }
 
 /**
- * 確認訂單並扣減庫存 (US3 - 管理員)
+ * 標記訂單為出貨中並扣減庫存 (Feature 011 US6 - 管理員)
+ * - 取代 confirmOrder() 函數
  * - 呼叫 PostgreSQL Function 確保原子性操作
- * - 訂單狀態從 pending → confirmed
+ * - 訂單狀態從 pending → shipping
  * - 扣減商品庫存（支援負庫存）
  * - 自動記錄操作歷史
  */
-export async function confirmOrder(
+export async function markAsShipping(
   orderId: string
 ): Promise<ActionResult<{ orderId: string }>> {
   try {
     const supabase = await createClient()
     const { userId, role } = await checkAuth()
 
-    // 僅管理員可確認訂單
+    // 僅管理員可標記出貨
     if (role !== 'admin') {
       return {
         success: false,
@@ -655,16 +656,16 @@ export async function confirmOrder(
     }
 
     // 呼叫 PostgreSQL Function 進行原子性操作
-    const { data, error } = await supabase.rpc('confirm_order_and_deduct_stock', {
+    const { data, error } = await supabase.rpc('mark_order_as_shipping', {
       p_order_id: orderId,
       p_actor_id: userId,
     })
 
     if (error || !data) {
-      console.error('確認訂單錯誤:', error)
+      console.error('標記出貨錯誤:', error)
       return {
         success: false,
-        message: error?.message || '確認訂單時發生錯誤',
+        message: error?.message || '標記出貨時發生錯誤',
       }
     }
 
@@ -673,7 +674,7 @@ export async function confirmOrder(
     if (!result.success) {
       return {
         success: false,
-        message: result.error || '確認訂單失敗',
+        message: result.error || '標記出貨失敗',
       }
     }
 
@@ -685,26 +686,28 @@ export async function confirmOrder(
     return {
       success: true,
       data: { orderId: result.order_id || orderId },
-      message: '訂單已確認，庫存已扣減',
+      message: '訂單已標記為出貨中，庫存已扣減',
     }
   } catch (error) {
-    console.error('confirmOrder error:', error)
+    console.error('markAsShipping error:', error)
     return {
       success: false,
-      message: error instanceof Error ? error.message : '確認訂單時發生未知錯誤',
+      message: error instanceof Error ? error.message : '標記出貨時發生未知錯誤',
     }
   }
 }
 
 /**
- * 更新訂單狀態 (US3 - 管理員)
- * - confirmed → shipping → completed
+ * 更新訂單狀態 (Feature 011 US6 - 管理員)
+ * - 簡化版，移除 confirmed 相關邏輯
+ * - 允許的狀態轉換: shipping → completed, pending → cancelled, shipping → cancelled
  * - 呼叫 PostgreSQL Function 確保原子性操作
  * - 自動記錄操作歷史
+ * - 注意: pending → shipping 必須使用 markAsShipping() 函數
  */
 export async function updateOrderStatus(
   orderId: string,
-  newStatus: 'confirmed' | 'shipping' | 'completed'
+  newStatus: 'shipping' | 'completed' | 'cancelled'
 ): Promise<ActionResult<{ orderId: string; newStatus: string }>> {
   try {
     const supabase = await createClient()
@@ -748,10 +751,9 @@ export async function updateOrderStatus(
     revalidatePath('/store/orders')
     revalidatePath(`/store/orders/${orderId}`)
 
-    // 狀態標籤映射
+    // 狀態標籤映射（移除 confirmed）
     const statusLabels: Record<string, string> = {
       pending: '待確認',
-      confirmed: '已確認',
       shipping: '出貨中',
       completed: '已完成',
       cancelled: '已取消',

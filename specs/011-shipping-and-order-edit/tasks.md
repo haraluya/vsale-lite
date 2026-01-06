@@ -128,14 +128,14 @@
 
 ### Server Actions 更新
 
-- [ ] T029 [P] [US6] 在 `lib/actions/orders.ts` 新增 `markAsShipping()` Server Action（呼叫 `mark_order_as_shipping` RPC）
-- [ ] T030 [P] [US6] 更新 `lib/actions/orders.ts` 的 `updateOrderStatus()` Server Action（移除 confirmed 相關邏輯，僅允許 shipping→completed, pending→cancelled, shipping→cancelled）
-- [ ] T031 [P] [US6] 刪除 `lib/actions/orders.ts` 的 `confirmOrder()` Server Action（已由 markAsShipping 取代）
+- [X] T029 [P] [US6] 在 `lib/actions/orders.ts` 新增 `markAsShipping()` Server Action（呼叫 `mark_order_as_shipping` RPC）✅
+- [X] T030 [P] [US6] 更新 `lib/actions/orders.ts` 的 `updateOrderStatus()` Server Action（移除 confirmed 相關邏輯，僅允許 shipping→completed, pending→cancelled, shipping→cancelled）✅
+- [X] T031 [P] [US6] 將 `confirmOrder()` 重新命名為 `markAsShipping()`（已由新函數取代）✅
 
 ### UI 元件更新
 
-- [ ] T032 [US6] 更新 `components/admin/orders/order-actions.tsx`（移除「確認訂單」按鈕，新增「標記出貨（扣減庫存）」按鈕）
-- [ ] T033 [P] [US6] 更新 `components/shop/order-status-badge.tsx`（移除 confirmed 狀態顯示）
+- [X] T032 [US6] 更新 `components/admin/order-actions.tsx`（移除「確認訂單」按鈕，新增「標記出貨（扣減庫存）」按鈕）✅
+- [X] T033 [P] [US6] 更新 `components/shop/order-status-badge.tsx`（移除 confirmed 狀態顯示）✅
 
 **Checkpoint**: 訂單狀態流程正確（pending→shipping→completed），庫存扣減時機移至出貨階段
 

@@ -8,9 +8,9 @@ import type { OrderStatus } from '@/types'
 
 /**
  * 取消訂單按鈕元件
- * Feature: 004-cart-and-orders / US3
+ * Feature: 011-shipping-and-order-edit / US6
  *
- * - 允許管理員取消訂單（僅限 pending 或 confirmed 狀態）
+ * - 允許管理員取消訂單（僅限 pending 或 shipping 狀態）
  * - 包含確認對話框
  * - Neo-Brutalism 設計風格
  */
@@ -25,8 +25,8 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  // 僅允許取消 pending 或 confirmed 狀態的訂單
-  const canCancel = currentStatus === 'pending' || currentStatus === 'confirmed'
+  // 僅允許取消 pending 或 shipping 狀態的訂單
+  const canCancel = currentStatus === 'pending' || currentStatus === 'shipping'
 
   if (!canCancel) {
     return null
@@ -64,8 +64,8 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
             <h3 className="mb-4 text-xl font-bold">確認取消訂單</h3>
             <p className="mb-6 text-gray-700">
               您確定要取消訂單 <span className="font-mono font-bold">{orderNumber}</span> 嗎？
-              {currentStatus === 'confirmed' && (
-                <span className="mt-2 block text-sm text-red-600">此訂單已確認，取消後將回補庫存。</span>
+              {currentStatus === 'shipping' && (
+                <span className="mt-2 block text-sm text-red-600">此訂單已出貨，取消後將回補庫存。</span>
               )}
             </p>
 
