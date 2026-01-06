@@ -16,7 +16,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { CurrentUser } from '@/types'
-import { LogOut, User, ShoppingCart, Package } from 'lucide-react'
+import { LogOut, User, ShoppingCart, Package, Ticket } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
 import { Logo } from '@/components/ui/logo'
 import { designTokens } from '@/lib/design-tokens'
@@ -104,6 +104,24 @@ export function Navbar({ user }: NavbarProps) {
             >
               <Package className="h-4 w-4 md:h-5 md:w-5" />
               <span className="hidden sm:inline">我的訂單</span>
+            </Link>
+
+            {/* 優惠券按鈕 */}
+            <Link
+              href="/store/coupons"
+              className={cn(
+                "flex items-center gap-2 rounded-none bg-orange-100 font-bold transition-all",
+                designTokens.neoBrutalism.border.full,
+                "border-black",
+                designTokens.neoBrutalism.shadow.mobile,
+                "md:shadow-neo",
+                designTokens.neoBrutalism.hover,
+                "px-3 py-2 md:px-4",
+                "min-h-[44px] min-w-[44px]"  // WCAG 2.1 AA 觸控目標
+              )}
+            >
+              <Ticket className="h-4 w-4 md:h-5 md:w-5" />
+              <span className="hidden sm:inline">優惠券</span>
             </Link>
 
             {/* 購物車按鈕 */}

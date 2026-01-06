@@ -194,6 +194,18 @@ export const useCartStore = create<CartState>()(
         appliedCoupon: state.appliedCoupon,
         couponDiscount: state.couponDiscount,
       }),
+      // 🔧 Migrate 函式：從 v1 升級到 v2（新增優惠券欄位）
+      migrate: (persistedState: any, version: number) => {
+        if (version === 1) {
+          // v1 → v2: 新增優惠券相關欄位
+          return {
+            ...persistedState,
+            appliedCoupon: null,
+            couponDiscount: 0,
+          }
+        }
+        return persistedState
+      },
     }
   )
 )
