@@ -1065,60 +1065,37 @@ export async function deleteOrder(
 
     const { order_id, reason } = validated.data
 
-    // 查詢訂單狀態
-    const { data: order, error: fetchError } = await supabase
-      .from('orders')
-      .select('id, order_number, status')
-      .eq('id', order_id)
-      .single()
+    // 🔧 修復：使用 PostgreSQL Function 刪除訂單（繞過 RLS Policy）
+    const { data, error } = await supabase.rpc('delete_order_pending', {
+      p_order_id: order_id,
+      p_actor_id: userId,
+      p_reason: reason || '管理員刪除訂單',
+    })
 
-    if (fetchError || !order) {
-      console.error('查詢訂單錯誤:', fetchError)
+    if (error || !data) {
+      console.error('刪除訂單錯誤:', error)
       return {
         success: false,
-        message: '訂單不存在',
+        message: error?.message || '刪除訂單時發生錯誤',
       }
     }
 
-    // 僅允許刪除 pending 狀態的訂單
-    if (order.status !== 'pending') {
+    // 檢查 Function 回傳結果
+    const result = data as { success: boolean; error?: string; order_number?: string; message?: string }
+    if (!result.success) {
       return {
         success: false,
-        message: '僅允許刪除「待確認」狀態的訂單',
-      }
-    }
-
-    // 記錄刪除操作於 order_timelines
-    await supabase
-      .from('order_timelines')
-      .insert({
-        order_id: order.id,
-        action_type: 'deleted',
-        content: `管理員刪除訂單 (原因: ${reason || '未提供'})`,
-        actor_id: userId,
-        actor_role: role,
-      })
-
-    // 刪除訂單（CASCADE 會自動刪除 order_items 與 order_timelines）
-    const { error: deleteError } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', order_id)
-
-    if (deleteError) {
-      console.error('刪除訂單錯誤:', deleteError)
-      return {
-        success: false,
-        message: '刪除訂單時發生錯誤',
+        message: result.error || '刪除訂單失敗',
       }
     }
 
     // 重新驗證相關頁面
     revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${order_id}`)
 
     return {
       success: true,
-      message: `訂單 ${order.order_number} 已刪除`,
+      message: result.message || `訂單已刪除`,
     }
   } catch (error) {
     console.error('deleteOrder error:', error)
