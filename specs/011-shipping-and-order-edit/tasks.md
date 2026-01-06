@@ -500,5 +500,53 @@ Task T044: "新增 updateShippingFee() Server Action"
 **並行機會**: 28 個任務標記 [P]，可並行執行以縮短總時間
 
 **最後更新**: 2026-01-06
-**版本**: v1.1.0 (新增錯誤處理規範檢查任務)
-**狀態**: ✅ 完成
+**版本**: v1.2.0 (修復 BUG-011-001 & BUG-011-002)
+**狀態**: ✅ 完成（含緊急 Bug 修復）
+
+---
+
+## Bug 修復記錄
+
+### BUG-011-001: 編輯訂單無商品明細 (2026-01-06)
+**嚴重程度**: 🔴 Critical
+**影響**: 訂單編輯功能完全無法使用
+
+**根本原因**:
+1. 資料結構欄位不一致 (`order_items` vs `items`)
+2. 缺少 `order_custom_fees` 查詢
+3. 優惠券折扣讀取路徑錯誤
+
+**修復檔案**:
+- `lib/actions/orders.ts` (+15 行)
+- `components/admin/orders/order-editor.tsx` (-21 +10 行)
+- `components/admin/orders/order-detail-content.tsx` (+24 行)
+
+**Commit**: 7eb69fe
+
+---
+
+### BUG-011-002: 訂單修改失敗且歷史顯示「未知」(2026-01-06)
+**嚴重程度**: 🔴 Critical
+**影響**: 訂單修改無法儲存、操作記錄錯誤
+
+**根本原因**:
+1. RPC 回傳資料結構處理錯誤（期望物件，實際為陣列）
+2. `actor_role` 查詢返回 NULL
+3. 缺少 UPDATE/DELETE 操作檢查
+
+**修復檔案**:
+- `lib/actions/orders.ts` (+15 行 RPC 處理)
+- `supabase/migrations/20260125_fix_order_modifications_function.sql` (新建 220 行)
+
+**Commit**: 274c9bd
+
+---
+
+### 新增文件
+- `BUGFIX_REPORT.md`: 完整 Bug 分析與修復方案
+- `DEPLOYMENT_CHECKLIST.md`: 6 階段部署檢查清單
+- `TESTING_REPORT.md`: 30 項測試通過記錄
+- `IMPLEMENTATION_SUMMARY.md`: 功能實作完成總結
+- `rollback/*.sql`: 3 個 Rollback 腳本
+
+**測試狀態**: ✅ TypeScript 通過 | ✅ Migration 應用 | ⏳ 待使用者驗證
