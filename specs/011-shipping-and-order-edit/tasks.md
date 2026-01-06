@@ -542,11 +542,49 @@ Task T044: "新增 updateShippingFee() Server Action"
 
 ---
 
+### 補充修復 #1: 操作歷史顯示「未知操作」(2026-01-06)
+**嚴重程度**: 🟡 Medium
+**影響**: 訂單修改成功但操作歷史顯示錯誤
+
+**根本原因**:
+1. `order-timeline.tsx` 未處理 `order_modified` action type
+2. `OrderTimeline` 型別缺少 `modifications` 欄位
+3. 所有 timeline 查詢未 SELECT `modifications` 欄位
+
+**修復檔案**:
+- `components/admin/order-timeline.tsx` (+95 行新增 formatModifications 函數與顯示邏輯)
+- `types/index.ts` (新增 `order_modified` 與 `modifications` 欄位)
+- `lib/actions/order-timelines.ts` (+1 欄位查詢)
+- `lib/actions/orders.ts` (+2 處 modifications 欄位映射)
+
+**Commit**: 00eb9e2
+
+---
+
+### 補充修復 #2: 前台訂單詳情缺少費用顯示 (2026-01-06)
+**嚴重程度**: 🟡 Medium
+**影響**: 前台（客戶）訂單詳情頁面與後台顯示不一致
+
+**根本原因**:
+前台訂單詳情頁面僅顯示商品明細與優惠券，未實作運費與自訂費用顯示
+
+**修復檔案**:
+- `app/(shop)/store/orders/[id]/page.tsx` (+50 行運費與自訂費用顯示)
+
+**修復內容**:
+1. ✅ 新增運費顯示（🚚 emoji、免運顯示為綠色）
+2. ✅ 新增自訂費用顯示（💵 emoji、支援多項費用、負數顯示為紅色）
+3. ✅ 統一前後台顯示順序（商品 → 運費 → 自訂費用 → 優惠券 → 總額）
+
+**Commit**: 7be7ee0
+
+---
+
 ### 新增文件
-- `BUGFIX_REPORT.md`: 完整 Bug 分析與修復方案
+- `BUGFIX_REPORT.md`: 完整 Bug 分析與修復方案（包含 2 個關鍵 Bug + 2 個補充修復）
 - `DEPLOYMENT_CHECKLIST.md`: 6 階段部署檢查清單
 - `TESTING_REPORT.md`: 30 項測試通過記錄
 - `IMPLEMENTATION_SUMMARY.md`: 功能實作完成總結
 - `rollback/*.sql`: 3 個 Rollback 腳本
 
-**測試狀態**: ✅ TypeScript 通過 | ✅ Migration 應用 | ⏳ 待使用者驗證
+**測試狀態**: ✅ TypeScript 通過 | ✅ Migration 應用 | ✅ 補充修復完成 | ⏳ 待使用者驗證
