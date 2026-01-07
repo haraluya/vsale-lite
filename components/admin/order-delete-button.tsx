@@ -37,7 +37,7 @@ export function OrderDeleteButton({
     return null
   }
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setShowDialog(false)
@@ -49,10 +49,9 @@ export function OrderDeleteButton({
 
       if (result.success) {
         toast.success(result.message || '訂單已成功刪除')
-        // 延遲導向,讓 toast 有時間顯示，然後強制重新載入訂單列表
-        setTimeout(() => {
-          window.location.href = '/admin/orders'
-        }, 800)
+        // 🔧 修復：立即導向，避免頁面重新渲染觸發 404
+        // 使用 router.push 而非 window.location.href，保持 SPA 體驗
+        router.push('/admin/orders')
       } else {
         // 🔧 修復：刪除失敗時不要跳轉，顯示錯誤訊息
         toast.error(result.message || '訂單刪除失敗')
