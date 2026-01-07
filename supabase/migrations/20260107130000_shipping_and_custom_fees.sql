@@ -229,7 +229,8 @@ GRANT EXECUTE ON FUNCTION mark_order_as_shipping(UUID, UUID) TO authenticated;
 
 -- Function 3: 更新訂單狀態 (簡化版，移除 confirmed 狀態)
 -- 覆寫 M3 建立的 update_order_status 函數
-CREATE OR REPLACE FUNCTION update_order_status(
+DROP FUNCTION IF EXISTS update_order_status(UUID, TEXT, UUID);
+CREATE FUNCTION update_order_status(
   p_order_id UUID,
   p_new_status TEXT,
   p_actor_id UUID

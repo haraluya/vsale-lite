@@ -13,8 +13,6 @@
 -- ================================================================
 
 -- 會員等級表
-COMMENT ON TABLE tiers IS '會員等級表：定義批發系統的客戶等級（零售、批發、經銷商），用於綁定等級價格';
-
 CREATE TABLE IF NOT EXISTS tiers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL UNIQUE,
@@ -23,6 +21,7 @@ CREATE TABLE IF NOT EXISTS tiers (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+COMMENT ON TABLE tiers IS '會員等級表：定義批發系統的客戶等級（零售、批發、經銷商），用於綁定等級價格';
 COMMENT ON COLUMN tiers.id IS '等級 ID（UUID）';
 COMMENT ON COLUMN tiers.name IS '等級名稱（如「零售」、「批發」、「經銷商」）';
 COMMENT ON COLUMN tiers.rank IS '等級排序（數字越大等級越高）';
@@ -30,8 +29,6 @@ COMMENT ON COLUMN tiers.created_at IS '建立時間';
 COMMENT ON COLUMN tiers.updated_at IS '最後更新時間';
 
 -- 使用者業務資料表
-COMMENT ON TABLE profiles IS '使用者業務資料表：擴充 auth.users，儲存手機號碼、角色、會員等級等業務資訊';
-
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   phone TEXT UNIQUE,
@@ -42,6 +39,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   display_name TEXT,
   notes TEXT
 );
+
+COMMENT ON TABLE profiles IS '使用者業務資料表：擴充 auth.users，儲存手機號碼、角色、會員等級等業務資訊';
 
 COMMENT ON COLUMN profiles.id IS '使用者 ID（關聯 auth.users.id）';
 COMMENT ON COLUMN profiles.phone IS '手機號碼（客戶必填，用於登入）';

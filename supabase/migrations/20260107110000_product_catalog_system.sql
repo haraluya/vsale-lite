@@ -18,8 +18,6 @@
 -- ================================================================
 
 -- 商品分類表
-COMMENT ON TABLE categories IS '商品分類表：定義商品的頂層分類（如飲料、零食、日用品）';
-
 CREATE TABLE IF NOT EXISTS categories (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code VARCHAR(10) NOT NULL UNIQUE,
@@ -31,6 +29,7 @@ CREATE TABLE IF NOT EXISTS categories (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+COMMENT ON TABLE categories IS '商品分類表：定義商品的頂層分類（如飲料、零食、日用品）';
 COMMENT ON COLUMN categories.id IS '分類 ID（UUID）';
 COMMENT ON COLUMN categories.code IS '分類代碼（3-10 個大寫字母，如 DRK, SNK, DAI）';
 COMMENT ON COLUMN categories.name IS '分類名稱（如「飲料」、「零食」）';
@@ -41,8 +40,6 @@ COMMENT ON COLUMN categories.created_at IS '建立時間';
 COMMENT ON COLUMN categories.updated_at IS '最後更新時間';
 
 -- 商品系列表
-COMMENT ON TABLE series IS '商品系列表：組織商品的中間層，如「美粒果系列果汁」';
-
 CREATE TABLE IF NOT EXISTS series (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   category_id UUID REFERENCES categories(id) ON DELETE RESTRICT,
@@ -68,8 +65,6 @@ COMMENT ON COLUMN series.created_at IS '建立時間';
 COMMENT ON COLUMN series.updated_at IS '最後更新時間';
 
 -- 商品表
-COMMENT ON TABLE products IS '商品表：儲存所有商品資訊（商品編號、名稱、庫存、價格等）';
-
 CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   code VARCHAR(50) NOT NULL UNIQUE,
@@ -87,6 +82,7 @@ CREATE TABLE IF NOT EXISTS products (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+COMMENT ON TABLE products IS '商品表：儲存所有商品資訊（商品編號、名稱、庫存、價格等）';
 COMMENT ON COLUMN products.id IS '商品 ID（UUID）';
 COMMENT ON COLUMN products.code IS '商品編號（自動生成，格式：[分類代碼]-[系列代碼]-[01]，如 DRK-TEA-01）';
 COMMENT ON COLUMN products.name IS '商品名稱（必須唯一）';
@@ -103,8 +99,6 @@ COMMENT ON COLUMN products.created_at IS '建立時間';
 COMMENT ON COLUMN products.updated_at IS '最後更新時間';
 
 -- 等級價格表
-COMMENT ON TABLE tier_prices IS '等級價格表：儲存每個商品在每個會員等級的對應價格';
-
 CREATE TABLE IF NOT EXISTS tier_prices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tier_id UUID NOT NULL REFERENCES tiers(id) ON DELETE CASCADE,
@@ -115,6 +109,7 @@ CREATE TABLE IF NOT EXISTS tier_prices (
   UNIQUE(tier_id, product_id)
 );
 
+COMMENT ON TABLE tier_prices IS '等級價格表：儲存每個商品在每個會員等級的對應價格';
 COMMENT ON COLUMN tier_prices.id IS '價格記錄 ID（UUID）';
 COMMENT ON COLUMN tier_prices.tier_id IS '會員等級 ID';
 COMMENT ON COLUMN tier_prices.product_id IS '商品 ID';
