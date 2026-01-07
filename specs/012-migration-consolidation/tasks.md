@@ -112,41 +112,41 @@ description: "Migration 整合與資料庫優化任務清單"
 
 ### M5: 優惠券系統
 
-- [ ] T048 [US1] 建立整合檔案 `supabase/migrations/20260107140000_coupon_system.sql`
-- [ ] T049 [US1] 整合 `20260119_create_coupons.sql` (優惠券基礎資料表)
-- [ ] T050 [US1] 整合 `20260120_add_coupon_claim_limit.sql` (領取張數限制)
-- [ ] T051 [US1] 整合 `20260121_add_order_coupons_insert_policy.sql` (訂單優惠券 RLS)
-- [ ] T052 [US1] 新增完整註解（優惠券類型、限制說明）
-- [ ] T053 [US1] 執行 M1-M5 並驗證
+- [X] T048 [US1] 建立整合檔案 `supabase/migrations/20260107140000_coupon_system.sql`
+- [X] T049 [US1] 整合 `20260119_create_coupons.sql` (優惠券基礎資料表)
+- [X] T050 [US1] 整合 `20260120_add_coupon_claim_limit.sql` (領取張數限制)
+- [X] T051 [US1] 整合 `20260121_add_order_coupons_insert_policy.sql` (訂單優惠券 RLS)
+- [X] T052 [US1] 新增完整註解（優惠券類型、限制說明）
+- [ ] T053 [US1] 執行 M1-M5 並驗證 ⏳ 待驗證
 
 ### M6: 系統管理與稽核
 
-- [ ] T054 [US1] 建立整合檔案 `supabase/migrations/20260107150000_system_admin_and_audit.sql`
-- [ ] T055 [US1] 整合 `20260113_system_admin.sql` (管理員與系統設定)
-- [ ] T056 [US1] 整合 `20260109_system_enhancement.sql` (廣告輪播)
-- [ ] T057 [US1] 整合 `20260114_add_audit_logs_insert_policy.sql` (操作日誌 RLS)
-- [ ] T058 [US1] 整合 `20260115_update_system_settings_description.sql` (設定描述欄位)
-- [ ] T059 [US1] 新增完整註解（系統設定項目、稽核日誌用途）
-- [ ] T060 [US1] 執行 M1-M6 並驗證
+- [X] T054 [US1] 建立整合檔案 `supabase/migrations/20260107150000_system_admin_and_audit.sql`
+- [X] T055 [US1] 整合 `20260113_system_admin.sql` (管理員與系統設定)
+- [X] T056 [US1] 整合 `20260109_system_enhancement.sql` (廣告輪播)
+- [X] T057 [US1] 整合 `20260114_add_audit_logs_insert_policy.sql` (操作日誌 RLS)
+- [X] T058 [US1] 整合 `20260115_update_system_settings_description.sql` (設定描述欄位)
+- [X] T059 [US1] 新增完整註解（系統設定項目、稽核日誌用途）
+- [ ] T060 [US1] 執行 M1-M6 並驗證 ⏳ 待驗證
 
 ### M7: 索引與效能優化
 
-- [ ] T061 [US1] 建立整合檔案 `supabase/migrations/20260107160000_indexes_and_performance.sql`
-- [ ] T062 [US1] 整合所有現有索引定義（從 M1-M6 提取）
-- [ ] T063 [US1] 新增效能優化索引 `idx_products_series_status` (複合索引: series_id, status)
-- [ ] T064 [US1] 新增效能優化索引 `idx_products_active_series_updated` (部分索引: status='active')
-- [ ] T065 [US1] 新增效能優化索引 `idx_orders_pending_created` (部分索引: status='pending')
-- [ ] T066 [US1] 確認 GIN 索引 `idx_products_tags` 存在
-- [ ] T067 [US1] 新增完整註解（索引用途、效能影響、使用場景）
-- [ ] T068 [US1] 執行 M1-M7 並驗證
+- [X] T061 [US1] 建立整合檔案 `supabase/migrations/20260107160000_indexes_and_performance.sql`
+- [X] T062 [US1] 整合所有現有索引定義（從 M1-M6 提取）
+- [X] T063 [US1] 新增效能優化索引 `idx_products_series_status` (複合索引: series_id, status)
+- [X] T064 [US1] 新增效能優化索引 `idx_products_active_series_updated` (部分索引: status='active')
+- [X] T065 [US1] 新增效能優化索引 `idx_orders_pending_created` (部分索引: status='pending')
+- [X] T066 [US1] 確認 GIN 索引 `idx_products_tags` 存在
+- [X] T067 [US1] 新增完整註解（索引用途、效能影響、使用場景）
+- [ ] T068 [US1] 執行 M1-M7 並驗證 ⏳ 待驗證
 
 ### M8: RLS 策略
 
-- [ ] T069 [US1] 建立整合檔案 `supabase/migrations/20260107170000_rls_policies.sql`
-- [ ] T070 [US1] 整合所有 RLS Policy 定義（從 M1-M6 提取）
-- [ ] T071 [US1] 為 18 個表新增 ENABLE ROW LEVEL SECURITY
-- [ ] T072 [US1] 為所有 Policy 新增註解（COMMENT ON POLICY）
-- [ ] T073 [US1] 執行完整 Migration 並驗證（M1-M8）
+- [X] T069 [US1] 建立整合檔案 `supabase/migrations/20260107170000_rls_policies.sql`
+- [X] T070 [US1] 整合所有 RLS Policy 定義（從 M1-M6 提取）
+- [X] T071 [US1] 為 18 個表新增 ENABLE ROW LEVEL SECURITY
+- [X] T072 [US1] 為所有 Policy 新增註解（COMMENT ON POLICY）
+- [ ] T073 [US1] 執行完整 Migration 並驗證（M1-M8）⏳ 待驗證
 
 **Checkpoint**: 8 個整合檔案已建立，可透過 `supabase db reset` 全新建立資料庫
 
