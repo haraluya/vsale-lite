@@ -34,20 +34,26 @@
 
 **新檔案**: `20260107110000_product_catalog_system.sql`
 
-**整合來源** (4 個檔案):
+**整合來源** (7 個檔案):
 
 | 編號 | 舊檔案名稱 | 功能說明 |
 |------|-----------|---------|
 | 1 | `20260102_products_and_categories.sql` | 基礎資料表 (categories, products) |
-| 2 | `20260110_add_product_tags.sql` | 商品標籤功能 |
-| 3 | `20260112_add_product_search_indexes.sql` | 搜尋索引 |
-| 4 | `20260116_add_unique_name_constraints.sql` | 唯一性約束 |
+| 2 | `20260103_series_and_tier_prices.sql` | 系列與等級價格機制 |
+| 3 | `20260105_retail_price_protection.sql` | 零售價格保護 |
+| 4 | `20260106_add_series_code.sql` | 系列代碼 |
+| 5 | `20260110_add_product_tags.sql` | 商品標籤功能 |
+| 6 | `20260112_add_product_search_indexes.sql` | 搜尋索引 |
+| 7 | `20260116_add_unique_name_constraints.sql` | 唯一性約束 |
 
 **包含內容**:
-- ✅ `categories` 表（商品分類）
-- ✅ `series` 表（產品系列）
-- ✅ `products` 表（商品）
-- ✅ `tier_prices` 表（等級價格）
+- ✅ `categories` 表（商品分類）- 含代碼、狀態、排序
+- ✅ `series` 表（產品系列）- 含代碼、狀態、排序
+- ✅ `products` 表（商品）- 含標籤、零售價格、庫存狀態
+- ✅ `tier_prices` 表（等級價格）- 多對多關聯
+- ✅ 商品編號自動生成函數（格式：[分類代碼]-[系列代碼]-[01]）
+- ✅ Storage Bucket（products）與 RLS Policies
+- ✅ 預設資料（3 個分類）
 - ✅ 商品標籤 (`tags` 欄位)
 - ✅ GIN 索引 (tags 全文搜尋)
 - ✅ 唯一性約束 (products.name, series.name)

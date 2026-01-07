@@ -76,16 +76,16 @@ description: "Migration 整合與資料庫優化任務清單"
 
 ### M2: 商品目錄系統
 
-- [ ] T021 [US1] 建立整合檔案 `supabase/migrations/20260107110000_product_catalog_system.sql`
-- [ ] T022 [US1] 整合 `20260102_products_and_categories.sql` (categories, series, products 表定義)
-- [ ] T023 [US1] 整合 `20260103_series_and_tier_prices.sql` (系列與等級價格)
-- [ ] T024 [US1] 整合 `20260105_retail_price_protection.sql` (零售價格保護)
-- [ ] T025 [US1] 整合 `20260106_add_series_code.sql` (系列代碼)
-- [ ] T026 [US1] 整合 `20260110_add_product_tags.sql` (商品標籤)
-- [ ] T027 [US1] 整合 `20260112_add_product_search_indexes.sql` (搜尋索引)
-- [ ] T028 [US1] 整合 `20260116_add_unique_name_constraints.sql` (唯一性約束)
-- [ ] T029 [US1] 新增完整註解（表、欄位、索引、函數）
-- [ ] T030 [US1] 執行 M1+M2 並驗證（重置後執行）
+- [X] T021 [US1] 建立整合檔案 `supabase/migrations/20260107110000_product_catalog_system.sql`
+- [X] T022 [US1] 整合 `20260102_products_and_categories.sql` (categories, series, products 表定義)
+- [X] T023 [US1] 整合 `20260103_series_and_tier_prices.sql` (系列與等級價格)
+- [X] T024 [US1] 整合 `20260105_retail_price_protection.sql` (零售價格保護)
+- [X] T025 [US1] 整合 `20260106_add_series_code.sql` (系列代碼)
+- [X] T026 [US1] 整合 `20260110_add_product_tags.sql` (商品標籤)
+- [X] T027 [US1] 整合 `20260112_add_product_search_indexes.sql` (搜尋索引)
+- [X] T028 [US1] 整合 `20260116_add_unique_name_constraints.sql` (唯一性約束)
+- [X] T029 [US1] 新增完整註解（表、欄位、索引、函數）
+- [ ] T030 [US1] 執行 M1+M2 並驗證（重置後執行）⏳ 待驗證
 
 ### M3: 訂單與工作流程
 
