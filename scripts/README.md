@@ -305,6 +305,57 @@ supabase start
 1. 安裝 PostgreSQL 客戶端工具
 2. 或使用 Supabase Studio SQL Editor (http://127.0.0.1:54323)
 
+### 問題 3: 控制台顯示中文亂碼
+
+**現象**:
+- 腳本可以正常執行
+- 但控制台輸出顯示亂碼
+
+**原因**:
+- 這是終端機編碼設定問題，**不影響腳本功能**
+- Windows 預設使用 Big5 編碼，但腳本使用 UTF-8 with BOM
+
+**解決方法**:
+
+**方法 1: 使用 Windows Terminal（推薦）**
+```powershell
+wt powershell -NoExit
+```
+
+**方法 2: 切換代碼頁**
+```powershell
+chcp 65001  # 切換到 UTF-8
+.\scripts\db-backup.ps1
+```
+
+**方法 3: 設定 PowerShell 編碼**
+```powershell
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+.\scripts\db-backup.ps1
+```
+
+**重要**: 即使顯示亂碼，腳本功能完全正常，資料庫操作不受影響。
+
+### 問題 4: 執行腳本提示「無法載入」
+
+**錯誤訊息**:
+```
+無法載入檔案，因為此系統已停用指令碼執行
+```
+
+**解決方法**:
+
+**臨時允許（推薦）**:
+```powershell
+powershell -ExecutionPolicy Bypass -File ".\scripts\db-backup.ps1"
+```
+
+**永久設定（需管理員權限）**:
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 ---
 
 ## 進階使用
@@ -332,12 +383,50 @@ SELECT * FROM health_check_results WHERE category = 'RLS';
 
 ---
 
+## 工具腳本
+
+本目錄還包含以下輔助工具腳本:
+
+### `fix-encoding.ps1` - 編碼修復工具
+自動將所有 PowerShell 腳本轉換為 UTF-8 with BOM 編碼。
+
+**使用時機**: 若腳本出現編碼問題，可執行此腳本修復。
+
+```powershell
+.\scripts\fix-encoding.ps1
+```
+
+### `verify-encoding.ps1` - 編碼驗證工具
+檢查所有腳本的編碼格式與 PowerShell 語法。
+
+```powershell
+.\scripts\verify-encoding.ps1
+```
+
+**輸出**:
+```
+Checking: D:\APP\vsale\scripts\db-backup.ps1
+  BOM: EF BB BF
+  [OK] UTF-8 with BOM
+  [OK] PowerShell syntax valid
+```
+
+### `test-encoding.ps1` - 編碼測試工具
+測試中文字元顯示是否正常。
+
+```powershell
+.\scripts\test-encoding.ps1
+```
+
+---
+
 ## 相關文件
 
 - 📖 [安全 Migration 指南](../docs/SAFE_MIGRATION_GUIDE.md)
 - 📖 [備份還原快速參考](../docs/BACKUP_RESTORE_CHEATSHEET.md)
 - 📖 [資料庫安全協議](../docs/DATABASE_SAFETY_PROTOCOL.md)
 - 📖 [健康檢查快速開始](../specs/012-migration-consolidation/quickstart.md)
+- 📖 [編碼修復報告](ENCODING-FIX-REPORT.md)
 
 ---
 
