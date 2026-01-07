@@ -11,6 +11,12 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "prepare": "husky",
+    "db:migrate": "powershell -ExecutionPolicy Bypass -File scripts/db-migrate-local.ps1",
+    "db:migrate:preview": "powershell -ExecutionPolicy Bypass -File scripts/db-migrate-local.ps1 -DryRun",
+    "db:reset": "powershell -ExecutionPolicy Bypass -File scripts/safe-db-reset.ps1",
+    "db:backup": "powershell -ExecutionPolicy Bypass -File scripts/db-backup.ps1",
+    "db:restore": "powershell -ExecutionPolicy Bypass -File scripts/db-restore.ps1",
+    "db:health": "powershell -ExecutionPolicy Bypass -File scripts/db-health-check.ps1",
     "deploy:db": "bash scripts/backup-before-deploy.sh"
   },
   "dependencies": {

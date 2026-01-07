@@ -431,6 +431,54 @@ vsale/
 
 ## 重要提醒
 
+### 🚀 Migration 工作流程（日常開發必讀）⭐
+
+**本專案已改用 Supabase 官方推薦的增量式 Migration 工作流程**
+
+#### ✅ 日常開發標準流程（保留資料）
+
+```bash
+# 1. 建立新 Migration
+supabase migration new add_feature_name
+
+# 2. 編輯 Migration 檔案
+# 檔案位置: supabase/migrations/YYYYMMDD_add_feature_name.sql
+
+# 3. 套用 Migration（保留現有資料）⭐ 推薦
+pnpm db:migrate
+
+# 或使用 Supabase CLI 直接執行
+supabase db push --local
+```
+
+**為什麼推薦使用 `pnpm db:migrate`？**
+- ✅ **保留所有測試資料**（訂單、商品、客戶）
+- ✅ **僅套用新的 Migration**（增量更新）
+- ✅ **官方推薦做法**（Supabase 標準流程）
+- ✅ **適合日常開發**（每天多次使用）
+
+#### ⚠️ 何時使用 `pnpm db:reset`（清空資料）
+
+```bash
+# 警告：此操作會清空所有資料！
+pnpm db:reset
+```
+
+**僅在以下情況使用**:
+- 需要全新的資料庫環境
+- 測試資料已污染
+- 測試完整 Migration 流程
+- **必須先詢問使用者同意**
+
+#### 📚 完整文件
+
+- 📖 **Migration 工作流程指南**: [`docs/MIGRATION_WORKFLOW.md`](docs/MIGRATION_WORKFLOW.md) - 詳細的工作流程說明
+- 🔍 **官方研究報告**: [`docs/SUPABASE_MIGRATION_RESEARCH.md`](docs/SUPABASE_MIGRATION_RESEARCH.md) - Supabase 官方最佳實踐
+- 📋 **決策樹**: [`docs/MIGRATION_DECISION_TREE.md`](docs/MIGRATION_DECISION_TREE.md) - 快速選擇正確工具
+- 🔧 **系統分析**: [`docs/VSALE_MIGRATION_SYSTEM_ANALYSIS.md`](docs/VSALE_MIGRATION_SYSTEM_ANALYSIS.md) - 專案 Migration 基礎設施
+
+---
+
 ### ⚠️ 資料庫安全最高指導原則
 
 **🛡️ 絕對禁止在遠端/生產環境執行 `supabase db reset`**
@@ -441,25 +489,26 @@ vsale/
 1. **本機優先**: 確保本機 Supabase 正在執行（`supabase start`），先在本機環境測試
 2. **生成遷移**: 執行 `supabase migration new <描述性名稱>` 或使用安全腳本 `.\scripts\safe-migration.ps1 -Name "add_feature"`
 3. **編輯 SQL**: 編輯生成的 Migration 檔案，檢查是否有意外的 `DROP` 指令
-4. **安全部署**: 使用 `supabase db push` 推送變更（**保留現有資料**）
+4. **安全部署**: 使用 `pnpm db:migrate` 或 `supabase db push --local` 推送變更（**保留現有資料**）
 5. **本機開發禁令**: **絕對禁止**使用 `supabase db reset`，除非獲得使用者明確同意
 
 **🚨 重要：本機開發資料保護**:
 - ❌ **絕對禁止**: 在本機環境執行 `supabase db reset`（會清空測試資料）
-- ✅ **必須使用**: `supabase db push` 推送 Migration（保留現有資料）
+- ✅ **必須使用**: `pnpm db:migrate` 或 `supabase db push --local` 推送 Migration（保留現有資料）
 - ⚠️ **例外情況**: 若必須重置，**必須先詢問使用者**並獲得明確同意
 - 📝 **使用者測試資料**: 使用者在測試過程中會建立資料（訂單、商品、客戶），這些資料必須被保留
 
 **指令管控**:
-- ✅ **推薦使用**:
+- ✅ **推薦使用**（日常開發）:
+  - `pnpm db:migrate` - 套用新 Migration（保留資料）⭐ **首選**
+  - `pnpm db:migrate:preview` - 預覽將套用的 Migration
   - `supabase migration new <name>` - 建立新 Migration
-  - `supabase db push` - 推送 Migration (保留資料)
   - `.\scripts\safe-migration.ps1` - 安全 Migration 輔助腳本
-- ⚠️ **謹慎使用**:
-  - `supabase db reset` - **必須先詢問使用者同意**
+- ⚠️ **謹慎使用**（清空資料）:
+  - `pnpm db:reset` - 完全重建資料庫 - **必須先詢問使用者同意**
 - ❌ **嚴格禁止**:
   - 在遠端/生產環境執行任何重置指令
-  - 未經使用者同意在本機執行 `supabase db reset`
+  - 未經使用者同意在本機執行 `supabase db reset` 或 `pnpm db:reset`
 
 **四層安全機制**:
 1. **預防層**: Migration 流程 + 增量式更新 + Git Pre-commit Hook

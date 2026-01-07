@@ -15,6 +15,39 @@ param(
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
+# ============================================================
+# 顯著警告訊息
+# ============================================================
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Red
+Write-Host "  ⚠️  重要警告" -ForegroundColor Red
+Write-Host "========================================" -ForegroundColor Red
+Write-Host ""
+Write-Host "此腳本會清空所有資料庫資料！" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "大多數情況下，您應該使用：" -ForegroundColor Cyan
+Write-Host "  pnpm db:migrate" -ForegroundColor White -BackgroundColor DarkGreen
+Write-Host ""
+Write-Host "或直接執行：" -ForegroundColor Cyan
+Write-Host "  .\scripts\db-migrate-local.ps1" -ForegroundColor White
+Write-Host ""
+Write-Host "db:migrate 的優勢：" -ForegroundColor Cyan
+Write-Host "  ✅ 僅套用新的 Migration（增量更新）" -ForegroundColor Green
+Write-Host "  ✅ 保留所有現有資料（訂單、商品、客戶）" -ForegroundColor Green
+Write-Host "  ✅ Supabase 官方推薦做法" -ForegroundColor Green
+Write-Host "  ✅ 適合日常開發（每天多次使用）" -ForegroundColor Green
+Write-Host ""
+Write-Host "僅在以下情況使用 db:reset：" -ForegroundColor Cyan
+Write-Host "  • 需要完全重新開始" -ForegroundColor Gray
+Write-Host "  • 測試資料已污染" -ForegroundColor Gray
+Write-Host "  • 測試完整 Migration 流程" -ForegroundColor Gray
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Red
+Write-Host ""
+Write-Host "按任意鍵繼續使用 db:reset，或 Ctrl+C 取消..." -ForegroundColor Yellow
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+Write-Host ""
+
 # 顯示標題
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  安全資料庫重置工具" -ForegroundColor Cyan

@@ -95,7 +95,7 @@ if ($Push) {
     supabase migration list
 
     Write-Host ""
-    Write-Host "⚠️  即將執行 supabase db push (保留現有資料)" -ForegroundColor Yellow
+    Write-Host "⚠️  即將執行 supabase db push --local (保留現有資料)" -ForegroundColor Yellow
     Write-Host ""
 
     $confirm = Read-Host "確定要推送 Migration? (y/n)"
@@ -105,8 +105,8 @@ if ($Push) {
     }
 
     Write-Host ""
-    Write-Host "執行: supabase db push" -ForegroundColor Gray
-    supabase db push
+    Write-Host "執行: supabase db push --local" -ForegroundColor Gray
+    supabase db push --local
 
     Write-Host ""
     Write-Host "✅ Migration 推送完成" -ForegroundColor Green
