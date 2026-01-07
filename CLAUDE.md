@@ -2,7 +2,7 @@
 
 **專案名稱**: Vsale-lite
 **專案類型**: B2B 批發訂貨系統
-**最後更新**: 2026-01-06
+**最後更新**: 2026-01-07
 
 ## 專案概述
 
@@ -587,8 +587,42 @@ supabase migration new <name>
 supabase migration list
 ```
 
-**Migration 檔案位置**:
-- `supabase/migrations/*.sql` - 按時間戳排序 (20260101, 20260102, 20260103...)
+**Migration 檔案架構** (2026-01-07 整合後):
+
+專案已將 27 個零散的 Migration 檔案整合為 8 個功能模組化檔案，減少 70% 檔案數量：
+
+| 模組 | 檔案名稱 | 功能說明 | 包含內容 |
+|------|---------|----------|----------|
+| **M1** | `20260107100000_core_auth_and_tiers.sql` | 核心認證與會員等級 | tiers, profiles 表 + RLS |
+| **M2** | `20260107110000_product_catalog_system.sql` | 商品目錄系統 | categories, series, products 表 + 索引 |
+| **M3** | `20260107120000_orders_and_workflow.sql` | 訂單與工作流程 | orders, order_items, order_timelines 表 + 5 函數 |
+| **M4** | `20260107130000_shipping_and_custom_fees.sql` | 運費與自訂費用 | order_custom_fees 表 + 運費計算函數 |
+| **M5** | `20260107140000_coupon_system.sql` | 優惠券系統 | coupons, user_coupons 等 5 表 + View |
+| **M6** | `20260107150000_system_admin_and_audit.sql` | 系統管理與稽核 | admin_users, audit_logs, system_settings 表 |
+| **M7** | `20260107160000_indexes_and_performance.sql` | 索引與效能優化 | 50+ 個索引（含效能優化索引） |
+| **M8** | `20260107170000_rls_policies.sql` | RLS 策略 | 18 個表的 60+ 個 Policy |
+
+**整合優勢**:
+- ✅ **可讀性提升**: 新開發者 10 分鐘內理解資料庫架構（原 30+ 分鐘）
+- ✅ **維護性提升**: 按功能模組組織，快速找到需要修改的位置
+- ✅ **完整註解**: 每個表、欄位、函數都有 COMMENT 說明
+- ✅ **集中管理**: M7 集中管理所有索引，M8 集中管理所有 RLS
+
+**舊檔案封存**:
+- 📁 **位置**: `supabase/migrations/.archive/`（27 個舊檔案已備份）
+- 📋 **對應表**: `.archive/MAPPING.md`（舊檔案與新模組的對應關係）
+- 📖 **還原指引**: `.archive/README.md`
+
+**自動化工具** (PowerShell 腳本):
+- `scripts/db-backup.ps1` - 資料庫備份（支援元數據、自動清理）
+- `scripts/db-restore.ps1` - 資料庫還原（互動式選擇備份）
+- `scripts/db-health-check.ps1` - 健康檢查（225+ 檢查項目，<30 秒）
+- `scripts/safe-db-reset.ps1` - 安全重置（自動備份 + 重置）
+
+**快速參考**:
+- 📚 **Migration 索引**: `supabase/migrations/README.md`
+- 🚀 **快速開始**: `specs/012-migration-consolidation/quickstart.md`
+- 📊 **整合報告**: `specs/012-migration-consolidation/INTEGRATION_REPORT.md`
 
 **⚠️ Migration 安全原則** - **必讀！**
 
