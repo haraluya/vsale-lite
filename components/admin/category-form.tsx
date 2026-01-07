@@ -25,7 +25,6 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
     name: category?.name || '',
     code: category?.code || '',
     description: category?.description || '',
-    sort_order: category?.sort_order?.toString() || '0',
   })
 
   const action = isEdit && category
@@ -92,25 +91,6 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
         />
         {state && 'errors' in state && state.errors?.description && (
           <p className="mt-2 text-sm text-red-500">{state.errors.description[0]}</p>
-        )}
-      </div>
-
-      <div>
-        <Label htmlFor="sort_order">排序數字 *</Label>
-        <Input
-          id="sort_order"
-          name="sort_order"
-          type="number"
-          value={formData.sort_order}
-          onChange={(e) => setFormData({ ...formData, sort_order: e.target.value })}
-          placeholder="數字越小越優先顯示"
-          required
-          min="0"
-          className="mt-2"
-        />
-        <p className="mt-1 text-sm text-gray-500">提示:數字越小的分類會優先顯示在前面</p>
-        {state && 'errors' in state && state.errors?.sort_order && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.sort_order[0]}</p>
         )}
       </div>
 

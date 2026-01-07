@@ -20,10 +20,6 @@ export const createCategorySchema = z.object({
     .max(500, '描述最多 500 字')
     .optional()
     .or(z.literal('')),
-  sort_order: z.coerce.number()
-    .int('排序必須為整數')
-    .min(0, '排序必須大於等於 0')
-    .default(0),
 })
 
 /**
@@ -43,10 +39,6 @@ export const updateCategorySchema = z.object({
     .max(500, '描述最多 500 字')
     .optional()
     .or(z.literal('')),
-  sort_order: z.coerce.number()
-    .int('排序必須為整數')
-    .min(0, '排序必須大於等於 0')
-    .optional(),
 })
 
 /**

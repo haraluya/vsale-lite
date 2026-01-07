@@ -99,7 +99,6 @@ export type Category = {
   name: string
   code: string  // 🆕 Feature 003: 分類代碼 (如 DRK, SNK)
   description: string | null
-  sort_order: number
   created_at: string
   updated_at: string
 }

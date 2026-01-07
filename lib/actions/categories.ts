@@ -12,7 +12,7 @@ import { createCategorySchema, updateCategorySchema } from '@/lib/validations/ca
 import type { ActionResult, Category } from '@/types'
 
 /**
- * 查詢所有商品分類 (依 sort_order 排序)
+ * 查詢所有商品分類
  */
 export async function getCategories(): Promise<Category[]> {
   try {
@@ -22,7 +22,6 @@ export async function getCategories(): Promise<Category[]> {
     const { data, error } = await adminClient
       .from('categories')
       .select('*')
-      .order('sort_order', { ascending: true })
 
     if (error) {
       console.error('getCategories error:', error)
@@ -52,7 +51,6 @@ export async function createCategory(
       name: formData.get('name'),
       code: formData.get('code'),
       description: formData.get('description') || '',
-      sort_order: formData.get('sort_order') || '0',
     }
 
     // 3. 驗證輸入
@@ -105,7 +103,6 @@ export async function createCategory(
         name: data.name,
         code: data.code,
         description: data.description || null,
-        sort_order: data.sort_order,
       })
       .select('id')
       .single()
@@ -158,7 +155,6 @@ export async function updateCategory(
       name: formData.get('name'),
       code: formData.get('code'),
       description: formData.get('description') || '',
-      sort_order: formData.get('sort_order'),
     }
 
     // 3. 驗證輸入
