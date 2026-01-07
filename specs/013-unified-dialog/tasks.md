@@ -84,16 +84,16 @@
 
 ### P1 中頻功能遷移 (10 個檔案，40 個對話框)
 
-- [ ] T026 [P] [US2] 遷移公告表單驗證 `components/admin/announcements/AnnouncementForm.tsx`
-- [ ] T027 [P] [US2] 遷移公告列表對話框 `components/admin/announcements/AnnouncementListClient.tsx`
-- [ ] T028 [P] [US2] 遷移 Logo 上傳驗證 `components/admin/LogoUploader.tsx`
-- [ ] T029 [P] [US2] 遷移系列刪除按鈕對話框 `components/admin/series-delete-button.tsx`
-- [ ] T030 [P] [US2] 遷移商品標籤表格對話框 `components/admin/product-table-with-tags.tsx`
-- [ ] T031 [US2] 遷移成員管理對話框（含 prompt）`components/admin/MemberListClient.tsx`
-- [ ] T032 [P] [US2] 遷移客戶表格 alert `components/admin/client-table.tsx`
-- [ ] T033 [P] [US2] 遷移會員等級表單 alert `components/admin/tier-form.tsx`
-- [ ] T034 [P] [US2] 遷移密碼更新表單 alert `components/admin/update-password-form.tsx`
-- [ ] T035 [P] [US2] 遷移價格表單 alert `components/admin/pricing/ProductPricingForm.tsx`
+- [x] T026 [P] [US2] 遷移公告表單驗證 `components/admin/announcements/AnnouncementForm.tsx`
+- [x] T027 [P] [US2] 遷移公告列表對話框 `components/admin/announcements/AnnouncementListClient.tsx`
+- [x] T028 [P] [US2] 遷移 Logo 上傳驗證 `components/admin/LogoUploader.tsx`
+- [x] T029 [P] [US2] 遷移系列刪除按鈕對話框 `components/admin/series-delete-button.tsx`
+- [x] T030 [P] [US2] 遷移商品標籤表格對話框 `components/admin/product-table-with-tags.tsx`
+- [x] T031 [US2] 遷移成員管理對話框（含 prompt）`components/admin/MemberListClient.tsx`
+- [x] T032 [P] [US2] 遷移客戶表格 alert `components/admin/client-table.tsx`
+- [x] T033 [P] [US2] 遷移會員等級表單 alert `components/admin/tier-form.tsx`
+- [x] T034 [P] [US2] 遷移密碼更新表單 alert `components/admin/update-password-form.tsx`
+- [x] T035 [P] [US2] 遷移價格表單 alert `components/admin/pricing/ProductPricingForm.tsx`
 
 ### P2 低頻功能遷移 (9 個檔案，25 個對話框)
 
@@ -280,14 +280,14 @@ Task: "遷移商品管理對話框（3 confirm + 3 alert）components/admin/prod
 
 **Phase 0 (Setup & Foundational)**: ✅ 13/13 已完成 (100%)
 **Phase 3 (US1 - Hook API)**: ✅ 7/7 已完成 (100%)
-**Phase 4 (US2 - 遷移)**: 🚧 5/23 進行中 (22%)
+**Phase 4 (US2 - 遷移)**: 🚧 15/23 進行中 (65%)
   - P0 高頻: ✅ 5/5 已完成 (100%)
-  - P1 中頻: 📋 0/10 待開始 (0%)
+  - P1 中頻: ✅ 10/10 已完成 (100%)
   - P2 低頻: 📋 0/8 待開始 (0%)
 **Phase 5 (US3 - 驗證)**: 📋 0/6 待開始 (0%)
 **Phase 6 (US4 - ESLint)**: 📋 0/6 待開始 (0%)
 **Phase 7 (Polish)**: 📋 0/8 待開始 (0%)
 
-**總進度**: 25/63 任務完成 (40%)
+**總進度**: 35/63 任務完成 (56%)
 
-**下一步**: 繼續 Phase 4 - User Story 2 遷移（P1 中頻檔案）
+**下一步**: 繼續 Phase 4 - User Story 2 遷移（P2 低頻檔案，剩餘 T036-T043）

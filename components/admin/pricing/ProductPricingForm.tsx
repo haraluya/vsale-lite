@@ -1,6 +1,7 @@
 /**
  * ProductPricingForm Component
  * Feature: 007-system-enhancement (US5 - 價格管理優化)
+ * Feature: 013-unified-dialog (T035)
  *
  * 商品價格表單元件
  * - 商品下拉選單
@@ -13,8 +14,10 @@
 import { useState, useEffect } from 'react'
 import { getProductsForPricing, getProductPriceMatrix, batchSetProductPrices } from '@/lib/actions/pricing'
 import { InfoIcon } from 'lucide-react'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 export function ProductPricingForm() {
+  const alert = useAlert()
   const [products, setProducts] = useState<any[]>([])
   const [selectedProductId, setSelectedProductId] = useState<string>('')
   const [productData, setProductData] = useState<any>(null)
@@ -76,9 +79,17 @@ export function ProductPricingForm() {
     const result = await batchSetProductPrices(selectedProductId, prices)
 
     if (result.success) {
-      alert('價格設定成功')
+      await alert({
+        title: '儲存成功',
+        message: '價格設定成功',
+        variant: 'success'
+      })
     } else {
-      alert(result.message || '價格設定失敗')
+      await alert({
+        title: '儲存失敗',
+        message: result.message || '價格設定失敗',
+        variant: 'error'
+      })
     }
 
     setIsSaving(false)

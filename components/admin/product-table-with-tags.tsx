@@ -4,6 +4,7 @@
  * Product Table with Batch Tag Management
  * Feature: 006-ux-enhancement (US9 - T069, T071)
  * Feature: 005-responsive-ui (Phase 3.2 - T013-T014)
+ * Feature: 013-unified-dialog (T030)
  */
 
 import { useState } from 'react'
@@ -19,6 +20,7 @@ import { TagBadgeList } from '@/components/ui/tag-badge'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Product, Series } from '@/types'
+import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
 
 interface ProductTableWithTagsProps {
   products: Product[]
@@ -40,6 +42,8 @@ export function ProductTableWithTags({
   selectedSeries,
 }: ProductTableWithTagsProps) {
   const router = useRouter()
+  const confirm = useConfirm()
+  const alert = useAlert()
   const [search, setSearch] = useState(searchQuery)
   const [seriesFilter, setSeriesFilter] = useState(selectedSeries)
   const [editingStockId, setEditingStockId] = useState<string | null>(null)
@@ -55,16 +59,28 @@ export function ProductTableWithTags({
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`確定要刪除商品「${name}」嗎?此操作無法復原。`)) {
-      return
-    }
+    const confirmed = await confirm({
+      title: '刪除商品',
+      description: `確定要刪除商品「${name}」嗎？此操作無法復原。`,
+      variant: 'danger'
+    })
+
+    if (!confirmed) return
 
     const result = await deleteProduct(id)
     if (result.success) {
-      alert(result.message)
+      await alert({
+        title: '刪除成功',
+        message: result.message || '商品已成功刪除',
+        variant: 'success'
+      })
       router.refresh()
     } else {
-      alert(`刪除失敗: ${result.message}`)
+      await alert({
+        title: '刪除失敗',
+        message: result.message || '刪除商品失敗',
+        variant: 'error'
+      })
     }
   }
 
@@ -79,7 +95,11 @@ export function ProductTableWithTags({
       setEditingStockId(null)
       router.refresh()
     } else {
-      alert(`更新失敗: ${result.message}`)
+      await alert({
+        title: '更新失敗',
+        message: result.message,
+        variant: 'error'
+      })
     }
   }
 
