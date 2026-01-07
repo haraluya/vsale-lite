@@ -27,7 +27,6 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
   const [formData, setFormData] = useState({
     title: announcement?.title || '',
     linkUrl: announcement?.link_url || '',
-    sortOrder: announcement?.sort_order || 0,
     isActive: announcement?.is_active ?? true,
   })
 
@@ -68,7 +67,6 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
           announcementId: announcement.id,
           title: formData.title,
           linkUrl: formData.linkUrl || null,
-          sortOrder: formData.sortOrder,
           isActive: formData.isActive,
         })
 
@@ -102,7 +100,7 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
           title: formData.title,
           imageUrl: 'https://placeholder.com/temp.jpg', // 暫時 URL
           linkUrl: formData.linkUrl || null,
-          sortOrder: formData.sortOrder,
+          sortOrder: 0, // 預設排序為 0，後續可用拖曳調整
           isActive: formData.isActive,
         })
 
@@ -167,21 +165,6 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         )}
         <p className="mt-1 text-sm text-gray-500">
           點擊廣告時的跳轉連結，留空則不跳轉
-        </p>
-      </div>
-
-      {/* 排序 */}
-      <div>
-        <label className="mb-2 block font-bold">排序順序</label>
-        <input
-          type="number"
-          value={formData.sortOrder}
-          onChange={(e) => setFormData({ ...formData, sortOrder: parseInt(e.target.value) || 0 })}
-          className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="0"
-        />
-        <p className="mt-1 text-sm text-gray-500">
-          數字越小越前面，預設為 0
         </p>
       </div>
 

@@ -96,10 +96,6 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
               </button>
             </div>
 
-            {/* 排序 */}
-            <div className="absolute right-2 top-2 rounded-none border-2 border-black bg-white px-2 py-1 text-xs font-bold">
-              排序: {announcement.sort_order}
-            </div>
           </div>
 
           {/* 廣告資訊 */}
