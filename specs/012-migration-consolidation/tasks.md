@@ -146,9 +146,9 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T070 [US1] 整合所有 RLS Policy 定義（從 M1-M6 提取）
 - [X] T071 [US1] 為 18 個表新增 ENABLE ROW LEVEL SECURITY
 - [X] T072 [US1] 為所有 Policy 新增註解（COMMENT ON POLICY）
-- [ ] T073 [US1] 執行完整 Migration 並驗證（M1-M8）⏳ 待驗證
+- [X] T073 [US1] 執行完整 Migration 並驗證（M1-M8）
 
-**Checkpoint**: 8 個整合檔案已建立，可透過 `supabase db reset` 全新建立資料庫
+**Checkpoint**: ✅ 8 個整合檔案已建立並驗證完成，`supabase db reset` 成功執行無錯誤
 
 ---
 
