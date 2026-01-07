@@ -15,6 +15,7 @@ import Image from 'next/image'
 import { Upload } from 'lucide-react'
 import { createAnnouncement, updateAnnouncement, uploadAnnouncementImage } from '@/lib/actions/announcements'
 import type { Announcement } from '@/types'
+import { toast } from 'sonner'
 
 interface AnnouncementFormProps {
   announcement?: Announcement
@@ -41,13 +42,13 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
 
     // 驗證檔案類型
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      alert('僅支援 JPG、PNG、WebP 格式')
+      toast.error('僅支援 JPG、PNG、WebP 格式')
       return
     }
 
     // 驗證檔案大小
     if (file.size > 5 * 1024 * 1024) {
-      alert('檔案大小不得超過 5MB')
+      toast.error('檔案大小不得超過 5MB')
       return
     }
 
@@ -72,7 +73,7 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
 
         if (!result.success) {
           setErrors({})
-          alert(result.message || '更新失敗')
+          toast.error(result.message || '更新失敗')
           setIsSubmitting(false)
           return
         }
@@ -81,16 +82,16 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         if (imageFile) {
           const uploadResult = await uploadAnnouncementImage(announcement.id, imageFile)
           if (!uploadResult.success) {
-            alert(uploadResult.message || '圖片上傳失敗')
+            toast.error(uploadResult.message || '圖片上傳失敗')
           }
         }
 
-        alert('廣告更新成功')
+        toast.success('廣告更新成功')
         router.push('/admin/announcements')
       } else {
         // 新增模式 - 必須有圖片
         if (!imageFile) {
-          alert('請上傳廣告圖片')
+          toast.error('請上傳廣告圖片')
           setIsSubmitting(false)
           return
         }
@@ -106,7 +107,7 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
 
         if (!result.success || !result.data) {
           setErrors({})
-          alert(result.message || '建立失敗')
+          toast.error(result.message || '建立失敗')
           setIsSubmitting(false)
           return
         }
@@ -114,17 +115,17 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         // 上傳圖片
         const uploadResult = await uploadAnnouncementImage(result.data.id, imageFile)
         if (!uploadResult.success) {
-          alert(uploadResult.message || '圖片上傳失敗')
+          toast.error(uploadResult.message || '圖片上傳失敗')
           setIsSubmitting(false)
           return
         }
 
-        alert('廣告建立成功')
+        toast.success('廣告建立成功')
         router.push('/admin/announcements')
       }
     } catch (error) {
       console.error('提交失敗:', error)
-      alert('操作失敗，請稍後再試')
+      toast.error('操作失敗，請稍後再試')
       setIsSubmitting(false)
     }
   }
