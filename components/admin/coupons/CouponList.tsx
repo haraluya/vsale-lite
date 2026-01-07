@@ -19,6 +19,7 @@ import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { useConfirm } from '@/lib/contexts/dialog-context'
 
 interface CouponListProps {
   coupons: Coupon[]
@@ -26,6 +27,7 @@ interface CouponListProps {
 }
 
 export function CouponList({ coupons, showArchived = false }: CouponListProps) {
+  const confirm = useConfirm()
   const router = useRouter()
   const [loading, setLoading] = useState<string | null>(null)
 
@@ -39,7 +41,15 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
       })
 
   const handleDelete = async (couponId: string, couponCode: string) => {
-    if (!confirm(`確定要刪除優惠券「${couponCode}」嗎？`)) {
+    const confirmed = await confirm({
+      title: '確認刪除',
+      description: `確定要刪除優惠券「${couponCode}」嗎？此操作無法復原。`,
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
       return
     }
 

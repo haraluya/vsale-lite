@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { useConfirm } from '@/lib/contexts/dialog-context'
 
 function CategoryRow({ category, onDelete, loading }: { category: Category; onDelete: (id: string, name: string) => void; loading: string | null }) {
   return (
@@ -55,11 +56,20 @@ function CategoryRow({ category, onDelete, loading }: { category: Category; onDe
 }
 
 export function CategoryTable({ categories: initialCategories }: { categories: Category[] }) {
+  const confirm = useConfirm()
   const [categories, setCategories] = useState(initialCategories)
   const [loading, setLoading] = useState<string | null>(null)
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`確定要刪除「${name}」分類嗎?\n\n注意:若此分類已有商品使用,將無法刪除。`)) {
+    const confirmed = await confirm({
+      title: '確認刪除',
+      description: `確定要刪除「${name}」分類嗎？\n\n注意：若此分類已有商品使用，將無法刪除。`,
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
       return
     }
 
