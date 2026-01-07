@@ -89,8 +89,12 @@ export async function getAllTiersWithPrices(
 /**
  * 設定或更新單一商品在特定等級的價格 (僅管理員)
  * @param data 價格資料 { product_id, tier_id, price }
+ *
+ * 邏輯說明：
+ * - 若 price 不為 null：UPSERT 操作（新增或更新）
+ * - 若 price 為 null：DELETE 操作（刪除該筆價格記錄，客戶端將自動使用零售價）
  */
-export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResult<TierPrice>> {
+export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResult<TierPrice | null>> {
   try {
     await checkAuth('admin') // 僅管理員可執行
 
@@ -129,7 +133,31 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
       return { success: false, message: '等級不存在' }
     }
 
-    // UPSERT 操作 (若存在則更新,不存在則新增)
+    // 若 price 為 null，執行 DELETE 操作
+    if (validation.data.price === null) {
+      const { error } = await adminClient
+        .from('tier_prices')
+        .delete()
+        .eq('product_id', validation.data.product_id)
+        .eq('tier_id', validation.data.tier_id)
+
+      if (error) {
+        console.error('setTierPrice DELETE 錯誤:', error)
+        return { success: false, message: '移除價格失敗' }
+      }
+
+      // 更新快取
+      revalidatePath('/admin/pricing')
+      revalidatePath(`/store/series/*`) // 更新所有系列詳情頁
+
+      return {
+        success: true,
+        data: null,
+        message: '價格已移除（將自動使用零售價格）',
+      }
+    }
+
+    // 若 price 不為 null，執行 UPSERT 操作
     const { data: result, error } = await adminClient
       .from('tier_prices')
       .upsert(
@@ -146,7 +174,7 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
       .single()
 
     if (error) {
-      console.error('setTierPrice 錯誤:', error)
+      console.error('setTierPrice UPSERT 錯誤:', error)
       return { success: false, message: '價格設定失敗' }
     }
 
@@ -168,10 +196,14 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
 /**
  * 批量設定多個商品在所有等級的價格 (僅管理員)
  * @param data 批量價格資料 { prices: [{ product_id, tier_id, price }, ...] }
+ *
+ * 邏輯說明：
+ * - 若 price 不為 null：UPSERT 操作（新增或更新）
+ * - 若 price 為 null：DELETE 操作（刪除該筆價格記錄，客戶端將自動使用零售價）
  */
 export async function batchSetTierPrices(
   data: BatchSetTierPricesInput
-): Promise<ActionResult<{ updated: number }>> {
+): Promise<ActionResult<{ updated: number; deleted: number }>> {
   try {
     await checkAuth('admin') // 僅管理員可執行
 
@@ -188,17 +220,46 @@ export async function batchSetTierPrices(
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
-    // 批量 UPSERT 操作
-    const { data: result, error } = await adminClient
-      .from('tier_prices')
-      .upsert(validation.data.prices, {
-        onConflict: 'tier_id,product_id',
-      })
-      .select()
+    // 分類資料：需要 UPSERT 的（price 不為 null）與需要 DELETE 的（price 為 null）
+    const toUpsert = validation.data.prices.filter(p => p.price !== null)
+    const toDelete = validation.data.prices.filter(p => p.price === null)
 
-    if (error) {
-      console.error('batchSetTierPrices 錯誤:', error)
-      return { success: false, message: '批量設定價格失敗' }
+    let upsertedCount = 0
+    let deletedCount = 0
+
+    // 1. 批量 UPSERT 操作（僅處理有價格的）
+    if (toUpsert.length > 0) {
+      const { data: result, error } = await adminClient
+        .from('tier_prices')
+        .upsert(toUpsert, {
+          onConflict: 'tier_id,product_id',
+        })
+        .select()
+
+      if (error) {
+        console.error('batchSetTierPrices UPSERT 錯誤:', error)
+        return { success: false, message: '批量設定價格失敗' }
+      }
+
+      upsertedCount = result.length
+    }
+
+    // 2. 批量 DELETE 操作（處理價格為 null 的）
+    if (toDelete.length > 0) {
+      for (const item of toDelete) {
+        const { error } = await adminClient
+          .from('tier_prices')
+          .delete()
+          .eq('product_id', item.product_id)
+          .eq('tier_id', item.tier_id)
+
+        if (error) {
+          console.error('batchSetTierPrices DELETE 錯誤:', error)
+          // 不中斷，繼續刪除其他記錄
+        } else {
+          deletedCount++
+        }
+      }
     }
 
     // 更新快取
@@ -207,8 +268,8 @@ export async function batchSetTierPrices(
 
     return {
       success: true,
-      data: { updated: result.length },
-      message: `批量設定價格成功（${result.length} 筆）`,
+      data: { updated: upsertedCount, deleted: deletedCount },
+      message: `批量設定價格成功（更新 ${upsertedCount} 筆，移除 ${deletedCount} 筆）`,
     }
   } catch (error) {
     console.error('batchSetTierPrices 異常:', error)

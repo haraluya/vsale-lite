@@ -193,39 +193,50 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
 
                     return (
                       <td key={tier.tier_id} className="border-black px-4 py-3">
-                        <input
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          value={currentPrice ?? ''}
-                          onChange={(e) =>
-                            handlePriceChange(product.id, tier.tier_id, e.target.value)
-                          }
-                          disabled={isRetail}
-                          placeholder={isRetail ? '自動同步' : '未設定'}
-                          className={`w-28 rounded-none border-2 px-3 py-1 text-sm focus:border-blue-500 focus:outline-none ${
-                            isRetail
-                              ? 'cursor-not-allowed bg-yellow-50 border-yellow-300 text-yellow-700'
-                              : 'border-gray-300'
-                          }`}
-                        />
-                        {/* 折扣率顯示 */}
-                        {!isRetail && currentPrice && product.retail_price && (
-                          <div className="mt-1 text-xs text-gray-500">
-                            {currentPrice < product.retail_price
-                              ? `省 ${Math.round(
-                                  ((product.retail_price - currentPrice) /
-                                    product.retail_price) *
-                                    100
-                                )}%`
-                              : currentPrice === product.retail_price
-                                ? '原價'
-                                : `+${Math.round(
-                                    ((currentPrice - product.retail_price) /
-                                      product.retail_price) *
-                                      100
-                                  )}%`}
+                        {isRetail ? (
+                          // 零售等級：顯示零售價格（禁用編輯）
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={product.retail_price ? `$${product.retail_price.toFixed(2)}` : 'N/A'}
+                              disabled
+                              className="w-28 rounded-none border-2 border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
+                            />
+                            <span className="text-xs text-gray-500">自動同步</span>
                           </div>
+                        ) : (
+                          // 其他等級：可編輯價格
+                          <>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={currentPrice ?? ''}
+                              onChange={(e) =>
+                                handlePriceChange(product.id, tier.tier_id, e.target.value)
+                              }
+                              placeholder="未設定"
+                              className="w-28 rounded-none border-2 border-gray-300 px-3 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                            />
+                            {/* 折扣率顯示 */}
+                            {currentPrice && product.retail_price && (
+                              <div className="mt-1 text-xs text-gray-500">
+                                {currentPrice < product.retail_price
+                                  ? `省 ${Math.round(
+                                      ((product.retail_price - currentPrice) /
+                                        product.retail_price) *
+                                        100
+                                    )}%`
+                                  : currentPrice === product.retail_price
+                                    ? '原價'
+                                    : `+${Math.round(
+                                        ((currentPrice - product.retail_price) /
+                                          product.retail_price) *
+                                          100
+                                      )}%`}
+                              </div>
+                            )}
+                          </>
                         )}
                       </td>
                     )
