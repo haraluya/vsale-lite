@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { deleteTier } from '@/lib/actions/tiers'
 import { reorderTiers } from '@/lib/actions/reorder'
 import { useState } from 'react'
+import { useConfirm } from '@/lib/contexts/dialog-context'
 import {
   DndContext,
   closestCenter,
@@ -94,6 +95,7 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
 }
 
 export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
+  const confirm = useConfirm()
   const [tiers, setTiers] = useState(initialTiers)
   const [loading, setLoading] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -138,7 +140,15 @@ export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`確定要刪除「${name}」等級嗎?`)) {
+    const confirmed = await confirm({
+      title: '確認刪除',
+      description: `確定要刪除「${name}」等級嗎？此操作無法復原。`,
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
       return
     }
 

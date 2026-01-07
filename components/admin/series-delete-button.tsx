@@ -15,6 +15,8 @@ import { useRouter } from 'next/navigation'
 import { deleteSeries } from '@/lib/actions/series'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useConfirm } from '@/lib/contexts/dialog-context'
+import { toast } from 'sonner'
 
 interface SeriesDeleteButtonProps {
   seriesId: string
@@ -22,11 +24,20 @@ interface SeriesDeleteButtonProps {
 }
 
 export function SeriesDeleteButton({ seriesId, seriesName }: SeriesDeleteButtonProps) {
+  const confirm = useConfirm()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
   const handleDelete = async () => {
-    if (!confirm(`確定要刪除系列「${seriesName}」嗎?\n\n注意:若此系列下有商品,則無法刪除。`)) {
+    const confirmed = await confirm({
+      title: '確認刪除',
+      description: `確定要刪除系列「${seriesName}」嗎？\n\n注意：若此系列下有商品，則無法刪除。`,
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
       return
     }
 
@@ -36,13 +47,13 @@ export function SeriesDeleteButton({ seriesId, seriesName }: SeriesDeleteButtonP
       const result = await deleteSeries(seriesId)
 
       if (result.success) {
-        alert(result.message || '系列刪除成功')
+        toast.success(result.message || '系列刪除成功')
         router.refresh()
       } else {
-        alert(result.message || '系列刪除失敗')
+        toast.error(result.message || '系列刪除失敗')
       }
     } catch (error) {
-      alert('刪除失敗:' + (error instanceof Error ? error.message : '未知錯誤'))
+      toast.error('刪除失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
     } finally {
       setLoading(false)
     }

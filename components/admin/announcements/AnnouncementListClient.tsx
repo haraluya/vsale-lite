@@ -16,17 +16,28 @@ import Link from 'next/link'
 import { Edit, Trash2, ExternalLink } from 'lucide-react'
 import { deleteAnnouncement, updateAnnouncement } from '@/lib/actions/announcements'
 import type { Announcement } from '@/types'
+import { useConfirm } from '@/lib/contexts/dialog-context'
+import { toast } from 'sonner'
 
 interface AnnouncementListClientProps {
   announcements: Announcement[]
 }
 
 export function AnnouncementListClient({ announcements: initialAnnouncements }: AnnouncementListClientProps) {
+  const confirm = useConfirm()
   const [announcements, setAnnouncements] = useState(initialAnnouncements)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`確定要刪除廣告「${title}」嗎？此操作無法復原。`)) {
+    const confirmed = await confirm({
+      title: '確認刪除',
+      description: `確定要刪除廣告「${title}」嗎？此操作無法復原。`,
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
       return
     }
 
@@ -35,9 +46,9 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
 
     if (result.success) {
       setAnnouncements((prev) => prev.filter((a) => a.id !== id))
-      alert('廣告已刪除')
+      toast.success('廣告已刪除')
     } else {
-      alert(result.message || '刪除失敗')
+      toast.error(result.message || '刪除失敗')
     }
 
     setDeletingId(null)
@@ -55,8 +66,9 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
           a.id === announcement.id ? { ...a, is_active: !a.is_active } : a
         )
       )
+      toast.success(announcement.is_active ? '廣告已停用' : '廣告已啟用')
     } else {
-      alert(result.message || '更新失敗')
+      toast.error(result.message || '更新失敗')
     }
   }
 

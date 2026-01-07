@@ -11,6 +11,7 @@ import { Tier, Client, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Copy, Check } from 'lucide-react'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 type ClientFormProps = {
   client?: Client
@@ -20,6 +21,7 @@ type ClientFormProps = {
 
 export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   const router = useRouter()
+  const alert = useAlert()
   const isEdit = mode === 'edit'
   const [copied, setCopied] = useState(false)
 
@@ -29,12 +31,19 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   >(isEdit && client ? updateClient.bind(null, client.id) : createClient, null)
 
   useEffect(() => {
-    if (state?.success && !state.data?.password) {
-      alert(state.message)
-      router.push('/admin/clients')
-      router.refresh()
+    const handleSuccess = async () => {
+      if (state?.success && !state.data?.password) {
+        await alert({
+          title: '操作成功',
+          message: state.message || '客戶更新成功',
+          variant: 'success'
+        })
+        router.push('/admin/clients')
+        router.refresh()
+      }
     }
-  }, [state, router])
+    handleSuccess()
+  }, [state, router, alert])
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text)

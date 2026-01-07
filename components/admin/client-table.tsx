@@ -11,6 +11,7 @@ import { deleteClient } from '@/lib/actions/clients'
 import { useHighlightKeyword } from './client-filter'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 type ClientTableProps = {
   clients: Client[]
@@ -26,6 +27,7 @@ export function ClientTable({
   searchKeyword = '',
 }: ClientTableProps) {
   const router = useRouter()
+  const alert = useAlert()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -56,13 +58,25 @@ export function ClientTable({
       const result = await deleteClient(clientToDelete.id)
 
       if (result.success) {
-        alert(result.message)
+        await alert({
+          title: '刪除成功',
+          message: result.message || '客戶已成功刪除',
+          variant: 'success'
+        })
         router.refresh()
       } else {
-        alert(result.message)
+        await alert({
+          title: '刪除失敗',
+          message: result.message || '刪除客戶失敗',
+          variant: 'error'
+        })
       }
     } catch (error) {
-      alert('刪除失敗，請稍後再試')
+      await alert({
+        title: '刪除失敗',
+        message: '刪除失敗，請稍後再試',
+        variant: 'error'
+      })
     } finally {
       setIsDeleting(false)
       setDeleteDialogOpen(false)

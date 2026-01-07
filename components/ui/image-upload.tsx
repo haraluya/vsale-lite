@@ -13,6 +13,7 @@ import Image from 'next/image'
 import { Upload, X, Loader2 } from 'lucide-react'
 import { uploadProductImage, deleteProductImage } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
+import { useConfirm } from '@/lib/contexts/dialog-context'
 
 interface ImageUploadProps {
   productId: string
@@ -27,6 +28,7 @@ export function ImageUpload({
   onUploadSuccess,
   onDeleteSuccess,
 }: ImageUploadProps) {
+  const confirm = useConfirm()
   const [imageUrl, setImageUrl] = useState<string | null>(currentImageUrl || null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +63,13 @@ export function ImageUpload({
   }
 
   const handleDelete = async () => {
-    if (!confirm('確定要刪除此圖片嗎?')) return
+    const confirmed = await confirm({
+      title: '刪除圖片',
+      description: '確定要刪除此圖片嗎？',
+      variant: 'danger'
+    })
+
+    if (!confirmed) return
 
     setError(null)
     setUploading(true)

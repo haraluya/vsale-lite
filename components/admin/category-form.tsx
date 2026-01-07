@@ -10,6 +10,7 @@ import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { Category, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 type CategoryFormProps = {
   category?: Category
@@ -18,6 +19,7 @@ type CategoryFormProps = {
 
 export function CategoryForm({ category, mode }: CategoryFormProps) {
   const router = useRouter()
+  const alert = useAlert()
   const isEdit = mode === 'edit'
 
   // 使用受控元件來保留使用者輸入
@@ -34,12 +36,19 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
   const [state, formAction, pending] = useActionState<any>(action as any, null)
 
   useEffect(() => {
-    if (state?.success) {
-      alert(state.message)
-      router.push('/admin/categories')
-      router.refresh()
+    const handleSuccess = async () => {
+      if (state?.success) {
+        await alert({
+          title: '操作成功',
+          message: state.message || '分類操作成功',
+          variant: 'success'
+        })
+        router.push('/admin/categories')
+        router.refresh()
+      }
     }
-  }, [state, router])
+    handleSuccess()
+  }, [state, router, alert])
 
   return (
     <form action={formAction} className="space-y-6">

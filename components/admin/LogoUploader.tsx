@@ -8,6 +8,8 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Upload, Trash2, X, Check } from 'lucide-react'
+import { useConfirm } from '@/lib/contexts/dialog-context'
+import { toast } from 'sonner'
 
 interface LogoUploaderProps {
   logoType: 'logo' | 'logo-icon' | 'favicon'
@@ -22,6 +24,7 @@ export function LogoUploader({
   uploadAction,
   deleteAction,
 }: LogoUploaderProps) {
+  const confirm = useConfirm()
   const [uploading, setUploading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [previewFile, setPreviewFile] = useState<File | null>(null)
@@ -33,7 +36,7 @@ export function LogoUploader({
 
     // 驗證檔案大小（2MB）
     if (file.size > 2 * 1024 * 1024) {
-      alert('檔案大小不可超過 2MB')
+      toast.error('檔案大小不可超過 2MB')
       e.target.value = ''
       return
     }
@@ -41,7 +44,7 @@ export function LogoUploader({
     // 驗證檔案類型
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml']
     if (!validTypes.includes(file.type)) {
-      alert('僅支援 JPG, PNG, WebP, SVG 格式')
+      toast.error('僅支援 JPG, PNG, WebP, SVG 格式')
       e.target.value = ''
       return
     }
@@ -78,14 +81,22 @@ export function LogoUploader({
       setPreviewUrl(null)
     } catch (error) {
       console.error('上傳失敗:', error)
-      alert('上傳失敗，請重試')
+      toast.error('上傳失敗，請重試')
     } finally {
       setUploading(false)
     }
   }
 
   const handleDelete = async () => {
-    if (!confirm('確定要刪除此 Logo 嗎？')) return
+    const confirmed = await confirm({
+      title: '確認刪除',
+      description: '確定要刪除此 Logo 嗎？',
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) return
 
     setDeleting(true)
     try {

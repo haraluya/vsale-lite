@@ -8,6 +8,7 @@ import { updateOrderDetails } from '@/lib/actions/orders'
 import type { OrderDetail } from '@/types'
 import type { OrderModificationsInput } from '@/lib/validations/order.schema'
 import { Loader2, Trash2, Plus, X } from 'lucide-react'
+import { useAlert, useConfirm, usePrompt } from '@/lib/contexts/dialog-context'
 
 interface OrderEditorProps {
   order: OrderDetail
@@ -35,6 +36,9 @@ interface EditedFee {
 }
 
 export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
+  const alert = useAlert()
+  const confirm = useConfirm()
+  const prompt = usePrompt()
   const originalItems = order.items || []
   const originalFees = order.custom_fees || []
 
@@ -113,7 +117,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
   }
 
   // 修改商品數量（輸入欄位）
-  const handleQuantityInputChange = (itemId: string, value: string) => {
+  const handleQuantityInputChange = async (itemId: string, value: string) => {
     // 只允許數字
     if (value !== '' && !/^\d+$/.test(value)) {
       return
@@ -123,12 +127,20 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
 
     // 驗證數量
     if (isNaN(newQuantity) || newQuantity < 1) {
-      alert('數量必須大於 0')
+      await alert({
+        title: '輸入錯誤',
+        message: '數量必須大於 0',
+        variant: 'error'
+      })
       return
     }
 
     if (newQuantity > 99999) {
-      alert('數量不可超過 99,999')
+      await alert({
+        title: '輸入錯誤',
+        message: '數量不可超過 99,999',
+        variant: 'error'
+      })
       return
     }
 
@@ -136,10 +148,14 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
   }
 
   // 標記商品為已移除
-  const handleToggleRemoveItem = (itemId: string) => {
+  const handleToggleRemoveItem = async (itemId: string) => {
     const activeItems = editedItems.filter(item => !item.is_removed)
     if (activeItems.length === 1 && activeItems[0].id === itemId) {
-      alert('訂單至少需保留一個商品')
+      await alert({
+        title: '無法移除',
+        message: '訂單至少需保留一個商品',
+        variant: 'warning'
+      })
       return
     }
 
@@ -153,23 +169,36 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
   }
 
   // 新增自訂費用
-  const handleAddFee = () => {
-    const feeName = prompt('請輸入費用名稱（例：手續費、包裝費、優惠折扣）：')
-    if (!feeName || feeName.trim() === '') return
+  const handleAddFee = async () => {
+    const result = await prompt({
+      title: '新增自訂費用',
+      message: '請輸入費用名稱與金額（可為負數表示折扣）',
+      fields: [
+        {
+          name: 'feeName',
+          label: '費用名稱',
+          type: 'text',
+          placeholder: '例：手續費、包裝費、優惠折扣',
+          required: true
+        },
+        {
+          name: 'amount',
+          label: '金額',
+          type: 'number',
+          placeholder: '可輸入負數表示折扣',
+          required: true
+        }
+      ]
+    })
 
-    const amountStr = prompt('請輸入金額（可為負數表示折扣）：')
-    if (!amountStr) return
+    if (!result) return
 
-    const amount = parseFloat(amountStr)
-    if (isNaN(amount)) {
-      alert('請輸入有效的數字')
-      return
-    }
+    const { feeName, amount } = result
 
     const newFee: EditedFee = {
       id: `temp-${Date.now()}`,
       fee_name: feeName.trim(),
-      amount,
+      amount: parseFloat(amount),
       is_new: true,
     }
 
@@ -258,7 +287,11 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
       (!modifications.fees || modifications.fees.length === 0) &&
       !modifications.shipping
     ) {
-      alert('沒有任何修改，無需儲存')
+      await alert({
+        title: '無任何修改',
+        message: '沒有任何修改，無需儲存',
+        variant: 'info'
+      })
       return
     }
 
@@ -279,7 +312,12 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
 是否儲存變更？
     `.trim()
 
-    if (!confirm(confirmMsg)) return
+    const confirmed = await confirm({
+      title: '確認儲存變更',
+      description: confirmMsg
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
 
@@ -293,24 +331,38 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
 
     // Phase 8 (US5): 處理優惠券警告
     if (result.success && result.data?.coupon_warning && !skipCouponWarning) {
-      const removeCoupon = confirm(
-        `⚠️ 優惠券驗證失敗\n\n${result.data.coupon_warning}\n\n是否移除優惠券並重新儲存修改？\n\n• 點擊「確定」→ 移除優惠券並儲存\n• 點擊「取消」→ 保留優惠券，放棄修改`
-      )
+      const removeCoupon = await confirm({
+        title: '⚠️ 優惠券驗證失敗',
+        description: `${result.data.coupon_warning}\n\n是否移除優惠券並重新儲存修改？\n\n• 點擊「確定」→ 移除優惠券並儲存\n• 點擊「取消」→ 保留優惠券，放棄修改`,
+        variant: 'warning'
+      })
 
       if (removeCoupon) {
         // 重新呼叫 handleSave，並移除優惠券
         await handleSave(true)
       } else {
-        alert('已取消訂單修改，優惠券保留')
+        await alert({
+          title: '已取消修改',
+          message: '已取消訂單修改，優惠券保留',
+          variant: 'info'
+        })
       }
       return
     }
 
     if (result.success) {
-      alert('訂單修改成功！')
+      await alert({
+        title: '修改成功',
+        message: '訂單修改成功！',
+        variant: 'success'
+      })
       onSave()
     } else {
-      alert(`修改失敗：${result.message}`)
+      await alert({
+        title: '修改失敗',
+        message: `修改失敗：${result.message}`,
+        variant: 'error'
+      })
     }
   }
 

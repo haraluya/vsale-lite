@@ -2,7 +2,7 @@
 
 **專案名稱**: Vsale-lite
 **專案類型**: B2B 批發訂貨系統
-**最後更新**: 2026-01-07
+**最後更新**: 2026-01-08
 
 ---
 
@@ -146,6 +146,46 @@ vsale/
 - 後台 Sidebar: 手機隱藏 (Sheet) / 平板收縮 (w-16) / 桌面展開 (w-64)
 - 後台表格: 手機卡片視圖 / 桌面完整表格
 - 設計 Token 優先於硬編碼樣式
+
+### VIII. 統一對話框系統 (013-unified-dialog)
+- **必須** 使用統一對話框 Hook 替代原生瀏覽器對話框
+- **絕對禁止** 使用 `window.alert()`、`window.confirm()`、`window.prompt()`
+- ESLint 規則已配置，違反將導致錯誤
+
+**使用方式**:
+```typescript
+'use client'
+import { useAlert, useConfirm, usePrompt } from '@/lib/contexts/dialog-context'
+
+// Alert - 通知型對話框
+const alert = useAlert()
+await alert({ title: '成功', message: '資料已儲存', variant: 'success' })
+
+// Confirm - 確認型對話框
+const confirm = useConfirm()
+const confirmed = await confirm({
+  title: '確認刪除',
+  description: '此操作無法復原',
+  variant: 'danger'
+})
+
+// Prompt - 輸入型對話框
+const prompt = usePrompt()
+const value = await prompt({
+  title: '請輸入名稱',
+  placeholder: '名稱',
+  variant: 'info'
+})
+```
+
+**變體 (variant)**:
+- `success` - 綠色（成功操作）
+- `error` - 紅色（錯誤訊息）
+- `warning` - 黃色（警告）
+- `info` - 藍色（資訊，預設）
+- `danger` - 紅色（危險操作，用於 confirm）
+
+**詳見**: `specs/013-unified-dialog/quickstart.md`
 
 ---
 
@@ -420,6 +460,63 @@ vsale/
 - ✅ 支援負庫存（預購/欠貨場景）
 - ✅ 自訂費用支援（手續費、包裝費、額外運費、總額調整）
 - ✅ 批次修改功能（商品單價、數量、運費一次性提交）
+
+#### 9. **013-unified-dialog**: 統一對話框系統 ✅ **NEW!**
+**狀態**: Phase 1-7 核心功能完成 (2026-01-08)
+
+**核心功能**:
+1. ✅ 統一對話框 Hook API（useAlert、useConfirm、usePrompt）
+2. ✅ 替換所有原生瀏覽器對話框（18 個檔案、72 個對話框）
+3. ✅ Neo-Brutalism 設計規範（3px 邊框、硬邊陰影、點擊效果）
+4. ✅ ESLint 規則預防未來引入原生對話框
+5. ✅ 對話框佇列機制（連續呼叫自動排隊）
+6. ✅ 背景滾動鎖定與 ESC 鍵關閉支援
+
+**核心元件**:
+- `DialogProvider`: React Context 提供統一對話框狀態管理
+- `AlertDialog`: 通知型對話框（success / error / warning / info）
+- `ConfirmDialog`: 確認型對話框（含取消按鈕、danger 變體）
+- `PromptDialog`: 輸入型對話框（含驗證規則）
+
+**Hook API** (`lib/contexts/dialog-context.tsx`):
+- `useAlert()`: 顯示通知訊息（返回 Promise<void>）
+- `useConfirm()`: 顯示確認對話框（返回 Promise<boolean>）
+- `usePrompt()`: 顯示輸入對話框（返回 Promise<string | null>）
+
+**ESLint 配置** (`.eslintrc.json`):
+- 禁止使用 `window.alert()`、`window.confirm()`、`window.prompt()`
+- 提供自訂錯誤訊息引導使用 Hook
+- 測試檔案與型別定義檔案自動排除
+- Git pre-commit hook 自動檢查
+
+**已遷移檔案** (18 個):
+- **P0 高頻**: 會員等級、優惠券、訂單、商品、分類管理（5 個檔案）
+- **P1 中頻**: 公告、Logo、系列、標籤、成員、密碼、價格（10 個檔案）
+- **P2 低頻**: 訂單編輯器、前台導覽列、圖片上傳（3 個檔案）
+
+**文件位置**:
+- 規格: `specs/013-unified-dialog/spec.md`
+- 技術研究: `specs/013-unified-dialog/research.md`
+- 快速上手: `specs/013-unified-dialog/quickstart.md`
+- API 合約: `specs/013-unified-dialog/contracts/`
+- 任務清單: `specs/013-unified-dialog/tasks.md`
+
+**進度**: 52/63 任務完成 (83%)
+- Phase 1-2 (Setup & Foundational): ✅ 完整（13/13）
+- Phase 3 (US1 - Hook API): ✅ 完整（7/7）
+- Phase 4 (US2 - 遷移 72 個對話框): ✅ 完整（23/23）
+- Phase 5 (US3 - 驗證): 🔄 進行中（3/6 - TypeScript/ESLint 通過）
+- Phase 6 (US4 - ESLint 規則): ✅ 完整（6/6）
+- Phase 7 (Polish): 🔄 進行中（文件撰寫）
+
+**特色亮點**:
+- ✅ Promise-based API（與原生對話框使用方式一致）
+- ✅ Neo-Brutalism 設計（3px 黑邊框、8px 硬陰影）
+- ✅ 五種變體配色（success、error、warning、info、danger）
+- ✅ ESLint 規則自動阻止原生對話框引入
+- ✅ 對話框佇列機制（連續呼叫不會互相覆蓋）
+- ✅ 無障礙支援（ARIA 標籤、鍵盤導航、焦點管理）
+- ✅ 響應式設計（手機 2px / 桌面 3px 邊框）
 
 ---
 

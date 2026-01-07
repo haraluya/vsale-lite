@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { getPublicSettings } from '@/lib/actions/system'
+import { DialogProvider } from '@/lib/contexts/dialog-context'
+import { Toaster } from 'sonner'
 
 export async function generateMetadata(): Promise<Metadata> {
   // 從資料庫讀取公開設定
@@ -35,7 +37,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-TW">
-      <body>{children}</body>
+      <body>
+        <DialogProvider>
+          {children}
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                border: '3px solid black',
+                boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
+                borderRadius: '0',
+              },
+              className: 'font-bold',
+            }}
+          />
+        </DialogProvider>
+      </body>
     </html>
   )
 }

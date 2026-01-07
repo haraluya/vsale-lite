@@ -1,0 +1,34 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "no-restricted-globals": [
+      "error",
+      {
+        "name": "alert",
+        "message": "請使用 useAlert Hook 替代原生 alert()。匯入：import { useAlert } from '@/lib/contexts/dialog-context'"
+      },
+      {
+        "name": "confirm",
+        "message": "請使用 useConfirm Hook 替代原生 confirm()。匯入：import { useConfirm } from '@/lib/contexts/dialog-context'"
+      },
+      {
+        "name": "prompt",
+        "message": "請使用 usePrompt Hook 替代原生 prompt()。匯入：import { usePrompt } from '@/lib/contexts/dialog-context'"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+      "rules": {
+        "no-restricted-globals": "off"
+      }
+    },
+    {
+      "files": ["types/**/*.ts", "lib/contexts/dialog-context.tsx", "components/ui/dialogs/*.tsx"],
+      "rules": {
+        "no-restricted-globals": "off"
+      }
+    }
+  ]
+}

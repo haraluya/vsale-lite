@@ -9,6 +9,7 @@ import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 type UpdatePasswordFormProps = {
   clientId: string
@@ -17,6 +18,7 @@ type UpdatePasswordFormProps = {
 
 export function UpdatePasswordForm({ clientId, clientName }: UpdatePasswordFormProps) {
   const router = useRouter()
+  const alert = useAlert()
 
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     updateClientPassword.bind(null, clientId),
@@ -25,11 +27,16 @@ export function UpdatePasswordForm({ clientId, clientName }: UpdatePasswordFormP
 
   useEffect(() => {
     if (state?.success) {
-      alert(state.message)
-      router.push('/admin/clients')
-      router.refresh()
+      alert({
+        title: '更新成功',
+        message: state.message || '密碼已更新',
+        variant: 'success'
+      }).then(() => {
+        router.push('/admin/clients')
+        router.refresh()
+      })
     }
-  }, [state, router])
+  }, [state, router, alert])
 
   return (
     <form action={formAction} className="space-y-6">

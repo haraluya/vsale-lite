@@ -7,6 +7,7 @@ import { OrderCancelButton } from './order-cancel-button'
 import { OrderDeleteButton } from './order-delete-button'
 import { toast } from 'sonner'
 import type { OrderStatus } from '@/types'
+import { useConfirm } from '@/lib/contexts/dialog-context'
 
 /**
  * 訂單操作元件
@@ -26,10 +27,19 @@ interface OrderActionsProps {
 }
 
 export function OrderActions({ orderId, orderNumber, currentStatus }: OrderActionsProps) {
+  const confirm = useConfirm()
   const [isPending, startTransition] = useTransition()
 
   const handleMarkAsShipping = async () => {
-    if (!confirm('確定要標記為出貨中並扣減庫存嗎？此操作無法撤銷。')) {
+    const confirmed = await confirm({
+      title: '確認標記出貨',
+      description: '確定要標記為出貨中並扣減庫存嗎？此操作無法撤銷。',
+      variant: 'warning',
+      confirmText: '確定',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
       return
     }
 

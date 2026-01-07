@@ -17,6 +17,8 @@ import { Pagination } from '@/components/admin/pagination'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Product, Series } from '@/types'
+import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
+import { toast } from 'sonner'
 
 interface ProductTableProps {
   products: Product[]
@@ -37,6 +39,8 @@ export function ProductTable({
   searchQuery,
   selectedSeries,
 }: ProductTableProps) {
+  const confirm = useConfirm()
+  const alert = useAlert()
   const router = useRouter()
   const [search, setSearch] = useState(searchQuery)
   const [seriesFilter, setSeriesFilter] = useState(selectedSeries)
@@ -51,16 +55,28 @@ export function ProductTable({
   }
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`確定要刪除商品「${name}」嗎?此操作無法復原。`)) {
+    const confirmed = await confirm({
+      title: '確認刪除',
+      description: `確定要刪除商品「${name}」嗎？此操作無法復原。`,
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
       return
     }
 
     const result = await deleteProduct(id)
     if (result.success) {
-      alert(result.message)
+      toast.success(result.message || '刪除成功')
       router.refresh()
     } else {
-      alert(`刪除失敗: ${result.message}`)
+      await alert({
+        title: '刪除失敗',
+        message: result.message || '無法刪除商品',
+        variant: 'error',
+      })
     }
   }
 
@@ -73,9 +89,14 @@ export function ProductTable({
     const result = await updateProductStock(productId, stockValue)
     if (result.success) {
       setEditingStockId(null)
+      toast.success('庫存已更新')
       router.refresh()
     } else {
-      alert(`更新失敗: ${result.message}`)
+      await alert({
+        title: '更新失敗',
+        message: result.message || '無法更新庫存',
+        variant: 'error',
+      })
     }
   }
 

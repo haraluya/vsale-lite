@@ -11,6 +11,7 @@ import { LoadingSpinner } from '@/components/ui/loading'
 import { Tier, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 type TierFormProps = {
   tier?: Tier
@@ -19,6 +20,7 @@ type TierFormProps = {
 
 export function TierForm({ tier, mode }: TierFormProps) {
   const router = useRouter()
+  const alert = useAlert()
   const isEdit = mode === 'edit'
 
   // Feature 011: 運費設定狀態
@@ -33,11 +35,16 @@ export function TierForm({ tier, mode }: TierFormProps) {
 
   useEffect(() => {
     if (state?.success) {
-      alert(state.message)
-      router.push('/admin/tiers')
-      router.refresh()
+      alert({
+        title: '操作成功',
+        message: state.message || '會員等級已儲存',
+        variant: 'success'
+      }).then(() => {
+        router.push('/admin/tiers')
+        router.refresh()
+      })
     }
-  }, [state, router])
+  }, [state, router, alert])
 
   return (
     <form action={formAction} className="space-y-6">
