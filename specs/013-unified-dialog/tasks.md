@@ -97,14 +97,14 @@
 
 ### P2 低頻功能遷移 (9 個檔案，25 個對話框)
 
-- [ ] T036 [US2] 遷移訂單編輯器對話框（3 alert + 2 confirm + 2 prompt）`components/admin/orders/order-editor.tsx`
-- [ ] T037 [P] [US2] 遷移訂單詳情確認 `components/admin/orders/order-detail-content.tsx`
-- [ ] T038 [P] [US2] 遷移前台商品卡 alert `components/shop/product-with-price-card.tsx`
-- [ ] T039 [US2] 遷移前台導覽列對話框（confirm + alert）`components/shop/navbar.tsx`
-- [ ] T040 [P] [US2] 遷移圖片上傳確認 `components/ui/image-upload.tsx`
-- [ ] T041 [P] [US2] 遷移客戶表單 alert `components/admin/client-form.tsx`
-- [ ] T042 [P] [US2] 遷移客戶表單 v2 alert `components/admin/client-form-v2.tsx`
-- [ ] T043 [P] [US2] 遷移分類表單 alert `components/admin/category-form.tsx`
+- [x] T036 [US2] 遷移訂單編輯器對話框（3 alert + 2 confirm + 2 prompt）`components/admin/orders/order-editor.tsx`
+- [x] T037 [P] [US2] 遷移訂單詳情確認 `components/admin/orders/order-detail-content.tsx`
+- [x] T038 [P] [US2] 遷移前台商品卡 alert `components/shop/product-with-price-card.tsx`
+- [x] T039 [US2] 遷移前台導覽列對話框（confirm + alert）`components/shop/navbar.tsx`
+- [x] T040 [P] [US2] 遷移圖片上傳確認 `components/ui/image-upload.tsx`
+- [x] T041 [P] [US2] 遷移客戶表單 alert `components/admin/client-form.tsx`
+- [x] T042 [P] [US2] 遷移客戶表單 v2 alert `components/admin/client-form-v2.tsx`
+- [x] T043 [P] [US2] 遷移分類表單 alert `components/admin/category-form.tsx`
 
 **Checkpoint**: 所有 18 個檔案的 72 個原生對話框已替換，設計一致性達成
 
@@ -280,14 +280,14 @@ Task: "遷移商品管理對話框（3 confirm + 3 alert）components/admin/prod
 
 **Phase 0 (Setup & Foundational)**: ✅ 13/13 已完成 (100%)
 **Phase 3 (US1 - Hook API)**: ✅ 7/7 已完成 (100%)
-**Phase 4 (US2 - 遷移)**: 🚧 15/23 進行中 (65%)
+**Phase 4 (US2 - 遷移)**: ✅ 23/23 完成 (100%)
   - P0 高頻: ✅ 5/5 已完成 (100%)
   - P1 中頻: ✅ 10/10 已完成 (100%)
-  - P2 低頻: 📋 0/8 待開始 (0%)
+  - P2 低頻: ✅ 8/8 已完成 (100%)
 **Phase 5 (US3 - 驗證)**: 📋 0/6 待開始 (0%)
 **Phase 6 (US4 - ESLint)**: 📋 0/6 待開始 (0%)
 **Phase 7 (Polish)**: 📋 0/8 待開始 (0%)
 
-**總進度**: 35/63 任務完成 (56%)
+**總進度**: 43/63 任務完成 (68%)
 
-**下一步**: 繼續 Phase 4 - User Story 2 遷移（P2 低頻檔案，剩餘 T036-T043）
+**下一步**: Phase 5 - User Story 3 驗證（執行全專案搜尋、型別檢查、ESLint 檢查、功能測試）

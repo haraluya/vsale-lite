@@ -23,6 +23,7 @@ import { validateCartItem } from '@/lib/actions/cart'
 import type { ProductWithPrice } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 interface ProductWithPriceCardProps {
   product: ProductWithPrice
@@ -32,6 +33,7 @@ interface ProductWithPriceCardProps {
 
 export function ProductWithPriceCard({ product, tierName, onImageClick }: ProductWithPriceCardProps) {
   const { addItem, getItemQuantity, items } = useCartStore()
+  const alert = useAlert()
   const [isAdding, setIsAdding] = useState(false)
 
   // 使用 mounted 狀態避免 hydration 不一致
@@ -65,7 +67,11 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
     const validation = await validateCartItem(product.id)
 
     if (!validation.success) {
-      alert(validation.message)
+      await alert({
+        title: '加入購物車失敗',
+        message: validation.message || '無法加入購物車',
+        variant: 'error'
+      })
       setIsAdding(false)
       return
     }

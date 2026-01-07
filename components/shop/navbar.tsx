@@ -21,12 +21,15 @@ import { useCartStore } from '@/stores/cart'
 import { Logo } from '@/components/ui/logo'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
 
 interface NavbarProps {
   user: CurrentUser
 }
 
 export function Navbar({ user }: NavbarProps) {
+  const confirm = useConfirm()
+  const alert = useAlert()
   const [loading, setLoading] = useState(false)
   const [cartItemsCount, setCartItemsCount] = useState(0)
   const { getTotalItems } = useCartStore()
@@ -37,7 +40,13 @@ export function Navbar({ user }: NavbarProps) {
   }, [getTotalItems])
 
   const handleLogout = async () => {
-    if (!confirm('確定要登出嗎?')) return
+    const confirmed = await confirm({
+      title: '確認登出',
+      description: '確定要登出嗎？',
+      variant: 'default'
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
 
@@ -47,7 +56,11 @@ export function Navbar({ user }: NavbarProps) {
       const authLogout = await import('@/lib/actions/auth').then(m => m.logout)
       await authLogout()
     } catch (error) {
-      alert('登出失敗，請稍後再試')
+      await alert({
+        title: '登出失敗',
+        message: '登出失敗，請稍後再試',
+        variant: 'error'
+      })
       setLoading(false)
     }
   }

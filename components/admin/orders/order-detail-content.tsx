@@ -13,6 +13,7 @@ import { ArrowLeft, User, Phone, Award, Calendar, FileText, Edit } from 'lucide-
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import type { OrderDetail, OrderTimelineWithActor } from '@/types'
+import { useConfirm } from '@/lib/contexts/dialog-context'
 
 interface OrderDetailContentProps {
   order: OrderDetail
@@ -21,6 +22,7 @@ interface OrderDetailContentProps {
 
 export function OrderDetailContent({ order: initialOrder, timelines }: OrderDetailContentProps) {
   const router = useRouter()
+  const confirm = useConfirm()
   const [isPending, startTransition] = useTransition()
   const [editMode, setEditMode] = useState(false)
   const [order, setOrder] = useState(initialOrder)
@@ -55,8 +57,14 @@ export function OrderDetailContent({ order: initialOrder, timelines }: OrderDeta
   }
 
   // 取消編輯
-  const handleCancel = () => {
-    if (confirm('確定要取消編輯嗎？所有未儲存的變更將遺失。')) {
+  const handleCancel = async () => {
+    const confirmed = await confirm({
+      title: '取消編輯',
+      description: '確定要取消編輯嗎？所有未儲存的變更將遺失。',
+      variant: 'danger'
+    })
+
+    if (confirmed) {
       setEditMode(false)
     }
   }

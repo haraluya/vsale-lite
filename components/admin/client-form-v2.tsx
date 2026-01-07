@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { LoadingSpinner } from '@/components/ui/loading'
 import type { Tier, Client } from '@/types'
 import { useRouter } from 'next/navigation'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 type ClientFormV2Props = {
   client: Client
@@ -21,6 +22,7 @@ type ClientFormV2Props = {
  */
 export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
   const router = useRouter()
+  const alert = useAlert()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -45,7 +47,11 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
       })
 
       if (result.success) {
-        alert(result.message || '客戶更新成功')
+        await alert({
+          title: '更新成功',
+          message: result.message || '客戶更新成功',
+          variant: 'success'
+        })
         router.push('/admin/clients')
         router.refresh()
       } else {
