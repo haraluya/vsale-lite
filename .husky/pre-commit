@@ -72,5 +72,20 @@ if git diff --cached --name-only | grep -qE "\.(sh|js|ts)$"; then
   fi
 fi
 
+# 檢查 3: ESLint 檢查（僅檢查已暫存的檔案）
+echo "🔍 執行 ESLint 檢查..."
+if git diff --cached --name-only | grep -qE "\.(ts|tsx|js|jsx)$"; then
+  staged_files=$(git diff --cached --name-only | grep -E "\.(ts|tsx|js|jsx)$" | xargs)
+  if [ -n "$staged_files" ]; then
+    echo "檢查檔案: $staged_files"
+    if ! npx eslint $staged_files --max-warnings=0; then
+      echo -e "${RED}❌ ESLint 檢查失敗${NC}"
+      echo "請修復上述錯誤後再提交"
+      exit 1
+    fi
+    echo -e "${GREEN}✅ ESLint 檢查通過${NC}"
+  fi
+fi
+
 echo -e "${GREEN}✅ 所有安全檢查通過${NC}"
 exit 0
