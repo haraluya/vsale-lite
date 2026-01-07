@@ -128,7 +128,9 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
         <div className="flex gap-4">
           <Button
             type="button"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault()
+              console.log('繼續建立客戶按鈕被點擊')
               window.location.reload()
             }}
           >

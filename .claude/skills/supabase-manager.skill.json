@@ -1,0 +1,41 @@
+{
+  "name": "supabase-manager",
+  "version": "1.0.0",
+  "description": "Supabase 資料庫管理專家 - 內建資料保護協議",
+  "triggers": [
+    "supabase",
+    "database",
+    "migration",
+    "db reset",
+    "資料庫",
+    "遷移"
+  ],
+  "keywords": [
+    "supabase db reset",
+    "pnpm db:reset",
+    "migration",
+    "資料庫重置",
+    "清空資料"
+  ],
+  "autoActivate": true,
+  "priority": "high",
+  "requiredApproval": [
+    "db reset",
+    "DROP TABLE",
+    "TRUNCATE TABLE",
+    "清空資料"
+  ],
+  "safeCommands": [
+    "supabase status",
+    "supabase migration list",
+    "pnpm db:migrate",
+    "pnpm db:backup",
+    "pnpm db:health"
+  ],
+  "dangerousCommands": [
+    "supabase db reset",
+    "pnpm db:reset",
+    "DROP TABLE",
+    "TRUNCATE"
+  ]
+}

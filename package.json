@@ -17,6 +17,8 @@
     "db:backup": "powershell -ExecutionPolicy Bypass -File scripts/db-backup.ps1",
     "db:restore": "powershell -ExecutionPolicy Bypass -File scripts/db-restore.ps1",
     "db:health": "powershell -ExecutionPolicy Bypass -File scripts/db-health-check.ps1",
+    "db:save": "powershell -ExecutionPolicy Bypass -File scripts/quick-backup.ps1",
+    "db:load": "powershell -ExecutionPolicy Bypass -File scripts/quick-restore.ps1",
     "deploy:db": "bash scripts/backup-before-deploy.sh"
   },
   "dependencies": {
