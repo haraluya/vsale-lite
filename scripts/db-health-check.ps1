@@ -11,6 +11,11 @@ param(
     [string]$ReportDir = ".\reports"    # 報告儲存目錄
 )
 
+# 設定終端機編碼為 UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 # 顯示標題
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  資料庫健康檢查工具" -ForegroundColor Cyan

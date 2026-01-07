@@ -10,6 +10,11 @@ param(
     [int]$MaxBackups = 10
 )
 
+# 設定終端機編碼為 UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 # 顯示標題
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  資料庫備份工具" -ForegroundColor Cyan
@@ -76,24 +81,36 @@ $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $backupFilename = "${timestamp}_${Reason}.sql"
 $backupPath = Join-Path $backupDir $backupFilename
 
-# 執行 pg_dump
+# 執行 pg_dump (使用 Docker 容器中的 pg_dump)
 $startTime = Get-Date
 try {
-    $pgDumpOutput = pg_dump -h $dbHost -p $dbPort -U $dbUser -d $dbName `
-        --clean `
-        --if-exists `
-        --no-owner `
-        --no-acl `
-        --schema=public `
-        --schema=storage `
-        --schema=auth `
-        --file="$backupPath" 2>&1
+    # 使用 docker exec 執行 pg_dump
+    $containerName = "supabase_db_vsale"
+
+    # 檢查容器是否存在
+    $containerCheck = docker ps --filter "name=supabase_db" --format "{{.Names}}" 2>&1
+    if (-not $containerCheck) {
+        Write-Host "[錯誤] 錯誤: 找不到 Supabase 資料庫容器" -ForegroundColor Red
+        Write-Host "請確認 Supabase 正在執行 (supabase start)" -ForegroundColor Yellow
+        exit 1
+    }
+
+    # 使用實際容器名稱
+    $actualContainer = ($containerCheck | Select-Object -First 1).Trim()
+
+    # 執行 Docker pg_dump
+    $pgDumpCmd = "docker exec $actualContainer pg_dump -h localhost -p 5432 -U postgres -d postgres --clean --if-exists --no-owner --no-acl --schema=public --schema=storage --schema=auth"
+
+    $pgDumpOutput = Invoke-Expression $pgDumpCmd 2>&1
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "[錯誤] 錯誤: pg_dump 執行失敗" -ForegroundColor Red
         Write-Host $pgDumpOutput -ForegroundColor Red
         exit 1
     }
+
+    # 將輸出寫入檔案
+    $pgDumpOutput | Out-File -FilePath $backupPath -Encoding UTF8
 
     $backupDuration = (Get-Date) - $startTime
     $backupDurationMs = [int]$backupDuration.TotalMilliseconds
@@ -117,24 +134,29 @@ $backupFileInfo = Get-Item $backupPath
 $backupSizeBytes = $backupFileInfo.Length
 $backupSizeMB = [math]::Round($backupSizeBytes / 1MB, 2)
 
-# 查詢資料表數量與資料筆數
+# 查詢資料表數量與資料筆數 (使用 Docker exec)
 try {
-    $tableCountQuery = @"
-SELECT COUNT(*)
-FROM information_schema.tables
-WHERE table_schema = 'public';
-"@
+    $tableCountQuery = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public';"
+    $tableCountRaw = docker exec $actualContainer psql -h localhost -p 5432 -U postgres -d postgres -t -c $tableCountQuery 2>&1
 
-    $tableCountOutput = psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -t -c $tableCountQuery 2>&1
-    $tableCount = [int]($tableCountOutput -replace '\s+', '')
+    # 處理多行輸出,取最後一行非空白行
+    $tableCountLines = ($tableCountRaw | Where-Object { $_.Trim() -ne '' })
+    if ($tableCountLines -is [array]) {
+        $tableCount = [int]($tableCountLines[-1].Trim())
+    } else {
+        $tableCount = [int]($tableCountLines.Trim())
+    }
 
-    $rowCountQuery = @"
-SELECT SUM(n_live_tup)
-FROM pg_stat_user_tables;
-"@
+    $rowCountQuery = "SELECT COALESCE(SUM(n_live_tup), 0) FROM pg_stat_user_tables;"
+    $rowCountRaw = docker exec $actualContainer psql -h localhost -p 5432 -U postgres -d postgres -t -c $rowCountQuery 2>&1
 
-    $rowCountOutput = psql -h $dbHost -p $dbPort -U $dbUser -d $dbName -t -c $rowCountQuery 2>&1
-    $totalRows = [int]($rowCountOutput -replace '\s+', '')
+    # 處理多行輸出,取最後一行非空白行
+    $rowCountLines = ($rowCountRaw | Where-Object { $_.Trim() -ne '' })
+    if ($rowCountLines -is [array]) {
+        $totalRows = [int]($rowCountLines[-1].Trim())
+    } else {
+        $totalRows = [int]($rowCountLines.Trim())
+    }
 
 } catch {
     Write-Host "[警告]  警告: 無法查詢資料庫統計資訊 ($_)" -ForegroundColor Yellow

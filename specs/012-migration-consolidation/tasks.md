@@ -46,10 +46,10 @@ description: "Migration 整合與資料庫優化任務清單"
 
 ### 腳本測試與驗證
 
-- [ ] T010 測試備份腳本（執行備份、驗證元數據檔案、檢查檔案大小）⚠️ 編碼問題待修復
-- [ ] T011 測試還原腳本（還原到測試備份、驗證資料完整性）⚠️ 編碼問題待修復
-- [ ] T012 測試健康檢查腳本（執行檢查、驗證報告格式、確認檢查項目數量 >= 200）⚠️ 編碼問題待修復
-- [ ] T013 測試安全重置腳本（自動備份 → 重置 → 驗證）⚠️ 編碼問題待修復
+- [X] T010 測試備份腳本（執行備份、驗證元數據檔案、檢查檔案大小）✅ 編碼問題已修復
+- [X] T011 測試還原腳本（還原到測試備份、驗證資料完整性）✅ 編碼問題已修復
+- [X] T012 測試健康檢查腳本（執行檢查、驗證報告格式、確認檢查項目數量 >= 200）✅ 編碼問題已修復
+- [X] T013 測試安全重置腳本（自動備份 → 重置 → 驗證）✅ 編碼問題已修復
 
 ### 文件準備
 
@@ -72,7 +72,7 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T017 [US1] 整合 `20260101_initial_schema.sql` (tiers, profiles 表定義)
 - [X] T018 [US1] 整合 `20260104_fix_profiles_rls.sql` (RLS Policy 修復)
 - [X] T019 [US1] 新增完整註解（COMMENT ON TABLE, COMMENT ON COLUMN）
-- [ ] T020 [US1] 執行 M1 並驗證（`supabase db reset`）⏳ 待驗證
+- [X] T020 [US1] 執行 M1 並驗證（`supabase db reset`）✅ 已驗證
 
 ### M2: 商品目錄系統
 
@@ -85,7 +85,7 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T027 [US1] 整合 `20260112_add_product_search_indexes.sql` (搜尋索引)
 - [X] T028 [US1] 整合 `20260116_add_unique_name_constraints.sql` (唯一性約束)
 - [X] T029 [US1] 新增完整註解（表、欄位、索引、函數）
-- [ ] T030 [US1] 執行 M1+M2 並驗證（重置後執行）⏳ 待驗證
+- [X] T030 [US1] 執行 M1+M2 並驗證（重置後執行）✅ 已驗證
 
 ### M3: 訂單與工作流程
 
@@ -97,7 +97,7 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T036 [US1] 整合 `20260117_grant_order_functions.sql` (函數權限授予)
 - [X] T037 [US1] 整合 `20260118_fix_order_functions_action_type.sql` (action_type 修復)
 - [X] T038 [US1] 新增完整註解（函數用途、參數說明）
-- [ ] T039 [US1] 執行 M1+M2+M3 並驗證
+- [X] T039 [US1] 執行 M1+M2+M3 並驗證
 
 ### M4: 運費與自訂費用
 
@@ -108,7 +108,7 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T044 [US1] 整合 `20260125_fix_order_modifications_function.sql` (修改函數修復)
 - [X] T045 [US1] 整合 `20260126_fix_cancel_order_allow_shipping.sql` (取消訂單修復)
 - [X] T046 [US1] 新增完整註解（運費計算邏輯、自訂費用用途）
-- [ ] T047 [US1] 執行 M1-M4 並驗證
+- [X] T047 [US1] 執行 M1-M4 並驗證
 
 ### M5: 優惠券系統
 
@@ -117,7 +117,7 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T050 [US1] 整合 `20260120_add_coupon_claim_limit.sql` (領取張數限制)
 - [X] T051 [US1] 整合 `20260121_add_order_coupons_insert_policy.sql` (訂單優惠券 RLS)
 - [X] T052 [US1] 新增完整註解（優惠券類型、限制說明）
-- [ ] T053 [US1] 執行 M1-M5 並驗證 ⏳ 待驗證
+- [X] T053 [US1] 執行 M1-M5 並驗證 ✅ 已驗證
 
 ### M6: 系統管理與稽核
 
@@ -127,7 +127,7 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T057 [US1] 整合 `20260114_add_audit_logs_insert_policy.sql` (操作日誌 RLS)
 - [X] T058 [US1] 整合 `20260115_update_system_settings_description.sql` (設定描述欄位)
 - [X] T059 [US1] 新增完整註解（系統設定項目、稽核日誌用途）
-- [ ] T060 [US1] 執行 M1-M6 並驗證 ⏳ 待驗證
+- [X] T060 [US1] 執行 M1-M6 並驗證 ✅ 已驗證
 
 ### M7: 索引與效能優化
 
@@ -138,7 +138,7 @@ description: "Migration 整合與資料庫優化任務清單"
 - [X] T065 [US1] 新增效能優化索引 `idx_orders_pending_created` (部分索引: status='pending')
 - [X] T066 [US1] 確認 GIN 索引 `idx_products_tags` 存在
 - [X] T067 [US1] 新增完整註解（索引用途、效能影響、使用場景）
-- [ ] T068 [US1] 執行 M1-M7 並驗證 ⏳ 待驗證
+- [X] T068 [US1] 執行 M1-M7 並驗證 ✅ 已驗證
 
 ### M8: RLS 策略
 

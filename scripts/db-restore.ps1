@@ -9,6 +9,11 @@ param(
     [string]$BackupFile = ""  # 指定備份檔案路徑（選填，預設互動式選擇）
 )
 
+# 設定終端機編碼為 UTF-8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::InputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 # 顯示標題
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  資料庫還原工具" -ForegroundColor Cyan
