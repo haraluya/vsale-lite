@@ -56,7 +56,7 @@ export function OrderDeleteButton({
       } else {
         // 🔧 修復：刪除失敗時不要跳轉，顯示錯誤訊息
         toast.error(result.message || '訂單刪除失敗')
-        console.error('❌ 刪除訂單失敗:', result)
+        console.error('刪除訂單失敗:', result)
         // 重新開啟對話框，讓使用者可以再試一次
         setShowDialog(true)
       }
