@@ -121,7 +121,7 @@ export async function createOrder(
       }
     }
 
-    // 2. 批次查詢商品與價格
+    // 2. 批次查詢商品與價格（LEFT JOIN tier_prices，未設定價格時使用零售價）
     const productIds = items.map(item => item.productId)
     const { data: products, error: productsError } = await supabase
       .from('products')
@@ -129,7 +129,8 @@ export async function createOrder(
         id,
         name,
         status,
-        tier_prices!inner(price)
+        retail_price,
+        tier_prices(price)
       `)
       .in('id', productIds)
       .eq('tier_prices.tier_id', tierId!)
@@ -143,11 +144,11 @@ export async function createOrder(
       }
     }
 
-    // 3. 驗證所有商品都有價格
+    // 3. 驗證所有商品都存在且為啟用狀態
     if (products.length !== items.length) {
       return {
         success: false,
-        message: '部分商品不存在、已停用或未設定價格',
+        message: '部分商品不存在或已停用',
       }
     }
 
@@ -170,11 +171,15 @@ export async function createOrder(
         }
       }
 
-      const price = (product.tier_prices as any)[0]?.price
+      // 優先使用等級價格，若未設定則使用零售價格
+      const tierPrice = (product.tier_prices as any)[0]?.price
+      const price = tierPrice !== null && tierPrice !== undefined ? tierPrice : product.retail_price
+
+      // 檢查是否有有效價格
       if (price === null || price === undefined) {
         return {
           success: false,
-          message: `商品「${product.name}」未設定您的等級價格`,
+          message: `商品「${product.name}」未設定價格`,
         }
       }
 
