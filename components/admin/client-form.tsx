@@ -126,10 +126,16 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
         </div>
 
         <div className="flex gap-4">
-          <Button onClick={() => window.location.href = '/admin/clients/new'}>
+          <Button
+            type="button"
+            onClick={() => {
+              window.location.reload()
+            }}
+          >
             繼續建立客戶
           </Button>
           <Button
+            type="button"
             variant="secondary"
             onClick={() => router.push('/admin/clients')}
           >
