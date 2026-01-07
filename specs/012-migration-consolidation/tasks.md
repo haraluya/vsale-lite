@@ -89,25 +89,25 @@ description: "Migration 整合與資料庫優化任務清單"
 
 ### M3: 訂單與工作流程
 
-- [ ] T031 [US1] 建立整合檔案 `supabase/migrations/20260107120000_orders_and_workflow.sql`
-- [ ] T032 [US1] 整合 `20260107_create_orders.sql` (orders, order_items, order_timelines 表定義)
-- [ ] T033 [US1] 整合 `20260108_fix_orders_rls_insert.sql` (RLS 修復)
-- [ ] T034 [US1] 整合 `20260106_add_delete_order_function.sql` (刪除函數)
-- [ ] T035 [US1] 整合 `20260111_add_order_delete_action.sql` (刪除操作支援)
-- [ ] T036 [US1] 整合 `20260117_grant_order_functions.sql` (函數權限授予)
-- [ ] T037 [US1] 整合 `20260118_fix_order_functions_action_type.sql` (action_type 修復)
-- [ ] T038 [US1] 新增完整註解（函數用途、參數說明）
+- [X] T031 [US1] 建立整合檔案 `supabase/migrations/20260107120000_orders_and_workflow.sql`
+- [X] T032 [US1] 整合 `20260107_create_orders.sql` (orders, order_items, order_timelines 表定義)
+- [X] T033 [US1] 整合 `20260108_fix_orders_rls_insert.sql` (RLS 修復)
+- [X] T034 [US1] 整合 `20260106_add_delete_order_function.sql` (刪除函數)
+- [X] T035 [US1] 整合 `20260111_add_order_delete_action.sql` (刪除操作支援)
+- [X] T036 [US1] 整合 `20260117_grant_order_functions.sql` (函數權限授予)
+- [X] T037 [US1] 整合 `20260118_fix_order_functions_action_type.sql` (action_type 修復)
+- [X] T038 [US1] 新增完整註解（函數用途、參數說明）
 - [ ] T039 [US1] 執行 M1+M2+M3 並驗證
 
 ### M4: 運費與自訂費用
 
-- [ ] T040 [US1] 建立整合檔案 `supabase/migrations/20260107130000_shipping_and_custom_fees.sql`
-- [ ] T041 [US1] 整合 `20260122_add_shipping_features.sql` (運費設定)
-- [ ] T042 [US1] 整合 `20260123_remove_confirmed_status.sql` (移除 confirmed 狀態)
-- [ ] T043 [US1] 整合 `20260124_extend_order_timelines.sql` (訂單修改歷程)
-- [ ] T044 [US1] 整合 `20260125_fix_order_modifications_function.sql` (修改函數修復)
-- [ ] T045 [US1] 整合 `20260126_fix_cancel_order_allow_shipping.sql` (取消訂單修復)
-- [ ] T046 [US1] 新增完整註解（運費計算邏輯、自訂費用用途）
+- [X] T040 [US1] 建立整合檔案 `supabase/migrations/20260107130000_shipping_and_custom_fees.sql`
+- [X] T041 [US1] 整合 `20260122_add_shipping_features.sql` (運費設定)
+- [X] T042 [US1] 整合 `20260123_remove_confirmed_status.sql` (移除 confirmed 狀態)
+- [X] T043 [US1] 整合 `20260124_extend_order_timelines.sql` (訂單修改歷程)
+- [X] T044 [US1] 整合 `20260125_fix_order_modifications_function.sql` (修改函數修復)
+- [X] T045 [US1] 整合 `20260126_fix_cancel_order_allow_shipping.sql` (取消訂單修復)
+- [X] T046 [US1] 新增完整註解（運費計算邏輯、自訂費用用途）
 - [ ] T047 [US1] 執行 M1-M4 並驗證
 
 ### M5: 優惠券系統
