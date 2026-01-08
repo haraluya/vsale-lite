@@ -1,6 +1,36 @@
 # Vsale-lite - B2B 批發訂貨系統
 
+> **專案狀態**: 🚀 生產環境運行中 | 📅 最後更新: 2026-01-09
+
 一個專為批發業務設計的輕量級 B2B 訂貨系統,解決傳統 Excel/LINE 下單混亂、價格不透明的問題。
+
+---
+
+## 📁 根目錄檔案說明
+
+專案根目錄僅保留以下核心檔案，其他文件已歸檔至 `docs/` 或 `specs/` 目錄：
+
+| 檔案 | 用途 | 維護狀態 |
+|------|------|---------|
+| **README.md** | 專案主要說明文件 | ✅ 持續維護 |
+| **CLAUDE.md** | Claude Code 專案上下文（開發必讀） | ✅ 持續維護 |
+| **DEPLOYMENT.md** | 生產環境部署指南 | ✅ 持續維護 |
+| **package.json** | 專案依賴與腳本配置 | ✅ 持續維護 |
+| **tsconfig.json** | TypeScript 配置 | ✅ 穩定 |
+| **next.config.ts** | Next.js 配置 | ✅ 穩定 |
+| **tailwind.config.ts** | Tailwind CSS 配置 | ✅ 穩定 |
+| **.eslintrc.json** | ESLint 規則配置 | ✅ 穩定 |
+| **middleware.ts** | Next.js 路由保護中間件 | ✅ 穩定 |
+
+**其他重要目錄**:
+- 📖 `docs/` - 技術文件與開發指南（.gitignore 排除，僅供開發參考）
+- 📋 `specs/` - 功能規格與實作計畫（.gitignore 排除）
+- 🔧 `scripts/` - 自動化工具與腳本（.gitignore 排除）
+- 📦 `supabase/migrations/` - 資料庫 Migration 檔案（必須提交）
+
+**歷史文件歸檔**: 過時的修復記錄、研究報告、除錯日誌等已移至 [`docs/archive/`](docs/archive/ARCHIVE_README.md)
+
+---
 
 ## 核心特色
 

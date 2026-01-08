@@ -48,13 +48,55 @@ next-env.d.ts
 *~
 node_modules
 
-# Debug & Temporary Files
-DEBUG-*.md
+# ========================================
+# Temporary Test & Debug Files (根目錄)
+# ========================================
+# SQL 臨時檔案（診斷、修復、測試）
 check-*.sql
 diagnose-*.sql
 fix-*.sql
 setup-*.sql
+setup-test-*.sql
 create-admin*.sql
+insert-*.sql
+insert-test-*.sql
+
+# JS 測試檔案
+test-*.js
+
+# 環境檢查檔案
+.env.*.check
+
+# ========================================
+# Temporary Documentation (根目錄)
+# ========================================
+# 修復記錄
+FIX_*.md
+QUICK_*.md
+URGENT_*.md
+SIMPLE_*.md
+VERCEL_*.md
+DEBUG-*.md
+
+# 研究報告（應放在 docs/ 或 specs/）
+RESEARCH_*.md
+RLS_RESEARCH_*.md
+*_RESEARCH_*.md
+VIEWS_RESEARCH.md
+SUPABASE_RLS_*.md
+
+# 除錯記錄
+dialog.md
+
+# 決策記錄（應放在 docs/）
+DECISION_*.md
+
+# 過時文件
+MIGRATION_REQUIRED.md
+LOCAL_SUPABASE_SETUP.md
+
+# 臨時報告檔案
+RESEARCH_*.txt
 
 # Firebase (不使用)
 .firebaserc
@@ -95,12 +137,3 @@ supabase/.temp/
 
 # GitHub Workflows (需手動透過 GitHub 網頁建立)
 .github/workflows/
-
-!DEPLOYMENT_STATUS.md
-!QUICK_FIX.md
-!VERCEL_ERROR_FIX.md
-!FIX_GITHUB_SECRETS.md
-!URGENT_FIX.md
-!SIMPLE_FIX.md
-!FIX_500_ERROR.md
-!set-vercel-env.sh
