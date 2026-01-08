@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/check-prerequisites.ps1:*)",
-      "Bash(Test-Path \"D:\\\\APP\\\\vsale\\\\specs\\\\spec-011-shipping-and-order-edit\\\\checklists\")"
+      "Bash(Test-Path \"D:\\\\APP\\\\vsale\\\\specs\\\\spec-011-shipping-and-order-edit\\\\checklists\")",
+      "Bash(npm run build:*)",
+      "Bash(pnpm type-check:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(pnpm --version:*)"
     ]
   }
 }

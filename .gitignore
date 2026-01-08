@@ -54,5 +54,38 @@ diagnose-*.sql
 fix-*.sql
 setup-*.sql
 
+# Firebase (不使用)
+.firebaserc
+firebase.json
+.firebaseignore
+apphosting.yaml
+firebase-debug.log
+.env.production
+
+# Backup Files
+*.backup
+*.bak
+
+# Test Files (專案不使用測試，僅在 node_modules)
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+
+# Documentation & Specs (不需要部署)
+/docs/
+/specs/
+*.md
+!README.md
+!CLAUDE.md
+
 # Supabase Local
 supabase/snippets/
+supabase/.temp/
+
+# Scripts (不需要部署)
+/scripts/
+
+# Claude Code
+.claude/

@@ -1,7 +1,0 @@
-# 忽略所有備份檔案（包含 SQL 與 JSON 元數據）
-*.sql
-*.json
-*.tar.gz
-
-# 保留目錄結構說明
-!README.md
