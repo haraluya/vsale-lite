@@ -63,7 +63,7 @@ export async function middleware(request: NextRequest) {
 
     // 如果是網路錯誤且不是受保護路由,放行
     const pathname = request.nextUrl.pathname
-    const publicPaths = ['/', '/login', '/admin/login']
+    const publicPaths = ['/login', '/admin/login']
     if (publicPaths.includes(pathname)) {
       return supabaseResponse
     }
@@ -75,8 +75,8 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // 公開路由:登入頁、首頁
-  const publicPaths = ['/', '/login', '/admin/login']
+  // 公開路由:登入頁（根目錄會自動導向 /login，無需特殊處理）
+  const publicPaths = ['/login', '/admin/login']
   const isPublicPath = publicPaths.includes(pathname)
 
   // 管理員路由
@@ -123,7 +123,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // 3. 已登入訪問登入頁處理 (允許切換角色)
-  if (isPublicPath && pathname !== '/') {
+  if (isPublicPath) {
     // 客戶訪問後台登入頁 → 允許 (需要先登出才能以管理員身份登入)
     if (profile.role === 'client' && pathname === '/admin/login') {
       return supabaseResponse

@@ -179,12 +179,14 @@ export async function loginWithPhone(
 export async function logout(): Promise<void> {
   const supabase = await createClient()
 
-  // 先查詢當前用戶角色
+  // 先查詢當前用戶角色（在登出前）
   const { data: { user } } = await supabase.auth.getUser()
   let targetLoginPage = '/login' // 預設前台登入頁
 
   if (user) {
-    const { data: profile } = await supabase
+    // 使用 Admin Client 繞過 RLS 查詢角色
+    const adminClient = createAdminClient()
+    const { data: profile } = await adminClient
       .from('profiles')
       .select('role')
       .eq('id', user.id)
@@ -196,6 +198,7 @@ export async function logout(): Promise<void> {
     }
   }
 
+  // 執行登出
   await supabase.auth.signOut()
   revalidatePath('/', 'layout')
   redirect(targetLoginPage)
