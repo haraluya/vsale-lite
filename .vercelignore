@@ -18,9 +18,8 @@ node_modules/
 **/*.spec.tsx
 __tests__/
 
-# 排除文件與規格
+# 排除文件（保留 specs 因為程式碼有引用型別定義）
 /docs/
-/specs/
 *.md
 !README.md
 !CLAUDE.md
