@@ -289,7 +289,48 @@ refactor: 重構會員等級查詢邏輯
 
 ## 部署
 
-建議部署至 **Firebase App Hosting** (Taiwan region):
+### Vercel 自動部署 (推薦)
+
+專案已配置 Vercel 自動部署，每次推送到 GitHub master 分支時會自動部署。
+
+#### 設定步驟
+
+1. **在 Vercel 匯入專案**
+   - 前往 [Vercel Dashboard](https://vercel.com/dashboard)
+   - 點擊「Add New Project」
+   - 選擇「Import Git Repository」
+   - 連結 GitHub 帳號並選擇 `haraluya/vsale-lite` 倉庫
+
+2. **配置專案設定**
+   - Framework Preset: `Next.js`
+   - Build Command: `pnpm build`
+   - Output Directory: `.next`
+   - Install Command: `pnpm install`
+   - Node.js Version: `22.x`
+
+3. **設定環境變數**
+
+   在 Vercel 專案設定中新增以下環境變數：
+
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=https://qwovavytryvgchcowjof.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=你的_SUPABASE_ANON_KEY
+   ```
+
+4. **部署**
+   - 點擊「Deploy」開始首次部署
+   - 之後每次推送到 master 分支都會自動觸發部署
+
+#### GitHub Actions (可選)
+
+專案支援 GitHub Actions 進行 CI/CD：
+- 自動執行 TypeScript 型別檢查
+- 自動執行 ESLint 檢查
+- 自動部署到 Vercel
+
+### 手動部署
+
+如需手動部署：
 
 ```bash
 # 建置
