@@ -55,7 +55,16 @@ export function Navbar({ user }: NavbarProps) {
       // logout 函數會自動根據角色導向對應的登入頁
       const authLogout = await import('@/lib/actions/auth').then(m => m.logout)
       await authLogout()
+      // 注意：logout() 會執行 redirect()，所以這裡不會執行到
+      // redirect() 會拋出 NEXT_REDIRECT 錯誤，這是正常行為
     } catch (error) {
+      // 檢查是否為 Next.js 的 redirect 錯誤（正常登出流程）
+      if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+        // 這是正常的登出流程，不需要顯示錯誤
+        return
+      }
+
+      // 其他錯誤才顯示錯誤訊息
       await alert({
         title: '登出失敗',
         message: '登出失敗，請稍後再試',

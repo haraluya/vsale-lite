@@ -13,7 +13,14 @@ export function LogoutButton() {
     setIsLoggingOut(true)
     try {
       await logout()
+      // 注意：logout() 會執行 redirect()，所以這裡不會執行到
     } catch (error) {
+      // 檢查是否為 Next.js 的 redirect 錯誤（正常登出流程）
+      if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+        // 這是正常的登出流程，不需要處理
+        return
+      }
+      // 其他錯誤才記錄
       console.error('登出失敗:', error)
       setIsLoggingOut(false)
     }
