@@ -16,7 +16,7 @@
 ### 3. Vercel 配置
 - ✅ vercel.json 配置檔已存在
 - ✅ 環境變數已在 vercel.json 中預設
-- ✅ Vercel 專案已連結（專案 ID: prj_LKdxGgd6X1eeArB9fdIPQbjG5jE5）
+- ✅ Vercel 專案已連結（專案 ID: prj_RidqMdlWv7rdjBSbtbw6qEX6ZaLI）
 
 ---
 
@@ -46,7 +46,7 @@
 需要設定 3 個 GitHub Secrets：
 - `VERCEL_TOKEN`（需從 Vercel 建立）
 - `VERCEL_ORG_ID`: `team_qBAl7rAnjwmYd7dwQMBfMto6`
-- `VERCEL_PROJECT_ID`: `prj_LKdxGgd6X1eeArB9fdIPQbjG5jE5`
+- `VERCEL_PROJECT_ID`: `prj_RidqMdlWv7rdjBSbtbw6qEX6ZaLI`
 
 ---
 

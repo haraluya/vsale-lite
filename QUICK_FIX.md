@@ -34,7 +34,7 @@ GitHub Actions 缺少必要的 Vercel Secrets，導致部署失敗。
 
 #### Secret 3: VERCEL_PROJECT_ID
 - **Name**: `VERCEL_PROJECT_ID`
-- **Secret**: `prj_LKdxGgd6X1eeArB9fdIPQbjG5jE5`
+- **Secret**: `prj_RidqMdlWv7rdjBSbtbw6qEX6ZaLI`
 
 ### 步驟 3: 重新觸發部署
 

@@ -65,7 +65,7 @@ https://vercel.com/haraluyas-projects/vsale/settings/environment-variables
 |------|--------|
 | `VERCEL_TOKEN` | 剛才複製的 Token |
 | `VERCEL_ORG_ID` | `team_qBAl7rAnjwmYd7dwQMBfMto6` |
-| `VERCEL_PROJECT_ID` | `prj_LKdxGgd6X1eeArB9fdIPQbjG5jE5` |
+| `VERCEL_PROJECT_ID` | `prj_RidqMdlWv7rdjBSbtbw6qEX6ZaLI` |
 
 #### 2.3 重新執行 GitHub Actions
 1. 前往 https://github.com/haraluya/vsale-lite/actions
