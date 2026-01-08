@@ -13,6 +13,9 @@ import { AnnouncementListClient } from '@/components/admin/announcements/Announc
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
+// 強制動態渲染，避免預渲染時 workUnitAsyncStorage 未初始化錯誤
+export const dynamic = 'force-dynamic'
+
 export default async function AnnouncementsPage() {
   const result = await getAllAnnouncements()
   const announcements = result.success ? (result.data || []) : []

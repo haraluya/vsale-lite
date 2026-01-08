@@ -11,6 +11,9 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/shop/navbar'
 
+// 強制動態渲染，避免預渲染時 workUnitAsyncStorage 未初始化錯誤
+export const dynamic = 'force-dynamic'
+
 export default async function ShopLayout({
   children,
 }: {
