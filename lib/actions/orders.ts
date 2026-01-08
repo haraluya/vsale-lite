@@ -127,6 +127,7 @@ export async function createOrder(
       .select(`
         id,
         name,
+        series_id,
         status,
         retail_price,
         tier_prices(price)
@@ -154,6 +155,7 @@ export async function createOrder(
     let totalAmount = 0
     const orderItemsData: Array<{
       product_id: string
+      series_id_snapshot: string | null
       product_name_snapshot: string
       deal_price: number
       quantity: number
@@ -186,6 +188,7 @@ export async function createOrder(
 
       orderItemsData.push({
         product_id: product.id,
+        series_id_snapshot: (product as any).series_id || null,
         product_name_snapshot: product.name,
         deal_price: price,
         quantity: item.quantity,
@@ -587,6 +590,7 @@ export async function getOrderById(
         id: item.id,
         order_id: item.order_id,
         product_id: item.product_id,
+        series_id_snapshot: item.series_id_snapshot,
         product_name_snapshot: item.product_name_snapshot,
         deal_price: item.deal_price,
         quantity: item.quantity,
@@ -1210,14 +1214,15 @@ export async function updateOrderDetails(
 
       if (coupon) {
         // 查詢修改後的訂單明細（用於驗證優惠券條件）
+        // 🆕 使用 series_id_snapshot 快照，不依賴 products 表
         const { data: updatedItems } = await supabase
           .from('order_items')
           .select(`
             id,
             product_id,
+            series_id_snapshot,
             deal_price,
-            quantity,
-            products(series_id)
+            quantity
           `)
           .eq('order_id', orderId)
 
@@ -1225,7 +1230,7 @@ export async function updateOrderDetails(
           // 轉換為 CartItemForCoupon 格式
           const cartItems = updatedItems.map((item: any) => ({
             product_id: item.product_id,
-            series_id: item.products?.series_id || '',
+            series_id: item.series_id_snapshot || '',
             price: item.deal_price,
             quantity: item.quantity,
           }))

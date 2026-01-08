@@ -18,7 +18,8 @@ interface OrderEditorProps {
 
 interface EditedItem {
   id: string
-  product_id: string
+  product_id: string | null
+  series_id_snapshot: string | null
   product_name_snapshot: string
   deal_price: number
   quantity: number
