@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
@@ -49,15 +48,14 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
 
   return (
     <Link href={href} className={`inline-block ${className}`}>
-      <Image
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
         key={imageKey}
         src={logoUrl}
         alt={logoAlt}
         width={width}
         height={height}
-        priority
         className="h-auto w-auto"
-        unoptimized={logoUrl.startsWith('http')}
       />
     </Link>
   )
