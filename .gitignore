@@ -92,3 +92,5 @@ supabase/.temp/
 
 # Claude Code
 .claude/
+
+!DEPLOYMENT_STATUS.md
