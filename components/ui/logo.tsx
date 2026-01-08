@@ -26,7 +26,8 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
       .then((data) => {
         const settings = data.settings || []
         const logoSetting = settings.find((s: any) => s.key === 'logo_url')
-        if (logoSetting?.value && typeof logoSetting.value === 'string') {
+        // 僅當有有效的 URL 時才更新（非空字串且不是純空白）
+        if (logoSetting?.value && typeof logoSetting.value === 'string' && logoSetting.value.trim()) {
           // 加上時間戳來強制重新載入圖片
           const urlWithTimestamp = logoSetting.value.includes('?')
             ? `${logoSetting.value}&t=${Date.now()}`
@@ -34,9 +35,11 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
           setLogoUrl(urlWithTimestamp)
           setImageKey(Date.now())
         }
+        // 如果 logo_url 為空，保持使用預設的 /logo.svg（不做任何更新）
       })
       .catch((err) => {
         console.error('Failed to load logo:', err)
+        // 載入失敗時也保持使用預設 Logo
       })
   }, [])
 
