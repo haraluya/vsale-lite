@@ -87,7 +87,6 @@ export async function createOrder(
         .single()
 
       if (userCouponError || !userCoupon || !userCoupon.coupon) {
-        console.error('查詢優惠券錯誤:', userCouponError)
         return {
           success: false,
           message: userCouponError
@@ -137,7 +136,6 @@ export async function createOrder(
       .eq('status', 'active')
 
     if (productsError) {
-      console.error('查詢商品錯誤:', productsError)
       return {
         success: false,
         message: '查詢商品資訊時發生錯誤',
@@ -217,7 +215,6 @@ export async function createOrder(
       .rpc('generate_order_number')
 
     if (orderNumberError || !orderNumberData) {
-      console.error('產生訂單編號錯誤:', orderNumberError)
       return {
         success: false,
         message: '產生訂單編號時發生錯誤',
@@ -234,7 +231,6 @@ export async function createOrder(
       })
 
     if (shippingFeeError) {
-      console.error('計算運費錯誤:', shippingFeeError)
       return {
         success: false,
         message: '計算運費時發生錯誤',
@@ -262,7 +258,6 @@ export async function createOrder(
       .single()
 
     if (orderError || !order) {
-      console.error('建立訂單錯誤:', orderError)
 
       // 檢查是否為訂單編號衝突 (極端情況)
       if (orderError?.code === '23505') {
@@ -290,7 +285,6 @@ export async function createOrder(
       .insert(orderItems)
 
     if (itemsError) {
-      console.error('建立訂單明細錯誤:', itemsError)
       // 回滾訂單 (刪除剛建立的訂單)
       await supabase.from('orders').delete().eq('id', order.id)
       return {
@@ -313,7 +307,6 @@ export async function createOrder(
         })
 
       if (couponSnapshotError) {
-        console.error('建立優惠券快照錯誤:', couponSnapshotError)
         // 回滾訂單與訂單明細
         await supabase.from('orders').delete().eq('id', order.id)
         return {
@@ -332,7 +325,6 @@ export async function createOrder(
         .eq('id', couponData.userCouponId)
 
       if (updateUserCouponError) {
-        console.error('更新客戶優惠券使用狀態錯誤:', updateUserCouponError)
         // 不回滾，僅記錄錯誤（優惠券快照已建立，不影響訂單）
       }
     }
@@ -349,7 +341,6 @@ export async function createOrder(
       })
 
     if (timelineError) {
-      console.error('建立訂單歷史錯誤:', timelineError)
       // 不回滾,僅記錄錯誤 (歷史記錄失敗不應阻止訂單建立)
     }
 
@@ -377,7 +368,6 @@ export async function createOrder(
       message: successMessage,
     }
   } catch (error) {
-    console.error('createOrder error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '建立訂單時發生未知錯誤',
@@ -423,7 +413,6 @@ export async function getOrders(
     const { data: orders, count, error } = await query
 
     if (error) {
-      console.error('查詢訂單錯誤:', error)
       return {
         success: false,
         message: '查詢訂單列表時發生錯誤',
@@ -483,7 +472,6 @@ export async function getOrders(
       },
     }
   } catch (error) {
-    console.error('getOrders error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '查詢訂單列表時發生未知錯誤',
@@ -512,7 +500,6 @@ export async function getOrderById(
       .single()
 
     if (error) {
-      console.error('查詢訂單詳情錯誤:', error)
 
       if (error.code === 'PGRST116') {
         return {
@@ -648,7 +635,6 @@ export async function getOrderById(
       data: orderDetail,
     }
   } catch (error) {
-    console.error('getOrderById error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '查詢訂單詳情時發生未知錯誤',
@@ -686,7 +672,6 @@ export async function markAsShipping(
     })
 
     if (error || !data) {
-      console.error('標記出貨錯誤:', error)
       return {
         success: false,
         message: error?.message || '標記出貨時發生錯誤',
@@ -713,7 +698,6 @@ export async function markAsShipping(
       message: '訂單已標記為出貨中，庫存已扣減',
     }
   } catch (error) {
-    console.error('markAsShipping error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '標記出貨時發生未知錯誤',
@@ -753,7 +737,6 @@ export async function updateOrderStatus(
     })
 
     if (error || !data) {
-      console.error('更新訂單狀態錯誤:', error)
       return {
         success: false,
         message: error?.message || '更新訂單狀態時發生錯誤',
@@ -789,7 +772,6 @@ export async function updateOrderStatus(
       message: `訂單狀態已更新為「${statusLabels[result.new_status || newStatus]}」`,
     }
   } catch (error) {
-    console.error('updateOrderStatus error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '更新訂單狀態時發生未知錯誤',
@@ -826,7 +808,6 @@ export async function cancelOrder(
     })
 
     if (error || !data) {
-      console.error('取消訂單錯誤:', error)
       return {
         success: false,
         message: error?.message || '取消訂單時發生錯誤',
@@ -854,7 +835,6 @@ export async function cancelOrder(
       message: '訂單已取消，庫存已回補',
     }
   } catch (error) {
-    console.error('cancelOrder error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '取消訂單時發生未知錯誤',
@@ -917,7 +897,6 @@ export async function addOrderComment(
       .single()
 
     if (error) {
-      console.error('新增留言錯誤:', error)
       return {
         success: false,
         message: '新增留言時發生錯誤',
@@ -942,7 +921,6 @@ export async function addOrderComment(
       message: '留言已送出',
     }
   } catch (error) {
-    console.error('addOrderComment error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '新增留言時發生未知錯誤',
@@ -986,7 +964,6 @@ export async function getOrderTimeline(
       .order('created_at', { ascending: true })
 
     if (error) {
-      console.error('查詢訂單時間軸錯誤:', error)
       return {
         success: false,
         message: '查詢訂單時間軸時發生錯誤',
@@ -1029,7 +1006,6 @@ export async function getOrderTimeline(
       data: timelines,
     }
   } catch (error) {
-    console.error('getOrderTimeline error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '查詢訂單時間軸時發生未知錯誤',
@@ -1078,7 +1054,6 @@ export async function deleteOrder(
     })
 
     if (error || !data) {
-      console.error('刪除訂單錯誤:', error)
       return {
         success: false,
         message: error?.message || '刪除訂單時發生錯誤',
@@ -1103,7 +1078,6 @@ export async function deleteOrder(
       message: result.message || `訂單已刪除`,
     }
   } catch (error) {
-    console.error('deleteOrder error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '刪除訂單時發生未知錯誤',
@@ -1159,7 +1133,6 @@ export async function updateOrderDetails(
       .single()
 
     if (fetchError || !order) {
-      console.error('查詢訂單錯誤:', fetchError)
       return {
         success: false,
         message: '訂單不存在',
@@ -1196,7 +1169,6 @@ export async function updateOrderDetails(
     })
 
     if (error) {
-      console.error('批次修改訂單 RPC 錯誤:', error)
       return {
         success: false,
         message: error?.message || '批次修改訂單時發生錯誤',
@@ -1207,7 +1179,6 @@ export async function updateOrderDetails(
     const result = Array.isArray(data) ? data[0] : data
 
     if (!result) {
-      console.error('批次修改訂單無回傳資料')
       return {
         success: false,
         message: '訂單修改失敗：伺服器無回傳資料',
@@ -1216,7 +1187,6 @@ export async function updateOrderDetails(
 
     // 檢查 Function 回傳結果
     if (!result.success) {
-      console.error('批次修改訂單失敗:', result.message)
       return {
         success: false,
         message: result.message || '訂單修改失敗',
@@ -1301,7 +1271,6 @@ export async function updateOrderDetails(
       message: result.message,
     }
   } catch (error) {
-    console.error('updateOrderDetails error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : '批次修改訂單時發生未知錯誤',
