@@ -81,7 +81,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=你的_SUPABASE_ANON_KEY
 |-------------|---|---------|
 | `VERCEL_TOKEN` | Vercel API Token | [Vercel Tokens](https://vercel.com/account/tokens) → Create Token |
 | `VERCEL_ORG_ID` | `team_qBAl7rAnjwmYd7dwQMBfMto6` | 在 `.vercel/project.json` 中 |
-| `VERCEL_PROJECT_ID` | `prj_RidqMdlWv7rdjBSbtbw6qEX6ZaLI` | 在 `.vercel/project.json` 中 |
+| `VERCEL_PROJECT_ID` | `prj_GobC4pfN8TiN7NCTWQr9nxfHzTVr` | 在 `.vercel/project.json` 中 |
 
 #### 取得 VERCEL_TOKEN
 
