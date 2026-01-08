@@ -34,7 +34,7 @@ export function MobileNav() {
             <Menu className="h-6 w-6" />
           </button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-3/4 sm:max-w-sm p-0">
+        <SheetContent side="left" className="w-[280px] max-w-[80vw] p-0 overflow-x-hidden">
           <SheetTitle className="sr-only">導航選單</SheetTitle>
           <MobileSidebar onClose={() => setIsOpen(false)} />
         </SheetContent>

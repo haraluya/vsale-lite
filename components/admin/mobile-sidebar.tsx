@@ -88,57 +88,59 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
   const pathname = usePathname()
 
   return (
-    <div className="flex flex-col h-full bg-white p-6">
-      {/* Logo */}
-      <div className="mb-6">
-        <Logo variant="full" href="/admin/dashboard" />
-      </div>
+    <div className="flex flex-col h-full bg-white overflow-hidden">
+      <div className="flex flex-col h-full p-6 overflow-y-auto">
+        {/* Logo */}
+        <div className="mb-6 flex-shrink-0">
+          <Logo variant="full" href="/admin/dashboard" />
+        </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-6 overflow-y-auto">
-        {navSections.map((section, sectionIndex) => (
-          <div key={section.title}>
-            {/* 分隔線（除了第一個區塊） */}
-            {sectionIndex > 0 && (
-              <div className="mb-4 border-t-2 border-gray-300" />
-            )}
+        {/* Navigation */}
+        <nav className="flex-1 space-y-6">
+          {navSections.map((section, sectionIndex) => (
+            <div key={section.title}>
+              {/* 分隔線（除了第一個區塊） */}
+              {sectionIndex > 0 && (
+                <div className="mb-4 border-t-2 border-gray-300" />
+              )}
 
-            {/* 區塊標題 */}
-            <h3 className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-gray-500">
-              {section.title}
-            </h3>
+              {/* 區塊標題 */}
+              <h3 className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+                {section.title}
+              </h3>
 
-            {/* 導航項目 */}
-            <div className="space-y-1">
-              {section.items.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+              {/* 導航項目 */}
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
 
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={onClose}
-                    className={cn(
-                      'flex items-center gap-3 rounded-none border-2 px-4 py-2.5 font-bold transition-all',
-                      isActive
-                        ? 'border-black bg-brand-primary text-white shadow-none translate-x-[2px] translate-y-[2px]'
-                        : 'border-black bg-white text-black shadow-neo-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
-                    )}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span className="text-sm">{item.label}</span>
-                  </Link>
-                )
-              })}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={onClose}
+                      className={cn(
+                        'flex items-center gap-3 rounded-none border-2 px-4 py-2.5 font-bold transition-all w-full',
+                        isActive
+                          ? 'border-black bg-brand-primary text-white shadow-none translate-x-[2px] translate-y-[2px]'
+                          : 'border-black bg-white text-black shadow-neo-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
+                      )}
+                    >
+                      <Icon className="h-5 w-5 flex-shrink-0" />
+                      <span className="text-sm truncate">{item.label}</span>
+                    </Link>
+                  )
+                })}
+              </div>
             </div>
-          </div>
-        ))}
-      </nav>
+          ))}
+        </nav>
 
-      {/* Logout Button (底部) */}
-      <div className="mt-6 pt-6 border-t-2 border-gray-300">
-        <LogoutButton />
+        {/* Logout Button (底部) */}
+        <div className="mt-6 pt-6 border-t-2 border-gray-300 flex-shrink-0">
+          <LogoutButton />
+        </div>
       </div>
     </div>
   )
