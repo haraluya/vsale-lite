@@ -28,6 +28,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.vercel
 
 # vercel
 .vercel
@@ -53,6 +54,7 @@ check-*.sql
 diagnose-*.sql
 fix-*.sql
 setup-*.sql
+create-admin*.sql
 
 # Firebase (不使用)
 .firebaserc
