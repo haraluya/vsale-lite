@@ -282,33 +282,24 @@ export async function uploadLogo(input: {
       }
     }
 
-    // 3. 刪除舊檔案（如果存在）
+    // 3. 上傳前先刪除所有可能的舊 Logo（避免不同副檔名的孤兒檔案）
     const supabase = await createClient()
-    const fileExt = input.file.name.split('.').pop()
+    await supabase.storage.from('products').remove([
+      `system/${input.logoType}.jpg`,
+      `system/${input.logoType}.png`,
+      `system/${input.logoType}.webp`,
+      `system/${input.logoType}.svg`,
+    ])
+    // 註: 即使檔案不存在也不會報錯
+
+    // 4. 上傳新 Logo 檔案
+    const fileExt = input.file.type.split('/')[1] === 'jpeg' ? 'jpg' : input.file.type.split('/')[1]
     const filePath = `system/${input.logoType}.${fileExt}`
 
-    // 列出所有同名檔案（不同副檔名）
-    const { data: existingFiles } = await supabase.storage
-      .from('products')
-      .list('system', {
-        search: input.logoType,
-      })
-
-    // 刪除所有舊檔案
-    if (existingFiles && existingFiles.length > 0) {
-      const filesToDelete = existingFiles
-        .filter((file) => file.name.startsWith(input.logoType))
-        .map((file) => `system/${file.name}`)
-
-      if (filesToDelete.length > 0) {
-        await supabase.storage.from('products').remove(filesToDelete)
-      }
-    }
-
-    // 4. 上傳新檔案
     const { error: uploadError } = await supabase.storage
       .from('products')
       .upload(filePath, input.file, {
+        upsert: false, // 已刪除舊檔案，不需要 upsert
         contentType: input.file.type,
       })
 
@@ -386,33 +377,17 @@ export async function deleteLogo(
     const supabase = await createClient()
     const adminClient = createAdminClient()
 
-    // 2. 查詢舊的 Logo URL（用於刪除 Storage 檔案）
+    // 2. 刪除 Supabase Storage 中所有可能的 Logo 檔案（避免孤兒檔案）
+    await supabase.storage.from('products').remove([
+      `system/${logoType}.jpg`,
+      `system/${logoType}.png`,
+      `system/${logoType}.webp`,
+      `system/${logoType}.svg`,
+    ])
+    // 註: 即使檔案不存在也不會報錯
+
+    // 3. 更新 system_settings 表（清空 URL，前端將顯示預設圖片）
     const settingKey = `${logoType.replace('-', '_')}_url`
-
-    const { data: setting, error: fetchError } = await adminClient
-      .from('system_settings')
-      .select('value')
-      .eq('key', settingKey)
-      .single()
-
-    if (fetchError || !setting || !setting.value) {
-      return {
-        success: false,
-        message: 'Logo 不存在或已刪除',
-      }
-    }
-
-    // 3. 從 URL 提取檔案路徑
-    const urlParts = setting.value.split('/')
-    const fileName = urlParts[urlParts.length - 1]
-    const filePath = `system/${fileName}`
-
-    // 4. 刪除 Supabase Storage 檔案
-    const { error: deleteError } = await supabase.storage
-      .from('products')
-      .remove([filePath])
-
-    // 5. 更新 system_settings 表（清空 URL）
     const { error: updateError } = await adminClient
       .from('system_settings')
       .update({
@@ -430,17 +405,17 @@ export async function deleteLogo(
       }
     }
 
-    // 6. 記錄操作日誌
+    // 4. 記錄操作日誌
     await logAudit({
       target_type: 'system_setting',
       target_id: settingKey,
       action_type: 'updated',
-      old_values: { logo_url: setting.value },
+      old_values: { logo_url: '' }, // 已刪除舊值
       new_values: { logo_url: '' },
-      notes: `刪除 ${logoType} 圖片`,
+      notes: `刪除 ${logoType} 圖片（將使用預設圖片）`,
     })
 
-    // 7. 執行全站重新驗證
+    // 5. 執行全站重新驗證
     revalidatePath('/', 'layout')
 
     return {

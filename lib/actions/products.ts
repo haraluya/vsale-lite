@@ -646,7 +646,15 @@ export async function uploadProductImage(
       }
     }
 
-    // 5. 上傳到 Storage (覆寫模式)
+    // 5. 上傳前先刪除所有可能的舊圖片（避免不同副檔名的孤兒檔案）
+    await adminClient.storage.from('products').remove([
+      `${productId}/main.jpg`,
+      `${productId}/main.png`,
+      `${productId}/main.webp`,
+    ])
+    // 註: 即使檔案不存在也不會報錯
+
+    // 6. 上傳新圖片到 Storage
     const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `${productId}/main.${ext}`
 
@@ -654,7 +662,7 @@ export async function uploadProductImage(
       .from('products')
       .upload(filePath, file, {
         cacheControl: '3600',
-        upsert: true, // 覆寫舊檔案
+        upsert: false, // 已刪除舊檔案，不需要 upsert
       })
 
     if (uploadError) {
@@ -665,10 +673,10 @@ export async function uploadProductImage(
       }
     }
 
-    // 6. 取得公開 URL
+    // 7. 取得公開 URL
     const { data: urlData } = adminClient.storage.from('products').getPublicUrl(filePath)
 
-    // 7. 更新商品的 image_url
+    // 8. 更新商品的 image_url
     const { error: updateError } = await adminClient
       .from('products')
       .update({ image_url: urlData.publicUrl })
@@ -682,7 +690,7 @@ export async function uploadProductImage(
       }
     }
 
-    // 8. 重新驗證快取
+    // 9. 重新驗證快取
     revalidatePath('/admin/products')
     revalidatePath(`/admin/products/${productId}`)
 

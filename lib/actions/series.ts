@@ -305,15 +305,23 @@ export async function uploadSeriesImage(
       }
     }
 
+    // 上傳前先刪除所有可能的舊圖片（避免不同副檔名的孤兒檔案）
+    await adminClient.storage.from('products').remove([
+      `series/${series_id}/main.jpg`,
+      `series/${series_id}/main.png`,
+      `series/${series_id}/main.webp`,
+    ])
+    // 註: 即使檔案不存在也不會報錯
+
     // 取得檔案副檔名
-    const ext = file.type.split('/')[1]
+    const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `series/${series_id}/main.${ext}`
 
-    // 上傳到 Supabase Storage (覆寫模式)
+    // 上傳新圖片到 Supabase Storage
     const { error: uploadError } = await adminClient.storage
       .from('products')
       .upload(filePath, file, {
-        upsert: true,
+        upsert: false, // 已刪除舊檔案，不需要 upsert
         contentType: file.type,
       })
 

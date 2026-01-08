@@ -346,15 +346,23 @@ export async function uploadAnnouncementImage(
       return { success: false, message: '檔案大小不得超過 5MB' }
     }
 
-    // 3. 上傳至 Supabase Storage
+    // 3. 上傳前先刪除所有可能的舊圖片（避免不同副檔名的孤兒檔案）
     const supabase = await createClient()
-    const fileExt = file.name.split('.').pop()
+    await supabase.storage.from('products').remove([
+      `announcements/${announcementId}/main.jpg`,
+      `announcements/${announcementId}/main.png`,
+      `announcements/${announcementId}/main.webp`,
+    ])
+    // 註: 即使檔案不存在也不會報錯
+
+    // 4. 上傳新圖片至 Supabase Storage
+    const fileExt = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `announcements/${announcementId}/main.${fileExt}`
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('products')
       .upload(filePath, file, {
-        upsert: true,
+        upsert: false, // 已刪除舊檔案，不需要 upsert
         contentType: file.type,
       })
 
@@ -363,12 +371,12 @@ export async function uploadAnnouncementImage(
       return { success: false, message: '圖片上傳失敗' }
     }
 
-    // 4. 取得公開 URL
+    // 5. 取得公開 URL
     const {
       data: { publicUrl },
     } = supabase.storage.from('products').getPublicUrl(filePath)
 
-    // 5. 更新廣告記錄的 image_url
+    // 6. 更新廣告記錄的 image_url
     const adminClient = createAdminClient()
 
     const { error: updateError } = await adminClient
@@ -381,7 +389,7 @@ export async function uploadAnnouncementImage(
       return { success: false, message: '更新圖片 URL 失敗' }
     }
 
-    // 6. 更新快取
+    // 7. 更新快取
     revalidatePath('/store')
     revalidatePath('/admin/announcements')
     revalidatePath(`/admin/announcements/${announcementId}/edit`)
