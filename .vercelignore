@@ -1,0 +1,34 @@
+# 排除本地環境變數檔案（避免覆蓋 Vercel Dashboard 設定）
+.env.local
+.env*.local
+.env.development
+.env.production
+
+# 排除開發相關檔案
+node_modules/
+.next/
+.git/
+.vscode/
+.idea/
+
+# 排除測試檔案
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+__tests__/
+
+# 排除文件與規格
+/docs/
+/specs/
+*.md
+!README.md
+!CLAUDE.md
+!DEPLOYMENT.md
+
+# 排除 Supabase 本地檔案
+supabase/.temp/
+supabase/snippets/
+
+# 排除腳本
+/scripts/
