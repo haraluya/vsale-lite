@@ -93,6 +93,9 @@ supabase/.temp/
 # Claude Code
 .claude/
 
+# GitHub Workflows (需手動透過 GitHub 網頁建立)
+.github/workflows/
+
 !DEPLOYMENT_STATUS.md
 !QUICK_FIX.md
 !VERCEL_ERROR_FIX.md
