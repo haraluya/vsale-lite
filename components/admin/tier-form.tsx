@@ -63,22 +63,10 @@ export function TierForm({ tier, mode }: TierFormProps) {
         )}
       </div>
 
-      <div>
-        <Label htmlFor="rank">排序數字 *</Label>
-        <Input
-          id="rank"
-          name="rank"
-          type="number"
-          defaultValue={tier?.rank}
-          placeholder="數字越小越優先顯示"
-          required
-          min="1"
-          className="mt-2"
-        />
-        {state && 'errors' in state && state.errors?.rank && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.rank[0]}</p>
-        )}
-      </div>
+      {/* 隱藏的 rank 欄位，新增時會由 Server Action 自動設定，編輯時保持原值 */}
+      {isEdit && tier && (
+        <input type="hidden" name="rank" value={tier.rank} />
+      )}
 
       {/* Feature 011: 運費設定區塊 */}
       <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">

@@ -78,7 +78,8 @@ if git diff --cached --name-only | grep -qE "\.(ts|tsx|js|jsx)$"; then
   staged_files=$(git diff --cached --name-only | grep -E "\.(ts|tsx|js|jsx)$" | xargs)
   if [ -n "$staged_files" ]; then
     echo "檢查檔案: $staged_files"
-    if ! npx eslint $staged_files --max-warnings=0; then
+    # ESLint v9 使用舊配置格式需加上 --config 標誌
+    if ! ESLINT_USE_FLAT_CONFIG=false npx eslint $staged_files --max-warnings=0; then
       echo -e "${RED}❌ ESLint 檢查失敗${NC}"
       echo "請修復上述錯誤後再提交"
       exit 1

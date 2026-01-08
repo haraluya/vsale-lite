@@ -37,10 +37,26 @@ export async function createTier(
     // 1. 驗證權限
     await checkAuth('admin')
 
-    // 2. 驗證輸入
+    // 2. 取得 Admin Client
+    const adminClient = createAdminClient()
+
+    // 3. 若未提供 rank，自動分配下一個排序數字
+    let rankValue = formData.get('rank')
+    if (!rankValue) {
+      const { data: maxRankTier } = await adminClient
+        .from('tiers')
+        .select('rank')
+        .order('rank', { ascending: false })
+        .limit(1)
+        .single()
+
+      rankValue = maxRankTier ? String(maxRankTier.rank + 1) : '1'
+    }
+
+    // 4. 驗證輸入
     const validatedFields = createTierSchema.safeParse({
       name: formData.get('name'),
-      rank: formData.get('rank'),
+      rank: rankValue,
       shipping_fee: formData.get('shipping_fee') || '0',  // Feature 011: 運費
       free_shipping_threshold: formData.get('free_shipping_threshold') || null,  // Feature 011: 免運門檻
     })
@@ -53,8 +69,7 @@ export async function createTier(
       }
     }
 
-    // 3. 檢查名稱是否重複（使用 Admin Client）
-    const adminClient = createAdminClient()
+    // 5. 檢查名稱是否重複
     const { data: existingTier } = await adminClient
       .from('tiers')
       .select('id')
@@ -68,7 +83,7 @@ export async function createTier(
       }
     }
 
-    // 4. 建立等級
+    // 6. 建立等級
     const { data, error } = await adminClient
       .from('tiers')
       .insert(validatedFields.data)
@@ -83,7 +98,7 @@ export async function createTier(
       }
     }
 
-    // 5. Revalidate
+    // 7. Revalidate
     revalidatePath('/admin/tiers')
 
     return {
