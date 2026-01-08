@@ -94,3 +94,5 @@ supabase/.temp/
 .claude/
 
 !DEPLOYMENT_STATUS.md
+!QUICK_FIX.md
+!VERCEL_ERROR_FIX.md
