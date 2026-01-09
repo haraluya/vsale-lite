@@ -9,7 +9,8 @@ DECLARE
     v_encrypted_password TEXT;
 BEGIN
     -- 產生密碼雜湊 (password123)
-    v_encrypted_password := crypt('password123', gen_salt('bf'));
+    -- 使用 pgcrypto 擴展的 crypt 函數
+    v_encrypted_password := extensions.crypt('password123', extensions.gen_salt('bf'));
 
     -- 插入到 auth.users
     INSERT INTO auth.users (
