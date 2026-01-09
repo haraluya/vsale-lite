@@ -65,6 +65,11 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
     }
   }
 
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // 即時轉換為大寫
+    e.target.value = e.target.value.toUpperCase()
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -182,6 +187,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               id="code"
               name="code"
               defaultValue={series?.code}
+              onChange={handleCodeChange}
               required
               maxLength={10}
               pattern="^[A-Z]{3,10}$"
