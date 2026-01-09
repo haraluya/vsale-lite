@@ -11,7 +11,9 @@ const GCS_CONFIG = {
   projectId: process.env.GCS_PROJECT_ID!,
   bucketName: process.env.GCS_BUCKET_NAME!,
   keyFilePath: process.env.GCS_KEY_FILE_PATH, // 可選（開發時使用）
-  credentials: process.env.GCS_CREDENTIALS ? JSON.parse(process.env.GCS_CREDENTIALS) : undefined, // 生產環境使用
+  credentials: process.env.GCS_SERVICE_ACCOUNT_KEY
+    ? JSON.parse(process.env.GCS_SERVICE_ACCOUNT_KEY)
+    : (process.env.GCS_CREDENTIALS ? JSON.parse(process.env.GCS_CREDENTIALS) : undefined), // 向後相容
 }
 
 // 初始化 GCS Client
