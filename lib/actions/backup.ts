@@ -7,7 +7,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { performBackup } from '@/lib/backup/db-backup'
-import { deleteBackup as deleteGCSBackup } from '@/lib/cloud-storage/gcs'
+import { deleteBackup as deleteGCSBackup, getDownloadUrl as getGCSDownloadUrl } from '@/lib/cloud-storage/gcs'
 import type { ActionResult } from '@/types'
 import type { BackupJob, BackupSettings } from '@/types'
 
@@ -342,6 +342,70 @@ export async function updateBackupSettings(
     return {
       success: false,
       message: error instanceof Error ? error.message : '更新備份設定失敗',
+    }
+  }
+}
+
+/**
+ * 取得備份檔案下載 URL
+ * @param jobId 備份任務 ID
+ * @param expiresIn 有效期（秒），預設 3600（1 小時）
+ */
+export async function getBackupDownloadUrl(
+  jobId: string,
+  expiresIn = 3600
+): Promise<ActionResult<{ url: string; expiresAt: string }>> {
+  try {
+    // 權限檢查
+    const auth = await checkAdminAuth()
+    if (!auth) {
+      return {
+        success: false,
+        message: '權限不足：僅管理員可下載備份',
+      }
+    }
+
+    const supabase = await createClient()
+
+    // 1. 查詢備份記錄
+    const { data: job, error: fetchError } = await supabase
+      .from('backup_jobs')
+      .select('*')
+      .eq('id', jobId)
+      .single()
+
+    if (fetchError || !job) {
+      throw new Error(`Backup job not found: ${jobId}`)
+    }
+
+    // 2. 檢查備份狀態
+    if (job.status !== 'success') {
+      return {
+        success: false,
+        message: `無法下載：備份狀態為 ${job.status}`,
+      }
+    }
+
+    // 3. 產生臨時簽名 URL（僅支援 GCS）
+    if (job.storage_provider !== 'gcs') {
+      return {
+        success: false,
+        message: '目前僅支援 GCS 儲存的備份下載',
+      }
+    }
+
+    const url = await getGCSDownloadUrl(job.filename, expiresIn)
+    const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString()
+
+    return {
+      success: true,
+      data: { url, expiresAt },
+    }
+  } catch (error) {
+    console.error('Get backup download URL failed:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '產生下載連結失敗',
     }
   }
 }

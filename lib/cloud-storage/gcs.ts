@@ -142,6 +142,32 @@ export async function downloadBackup(filename: string): Promise<Buffer> {
 }
 
 /**
+ * 產生臨時簽名下載 URL
+ * @param filename 檔案名稱
+ * @param expiresIn 有效期（秒），預設 3600（1 小時）
+ * @returns 臨時簽名 URL
+ */
+export async function getDownloadUrl(filename: string, expiresIn = 3600): Promise<string> {
+  const storage = getStorageClient()
+  const bucket = storage.bucket(GCS_CONFIG.bucketName)
+  const file = bucket.file(filename)
+
+  try {
+    // 產生臨時簽名 URL
+    const [url] = await file.getSignedUrl({
+      version: 'v4',
+      action: 'read',
+      expires: Date.now() + expiresIn * 1000,
+    })
+
+    return url
+  } catch (error) {
+    console.error('GCS getDownloadUrl failed:', error)
+    throw new Error(`Failed to generate download URL: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+/**
  * 檢查 GCS 連線狀態
  * @returns 連線是否正常
  */

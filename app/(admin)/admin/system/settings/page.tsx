@@ -8,6 +8,7 @@ import { checkAuth } from '@/lib/actions/helpers'
 import { SystemSettingsForm } from '@/components/admin/SystemSettingsForm'
 import { LogoUploader } from '@/components/admin/LogoUploader'
 import { BackupManager } from '@/components/admin/BackupManager'
+import { BackupStatus } from '@/components/admin/BackupStatus'
 import { updateSetting, uploadLogo, deleteLogo } from '@/lib/actions/system'
 import { revalidatePath } from 'next/cache'
 
@@ -132,6 +133,13 @@ export default async function SystemSettingsPage() {
         <p className="mb-4 text-sm text-gray-600">
           管理資料庫備份、下載與還原資料
         </p>
+
+        {/* 備份狀態 */}
+        <div className="mb-6">
+          <BackupStatus />
+        </div>
+
+        {/* 備份列表 */}
         <BackupManager />
       </div>
     </div>
