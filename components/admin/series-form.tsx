@@ -12,6 +12,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createSeries, updateSeries, uploadSeriesImage } from '@/lib/actions/series'
 import type { Series, Category } from '@/types'
 import { Button } from '@/components/ui/button'
@@ -155,7 +156,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               defaultValue={series?.code}
               required
               maxLength={10}
-              pattern="[A-Z]{3,10}"
+              pattern="^[A-Z]{3,10}$"
               placeholder="TEA"
               className="w-full rounded-none border-2 border-black px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -226,11 +227,16 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
           {/* 圖片預覽 */}
           {imagePreview && (
             <div className="relative rounded-none border-2 border-black p-4">
-              <img
-                src={imagePreview}
-                alt="系列圖片預覽"
-                className="h-64 w-full object-contain"
-              />
+              <div className="relative h-64 w-full">
+                <Image
+                  src={imagePreview}
+                  alt="系列圖片預覽"
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  unoptimized={imagePreview.startsWith('blob:')}
+                />
+              </div>
               <button
                 type="button"
                 onClick={handleRemoveImage}
