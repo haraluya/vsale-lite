@@ -8,7 +8,8 @@ import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { performBackupWithProgress } from '@/lib/backup/db-backup'
 
-export async function POST(request: NextRequest) {
+// EventSource 只支援 GET 請求
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
 
