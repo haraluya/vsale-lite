@@ -3,17 +3,14 @@
  * 負責下載備份檔案、解壓縮、執行 SQL
  */
 
-import { exec } from 'child_process'
-import { promisify } from 'util'
-import { createWriteStream, createReadStream, unlinkSync, existsSync } from 'fs'
+import { createWriteStream, createReadStream, unlinkSync, existsSync, readFileSync } from 'fs'
 import { createGunzip } from 'zlib'
 import { pipeline } from 'stream/promises'
 import path from 'path'
 import os from 'os'
 import { createClient } from '@/lib/supabase/server'
 import { downloadBackup } from '@/lib/cloud-storage'
-
-const execAsync = promisify(exec)
+import { Client } from 'pg'
 
 // 資料庫連線資訊（從環境變數讀取）
 const DB_CONFIG = {
@@ -132,7 +129,7 @@ async function downloadAndDecompress(
 }
 
 /**
- * 執行 SQL 還原
+ * 執行 SQL 還原（使用 pg Client 直接連接 PostgreSQL）
  * @param sqlPath SQL 檔案路徑
  * @param onProgress 進度回調函數
  */
@@ -142,33 +139,45 @@ async function executeSQLRestore(
 ): Promise<void> {
   validateDBConfig()
 
+  // 建立 PostgreSQL 連線
+  const pgClient = new Client({
+    host: DB_CONFIG.host,
+    port: parseInt(DB_CONFIG.port || '5432'),
+    database: DB_CONFIG.database,
+    user: DB_CONFIG.user,
+    password: DB_CONFIG.password,
+    ssl: {
+      rejectUnauthorized: false, // Supabase 使用自簽憑證
+    },
+  })
+
   try {
     onProgress?.({
       stage: 'restoring',
-      message: '正在還原資料庫...',
+      message: '正在連接資料庫...',
       percentage: 70,
     })
 
-    // Windows 平台使用不同的密碼設定方式
-    const isWindows = process.platform === 'win32'
+    // 連接到資料庫
+    await pgClient.connect()
 
-    let command: string
-    if (isWindows) {
-      // Windows: 使用 PowerShell 設定環境變數
-      command = `powershell -Command "$env:PGPASSWORD='${DB_CONFIG.password}'; & psql -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -f '${sqlPath}'"`
-    } else {
-      // Linux/macOS: 使用 PGPASSWORD 環境變數
-      command = `PGPASSWORD="${DB_CONFIG.password}" psql -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -f "${sqlPath}"`
-    }
-
-    const { stdout, stderr } = await execAsync(command, {
-      maxBuffer: 50 * 1024 * 1024, // 50MB buffer
-      timeout: 600000, // 10 分鐘 timeout
+    onProgress?.({
+      stage: 'restoring',
+      message: '正在讀取 SQL 檔案...',
+      percentage: 72,
     })
 
-    if (stderr && !stderr.includes('NOTICE')) {
-      console.warn('psql stderr:', stderr)
-    }
+    // 讀取 SQL 檔案內容
+    const sqlContent = readFileSync(sqlPath, 'utf-8')
+
+    onProgress?.({
+      stage: 'restoring',
+      message: '正在執行 SQL 還原...',
+      percentage: 75,
+    })
+
+    // 直接執行完整的 SQL 檔案（pg Client 可以處理多條語句）
+    await pgClient.query(sqlContent)
 
     onProgress?.({
       stage: 'restoring',
@@ -176,8 +185,12 @@ async function executeSQLRestore(
       percentage: 90,
     })
   } catch (error) {
+    console.error('SQL 還原失敗:', error)
     throw new Error(`執行 SQL 還原失敗: ${error instanceof Error ? error.message : String(error)}`)
   } finally {
+    // 關閉資料庫連線
+    await pgClient.end().catch(console.error)
+
     // 清理 SQL 檔案
     if (existsSync(sqlPath)) {
       unlinkSync(sqlPath)

@@ -1,10 +1,10 @@
 /**
  * 雲端儲存統一介面
- * 實作自動切換邏輯（GCS 失敗時自動切換到 Vercel Blob）
+ * 僅使用 GCS 儲存備份（避免 Vercel Blob 因大檔案產生費用）
  */
 
 import { uploadBackupFromBuffer as uploadToGCS, deleteBackup as deleteGCSBackup, downloadBackupFile as downloadGCS } from './gcs'
-import { uploadToVercelBlob, deleteFromVercelBlob, downloadFromVercelBlob } from './vercel-blob'
+import { deleteFromVercelBlob, downloadFromVercelBlob } from './vercel-blob'
 
 export interface UploadResult {
   storage_provider: 'gcs' | 'vercel_blob'
@@ -13,8 +13,7 @@ export interface UploadResult {
 }
 
 /**
- * 上傳備份到雲端（自動切換邏輯）
- * 優先嘗試 GCS，失敗時自動切換到 Vercel Blob
+ * 上傳備份到 GCS（僅使用 GCS，不自動切換到 Vercel Blob）
  *
  * @param filename 檔案名稱（例: vsale-backup-20260109-020000.sql.gz）
  * @param buffer 檔案 Buffer
@@ -24,33 +23,23 @@ export async function uploadBackup(
   filename: string,
   buffer: Buffer
 ): Promise<UploadResult> {
-  // 優先嘗試 GCS
-  try {
-    console.log('[Cloud Storage] Attempting GCS upload...')
-    const gcsUrl = await uploadToGCS(filename, buffer) // uploadToGCS 現在接受 (filename, buffer)
+  console.log('[Cloud Storage] Uploading to GCS...')
 
+  try {
+    const gcsUrl = await uploadToGCS(filename, buffer)
+
+    console.log('[Cloud Storage] GCS upload successful')
     return {
       storage_provider: 'gcs',
       storage_url: gcsUrl,
     }
   } catch (gcsError) {
-    console.warn('[Cloud Storage] GCS upload failed, switching to Vercel Blob...', gcsError)
+    console.error('[Cloud Storage] GCS upload failed:', gcsError)
 
-    // GCS 失敗，自動切換到 Vercel Blob
-    try {
-      const vercelUrl = await uploadToVercelBlob(filename, buffer)
-
-      return {
-        storage_provider: 'vercel_blob',
-        storage_url: vercelUrl,
-        error_message: `GCS 上傳失敗（已切換到 Vercel Blob）: ${gcsError instanceof Error ? gcsError.message : 'Unknown error'}`,
-      }
-    } catch (vercelError) {
-      // 兩個儲存都失敗
-      throw new Error(
-        `所有雲端儲存均失敗 - GCS: ${gcsError instanceof Error ? gcsError.message : 'Unknown'}, Vercel Blob: ${vercelError instanceof Error ? vercelError.message : 'Unknown'}`
-      )
-    }
+    // 不再自動切換到 Vercel Blob，直接拋出錯誤
+    throw new Error(
+      `GCS 上傳失敗: ${gcsError instanceof Error ? gcsError.message : 'Unknown error'}`
+    )
   }
 }
 
