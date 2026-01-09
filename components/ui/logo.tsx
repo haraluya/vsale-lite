@@ -10,7 +10,9 @@ interface LogoProps {
 }
 
 export function Logo({ variant = 'full', className = '', href = '/store' }: LogoProps) {
-  const [logoUrl, setLogoUrl] = useState('/logo.svg')
+  // 根據 variant 選擇預設 Logo
+  const defaultLogoUrl = variant === 'icon' ? '/logo-icon.svg' : '/logo.svg'
+  const [logoUrl, setLogoUrl] = useState(defaultLogoUrl)
 
   useEffect(() => {
     // 從 API 讀取 Logo URL（禁用快取）
@@ -27,14 +29,17 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
         // 僅當有有效的 URL 時才更新（非空字串且不是純空白）
         if (logoSetting?.value && typeof logoSetting.value === 'string' && logoSetting.value.trim()) {
           setLogoUrl(logoSetting.value)
+        } else {
+          // 如果 logo_url 為空，使用對應的預設 Logo
+          setLogoUrl(defaultLogoUrl)
         }
-        // 如果 logo_url 為空，保持使用預設的 /logo.svg（不做任何更新）
       })
       .catch((err) => {
         console.error('Failed to load logo:', err)
-        // 載入失敗時也保持使用預設 Logo
+        // 載入失敗時使用預設 Logo
+        setLogoUrl(defaultLogoUrl)
       })
-  }, [])
+  }, [defaultLogoUrl])
 
   const logoAlt = 'Vsale'
   const width = variant === 'full' ? 200 : 60
