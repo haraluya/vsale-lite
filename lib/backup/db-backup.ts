@@ -11,7 +11,8 @@ import { pipeline } from 'stream/promises'
 import path from 'path'
 import os from 'os'
 import { createClient } from '@/lib/supabase/server'
-import { uploadBackup } from '@/lib/cloud-storage/gcs'
+import { uploadBackup } from '@/lib/cloud-storage'
+import { readFileSync } from 'fs'
 import { cleanupOldBackups } from '@/lib/backup/cleanup'
 import type { BackupMetadata, BackupJob } from '@/types'
 
@@ -231,8 +232,9 @@ export async function performBackup(
     // 3. 壓縮備份檔案
     await compressBackup(sqlFilePath, gzFilePath)
 
-    // 4. 上傳到 GCS
-    const storageUrl = await uploadBackup(gzFilePath, filename)
+    // 4. 上傳到雲端（自動切換邏輯：GCS 優先，失敗時切換到 Vercel Blob）
+    const buffer = readFileSync(gzFilePath)
+    const uploadResult = await uploadBackup(filename, buffer)
 
     // 5. 計算備份元數據
     const durationMs = Date.now() - startTime
@@ -243,9 +245,11 @@ export async function performBackup(
       .from('backup_jobs')
       .update({
         file_size: metadata.compressed_size,
-        storage_url: storageUrl,
+        storage_provider: uploadResult.storage_provider,
+        storage_url: uploadResult.storage_url,
         status: 'success',
         metadata,
+        error_message: uploadResult.error_message || null,
         completed_at: new Date().toISOString(),
       })
       .eq('id', backupJobId)

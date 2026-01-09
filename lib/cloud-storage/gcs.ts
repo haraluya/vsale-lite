@@ -74,6 +74,39 @@ export async function uploadBackup(
 }
 
 /**
+ * 上傳備份檔案到 GCS（從 Buffer）
+ * @param filename 儲存的檔案名稱（例如：vsale-backup-20260109-020000.sql.gz）
+ * @param buffer 檔案 Buffer
+ * @returns GCS 儲存 URL（gs://bucket/filename）
+ */
+export async function uploadBackupFromBuffer(
+  filename: string,
+  buffer: Buffer
+): Promise<string> {
+  const storage = getStorageClient()
+  const bucket = storage.bucket(GCS_CONFIG.bucketName)
+  const file = bucket.file(filename)
+
+  try {
+    // 上傳 Buffer 到 GCS
+    await file.save(buffer, {
+      metadata: {
+        contentType: 'application/gzip',
+        metadata: {
+          uploadedAt: new Date().toISOString(),
+        },
+      },
+    })
+
+    console.log(`GCS upload successful: gs://${GCS_CONFIG.bucketName}/${filename}`)
+    return `gs://${GCS_CONFIG.bucketName}/${filename}`
+  } catch (error) {
+    console.error('GCS upload from buffer failed:', error)
+    throw new Error(`Failed to upload backup to GCS: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+/**
  * 列出所有備份檔案
  * @returns 備份檔案列表（檔名、大小、建立時間）
  */
