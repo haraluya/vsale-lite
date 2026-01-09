@@ -10,7 +10,8 @@
       "Bash(pnpm --version:*)",
       "Bash(gcloud projects get-iam-policy:*)",
       "Bash(echo:*)",
-      "Bash(gcloud projects describe:*)"
+      "Bash(gcloud projects describe:*)",
+      "Bash(powershell.exe:*)"
     ]
   }
 }
