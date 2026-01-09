@@ -11,7 +11,6 @@ interface LogoProps {
 
 export function Logo({ variant = 'full', className = '', href = '/store' }: LogoProps) {
   const [logoUrl, setLogoUrl] = useState('/logo.svg')
-  const [imageKey, setImageKey] = useState(Date.now())
 
   useEffect(() => {
     // 從 API 讀取 Logo URL（禁用快取）
@@ -27,12 +26,7 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
         const logoSetting = settings.find((s: any) => s.key === 'logo_url')
         // 僅當有有效的 URL 時才更新（非空字串且不是純空白）
         if (logoSetting?.value && typeof logoSetting.value === 'string' && logoSetting.value.trim()) {
-          // 加上時間戳來強制重新載入圖片
-          const urlWithTimestamp = logoSetting.value.includes('?')
-            ? `${logoSetting.value}&t=${Date.now()}`
-            : `${logoSetting.value}?t=${Date.now()}`
-          setLogoUrl(urlWithTimestamp)
-          setImageKey(Date.now())
+          setLogoUrl(logoSetting.value)
         }
         // 如果 logo_url 為空，保持使用預設的 /logo.svg（不做任何更新）
       })
@@ -50,12 +44,12 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
     <Link href={href} className={`inline-block ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        key={imageKey}
         src={logoUrl}
         alt={logoAlt}
         width={width}
         height={height}
-        className="h-auto w-auto"
+        style={{ maxWidth: width, maxHeight: height }}
+        className="h-auto w-auto object-contain"
       />
     </Link>
   )

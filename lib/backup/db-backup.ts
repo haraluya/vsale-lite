@@ -69,7 +69,8 @@ async function createDatabaseDump(outputPath: string): Promise<void> {
 
   // 方案 1: 優先使用 Supabase CLI（不需要安裝 PostgreSQL）
   try {
-    const supabaseCommand = `supabase db dump --linked -f "${outputPath}"`
+    // ✅ 修正：使用 --data-only 僅備份資料，避免 CREATE TABLE 衝突
+    const supabaseCommand = `supabase db dump --linked --data-only -f "${outputPath}"`
 
     const { stdout, stderr } = await execAsync(supabaseCommand, {
       maxBuffer: 50 * 1024 * 1024, // 50MB buffer
@@ -79,7 +80,7 @@ async function createDatabaseDump(outputPath: string): Promise<void> {
       console.warn('supabase db dump stderr:', stderr)
     }
 
-    console.log('Database dump completed using Supabase CLI')
+    console.log('Database dump completed using Supabase CLI (data-only mode)')
     return
   } catch (supabaseError) {
     console.warn('Supabase CLI dump failed, trying pg_dump...', supabaseError)
@@ -87,7 +88,8 @@ async function createDatabaseDump(outputPath: string): Promise<void> {
 
   // 方案 2: Fallback 到 pg_dump（需要安裝 PostgreSQL 客戶端工具）
   try {
-    const pgDumpCommand = `pg_dump -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -F p --no-owner --no-acl -f "${outputPath}"`
+    // ✅ 修正：新增 --data-only 參數僅備份資料
+    const pgDumpCommand = `pg_dump -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -F p --data-only --no-owner --no-acl -f "${outputPath}"`
 
     const { stdout, stderr } = await execAsync(pgDumpCommand, {
       maxBuffer: 50 * 1024 * 1024,
