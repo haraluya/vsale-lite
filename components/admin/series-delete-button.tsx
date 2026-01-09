@@ -6,6 +6,7 @@
  * - 刪除系列
  * - 確認對話框
  * - 檢查是否有商品使用
+ * - 顯示使用該系列的商品清單
  */
 
 'use client'
@@ -15,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import { deleteSeries } from '@/lib/actions/series'
 import { Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useConfirm } from '@/lib/contexts/dialog-context'
+import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
 import { toast } from 'sonner'
 
 interface SeriesDeleteButtonProps {
@@ -25,6 +26,7 @@ interface SeriesDeleteButtonProps {
 
 export function SeriesDeleteButton({ seriesId, seriesName }: SeriesDeleteButtonProps) {
   const confirm = useConfirm()
+  const alert = useAlert()
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -50,10 +52,19 @@ export function SeriesDeleteButton({ seriesId, seriesName }: SeriesDeleteButtonP
         toast.success(result.message || '系列刪除成功')
         router.refresh()
       } else {
-        toast.error(result.message || '系列刪除失敗')
+        // 使用 alert 對話框顯示詳細錯誤訊息（支援多行訊息）
+        await alert({
+          title: '無法刪除系列',
+          message: result.message || '系列刪除失敗',
+          variant: 'error',
+        })
       }
     } catch (error) {
-      toast.error('刪除失敗：' + (error instanceof Error ? error.message : '未知錯誤'))
+      await alert({
+        title: '刪除失敗',
+        message: error instanceof Error ? error.message : '未知錯誤',
+        variant: 'error',
+      })
     } finally {
       setLoading(false)
     }

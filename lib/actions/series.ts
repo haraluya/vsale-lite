@@ -280,10 +280,10 @@ export async function deleteSeries(id: string): Promise<ActionResult<void>> {
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
-    // 檢查系列是否存在
+    // 檢查系列是否存在並取得系列資訊
     const { data: existing } = await adminClient
       .from('series')
-      .select('id')
+      .select('id, name, code')
       .eq('id', id)
       .single()
 
@@ -291,16 +291,24 @@ export async function deleteSeries(id: string): Promise<ActionResult<void>> {
       return { success: false, message: '系列不存在' }
     }
 
-    // 檢查系列下是否有商品
-    const { count } = await adminClient
+    // 檢查系列下是否有商品，並取得商品清單
+    const { data: products, count } = await adminClient
       .from('products')
-      .select('id', { count: 'exact', head: true })
+      .select('name, code')
       .eq('series_id', id)
+      .limit(10) // 最多顯示 10 個商品
 
     if (count && count > 0) {
+      // 建立商品清單訊息
+      const productList = products
+        ?.map((p) => `  • ${p.name} (${p.code})`)
+        .join('\n') || ''
+
+      const moreProducts = count > 10 ? `\n  ... 以及其他 ${count - 10} 個商品` : ''
+
       return {
         success: false,
-        message: '無法刪除：此系列下仍有商品,請先刪除或遷移商品',
+        message: `無法刪除系列「${existing.name}」(${existing.code})：\n\n此系列下有 ${count} 個商品正在使用：\n${productList}${moreProducts}\n\n請先刪除或將這些商品遷移到其他系列。`,
       }
     }
 
@@ -318,7 +326,7 @@ export async function deleteSeries(id: string): Promise<ActionResult<void>> {
 
     return {
       success: true,
-      message: '系列刪除成功',
+      message: `系列「${existing.name}」刪除成功`,
     }
   } catch (error) {
     console.error('deleteSeries 異常:', error)
