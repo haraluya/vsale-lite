@@ -443,7 +443,7 @@ export async function deleteClient(id: string): Promise<ActionResult> {
     // 2. 檢查客戶是否存在
     const { data: existingClient } = await adminClient
       .from('profiles')
-      .select('id, role, phone')
+      .select('id, role, phone, display_name')
       .eq('id', id)
       .single()
 
@@ -461,7 +461,29 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       }
     }
 
-    // 3. 使用 Admin Client 刪除 Auth 使用者 (確保電話號碼可重新註冊)
+    // 3. 檢查是否有關聯的訂單 (orders.user_id 使用 ON DELETE RESTRICT)
+    const { data: orders, error: ordersCheckError } = await adminClient
+      .from('orders')
+      .select('id')
+      .eq('user_id', id)
+      .limit(1)
+
+    if (ordersCheckError) {
+      console.error('檢查訂單失敗:', ordersCheckError)
+      return {
+        success: false,
+        message: '無法檢查客戶訂單，請稍後再試',
+      }
+    }
+
+    if (orders && orders.length > 0) {
+      return {
+        success: false,
+        message: '此客戶有訂單記錄，無法刪除。請先處理或刪除相關訂單。',
+      }
+    }
+
+    // 4. 使用 Admin Client 刪除 Auth 使用者 (確保電話號碼可重新註冊)
     const { error: authError } = await adminClient.auth.admin.deleteUser(id)
 
     if (authError) {
@@ -472,7 +494,7 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       }
     }
 
-    // 4. 再刪除 profile 資料 (cascade delete)
+    // 5. 再刪除 profile 資料 (cascade delete)
     const { error: profileError } = await adminClient
       .from('profiles')
       .delete()
@@ -482,9 +504,24 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       console.error('刪除客戶資料失敗:', profileError)
       // Auth 已刪除,Profile 失敗時記錄錯誤
       console.warn(`客戶 ${existingClient.phone} 的 auth 已刪除,但 profile 刪除失敗`)
+      return {
+        success: false,
+        message: `Auth 已刪除但資料清理失敗: ${profileError.message}`,
+      }
     }
 
-    // 5. Revalidate
+    // 6. 記錄操作日誌
+    await logAudit({
+      target_type: 'client',
+      target_id: id,
+      action_type: 'deleted',
+      old_values: {
+        phone: existingClient.phone,
+        display_name: existingClient.display_name,
+      },
+    })
+
+    // 7. Revalidate
     revalidatePath('/admin/clients')
 
     return {
