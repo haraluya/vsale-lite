@@ -419,8 +419,15 @@ supabase db push
 # 4. 驗證部署
 supabase db pull  # 確認 Schema 一致
 
-# 5. 測試功能
-pnpm build && firebase deploy
+# 5. 測試功能與部署
+# 本機驗證
+pnpm build && pnpm type-check && pnpm lint
+
+# 部署到 Vercel (自動)
+git push origin master  # GitHub Actions 自動執行部署
+
+# 或手動部署
+vercel --prod
 ```
 
 **🚨 絕對禁止**:

@@ -240,7 +240,7 @@ A: Skill 是「約束機制」而非「技術限制」。它能大幅降低誤�
    - 自動產生繁體中文 commit
 
 2. **Deployment Manager**
-   - Firebase 部署前檢查清單
+   - Vercel 部署前檢查清單
    - 自動執行 type-check 與 build
 
 3. **Test Runner**

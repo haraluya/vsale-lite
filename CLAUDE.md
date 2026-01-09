@@ -64,8 +64,10 @@ Vsale-lite 是一個專為批發業務設計的輕量級 B2B 訂貨系統,解決
 - **測試環境**: jsdom
 
 ### 部署
-- **平台**: Firebase App Hosting
-- **區域**: asia-east1 (Taiwan)
+- **平台**: Vercel (Serverless)
+- **區域**: sin1 (Singapore - 最接近台灣)
+- **自動部署**: GitHub Actions (push to master)
+- **備份系統**: Supabase 原生備份 + Google Cloud Storage
 <!-- END TECH_STACK -->
 
 ---
@@ -537,9 +539,10 @@ const value = await prompt({
 - 格式: `feat: 新增客戶端購物車功能` 或 `fix: 修復價格顯示錯誤`
 
 ### 部署策略
-- **必須** 以最小上傳大小部署 Firebase
-- 僅部署有修改的文件
-- 部署前執行 `pnpm build` 與型別檢查
+- **必須** 遵循 Vercel 自動部署流程（GitHub Actions）
+- 部署前自動執行 `pnpm build`、型別檢查與 ESLint
+- 僅部署有修改的文件（Vercel 自動最佳化）
+- 詳細部署指南參見 [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ### 測試策略
 - P0 功能必須包含整合測試

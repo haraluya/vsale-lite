@@ -155,8 +155,9 @@
 
 - [ ] **已部署應用程式**
   ```bash
-  pnpm build                     # 建置生產環境
-  firebase deploy --only hosting # 僅部署 Hosting
+  pnpm build                      # 建置生產環境
+  git push origin master          # 透過 GitHub Actions 自動部署到 Vercel
+  # 或手動部署: vercel --prod
   ```
   - 部署時間: `___________________`
   - 部署 URL: `___________________`
@@ -164,7 +165,8 @@
 - [ ] **已檢查部署日誌**
   - 無建置錯誤
   - 無部署錯誤
-  - Firebase Hosting 顯示成功
+  - Vercel 部署顯示成功 (檢查 GitHub Actions 或 Vercel Dashboard)
+  - 生產環境 URL: https://vsale-lite.vercel.app (或自訂網域)
 
 ---
 
@@ -228,7 +230,8 @@
 
 - [ ] **已監控錯誤日誌（至少 30 分鐘）**
   - Supabase Dashboard → Logs
-  - Firebase Console → Functions Logs (如有使用)
+  - Vercel Dashboard → Deployment Logs
+  - Vercel Dashboard → Runtime Logs (Serverless Functions)
   - 無異常錯誤
 
 - [ ] **已檢查效能指標**
@@ -292,8 +295,8 @@
 #### 方案 A: 從備份還原（最安全）
 
 ```bash
-# 1. 停止應用程式（避免寫入資料）
-firebase hosting:disable
+# 1. 回滾 Vercel 部署（立即恢復舊版應用程式）
+vercel rollback  # 或在 Vercel Dashboard 中選擇先前的部署版本
 
 # 2. 還原資料庫
 pg_restore -h db.qwovavytryvgchcowjof.supabase.co \
@@ -301,10 +304,10 @@ pg_restore -h db.qwovavytryvgchcowjof.supabase.co \
   --clean --if-exists \
   backup_YYYYMMDD_HHMMSS.dump
 
-# 3. 重新部署舊版應用程式
+# 3. 如需手動重新部署舊版
 git checkout previous-commit-hash
 pnpm build
-firebase deploy --only hosting
+vercel --prod  # 或 git push origin master 觸發自動部署
 
 # 4. 驗證系統正常
 ```
