@@ -537,6 +537,7 @@ export type BackupJob = {
   metadata: BackupMetadata | null  // 備份統計資料
   error_message: string | null  // 失敗時錯誤訊息
   created_by: string | null  // 手動備份操作者（自動備份時為 NULL）
+  includes_storage: boolean  // 是否包含 Supabase Storage 圖片（預設 false）
   started_at: string  // ISO 8601 格式
   completed_at: string | null
   created_at: string

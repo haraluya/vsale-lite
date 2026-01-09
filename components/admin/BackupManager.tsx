@@ -14,7 +14,6 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  RotateCcw,
 } from 'lucide-react'
 import { triggerBackup, getBackupJobs, deleteBackupJob } from '@/lib/actions/backup'
 import { useAlert, useConfirm } from '@/lib/contexts/dialog-context'
@@ -26,13 +25,9 @@ export function BackupManager() {
   const [jobs, setJobs] = useState<BackupJob[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [includeStorage, setIncludeStorage] = useState(false)
   const [backupInProgress, setBackupInProgress] = useState(false)
   const [backupProgress, setBackupProgress] = useState<{
-    message: string
-    percentage: number
-  } | null>(null)
-  const [restoreInProgress, setRestoreInProgress] = useState(false)
-  const [restoreProgress, setRestoreProgress] = useState<{
     message: string
     percentage: number
   } | null>(null)
@@ -63,7 +58,9 @@ export function BackupManager() {
 
     try {
       // 使用 EventSource 監聽備份進度
-      const eventSource = new EventSource('/api/backup/trigger')
+      const eventSource = new EventSource(
+        `/api/backup/trigger?includeStorage=${includeStorage ? 'true' : 'false'}`
+      )
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data)
@@ -183,85 +180,6 @@ export function BackupManager() {
     }
   }
 
-  async function handleRestoreBackup(job: BackupJob) {
-    const confirmed = await confirm({
-      title: '確認還原資料庫',
-      description: `確定要將資料庫還原到「${job.filename}」的時間點嗎？\n\n⚠️ 警告：此操作將覆蓋當前所有資料，建議先執行備份！`,
-      variant: 'danger',
-    })
-
-    if (!confirmed) return
-
-    setRestoreInProgress(true)
-    setRestoreProgress({ message: '準備還原資料庫...', percentage: 0 })
-
-    try {
-      // 使用 EventSource 監聽還原進度
-      const eventSource = new EventSource(`/api/backup/restore?jobId=${job.id}`)
-
-      eventSource.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-
-        if (data.stage === 'completed') {
-          // 還原完成
-          setRestoreProgress({ message: data.message, percentage: 100 })
-          eventSource.close()
-
-          setTimeout(() => {
-            alert({
-              title: '還原完成',
-              message: '資料庫已成功還原',
-              variant: 'success',
-            }).then(() => {
-              setRestoreInProgress(false)
-              setRestoreProgress(null)
-              loadJobs()
-            })
-          }, 1000)
-        } else if (data.stage === 'error') {
-          // 還原失敗
-          eventSource.close()
-          setRestoreProgress(null)
-          setRestoreInProgress(false)
-
-          alert({
-            title: '還原失敗',
-            message: data.error || '執行還原時發生錯誤',
-            variant: 'error',
-          }).then(() => {
-            loadJobs()
-          })
-        } else {
-          // 更新進度
-          setRestoreProgress({
-            message: data.message,
-            percentage: data.percentage || 0,
-          })
-        }
-      }
-
-      eventSource.onerror = () => {
-        eventSource.close()
-        setRestoreProgress(null)
-        setRestoreInProgress(false)
-
-        alert({
-          title: '連線錯誤',
-          message: '無法連線到伺服器，請重新整理頁面後再試',
-          variant: 'error',
-        })
-      }
-    } catch (error) {
-      setRestoreProgress(null)
-      setRestoreInProgress(false)
-
-      await alert({
-        title: '執行失敗',
-        message: error instanceof Error ? error.message : '無法執行還原',
-        variant: 'error',
-      })
-    }
-  }
 
   return (
     <div className="space-y-4">
@@ -289,6 +207,25 @@ export function BackupManager() {
         </div>
       </div>
 
+      {/* 備份選項 */}
+      <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+        <label className="flex cursor-pointer items-center gap-3">
+          <input
+            type="checkbox"
+            checked={includeStorage}
+            onChange={(e) => setIncludeStorage(e.target.checked)}
+            disabled={backupInProgress}
+            className="h-5 w-5 cursor-pointer border-2 border-black accent-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          />
+          <div>
+            <span className="font-bold">備份包含商品圖片與系統圖片</span>
+            <p className="text-sm text-gray-600">
+              包含 Supabase Storage 中的所有圖片檔案（商品圖、系統 Logo、公告圖片等）
+            </p>
+          </div>
+        </label>
+      </div>
+
       {/* 備份進度條 */}
       {backupProgress && (
         <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
@@ -307,23 +244,6 @@ export function BackupManager() {
         </div>
       )}
 
-      {/* 還原進度條 */}
-      {restoreProgress && (
-        <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="font-bold text-orange-600">{restoreProgress.message}</span>
-            <span className="text-sm font-bold text-gray-600">
-              {restoreProgress.percentage}%
-            </span>
-          </div>
-          <div className="h-4 w-full rounded-none border-2 border-black bg-gray-100">
-            <div
-              className="h-full bg-orange-400 transition-all duration-300"
-              style={{ width: `${restoreProgress.percentage}%` }}
-            />
-          </div>
-        </div>
-      )}
 
       {/* 備份列表 - 桌面表格視圖 */}
       <div className="hidden overflow-x-auto md:block">
@@ -343,6 +263,9 @@ export function BackupManager() {
                 狀態
               </th>
               <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
+                包含內容
+              </th>
+              <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
                 時間
               </th>
               <th className="px-4 py-3 text-left font-bold">操作</th>
@@ -351,13 +274,13 @@ export function BackupManager() {
           <tbody>
             {loading && jobs.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-600">
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-600">
                   載入中...
                 </td>
               </tr>
             ) : jobs.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-600">
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-600">
                   尚無備份記錄
                 </td>
               </tr>
@@ -377,28 +300,21 @@ export function BackupManager() {
                     <BackupStatusBadge status={job.status} />
                   </td>
                   <td className="border-r-2 border-black px-4 py-3 md:border-r-3">
+                    <BackupContentBadge includesStorage={job.includes_storage} />
+                  </td>
+                  <td className="border-r-2 border-black px-4 py-3 md:border-r-3">
                     {formatBackupTime(job.started_at)}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       {job.status === 'success' && (
-                        <>
-                          <button
-                            onClick={() => handleRestoreBackup(job)}
-                            disabled={restoreInProgress || backupInProgress}
-                            className="rounded-none border-2 border-black bg-orange-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
-                            title="還原資料庫"
-                          >
-                            <RotateCcw className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDownloadBackup(job)}
-                            className="rounded-none border-2 border-black bg-green-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
-                            title="下載備份"
-                          >
-                            <Download className="h-4 w-4" />
-                          </button>
-                        </>
+                        <button
+                          onClick={() => handleDownloadBackup(job)}
+                          className="rounded-none border-2 border-black bg-green-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                          title="下載備份"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
                       )}
                       <button
                         onClick={() => handleDeleteBackup(job)}
@@ -448,21 +364,12 @@ export function BackupManager() {
               </div>
               <div className="flex gap-2">
                 {job.status === 'success' && (
-                  <>
-                    <button
-                      onClick={() => handleRestoreBackup(job)}
-                      disabled={restoreInProgress || backupInProgress}
-                      className="flex-1 rounded-none border-2 border-black bg-orange-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
-                    >
-                      <RotateCcw className="mx-auto h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDownloadBackup(job)}
-                      className="flex-1 rounded-none border-2 border-black bg-green-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
-                    >
-                      <Download className="mx-auto h-4 w-4" />
-                    </button>
-                  </>
+                  <button
+                    onClick={() => handleDownloadBackup(job)}
+                    className="flex-1 rounded-none border-2 border-black bg-green-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                  >
+                    <Download className="mx-auto h-4 w-4" />
+                  </button>
                 )}
                 <button
                   onClick={() => handleDeleteBackup(job)}
@@ -531,6 +438,21 @@ function BackupStatusBadge({
     >
       <Icon className="h-3 w-3" />
       <span>{text}</span>
+    </span>
+  )
+}
+
+/**
+ * 備份內容徽章
+ */
+function BackupContentBadge({ includesStorage }: { includesStorage: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${
+        includesStorage ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+      }`}
+    >
+      {includesStorage ? '✓ 含圖片' : '僅資料庫'}
     </span>
   )
 }

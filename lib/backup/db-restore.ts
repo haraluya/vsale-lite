@@ -6,14 +6,11 @@
 import { createWriteStream, createReadStream, unlinkSync, existsSync, readFileSync } from 'fs'
 import { createGunzip } from 'zlib'
 import { pipeline } from 'stream/promises'
-import { exec } from 'child_process'
-import { promisify } from 'util'
 import path from 'path'
 import os from 'os'
+import { Client } from 'pg'
 import { createClient } from '@/lib/supabase/server'
 import { downloadBackup } from '@/lib/cloud-storage'
-
-const execAsync = promisify(exec)
 
 // 資料庫連線資訊（從環境變數讀取）
 const DB_CONFIG = {
@@ -132,12 +129,17 @@ async function downloadAndDecompress(
 }
 
 /**
- * 執行 SQL 還原（使用 psql 指令）
+ * 執行 SQL 還原（使用 Node.js pg Driver）
  *
- * ⚠️ 需求：必須安裝 PostgreSQL 客戶端工具
- * Windows: https://www.postgresql.org/download/windows/
- * macOS: brew install postgresql
- * Linux: sudo apt-get install postgresql-client
+ * 流程：
+ * 1. 連線到 Supabase 資料庫（Session Pooler）
+ * 2. 開啟 Transaction（確保原子性）
+ * 3. 停用觸發器（SET session_replication_role = replica）
+ * 4. 清空資料庫（DROP SCHEMA CASCADE + CREATE SCHEMA）
+ * 5. 執行備份 SQL
+ * 6. 提交 Transaction（成功）或回滾（失敗）
+ *
+ * ⚠️ 注意：此操作會完全清空並覆蓋當前資料庫
  *
  * @param sqlPath SQL 檔案路徑
  * @param onProgress 進度回調函數
@@ -148,44 +150,70 @@ async function executeSQLRestore(
 ): Promise<void> {
   validateDBConfig()
 
+  onProgress?.({
+    stage: 'restoring',
+    message: '正在連線到資料庫...',
+    percentage: 65,
+  })
+
+  // 建立 PostgreSQL 客戶端
+  const client = new Client({
+    host: DB_CONFIG.host,
+    port: Number(DB_CONFIG.port),
+    database: DB_CONFIG.database,
+    user: DB_CONFIG.user,
+    password: DB_CONFIG.password,
+    ssl: {
+      rejectUnauthorized: false, // Supabase 需要 SSL 但使用自簽證書
+    },
+  })
+
   try {
+    // 連線到資料庫
+    await client.connect()
+    console.log('Connected to database successfully')
+
     onProgress?.({
       stage: 'restoring',
-      message: '正在連線到資料庫...',
+      message: '正在準備還原環境...',
       percentage: 70,
     })
 
+    // 開始 Transaction
+    await client.query('BEGIN')
+    console.log('Transaction started')
+
+    // 停用觸發器（防止雙重加密）
+    await client.query('SET session_replication_role = replica')
+    console.log('Triggers disabled (session_replication_role = replica)')
+
     onProgress?.({
       stage: 'restoring',
-      message: '正在執行 SQL 還原...',
+      message: '正在清空現有資料...',
       percentage: 75,
     })
 
-    // 使用 psql 執行 SQL 檔案
-    // 透過環境變數傳遞密碼（跨平台支援）
-    const psqlCommand = `psql -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -f "${sqlPath}"`
+    // 清空資料庫
+    await client.query('DROP SCHEMA IF EXISTS public CASCADE')
+    await client.query('CREATE SCHEMA public')
+    await client.query('GRANT ALL ON SCHEMA public TO postgres')
+    await client.query('GRANT ALL ON SCHEMA public TO public')
+    console.log('Database schema cleared')
 
-    console.log('Executing restore with psql...')
-
-    const { stdout, stderr } = await execAsync(psqlCommand, {
-      maxBuffer: 50 * 1024 * 1024, // 50MB buffer
-      timeout: 600000, // 10 分鐘超時
-      env: {
-        ...process.env,
-        PGPASSWORD: DB_CONFIG.password, // 透過環境變數傳遞密碼
-        PGSSLMODE: 'require', // 強制使用 SSL
-      },
+    onProgress?.({
+      stage: 'restoring',
+      message: '正在還原備份資料...',
+      percentage: 80,
     })
 
-    if (stderr && !stderr.includes('WARNING') && !stderr.includes('NOTICE')) {
-      console.warn('psql stderr:', stderr)
-    }
+    // 讀取並執行備份 SQL
+    const sql = readFileSync(sqlPath, 'utf-8')
+    await client.query(sql)
+    console.log('Backup SQL executed successfully')
 
-    if (stdout) {
-      console.log('psql output:', stdout)
-    }
-
-    console.log('Database restore completed using psql')
+    // 提交 Transaction
+    await client.query('COMMIT')
+    console.log('Transaction committed')
 
     onProgress?.({
       stage: 'restoring',
@@ -193,6 +221,14 @@ async function executeSQLRestore(
       percentage: 90,
     })
   } catch (error) {
+    // 回滾 Transaction（確保資料一致性）
+    try {
+      await client.query('ROLLBACK')
+      console.log('Transaction rolled back due to error')
+    } catch (rollbackError) {
+      console.error('Failed to rollback transaction:', rollbackError)
+    }
+
     console.error('SQL 還原失敗:', error)
 
     // 提供更詳細的錯誤訊息
@@ -200,24 +236,30 @@ async function executeSQLRestore(
     if (error instanceof Error) {
       errorMessage = error.message
 
-      // 針對常見錯誤提供解決方案
-      if (errorMessage.includes('psql') && (errorMessage.includes('command not found') || errorMessage.includes('不是內部或外部命令'))) {
-        errorMessage = '⚠️ psql 指令未安裝\n\n' +
-          '還原功能需要 PostgreSQL 客戶端工具 (psql)。\n\n' +
-          '📥 安裝方式：\n' +
-          '1. 下載 PostgreSQL: https://www.postgresql.org/download/windows/\n' +
-          '2. 安裝時勾選 "Command Line Tools"\n' +
-          '3. 重新啟動終端機與開發伺服器\n' +
-          '4. 驗證安裝: 執行 psql --version\n\n' +
-          '💡 備註：僅需安裝客戶端工具，不需要執行 PostgreSQL 伺服器。'
+      // 特殊錯誤處理
+      if (errorMessage.includes('ECONNREFUSED')) {
+        errorMessage = '無法連線到資料庫，請檢查網路連線或資料庫設定'
+      } else if (errorMessage.includes('authentication failed')) {
+        errorMessage = '資料庫認證失敗，請檢查 DB_USER 和 DB_PASSWORD 設定'
+      } else if (errorMessage.includes('database') && errorMessage.includes('does not exist')) {
+        errorMessage = '資料庫不存在，請檢查 DB_NAME 設定'
       }
     }
 
     throw new Error(`執行 SQL 還原失敗: ${errorMessage}`)
   } finally {
-    // 清理原始 SQL 檔案
+    // 關閉資料庫連線
+    try {
+      await client.end()
+      console.log('Database connection closed')
+    } catch (closeError) {
+      console.warn('Failed to close database connection:', closeError)
+    }
+
+    // 清理 SQL 檔案
     if (existsSync(sqlPath)) {
       unlinkSync(sqlPath)
+      console.log('SQL file cleaned up')
     }
   }
 }
