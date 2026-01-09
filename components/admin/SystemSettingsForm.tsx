@@ -111,6 +111,8 @@ export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFor
                 {setting.value_type === 'number' && (
                   <input
                     type="number"
+                    step="1"
+                    min="0"
                     value={currentValue as number}
                     className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
                     onChange={(e) => handleChange(setting.key, parseFloat(e.target.value) || 0)}

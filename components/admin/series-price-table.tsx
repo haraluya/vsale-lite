@@ -210,7 +210,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                             <input
                               type="number"
                               min="0"
-                              step="0.01"
+                              step="1"
                               value={currentPrice ?? ''}
                               onChange={(e) =>
                                 handlePriceChange(product.id, tier.tier_id, e.target.value)

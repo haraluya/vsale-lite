@@ -255,10 +255,10 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             name="retail_price"
             type="number"
             min="0"
-            step="0.01"
+            step="1"
             value={formData.retail_price}
             onChange={(e) => setFormData({ ...formData, retail_price: e.target.value })}
-            placeholder="0.00"
+            placeholder="0"
           />
           <p className="mt-1 text-xs text-gray-600">
             零售價格是商品的基準價格,用於顯示折扣力度與自動建立零售等級價格
@@ -276,6 +276,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
               id="stock"
               name="stock"
               type="number"
+              step="1"
               value={formData.stock}
               onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
               placeholder="0"

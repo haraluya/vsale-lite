@@ -185,7 +185,7 @@ export function ProductPricingForm() {
                         value={prices[priceData.tier_id] ?? ''}
                         onChange={(e) => handlePriceChange(priceData.tier_id, e.target.value)}
                         placeholder="請輸入價格"
-                        step="0.01"
+                        step="1"
                         min="0"
                         className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
                       />

@@ -92,7 +92,7 @@ export function TierForm({ tier, mode }: TierFormProps) {
                   placeholder="例: 100"
                   required={chargeShipping}
                   min="0"
-                  step="0.01"
+                  step="1"
                   className="mt-2"
                 />
                 {state && 'errors' in state && state.errors?.shipping_fee && (
@@ -112,7 +112,7 @@ export function TierForm({ tier, mode }: TierFormProps) {
                   defaultValue={tier?.free_shipping_threshold || ''}
                   placeholder="例: 1000 (留空表示不提供免運)"
                   min="1"
-                  step="0.01"
+                  step="1"
                   className="mt-2"
                 />
                 {state && 'errors' in state && state.errors?.free_shipping_threshold && (

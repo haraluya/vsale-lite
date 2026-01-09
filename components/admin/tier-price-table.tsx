@@ -142,7 +142,7 @@ export function TierPriceTable({ product, tiersWithPrices }: TierPriceTableProps
                       <input
                         type="number"
                         min="0"
-                        step="0.01"
+                        step="1"
                         value={currentPrice ?? ''}
                         onChange={(e) => handlePriceChange(tier.tier_id, e.target.value)}
                         placeholder="未設定"
