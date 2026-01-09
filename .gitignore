@@ -30,6 +30,10 @@ yarn-error.log*
 .env
 .env.vercel
 
+# GCS Service Account 金鑰（絕對不要上傳到 Git！）
+service-account-key.json
+*-service-account-key.json
+
 # vercel
 .vercel
 
