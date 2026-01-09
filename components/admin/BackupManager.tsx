@@ -26,6 +26,10 @@ export function BackupManager() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
   const [backupInProgress, setBackupInProgress] = useState(false)
+  const [backupProgress, setBackupProgress] = useState<{
+    message: string
+    percentage: number
+  } | null>(null)
   const alert = useAlert()
   const confirm = useConfirm()
 
@@ -49,24 +53,72 @@ export function BackupManager() {
 
   async function handleTriggerBackup() {
     setBackupInProgress(true)
-    const result = await triggerBackup()
+    setBackupProgress({ message: '準備開始備份...', percentage: 0 })
 
-    if (result.success) {
+    try {
+      // 使用 EventSource 監聽備份進度
+      const eventSource = new EventSource('/api/backup/trigger')
+
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+
+        if (data.stage === 'completed') {
+          // 備份完成
+          setBackupProgress({ message: data.message, percentage: 100 })
+          eventSource.close()
+
+          setTimeout(async () => {
+            await alert({
+              title: '備份完成',
+              message: '資料庫備份已成功完成',
+              variant: 'success',
+            })
+            setBackupInProgress(false)
+            setBackupProgress(null)
+            loadJobs()
+          }, 1000)
+        } else if (data.stage === 'error') {
+          // 備份失敗
+          eventSource.close()
+          setBackupProgress(null)
+          setBackupInProgress(false)
+
+          await alert({
+            title: '備份失敗',
+            message: data.message || '執行備份時發生錯誤',
+            variant: 'error',
+          })
+          loadJobs()
+        } else {
+          // 更新進度
+          setBackupProgress({
+            message: data.message,
+            percentage: data.percentage || 0,
+          })
+        }
+      }
+
+      eventSource.onerror = async () => {
+        eventSource.close()
+        setBackupProgress(null)
+        setBackupInProgress(false)
+
+        await alert({
+          title: '連線錯誤',
+          message: '無法連線到伺服器，請重新整理頁面後再試',
+          variant: 'error',
+        })
+      }
+    } catch (error) {
+      setBackupProgress(null)
+      setBackupInProgress(false)
+
       await alert({
-        title: '備份已開始',
-        message: '系統正在執行備份，請稍後查看備份記錄',
-        variant: 'success',
-      })
-      loadJobs()
-    } else {
-      await alert({
-        title: '備份失敗',
-        message: result.message || '無法執行備份，請稍後再試',
+        title: '執行失敗',
+        message: error instanceof Error ? error.message : '無法執行備份',
         variant: 'error',
       })
     }
-
-    setBackupInProgress(false)
   }
 
   async function handleDownloadBackup(job: BackupJob) {
@@ -148,6 +200,24 @@ export function BackupManager() {
           </button>
         </div>
       </div>
+
+      {/* 備份進度條 */}
+      {backupProgress && (
+        <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="font-bold">{backupProgress.message}</span>
+            <span className="text-sm font-bold text-gray-600">
+              {backupProgress.percentage}%
+            </span>
+          </div>
+          <div className="h-4 w-full rounded-none border-2 border-black bg-gray-100">
+            <div
+              className="h-full bg-blue-400 transition-all duration-300"
+              style={{ width: `${backupProgress.percentage}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* 備份列表 - 桌面表格視圖 */}
       <div className="hidden overflow-x-auto md:block">

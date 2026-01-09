@@ -359,3 +359,185 @@ export async function performBackup(
     throw error
   }
 }
+
+/**
+ * 備份進度回報型別
+ */
+export type BackupProgress = {
+  stage:
+    | 'starting'
+    | 'dumping'
+    | 'compressing'
+    | 'uploading'
+    | 'calculating'
+    | 'updating'
+    | 'cleanup'
+    | 'completed'
+    | 'error'
+  message: string
+  percentage?: number
+}
+
+/**
+ * 執行完整備份流程（支援進度回報）
+ * @param backupType 備份類型（'auto' | 'manual'）
+ * @param userId 執行者 ID（手動備份時提供）
+ * @param onProgress 進度回報回調函數
+ * @returns 備份任務 ID
+ */
+export async function performBackupWithProgress(
+  backupType: 'auto' | 'manual',
+  userId: string | undefined,
+  onProgress: (progress: BackupProgress) => void
+): Promise<string> {
+  const supabase = await createClient()
+  const startTime = Date.now()
+
+  // 產生備份檔案名稱
+  const filename = generateBackupFilename()
+  const tempDir = os.tmpdir()
+  const sqlFilePath = path.join(tempDir, filename.replace('.gz', ''))
+  const gzFilePath = path.join(tempDir, filename)
+
+  let backupJobId: string | undefined = undefined
+
+  try {
+    // 1. 建立備份任務記錄
+    onProgress({ stage: 'starting', message: '建立備份任務記錄...', percentage: 0 })
+
+    const { data: backupJob, error: createError } = await supabase
+      .from('backup_jobs')
+      .insert({
+        filename,
+        file_size: 0,
+        storage_provider: 'gcs',
+        storage_url: '',
+        backup_type: backupType,
+        status: 'in_progress',
+        created_by: userId || null,
+      })
+      .select()
+      .single()
+
+    if (createError || !backupJob) {
+      throw new Error(`Failed to create backup job record: ${createError?.message}`)
+    }
+
+    backupJobId = backupJob.id
+
+    if (!backupJobId) {
+      throw new Error('Backup job ID is missing')
+    }
+
+    // 2. 執行資料庫備份
+    onProgress({ stage: 'dumping', message: '正在匯出資料庫...', percentage: 20 })
+    await createDatabaseDump(sqlFilePath)
+
+    // 3. 壓縮備份檔案
+    onProgress({ stage: 'compressing', message: '正在壓縮備份檔案...', percentage: 40 })
+    await compressBackup(sqlFilePath, gzFilePath)
+
+    // 4. 上傳到雲端
+    onProgress({ stage: 'uploading', message: '正在上傳到雲端儲存...', percentage: 60 })
+    const buffer = readFileSync(gzFilePath)
+    const uploadResult = await uploadBackup(filename, buffer)
+
+    // 5. 計算備份元數據
+    onProgress({ stage: 'calculating', message: '正在計算備份統計資訊...', percentage: 80 })
+    const durationMs = Date.now() - startTime
+    const metadata = await calculateBackupMetadata(sqlFilePath, gzFilePath, durationMs)
+
+    // 6. 更新備份任務記錄
+    onProgress({ stage: 'updating', message: '正在更新備份記錄...', percentage: 90 })
+    const { error: updateError } = await supabase
+      .from('backup_jobs')
+      .update({
+        file_size: metadata.compressed_size,
+        storage_provider: uploadResult.storage_provider,
+        storage_url: uploadResult.storage_url,
+        status: 'success',
+        metadata,
+        error_message: uploadResult.error_message || null,
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', backupJobId)
+
+    if (updateError) {
+      throw new Error(`Failed to update backup job: ${updateError.message}`)
+    }
+
+    // 7. 更新 system_settings
+    await supabase
+      .from('system_settings')
+      .update({ value: new Date().toISOString() })
+      .eq('key', 'backup_last_success')
+
+    await supabase.from('system_settings').update({ value: '' }).eq('key', 'backup_last_error')
+
+    // 8. 滾動刪除舊備份（僅自動備份）
+    if (backupType === 'auto') {
+      onProgress({ stage: 'cleanup', message: '正在清理舊備份...', percentage: 95 })
+      try {
+        const { data: maxKeepSetting } = await supabase
+          .from('system_settings')
+          .select('value')
+          .eq('key', 'backup_max_keep')
+          .single()
+
+        const maxKeep = maxKeepSetting ? parseInt(maxKeepSetting.value, 10) : 10
+
+        console.log(`Executing cleanup: keeping ${maxKeep} most recent auto backups`)
+        const cleanupResult = await cleanupOldBackups(maxKeep)
+
+        if (cleanupResult.deleted_count > 0) {
+          console.log(
+            `Cleanup completed: ${cleanupResult.deleted_count} backups deleted, ` +
+              `${(cleanupResult.deleted_size_bytes / 1024 / 1024).toFixed(2)} MB freed`
+          )
+        }
+      } catch (error) {
+        console.error('Cleanup failed (non-critical):', error)
+      }
+    }
+
+    // 9. 清理臨時檔案
+    unlinkSync(sqlFilePath)
+    unlinkSync(gzFilePath)
+
+    // 10. 完成
+    onProgress({ stage: 'completed', message: '備份完成！', percentage: 100 })
+
+    console.log(`Backup completed successfully: ${filename}`)
+    return backupJobId
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Backup failed:', errorMessage)
+
+    // 回報錯誤
+    onProgress({ stage: 'error', message: errorMessage })
+
+    // 更新備份任務記錄（status = 'failed'）
+    if (backupJobId) {
+      await supabase
+        .from('backup_jobs')
+        .update({
+          status: 'failed',
+          error_message: errorMessage,
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', backupJobId)
+    }
+
+    // 更新 system_settings
+    await supabase.from('system_settings').update({ value: errorMessage }).eq('key', 'backup_last_error')
+
+    // 清理臨時檔案
+    try {
+      if (sqlFilePath) unlinkSync(sqlFilePath)
+      if (gzFilePath) unlinkSync(gzFilePath)
+    } catch {}
+
+    throw error
+  }
+}
+
