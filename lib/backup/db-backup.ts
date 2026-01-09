@@ -59,21 +59,37 @@ function generateBackupFilename(): string {
 }
 
 /**
- * 執行 pg_dump 匯出資料庫
+ * 執行資料庫備份（優先使用 Supabase CLI，fallback 到 pg_dump）
  * @param outputPath 輸出檔案路徑（.sql）
  */
 async function createDatabaseDump(outputPath: string): Promise<void> {
   // 驗證資料庫連線資訊
   validateDBConfig()
 
-  // 建立 pg_dump 指令（跨平台支援）
-  // Windows: 使用 env 選項設定 PGPASSWORD，不在指令中設定
-  // Linux/Mac: 同樣方式支援
-  const pgDumpCommand = `pg_dump -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -F p --no-owner --no-acl -f "${outputPath}"`
-
+  // 方案 1: 優先使用 Supabase CLI（不需要安裝 PostgreSQL）
   try {
-    const { stdout, stderr } = await execAsync(pgDumpCommand, {
+    const supabaseCommand = `supabase db dump --linked -f "${outputPath}"`
+
+    const { stdout, stderr } = await execAsync(supabaseCommand, {
       maxBuffer: 50 * 1024 * 1024, // 50MB buffer
+    })
+
+    if (stderr && !stderr.includes('WARNING') && !stderr.includes('Connecting to remote database')) {
+      console.warn('supabase db dump stderr:', stderr)
+    }
+
+    console.log('Database dump completed using Supabase CLI')
+    return
+  } catch (supabaseError) {
+    console.warn('Supabase CLI dump failed, trying pg_dump...', supabaseError)
+  }
+
+  // 方案 2: Fallback 到 pg_dump（需要安裝 PostgreSQL 客戶端工具）
+  try {
+    const pgDumpCommand = `pg_dump -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -F p --no-owner --no-acl -f "${outputPath}"`
+
+    const { stdout, stderr } = await execAsync(pgDumpCommand, {
+      maxBuffer: 50 * 1024 * 1024,
       env: {
         ...process.env,
         PGPASSWORD: DB_CONFIG.password, // 透過環境變數傳遞密碼（跨平台支援）
@@ -83,9 +99,17 @@ async function createDatabaseDump(outputPath: string): Promise<void> {
     if (stderr && !stderr.includes('WARNING')) {
       console.warn('pg_dump stderr:', stderr)
     }
-  } catch (error) {
-    console.error('pg_dump failed:', error)
-    throw new Error(`Database dump failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+
+    console.log('Database dump completed using pg_dump')
+  } catch (pgDumpError) {
+    console.error('Both Supabase CLI and pg_dump failed')
+    throw new Error(
+      `資料庫備份失敗。請確保已安裝 PostgreSQL 客戶端工具或 Supabase CLI 設定正確。\n` +
+      `錯誤訊息: ${pgDumpError instanceof Error ? pgDumpError.message : '未知錯誤'}\n\n` +
+      `解決方案：\n` +
+      `1. 安裝 PostgreSQL: https://www.postgresql.org/download/windows/\n` +
+      `2. 或確保 Supabase CLI 已正確連線到遠端專案 (supabase link)`
+    )
   }
 }
 
