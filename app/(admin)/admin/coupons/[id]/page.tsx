@@ -17,15 +17,20 @@ interface PageProps {
   params: Promise<{
     id: string
   }>
+  searchParams: Promise<{
+    page?: string
+  }>
 }
 
-export default async function CouponDetailPage({ params }: PageProps) {
+export default async function CouponDetailPage({ params, searchParams }: PageProps) {
   const { id } = await params
+  const search = await searchParams
+  const page = Number(search.page) || 1
 
   // 並行查詢優惠券資料、統計與領取用戶
   const [couponResult, usersResult, statsResult] = await Promise.all([
     getCouponById(id),
-    getCouponUsers(id),
+    getCouponUsers(id, page, 50),
     getCouponStats(id),
   ])
 
@@ -34,16 +39,23 @@ export default async function CouponDetailPage({ params }: PageProps) {
   }
 
   const coupon = couponResult.data
-  const users = usersResult.success && usersResult.data ? usersResult.data : []
+  const usersData = usersResult.success && usersResult.data ? usersResult.data : {
+    users: [],
+    total: 0,
+    page: 1,
+    limit: 50,
+  }
   const stats = statsResult.success && statsResult.data ? statsResult.data : {
     claimCount: 0,
     usedCount: 0,
     totalDiscountAmount: 0,
   }
 
-  // 計算統計數據
-  const claimCount = users.length
-  const usedCount = users.filter((u) => u.used_at).length
+  // 計算分頁資訊
+  const { users, total, limit } = usersData
+  const totalPages = Math.ceil(total / limit)
+  const claimCount = stats.claimCount
+  const usedCount = stats.usedCount
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('zh-TW', {
@@ -124,8 +136,13 @@ export default async function CouponDetailPage({ params }: PageProps) {
         <div className="border-b-3 border-black bg-yellow-300 p-4">
           <h2 className="text-2xl font-black flex items-center gap-2">
             <Users className="h-6 w-6" />
-            領取用戶名單 ({users.length})
+            領取用戶名單 ({total} 位用戶)
           </h2>
+          {total > 0 && (
+            <p className="mt-1 text-sm text-gray-600">
+              第 {(page - 1) * limit + 1}-{Math.min(page * limit, total)} 筆，共 {total} 筆
+            </p>
+          )}
         </div>
 
         {users.length === 0 ? (
@@ -133,48 +150,82 @@ export default async function CouponDetailPage({ params }: PageProps) {
             <p className="text-gray-500">目前沒有客戶領取此優惠券</p>
           </div>
         ) : (
-          <div className="divide-y-3 divide-black">
-            {users.map((user, index) => (
-              <div key={index} className="p-4">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                  <div>
-                    <p className="font-bold">{user.user_name}</p>
-                    <p className="text-sm text-gray-600">{user.user_phone}</p>
-                  </div>
-
-                  <div className="flex flex-col md:items-end gap-1">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Calendar className="h-4 w-4" />
-                      領取時間：{formatDate(user.claimed_at)}
+          <>
+            <div className="divide-y-3 divide-black">
+              {users.map((user, index) => (
+                <div key={user.user_id} className="p-4">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div className="flex-1">
+                      <p className="font-bold text-lg">{user.user_name}</p>
+                      <p className="text-sm text-gray-600">{user.user_phone}</p>
                     </div>
 
-                    {user.used_at ? (
+                    <div className="flex flex-col md:items-end gap-2">
+                      {/* 領取統計 */}
                       <div className="flex items-center gap-2">
                         <span className="inline-flex items-center gap-1 rounded border-2 border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-green-600">
-                          ✓ 已使用
+                          已使用 {user.total_used} 張
                         </span>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(user.used_at)}
+                        <span className="inline-flex items-center gap-1 rounded border-2 border-gray-400 bg-gray-100 px-2 py-1 text-xs font-bold text-gray-600">
+                          未使用 {user.total_unused} 張
                         </span>
-                        {user.order_id && (
-                          <Link
-                            href={`/admin/orders/${user.order_id}`}
-                            className="text-xs text-blue-600 hover:underline"
-                          >
-                            查看訂單
-                          </Link>
-                        )}
                       </div>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded border-2 border-gray-400 bg-gray-100 px-2 py-1 text-xs font-bold text-gray-600">
-                        未使用
-                      </span>
-                    )}
+
+                      {/* 領取時間 */}
+                      <div className="flex items-center gap-1 text-xs text-gray-600">
+                        <Calendar className="h-3 w-3" />
+                        <span>
+                          {user.total_claimed > 1
+                            ? `首次：${formatDate(user.first_claimed_at)} / 最後：${formatDate(user.last_claimed_at)}`
+                            : `領取：${formatDate(user.first_claimed_at)}`}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              ))}
+            </div>
+
+            {/* 分頁控制 */}
+            {totalPages > 1 && (
+              <div className="border-t-3 border-black p-4 flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  共 {totalPages} 頁
+                </div>
+                <div className="flex items-center gap-2">
+                  {page > 1 && (
+                    <Link
+                      href={`/admin/coupons/${id}?page=${page - 1}`}
+                      className={cn(
+                        'px-4 py-2 bg-white font-bold transition-all',
+                        designTokens.neoBrutalism.border.full,
+                        designTokens.neoBrutalism.shadow.mobile,
+                        designTokens.neoBrutalism.hover
+                      )}
+                    >
+                      上一頁
+                    </Link>
+                  )}
+                  <span className="px-3 py-1 font-bold">
+                    {page} / {totalPages}
+                  </span>
+                  {page < totalPages && (
+                    <Link
+                      href={`/admin/coupons/${id}?page=${page + 1}`}
+                      className={cn(
+                        'px-4 py-2 bg-white font-bold transition-all',
+                        designTokens.neoBrutalism.border.full,
+                        designTokens.neoBrutalism.shadow.mobile,
+                        designTokens.neoBrutalism.hover
+                      )}
+                    >
+                      下一頁
+                    </Link>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
     </div>

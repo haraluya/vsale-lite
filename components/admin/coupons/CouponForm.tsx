@@ -68,6 +68,9 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   const [claimLimit, setClaimLimit] = useState<number>(
     coupon?.claim_limit || 1
   )
+  const [totalLimit, setTotalLimit] = useState<number | null>(
+    coupon?.total_limit !== undefined ? coupon.total_limit : null
+  )
 
   // 載入等級與系列資料
   useEffect(() => {
@@ -128,6 +131,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         valid_from: new Date(validFrom).toISOString(),
         valid_until: new Date(validUntil).toISOString(),
         claim_limit: Number(claimLimit),
+        total_limit: totalLimit ? Number(totalLimit) : null,
         tier_restrictions: selectedTiers,
         series_restrictions: selectedSeries,
       }
@@ -318,6 +322,27 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
           />
           <p className="mt-1 text-sm text-gray-600">
             設定客戶可領取此優惠券的張數上限（預設 1 張，輸入一次代碼即可領取所有張數）
+          </p>
+        </div>
+
+        {/* 總張數上限 */}
+        <div className="mb-4">
+          <label htmlFor="total_limit" className="mb-2 block font-bold">
+            總張數上限
+          </label>
+          <input
+            type="number"
+            id="total_limit"
+            value={totalLimit || ''}
+            onChange={(e) => setTotalLimit(e.target.value ? Number(e.target.value) : null)}
+            placeholder="不填寫 = 無限發放"
+            className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+            min={1}
+            step={1}
+            disabled={loading}
+          />
+          <p className="mt-1 text-sm text-gray-600">
+            限制所有客戶合計可領取的總張數（不填寫表示無限發放）
           </p>
         </div>
       </div>

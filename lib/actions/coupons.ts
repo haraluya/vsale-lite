@@ -507,7 +507,7 @@ export async function claimCoupon(
     const normalizedCode = normalizeCouponCode(data.couponCode)
     const { data: coupon, error: couponError } = await supabase
       .from('active_coupons')
-      .select('*, claim_limit')
+      .select('*, claim_limit, total_limit')
       .eq('code_normalized', normalizedCode)
       .single()
 
@@ -515,7 +515,24 @@ export async function claimCoupon(
       return { success: false, message: COUPON_ERROR_MESSAGES.COUPON_EXPIRED }
     }
 
-    // 4. 檢查已領取的張數
+    // 4. 檢查總張數上限（如果設定了 total_limit）
+    if (coupon.total_limit !== null) {
+      const { count: totalClaimed } = await supabase
+        .from('user_coupons')
+        .select('id', { count: 'exact', head: true })
+        .eq('coupon_id', coupon.id)
+
+      const totalClaimedCount = totalClaimed || 0
+
+      if (totalClaimedCount >= coupon.total_limit) {
+        return {
+          success: false,
+          message: COUPON_ERROR_MESSAGES.TOTAL_LIMIT_REACHED,
+        }
+      }
+    }
+
+    // 5. 檢查該用戶已領取的張數
     const { count: alreadyClaimed } = await supabase
       .from('user_coupons')
       .select('id', { count: 'exact', head: true })
@@ -525,7 +542,7 @@ export async function claimCoupon(
     const claimedCount = alreadyClaimed || 0
     const claimLimit = coupon.claim_limit || 1
 
-    // 5. 檢查是否已達上限
+    // 6. 檢查是否已達個人領取上限
     if (claimedCount >= claimLimit) {
       return {
         success: false,
@@ -533,8 +550,29 @@ export async function claimCoupon(
       }
     }
 
-    // 6. 計算可領取的張數（一次領取所有剩餘張數）
-    const remainingCount = claimLimit - claimedCount
+    // 7. 計算可領取的張數（考慮個人上限與總張數上限）
+    let remainingCount = claimLimit - claimedCount
+
+    // 如果有 total_limit，需要確保不超過總張數上限
+    if (coupon.total_limit !== null) {
+      const { count: totalClaimed } = await supabase
+        .from('user_coupons')
+        .select('id', { count: 'exact', head: true })
+        .eq('coupon_id', coupon.id)
+
+      const totalClaimedCount = totalClaimed || 0
+      const availableTotal = coupon.total_limit - totalClaimedCount
+
+      // 取個人可領取與總剩餘數的最小值
+      remainingCount = Math.min(remainingCount, availableTotal)
+
+      if (remainingCount <= 0) {
+        return {
+          success: false,
+          message: COUPON_ERROR_MESSAGES.TOTAL_LIMIT_REACHED,
+        }
+      }
+    }
 
     // 7. 批次建立領取記錄
     const insertRecords = Array.from({ length: remainingCount }, () => ({
@@ -589,7 +627,7 @@ export async function getUserCoupons(filters?: {
         coupon:coupons!inner(*)
       `)
       .eq('user_id', userId)
-      .neq('coupon.status', 'deleted') // ✅ 過濾已刪除的優惠券
+      .eq('coupon.status', 'active') // ✅ 僅顯示 active 狀態（停用與刪除完全隱藏）
       .order('claimed_at', { ascending: false })
 
     // 3. 套用篩選條件
@@ -606,18 +644,28 @@ export async function getUserCoupons(filters?: {
       return { success: false, message: '查詢優惠券失敗' }
     }
 
-    // 4. 前端額外過濾：隱藏過期的優惠券（僅顯示有效期內的）
+    // 4. 過濾後的優惠券包含過期狀態標記
     const now = new Date()
-    const filteredCoupons = (userCoupons || []).filter((uc: any) => {
+    const filteredCoupons = (userCoupons || []).map((uc: any) => {
       const coupon = uc.coupon
-      if (!coupon) return false
+      if (!coupon) return null
 
       const validFrom = new Date(coupon.valid_from)
       const validUntil = new Date(coupon.valid_until)
 
-      // 僅顯示有效期內的優惠券
-      return now >= validFrom && now <= validUntil
-    })
+      // 標記過期狀態（但仍顯示在列表中）
+      const isExpired = now > validUntil
+      const isNotStarted = now < validFrom
+
+      return {
+        ...uc,
+        coupon: {
+          ...coupon,
+          _is_expired: isExpired,
+          _is_not_started: isNotStarted,
+        },
+      }
+    }).filter((uc): uc is NonNullable<typeof uc> => uc !== null)
 
     return { success: true, data: filteredCoupons }
   } catch (error) {
@@ -730,21 +778,32 @@ export async function validateCoupon(
 }
 
 /**
- * 查詢優惠券領取用戶列表（管理員）
+ * 查詢優惠券領取用戶列表（管理員，彙整顯示）
  *
  * @param couponId - 優惠券 ID
- * @returns ActionResult<{ user_id, user_name, user_phone, claimed_at, used_at, order_id }[]>
+ * @param page - 頁碼（預設 1）
+ * @param limit - 每頁筆數（預設 50）
+ * @returns ActionResult<{ users: CouponUserSummary[], total: number, page: number, limit: number }>
  */
 export async function getCouponUsers(
-  couponId: string
-): Promise<ActionResult<Array<{
-  user_id: string
-  user_name: string
-  user_phone: string
-  claimed_at: string
-  used_at: string | null
-  order_id: string | null
-}>>> {
+  couponId: string,
+  page: number = 1,
+  limit: number = 50
+): Promise<ActionResult<{
+  users: Array<{
+    user_id: string
+    user_name: string
+    user_phone: string
+    total_claimed: number
+    total_used: number
+    total_unused: number
+    first_claimed_at: string
+    last_claimed_at: string
+  }>
+  total: number
+  page: number
+  limit: number
+}>> {
   try {
     // 1. 權限檢查
     const { role } = await checkAuth()
@@ -754,17 +813,15 @@ export async function getCouponUsers(
 
     const supabase = await createClient()
 
-    // 2. 查詢領取記錄並關聯用戶資料
+    // 2. 查詢所有領取記錄
     const { data: userCoupons, error } = await supabase
       .from('user_coupons')
       .select(`
         user_id,
         claimed_at,
-        used_at,
-        order_id
+        used_at
       `)
       .eq('coupon_id', couponId)
-      .order('claimed_at', { ascending: false })
 
     if (error) {
       console.error('查詢優惠券領取用戶失敗:', error)
@@ -772,35 +829,93 @@ export async function getCouponUsers(
     }
 
     if (!userCoupons || userCoupons.length === 0) {
-      return { success: true, data: [] }
+      return {
+        success: true,
+        data: {
+          users: [],
+          total: 0,
+          page: 1,
+          limit,
+        },
+      }
     }
 
-    // 3. 批次查詢用戶資料
-    const userIds = [...new Set(userCoupons.map((uc) => uc.user_id))]
+    // 3. 彙整每個用戶的領取記錄
+    const userSummaryMap = new Map<string, {
+      user_id: string
+      total_claimed: number
+      total_used: number
+      total_unused: number
+      first_claimed_at: string
+      last_claimed_at: string
+    }>()
+
+    userCoupons.forEach((uc: any) => {
+      if (!userSummaryMap.has(uc.user_id)) {
+        userSummaryMap.set(uc.user_id, {
+          user_id: uc.user_id,
+          total_claimed: 0,
+          total_used: 0,
+          total_unused: 0,
+          first_claimed_at: uc.claimed_at,
+          last_claimed_at: uc.claimed_at,
+        })
+      }
+
+      const summary = userSummaryMap.get(uc.user_id)!
+      summary.total_claimed += 1
+      if (uc.used_at) {
+        summary.total_used += 1
+      } else {
+        summary.total_unused += 1
+      }
+
+      // 更新首次與最後領取時間
+      if (new Date(uc.claimed_at) < new Date(summary.first_claimed_at)) {
+        summary.first_claimed_at = uc.claimed_at
+      }
+      if (new Date(uc.claimed_at) > new Date(summary.last_claimed_at)) {
+        summary.last_claimed_at = uc.claimed_at
+      }
+    })
+
+    // 4. 批次查詢用戶資料
+    const userIds = Array.from(userSummaryMap.keys())
     const { data: profiles } = await supabase
       .from('profiles')
       .select('id, phone, display_name')
       .in('id', userIds)
 
-    // 4. 建立 user_id -> profile 對應表
+    // 5. 建立 user_id -> profile 對應表
     const profileMap = new Map(
       (profiles || []).map((profile: any) => [profile.id, profile])
     )
 
-    // 5. 組合資料
-    const users = userCoupons.map((uc: any) => {
-      const profile = profileMap.get(uc.user_id)
+    // 6. 組合資料並排序（依最後領取時間降序）
+    const allUsers = Array.from(userSummaryMap.values()).map((summary) => {
+      const profile = profileMap.get(summary.user_id)
       return {
-        user_id: uc.user_id,
+        ...summary,
         user_name: profile?.display_name || profile?.phone || '未知客戶',
         user_phone: profile?.phone || '',
-        claimed_at: uc.claimed_at,
-        used_at: uc.used_at,
-        order_id: uc.order_id,
       }
+    }).sort((a, b) => {
+      return new Date(b.last_claimed_at).getTime() - new Date(a.last_claimed_at).getTime()
     })
 
-    return { success: true, data: users }
+    // 7. 分頁
+    const offset = (page - 1) * limit
+    const paginatedUsers = allUsers.slice(offset, offset + limit)
+
+    return {
+      success: true,
+      data: {
+        users: paginatedUsers,
+        total: allUsers.length,
+        page,
+        limit,
+      },
+    }
   } catch (error) {
     console.error('查詢優惠券領取用戶錯誤:', error)
     return { success: false, message: '查詢領取用戶時發生錯誤' }

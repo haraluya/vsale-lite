@@ -355,6 +355,7 @@ export type Coupon = {
   status: 'active' | 'inactive' | 'deleted'
   deleted_at: string | null
   claim_limit: number  // 🆕 每位客戶可領取張數上限（預設 1）
+  total_limit: number | null  // 🆕 總張數上限（所有客戶合計，NULL = 無限發放）
   created_at: string
   updated_at: string
 
@@ -392,6 +393,18 @@ export type CouponStats = {
   claimCount: number  // 領取次數
   usedCount: number  // 使用次數
   totalDiscountAmount: number  // 總折扣金額
+}
+
+// 優惠券領取用戶彙整資訊（後台詳情頁用）
+export type CouponUserSummary = {
+  user_id: string
+  user_name: string
+  user_phone: string
+  total_claimed: number  // 該用戶領取總張數
+  total_used: number  // 已使用張數
+  total_unused: number  // 未使用張數
+  first_claimed_at: string  // 首次領取時間
+  last_claimed_at: string  // 最後領取時間
 }
 
 // 優惠券查詢參數

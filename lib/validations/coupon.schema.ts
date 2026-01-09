@@ -78,6 +78,12 @@ export const createCouponSchema = z
       .max(99, '每位客戶最多可領取 99 張')
       .optional()
       .default(1),
+    total_limit: z
+      .number()
+      .int('總張數必須為整數')
+      .min(1, '總張數至少為 1 張')
+      .optional()
+      .nullable(), // NULL = 無限發放
     valid_from: z.string().datetime('生效開始時間格式錯誤'),
     valid_until: z.string().datetime('生效結束時間格式錯誤'),
     tier_restrictions: z.array(z.string().uuid()).optional().default([]),
@@ -124,6 +130,12 @@ export const updateCouponSchema = z.object({
     .min(1, '每位客戶至少可領取 1 張')
     .max(99, '每位客戶最多可領取 99 張')
     .optional(),
+  total_limit: z
+    .number()
+    .int('總張數必須為整數')
+    .min(1, '總張數至少為 1 張')
+    .optional()
+    .nullable(), // NULL = 無限發放
   valid_from: z.string().datetime().optional(),
   valid_until: z.string().datetime().optional(),
   status: z.enum(['active', 'inactive']).optional(),
@@ -189,6 +201,7 @@ export const COUPON_ERROR_MESSAGES = {
   // 領取錯誤
   ALREADY_CLAIMED: '您已領取過此優惠券',
   CLAIM_FAILED: '優惠券領取失敗',
+  TOTAL_LIMIT_REACHED: '此優惠券已達發放上限，無法再領取',
 
   // 使用條件錯誤
   TIER_RESTRICTION_FAILED: '此優惠券限特定會員等級使用',
