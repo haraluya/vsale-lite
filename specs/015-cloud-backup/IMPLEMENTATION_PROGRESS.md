@@ -2,16 +2,16 @@
 
 **Feature**: 015-cloud-backup
 **開始日期**: 2026-01-09
-**最後更新**: 2026-01-09 17:30
-**當前狀態**: Phase 1-2 完成（100%）
+**最後更新**: 2026-01-09 19:00
+**當前狀態**: Phase 1-5 完成（100%）✅
 
 ---
 
 ## 📊 總體進度
 
 ```
-進度：6/9 任務完成（67%）
-階段：Phase 1-2 ✅ | Phase 3-5 📋
+進度：9/9 任務完成（100%）✅
+階段：Phase 1-5 ✅ | 所有核心功能已完成
 ```
 
 ### 完成的任務 ✅
@@ -21,13 +21,21 @@
 - [x] Phase 2.1：資料庫 Migration（includes_storage）
 - [x] Phase 2.2：擴充 BackupJob 型別定義
 - [x] Phase 2.3：新增「備份包含圖片」勾選框 UI
-- [x] Phase 2.4：實作 Storage 備份邏輯 ✅ **NEW!**
+- [x] Phase 2.4：實作 Storage 備份邏輯
+- [x] Phase 3：建立圖片資料夾指引元件 ✅ **NEW!**
+- [x] Phase 4：改進下載功能支援多檔案 ✅ **NEW!**
+- [x] Phase 5：撰寫手動還原指引文件 ✅ **NEW!**
 
-### 待完成的任務 📋
+### 🎉 專案狀態
 
-- [ ] Phase 3：建立圖片資料夾指引元件
-- [ ] Phase 4：改進下載功能支援多檔案
-- [ ] Phase 5：撰寫手動還原指引文件
+**所有核心功能已完成！** 備份系統重構已達到 100% 完成度：
+- ✅ 移除還原功能
+- ✅ 新增備份包含圖片選項（UI + 後端）
+- ✅ Storage 備份邏輯（下載 + 壓縮 + 上傳）
+- ✅ 多檔案下載支援（資料庫 + 圖片）
+- ✅ 完整的手動還原指引文件
+
+**下一步**: 部署到生產環境並執行 E2E 測試
 
 ---
 
@@ -311,17 +319,25 @@ export async function GET(request: NextRequest) {
 
 ---
 
-## 🎯 Phase 3：建立圖片資料夾指引元件 📋
+## 🎯 Phase 3：建立圖片資料夾指引元件 ✅
 
-**狀態**：待實作
+**狀態**：已完成
 **優先級**：P1
-**預估時間**：30 分鐘
+**完成時間**：2026-01-09 18:00
+**實際時間**：20 分鐘
 
-### 3.1 建立元件檔案
+### 3.1 建立元件檔案 ✅
 
-**檔案**：`components/admin/StorageFolderGuide.tsx`（新建）
+**檔案**：`components/admin/StorageFolderGuide.tsx`（已建立）
 
-**元件內容**：
+**元件功能**：
+- ✅ 顯示 3 個 Bucket 的資料夾結構（products, public, announcements）
+- ✅ 清楚標示每個 Bucket 的用途與路徑格式
+- ✅ 提供手動上傳指引（4 步驟）
+- ✅ Neo-Brutalism 設計風格（琥珀色背景、黑色邊框、硬陰影）
+- ✅ 響應式設計（手機/桌面）
+
+**UI 設計**：
 ```tsx
 'use client'
 
@@ -775,3 +791,51 @@ No files matching the pattern "app/api/backup/restore/route.ts" were found.
 
 **Last Update**: 2026-01-09 15:00
 **Next Session**: 待使用者決定優先順序
+
+---
+
+## 🎯 Phase 3-5 完成摘要 ✅
+
+**完成時間**: 2026-01-09 18:00 - 19:00
+**總耗時**: 1 小時
+
+### Phase 3: 建立圖片資料夾指引元件 ✅
+
+**檔案**:
+- `components/admin/StorageFolderGuide.tsx` (新建)
+- `app/(admin)/admin/system/settings/page.tsx` (修改)
+
+**功能**:
+- 顯示 3 個 Bucket 資料夾結構（products, public, announcements）
+- 提供手動上傳指引（4 步驟）
+- Neo-Brutalism 設計風格
+
+### Phase 4: 改進下載功能支援多檔案 ✅
+
+**檔案**:
+- `app/api/backup/download/[jobId]/route.ts` (修改)
+- `components/admin/BackupManager.tsx` (修改)
+
+**功能**:
+- 支援 `type` 查詢參數（database | storage）
+- 桌面版：下拉選單（含圖片備份時）
+- 手機版：兩個下載按鈕（資料庫 + 圖片）
+- 自動判斷 `includes_storage` 欄位
+
+### Phase 5: 撰寫手動還原指引文件 ✅
+
+**檔案**:
+- `docs/MANUAL_RESTORE_GUIDE.md` (新建)
+
+**內容**:
+- 重要警告與前置準備
+- 5 個步驟詳細指引（下載、解壓縮、還原資料庫、還原圖片、驗證）
+- 支援 Windows/macOS/Linux 三種環境
+- 常見問題 FAQ（4 個問題與解決方案）
+- 技術支援聯絡資訊
+
+---
+
+**Last Update**: 2026-01-09 19:00
+**Status**: ✅ 所有核心功能已完成（100%）
+**Next Step**: 部署到生產環境並執行 E2E 測試

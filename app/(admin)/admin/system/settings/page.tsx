@@ -9,6 +9,7 @@ import { SystemSettingsForm } from '@/components/admin/SystemSettingsForm'
 import { LogoUploader } from '@/components/admin/LogoUploader'
 import { BackupManager } from '@/components/admin/BackupManager'
 import { BackupStatus } from '@/components/admin/BackupStatus'
+import { StorageFolderGuide } from '@/components/admin/StorageFolderGuide'
 import { updateSetting, uploadLogo, deleteLogo } from '@/lib/actions/system'
 import { revalidatePath } from 'next/cache'
 
@@ -141,6 +142,11 @@ export default async function SystemSettingsPage() {
 
         {/* 備份列表 */}
         <BackupManager />
+
+        {/* 圖片資料夾指引 */}
+        <div className="mt-6">
+          <StorageFolderGuide />
+        </div>
       </div>
     </div>
   )

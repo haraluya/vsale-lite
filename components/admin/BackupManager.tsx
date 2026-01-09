@@ -31,6 +31,7 @@ export function BackupManager() {
     message: string
     percentage: number
   } | null>(null)
+  const [showDownloadMenu, setShowDownloadMenu] = useState<string | null>(null)
   const alert = useAlert()
   const confirm = useConfirm()
 
@@ -126,22 +127,25 @@ export function BackupManager() {
     }
   }
 
-  async function handleDownloadBackup(job: BackupJob) {
+  async function handleDownloadBackup(job: BackupJob, type: 'database' | 'storage' = 'database') {
     try {
       // 直接下載檔案（不使用 Signed URL）
-      const downloadUrl = `/api/backup/download/${job.id}`
+      const downloadUrl = `/api/backup/download/${job.id}?type=${type}`
 
       // 建立隱藏的 <a> 標籤並觸發下載
       const link = document.createElement('a')
       link.href = downloadUrl
-      link.download = job.filename
+      link.download = type === 'database' ? job.filename : job.filename.replace('.sql.gz', '-storage.zip')
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
 
+      // 關閉下載選單
+      setShowDownloadMenu(null)
+
       await alert({
         title: '下載已開始',
-        message: `備份檔案 ${job.filename} 開始下載`,
+        message: `備份檔案開始下載：${type === 'database' ? '資料庫' : 'Storage 圖片'}`,
         variant: 'success',
       })
     } catch (error) {
@@ -308,13 +312,43 @@ export function BackupManager() {
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       {job.status === 'success' && (
-                        <button
-                          onClick={() => handleDownloadBackup(job)}
-                          className="rounded-none border-2 border-black bg-green-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
-                          title="下載備份"
-                        >
-                          <Download className="h-4 w-4" />
-                        </button>
+                        job.includes_storage ? (
+                          // 下拉選單（含圖片備份）
+                          <div className="relative">
+                            <button
+                              onClick={() => setShowDownloadMenu(showDownloadMenu === job.id ? null : job.id)}
+                              className="rounded-none border-2 border-black bg-green-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                              title="下載備份"
+                            >
+                              <Download className="h-4 w-4" />
+                            </button>
+                            {showDownloadMenu === job.id && (
+                              <div className="absolute right-0 top-full mt-2 z-10 rounded-none border-2 border-black bg-white shadow-neo-sm">
+                                <button
+                                  onClick={() => handleDownloadBackup(job, 'database')}
+                                  className="block w-full whitespace-nowrap px-4 py-2 text-left text-sm hover:bg-gray-100"
+                                >
+                                  📊 下載資料庫
+                                </button>
+                                <button
+                                  onClick={() => handleDownloadBackup(job, 'storage')}
+                                  className="block w-full whitespace-nowrap border-t-2 border-black px-4 py-2 text-left text-sm hover:bg-gray-100"
+                                >
+                                  🖼️ 下載圖片
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          // 單一下載按鈕（僅資料庫）
+                          <button
+                            onClick={() => handleDownloadBackup(job, 'database')}
+                            className="rounded-none border-2 border-black bg-green-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            title="下載備份"
+                          >
+                            <Download className="h-4 w-4" />
+                          </button>
+                        )
                       )}
                       <button
                         onClick={() => handleDeleteBackup(job)}
@@ -362,22 +396,49 @@ export function BackupManager() {
                 <span>•</span>
                 <span>{formatBackupTime(job.started_at)}</span>
               </div>
-              <div className="flex gap-2">
-                {job.status === 'success' && (
+              {job.includes_storage ? (
+                // 包含圖片：顯示兩個下載按鈕
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleDownloadBackup(job, 'database')}
+                      className="flex-1 rounded-none border-2 border-black bg-green-100 px-3 py-2 text-xs font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    >
+                      📊 資料庫
+                    </button>
+                    <button
+                      onClick={() => handleDownloadBackup(job, 'storage')}
+                      className="flex-1 rounded-none border-2 border-black bg-blue-100 px-3 py-2 text-xs font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    >
+                      🖼️ 圖片
+                    </button>
+                  </div>
                   <button
-                    onClick={() => handleDownloadBackup(job)}
-                    className="flex-1 rounded-none border-2 border-black bg-green-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    onClick={() => handleDeleteBackup(job)}
+                    className="w-full rounded-none border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
                   >
-                    <Download className="mx-auto h-4 w-4" />
+                    <Trash2 className="mx-auto h-4 w-4" />
                   </button>
-                )}
-                <button
-                  onClick={() => handleDeleteBackup(job)}
-                  className="flex-1 rounded-none border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
-                >
-                  <Trash2 className="mx-auto h-4 w-4" />
-                </button>
-              </div>
+                </div>
+              ) : (
+                // 僅資料庫：單一下載按鈕
+                <div className="flex gap-2">
+                  {job.status === 'success' && (
+                    <button
+                      onClick={() => handleDownloadBackup(job, 'database')}
+                      className="flex-1 rounded-none border-2 border-black bg-green-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    >
+                      <Download className="mx-auto h-4 w-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDeleteBackup(job)}
+                    className="flex-1 rounded-none border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                  >
+                    <Trash2 className="mx-auto h-4 w-4" />
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}

@@ -1,7 +1,10 @@
 /**
  * 備份檔案下載 API
- * GET /api/backup/download/[jobId]
+ * GET /api/backup/download/[jobId]?type=database|storage
  * 直接從 GCS 讀取檔案並返回，不使用 Signed URL
+ *
+ * Query Parameters:
+ * - type: 'database' (預設) | 'storage'
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -15,6 +18,9 @@ export async function GET(
   try {
     const { jobId } = await params
     const supabase = await createClient()
+
+    // 取得 type 參數（預設為 'database'）
+    const type = request.nextUrl.searchParams.get('type') || 'database'
 
     // 權限檢查：必須是管理員
     const { data: { user } } = await supabase.auth.getUser()
@@ -60,15 +66,40 @@ export async function GET(
       )
     }
 
+    // 根據 type 決定下載的檔案
+    let filename: string
+    let contentType: string
+
+    if (type === 'database') {
+      // 下載資料庫備份（.sql.gz）
+      filename = job.filename
+      contentType = 'application/gzip'
+    } else if (type === 'storage') {
+      // 下載 Storage 備份（.zip）
+      if (!job.includes_storage) {
+        return NextResponse.json(
+          { error: '此備份不包含 Storage 圖片' },
+          { status: 400 }
+        )
+      }
+      filename = job.filename.replace('.sql.gz', '-storage.zip')
+      contentType = 'application/zip'
+    } else {
+      return NextResponse.json(
+        { error: '無效的 type 參數，僅支援 database 或 storage' },
+        { status: 400 }
+      )
+    }
+
     // 從 GCS 下載檔案
-    const buffer = await downloadBackupFile(job.filename)
+    const buffer = await downloadBackupFile(filename)
 
     // 返回檔案（轉換 Buffer 為 Uint8Array）
     return new NextResponse(new Uint8Array(buffer), {
       status: 200,
       headers: {
-        'Content-Type': 'application/gzip',
-        'Content-Disposition': `attachment; filename="${job.filename}"`,
+        'Content-Type': contentType,
+        'Content-Disposition': `attachment; filename="${filename}"`,
         'Content-Length': buffer.length.toString(),
       },
     })
