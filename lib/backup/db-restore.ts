@@ -149,8 +149,17 @@ async function executeSQLRestore(
       percentage: 70,
     })
 
-    // 使用 psql 執行 SQL 檔案
-    const command = `PGPASSWORD="${DB_CONFIG.password}" psql -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -f "${sqlPath}"`
+    // Windows 平台使用不同的密碼設定方式
+    const isWindows = process.platform === 'win32'
+
+    let command: string
+    if (isWindows) {
+      // Windows: 使用 PowerShell 設定環境變數
+      command = `powershell -Command "$env:PGPASSWORD='${DB_CONFIG.password}'; & psql -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -f '${sqlPath}'"`
+    } else {
+      // Linux/macOS: 使用 PGPASSWORD 環境變數
+      command = `PGPASSWORD="${DB_CONFIG.password}" psql -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -f "${sqlPath}"`
+    }
 
     const { stdout, stderr } = await execAsync(command, {
       maxBuffer: 50 * 1024 * 1024, // 50MB buffer
