@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/server'
 import { uploadBackup } from '@/lib/cloud-storage'
 import { readFileSync } from 'fs'
 import { cleanupOldBackups } from '@/lib/backup/cleanup'
+import { backupStorage } from '@/lib/backup/storage-backup'
 import type { BackupMetadata, BackupJob } from '@/types'
 
 const execAsync = promisify(exec)
@@ -368,6 +369,7 @@ export type BackupProgress = {
     | 'starting'
     | 'dumping'
     | 'compressing'
+    | 'backing_up_storage'
     | 'uploading'
     | 'calculating'
     | 'updating'
@@ -383,12 +385,14 @@ export type BackupProgress = {
  * @param backupType 備份類型（'auto' | 'manual'）
  * @param userId 執行者 ID（手動備份時提供）
  * @param onProgress 進度回報回調函數
+ * @param includeStorage 是否包含 Supabase Storage 圖片備份
  * @returns 備份任務 ID
  */
 export async function performBackupWithProgress(
   backupType: 'auto' | 'manual',
   userId: string | undefined,
-  onProgress: (progress: BackupProgress) => void
+  onProgress: (progress: BackupProgress) => void,
+  includeStorage = false
 ): Promise<string> {
   const supabase = await createClient()
   const startTime = Date.now()
@@ -437,17 +441,36 @@ export async function performBackupWithProgress(
     onProgress({ stage: 'compressing', message: '正在壓縮備份檔案...', percentage: 40 })
     await compressBackup(sqlFilePath, gzFilePath)
 
-    // 4. 上傳到雲端
-    onProgress({ stage: 'uploading', message: '正在上傳到雲端儲存...', percentage: 60 })
+    // 4. 備份 Storage（如果需要）
+    let storageZipPath: string | null = null
+    if (includeStorage) {
+      onProgress({
+        stage: 'backing_up_storage',
+        message: '正在備份 Supabase Storage 圖片...',
+        percentage: 50,
+      })
+      storageZipPath = await backupStorage()
+    }
+
+    // 5. 上傳到雲端（資料庫備份）
+    onProgress({ stage: 'uploading', message: '正在上傳資料庫備份到雲端儲存...', percentage: 60 })
     const buffer = readFileSync(gzFilePath)
     const uploadResult = await uploadBackup(filename, buffer)
+
+    // 6. 上傳 Storage ZIP（如果有）
+    if (storageZipPath) {
+      onProgress({ stage: 'uploading', message: '正在上傳 Storage 圖片備份...', percentage: 70 })
+      const storageFilename = filename.replace('.sql.gz', '-storage.zip')
+      const storageBuffer = readFileSync(storageZipPath)
+      await uploadBackup(storageFilename, storageBuffer)
+    }
 
     // 5. 計算備份元數據
     onProgress({ stage: 'calculating', message: '正在計算備份統計資訊...', percentage: 80 })
     const durationMs = Date.now() - startTime
     const metadata = await calculateBackupMetadata(sqlFilePath, gzFilePath, durationMs)
 
-    // 6. 更新備份任務記錄
+    // 7. 更新備份任務記錄
     onProgress({ stage: 'updating', message: '正在更新備份記錄...', percentage: 90 })
     const { error: updateError } = await supabase
       .from('backup_jobs')
@@ -458,6 +481,7 @@ export async function performBackupWithProgress(
         status: 'success',
         metadata,
         error_message: uploadResult.error_message || null,
+        includes_storage: includeStorage,
         completed_at: new Date().toISOString(),
       })
       .eq('id', backupJobId)
@@ -503,6 +527,9 @@ export async function performBackupWithProgress(
     // 9. 清理臨時檔案
     unlinkSync(sqlFilePath)
     unlinkSync(gzFilePath)
+    if (storageZipPath) {
+      unlinkSync(storageZipPath)
+    }
 
     // 10. 完成
     onProgress({ stage: 'completed', message: '備份完成！', percentage: 100 })

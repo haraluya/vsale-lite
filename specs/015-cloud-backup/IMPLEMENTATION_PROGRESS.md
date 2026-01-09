@@ -2,16 +2,16 @@
 
 **Feature**: 015-cloud-backup
 **開始日期**: 2026-01-09
-**最後更新**: 2026-01-09 15:00
-**當前狀態**: Phase 1-2 完成（56% 進度）
+**最後更新**: 2026-01-09 17:30
+**當前狀態**: Phase 1-2 完成（100%）
 
 ---
 
 ## 📊 總體進度
 
 ```
-進度：5/9 任務完成（56%）
-階段：Phase 1-2 ✅ | Phase 3-6 🔄
+進度：6/9 任務完成（67%）
+階段：Phase 1-2 ✅ | Phase 3-5 📋
 ```
 
 ### 完成的任務 ✅
@@ -21,10 +21,10 @@
 - [x] Phase 2.1：資料庫 Migration（includes_storage）
 - [x] Phase 2.2：擴充 BackupJob 型別定義
 - [x] Phase 2.3：新增「備份包含圖片」勾選框 UI
+- [x] Phase 2.4：實作 Storage 備份邏輯 ✅ **NEW!**
 
 ### 待完成的任務 📋
 
-- [ ] Phase 2.4：實作 Storage 備份邏輯（複雜）
 - [ ] Phase 3：建立圖片資料夾指引元件
 - [ ] Phase 4：改進下載功能支援多檔案
 - [ ] Phase 5：撰寫手動還原指引文件
@@ -195,234 +195,119 @@ function BackupContentBadge({ includesStorage }: { includesStorage: boolean }) {
 - ✅ UI 元件顯示正常
 - ✅ 勾選框狀態管理正確
 
-### 2.4 實作 Storage 備份邏輯 📋 **待實作**
+### 2.4 實作 Storage 備份邏輯 ✅ **已完成**
 
 **目標**：實作 Supabase Storage 圖片備份功能
 
 **檔案**：`lib/backup/storage-backup.ts`（新建）
 
-**需要實作的功能**：
+**完成時間**：2026-01-09 17:30
 
-#### 2.4.1 安裝必要套件
+**已完成的功能**：
+
+#### 2.4.1 安裝必要套件 ✅
 ```bash
 pnpm add archiver @types/archiver
 ```
+**狀態**：✅ 已安裝（archiver@7.0.1, @types/archiver@7.0.0）
 
-#### 2.4.2 建立 Storage 備份模組
+#### 2.4.2 建立 Storage 備份模組 ✅
 
-**檔案結構**：
+**檔案**：`lib/backup/storage-backup.ts`（已建立）
+
+**核心功能**：
+- ✅ `downloadBucketFiles()`: 下載單個 Bucket 所有檔案（支援分頁處理，limit: 1000）
+- ✅ `downloadFolderFiles()`: 遞迴下載資料夾內所有檔案
+- ✅ `compressToZip()`: 將 Storage 檔案壓縮為 ZIP（使用 archiver，壓縮等級 9）
+- ✅ `backupStorage()`: 主函數，備份所有 Buckets（products, public, announcements）
+
+**技術實作**：
+- ✅ 使用 `createAdminClient()` 取得完整權限（避免 RLS 限制）
+- ✅ 支援分頁處理大量檔案（每頁 1000 個檔案）
+- ✅ 遞迴處理資料夾結構
+- ✅ 完整錯誤處理與臨時檔案清理
+- ✅ 詳細日誌輸出（每個檔案下載、壓縮進度）
+
+#### 2.4.3 整合到主要備份流程 ✅
+
+**檔案**：`lib/backup/db-backup.ts`（已修改）
+
+**變更內容**：
+1. ✅ 新增 `import { backupStorage } from '@/lib/backup/storage-backup'`
+2. ✅ 擴充 `BackupProgress` 型別，新增 `backing_up_storage` 階段
+3. ✅ 修改 `performBackupWithProgress()` 函數：
+   - 新增 `includeStorage` 參數（預設 false）
+   - 在壓縮後新增 Storage 備份步驟（Step 4）
+   - 上傳資料庫備份（Step 5）
+   - 上傳 Storage ZIP（Step 6，如果有）
+   - 更新 backup_jobs 記錄時設定 `includes_storage` 欄位
+   - 清理臨時檔案時包含 Storage ZIP
+
+**關鍵變更**：
 ```typescript
-// lib/backup/storage-backup.ts
+// 新增參數
+export async function performBackupWithProgress(
+  backupType: 'auto' | 'manual',
+  userId: string | undefined,
+  onProgress: (progress: BackupProgress) => void,
+  includeStorage = false  // ✅ 新增
+): Promise<string>
 
-import archiver from 'archiver'
-import { createWriteStream } from 'fs'
-import { createClient } from '@/lib/supabase/server'
-import path from 'path'
-import os from 'os'
-
-/**
- * 下載單個 Bucket 的所有檔案
- * @param bucket Bucket 名稱
- * @param tempDir 臨時目錄路徑
- */
-async function downloadBucketFiles(
-  bucket: string,
-  tempDir: string
-): Promise<void> {
-  const supabase = await createClient()
-
-  // 1. 列出 Bucket 所有檔案
-  const { data: files, error } = await supabase.storage
-    .from(bucket)
-    .list('', { limit: 1000, sortBy: { column: 'name', order: 'asc' } })
-
-  if (error) {
-    throw new Error(`列出 ${bucket} 檔案失敗: ${error.message}`)
-  }
-
-  // 2. 遞迴下載所有檔案
-  for (const file of files) {
-    if (file.name === '.emptyFolderPlaceholder') continue
-
-    // 下載檔案
-    const { data, error: downloadError } = await supabase.storage
-      .from(bucket)
-      .download(file.name)
-
-    if (downloadError) {
-      console.warn(`下載 ${bucket}/${file.name} 失敗:`, downloadError)
-      continue
-    }
-
-    // 儲存到臨時目錄
-    const filePath = path.join(tempDir, bucket, file.name)
-    const dir = path.dirname(filePath)
-
-    // 建立目錄（如果不存在）
-    if (!existsSync(dir)) {
-      mkdirSync(dir, { recursive: true })
-    }
-
-    // 寫入檔案
-    const arrayBuffer = await data.arrayBuffer()
-    writeFileSync(filePath, Buffer.from(arrayBuffer))
-  }
-}
-
-/**
- * 將 Storage 檔案壓縮為 ZIP
- * @param sourcePath 來源目錄路徑
- * @param outputPath 輸出 ZIP 檔案路徑
- */
-async function compressToZip(
-  sourcePath: string,
-  outputPath: string
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const output = createWriteStream(outputPath)
-    const archive = archiver('zip', { zlib: { level: 9 } })
-
-    output.on('close', () => {
-      console.log(`Storage ZIP 建立完成: ${archive.pointer()} bytes`)
-      resolve()
-    })
-
-    archive.on('error', (err) => {
-      reject(err)
-    })
-
-    archive.pipe(output)
-    archive.directory(sourcePath, false)
-    archive.finalize()
-  })
-}
-
-/**
- * 備份 Supabase Storage 圖片
- * @returns ZIP 檔案路徑
- */
-export async function backupStorage(): Promise<string> {
-  const tempDir = path.join(os.tmpdir(), `vsale-storage-${Date.now()}`)
-  const zipPath = path.join(os.tmpdir(), `vsale-storage-${Date.now()}.zip`)
-
-  try {
-    // 1. 列出所有需要備份的 buckets
-    const buckets = ['products', 'public', 'announcements']
-
-    // 2. 下載所有 Bucket 檔案
-    for (const bucket of buckets) {
-      console.log(`正在備份 ${bucket} bucket...`)
-      await downloadBucketFiles(bucket, tempDir)
-    }
-
-    // 3. 壓縮為 ZIP
-    console.log('正在壓縮 Storage 檔案...')
-    await compressToZip(tempDir, zipPath)
-
-    // 4. 清理臨時目錄
-    rmSync(tempDir, { recursive: true, force: true })
-
-    return zipPath
-  } catch (error) {
-    // 清理臨時檔案
-    if (existsSync(tempDir)) {
-      rmSync(tempDir, { recursive: true, force: true })
-    }
-    if (existsSync(zipPath)) {
-      unlinkSync(zipPath)
-    }
-
-    throw new Error(
-      `Storage 備份失敗: ${error instanceof Error ? error.message : String(error)}`
-    )
-  }
-}
-```
-
-#### 2.4.3 整合到主要備份流程
-
-**檔案**：`lib/backup/db-backup.ts`
-
-**修改位置**：`performBackup()` 函數
-
-**需要修改的區塊**：
-```typescript
-// 在上傳到 GCS 前新增 Storage 備份步驟
-
-// Step 5: 備份 Storage（如果需要）
+// 備份 Storage（Step 4）
 let storageZipPath: string | null = null
 if (includeStorage) {
   onProgress({
     stage: 'backing_up_storage',
-    message: '正在備份 Storage 圖片...',
-    percentage: 85,
+    message: '正在備份 Supabase Storage 圖片...',
+    percentage: 50,
   })
-
   storageZipPath = await backupStorage()
 }
 
-// Step 6: 上傳到 GCS（修改為支援多檔案）
-const filesToUpload: Array<{ path: string; filename: string }> = [
-  { path: gzPath, filename },
-]
-
+// 上傳 Storage ZIP（Step 6）
 if (storageZipPath) {
   const storageFilename = filename.replace('.sql.gz', '-storage.zip')
-  filesToUpload.push({ path: storageZipPath, filename: storageFilename })
+  const storageBuffer = readFileSync(storageZipPath)
+  await uploadBackup(storageFilename, storageBuffer)
 }
 
-// 逐一上傳檔案到 GCS
-for (const file of filesToUpload) {
-  await uploadToGCS(file.path, file.filename)
-}
-
-// Step 7: 更新 backup_jobs 記錄
-await supabase
-  .from('backup_jobs')
-  .update({
-    includes_storage: includeStorage,  // ✅ 新增欄位
-    // ... 其他欄位
-  })
-  .eq('id', jobId)
+// 更新 backup_jobs（includes_storage 欄位）
+await supabase.from('backup_jobs').update({
+  includes_storage: includeStorage,  // ✅ 新增
+  // ... 其他欄位
+})
 ```
 
-#### 2.4.4 修改 API 路由支援參數
+#### 2.4.4 修改 API 路由支援參數 ✅
 
-**檔案**：`app/api/backup/trigger/route.ts`
+**檔案**：`app/api/backup/trigger/route.ts`（已修改）
 
-**修改內容**：
+**變更內容**：
 ```typescript
 export async function GET(request: NextRequest) {
-  // 取得 includeStorage 參數
+  // ✅ 取得 includeStorage 參數
   const includeStorage = request.nextUrl.searchParams.get('includeStorage') === 'true'
 
-  // ... 其他邏輯
+  // ... 權限檢查
 
-  // 呼叫備份函數時傳遞參數
-  await performBackup(
+  // ✅ 傳遞參數給 performBackupWithProgress
+  await performBackupWithProgress(
     'manual',
-    userId,
+    user.id,
+    (progress) => { /* ... */ },
     includeStorage  // ✅ 傳遞參數
   )
 }
 ```
 
-**實作優先級**：P0（核心功能）
-**預估時間**：2-3 小時
-**複雜度**：高
-
-**關鍵挑戰**：
-1. ⚠️ Supabase Storage API 分頁處理（limit: 1000）
-2. ⚠️ 大量檔案下載的記憶體管理
-3. ⚠️ 壓縮過程的進度回報
-4. ⚠️ GCS 多檔案上傳的錯誤處理
-
 **驗證清單**：
-- [ ] 可成功下載所有 Bucket 檔案
-- [ ] ZIP 壓縮正確且可解壓
-- [ ] GCS 上傳兩個檔案（SQL.gz + Storage ZIP）
-- [ ] backup_jobs.includes_storage 正確更新
-- [ ] 錯誤處理與清理臨時檔案正常運作
+- ✅ TypeScript 型別檢查通過（pnpm type-check）
+- ⏳ Storage 備份功能測試（待部署後執行）
+- ⏳ ZIP 壓縮正確性驗證（待部署後執行）
+- ⏳ GCS 上傳兩個檔案驗證（待部署後執行）
+- ⏳ backup_jobs.includes_storage 正確更新（待部署後執行）
+
+**Phase 2.4 狀態**：✅ 開發完成，待部署後執行 E2E 測試
 
 ---
 
