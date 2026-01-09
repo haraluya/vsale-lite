@@ -8,9 +8,9 @@ import { createGunzip } from 'zlib'
 import { pipeline } from 'stream/promises'
 import path from 'path'
 import os from 'os'
+import { Client } from 'pg'
 import { createClient } from '@/lib/supabase/server'
 import { downloadBackup } from '@/lib/cloud-storage'
-import { Client } from 'pg'
 
 // 資料庫連線資訊（從環境變數讀取）
 const DB_CONFIG = {
@@ -129,7 +129,7 @@ async function downloadAndDecompress(
 }
 
 /**
- * 執行 SQL 還原（使用 pg Client 直接連接 PostgreSQL）
+ * 執行 SQL 還原（使用 pg Client 直接執行 SQL）
  * @param sqlPath SQL 檔案路徑
  * @param onProgress 進度回調函數
  */
@@ -139,36 +139,31 @@ async function executeSQLRestore(
 ): Promise<void> {
   validateDBConfig()
 
-  // 建立 PostgreSQL 連線
-  const pgClient = new Client({
-    host: DB_CONFIG.host,
-    port: parseInt(DB_CONFIG.port || '5432'),
-    database: DB_CONFIG.database,
-    user: DB_CONFIG.user,
-    password: DB_CONFIG.password,
+  // 讀取 SQL 檔案內容
+  const sqlContent = readFileSync(sqlPath, 'utf-8')
+
+  // 建立 PostgreSQL Client
+  const client = new Client({
+    host: DB_CONFIG.host!,
+    port: parseInt(DB_CONFIG.port!, 10),
+    database: DB_CONFIG.database!,
+    user: DB_CONFIG.user!,
+    password: DB_CONFIG.password!,
     ssl: {
-      rejectUnauthorized: false, // Supabase 使用自簽憑證
+      rejectUnauthorized: false, // Supabase 使用自簽證書
     },
   })
 
   try {
     onProgress?.({
       stage: 'restoring',
-      message: '正在連接資料庫...',
+      message: '正在連線到資料庫...',
       percentage: 70,
     })
 
-    // 連接到資料庫
-    await pgClient.connect()
-
-    onProgress?.({
-      stage: 'restoring',
-      message: '正在讀取 SQL 檔案...',
-      percentage: 72,
-    })
-
-    // 讀取 SQL 檔案內容
-    const sqlContent = readFileSync(sqlPath, 'utf-8')
+    // 連線到資料庫
+    await client.connect()
+    console.log('Connected to database for restore')
 
     onProgress?.({
       stage: 'restoring',
@@ -176,8 +171,10 @@ async function executeSQLRestore(
       percentage: 75,
     })
 
-    // 直接執行完整的 SQL 檔案（pg Client 可以處理多條語句）
-    await pgClient.query(sqlContent)
+    // 執行 SQL（pg_dump 產生的 SQL 是單一大檔案，直接執行）
+    await client.query(sqlContent)
+
+    console.log('Database restore completed')
 
     onProgress?.({
       stage: 'restoring',
@@ -186,12 +183,34 @@ async function executeSQLRestore(
     })
   } catch (error) {
     console.error('SQL 還原失敗:', error)
-    throw new Error(`執行 SQL 還原失敗: ${error instanceof Error ? error.message : String(error)}`)
-  } finally {
-    // 關閉資料庫連線
-    await pgClient.end().catch(console.error)
 
-    // 清理 SQL 檔案
+    // 提供更詳細的錯誤訊息
+    let errorMessage = '未知錯誤'
+    if (error instanceof Error) {
+      errorMessage = error.message
+
+      // 針對常見錯誤提供解決方案
+      if (errorMessage.includes('Tenant or user not found')) {
+        errorMessage = '資料庫連線失敗（認證錯誤）\n' +
+          '請檢查 .env.local 中的 DB_USER 和 DB_PASSWORD 是否正確。\n' +
+          '提示：Supabase Pooler 的使用者名稱格式為 postgres.{project_id}'
+      } else if (errorMessage.includes('certificate')) {
+        errorMessage = 'SSL 憑證驗證失敗\n' +
+          '請確認 DB_HOST 指向正確的 Supabase 連線端點。'
+      }
+    }
+
+    throw new Error(`執行 SQL 還原失敗: ${errorMessage}`)
+  } finally {
+    // 確保關閉資料庫連線
+    try {
+      await client.end()
+      console.log('Database connection closed')
+    } catch (endError) {
+      console.warn('Failed to close database connection:', endError)
+    }
+
+    // 清理原始 SQL 檔案
     if (existsSync(sqlPath)) {
       unlinkSync(sqlPath)
     }
