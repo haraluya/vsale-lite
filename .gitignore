@@ -30,6 +30,10 @@ yarn-error.log*
 .env
 .env.vercel
 
+# GCS Service Account 金鑰（絕對不要上傳到 Git！）
+service-account-key.json
+*-service-account-key.json
+
 # vercel
 .vercel
 
@@ -138,6 +142,13 @@ backups/*.json
 !backups/check_db_stats.js
 !backups/DISASTER_RECOVERY_TEST_REPORT.md
 !backups/restore_from_backup.js
+
+# Backup files in root directory (generated during testing)
+vsale-backup-*.sql
+vsale-backup-*.sql.gz
+vsale-backup-*.zip
+backup-*.sql
+*.sql.backup
 
 # Scripts (不需要部署)
 /scripts/

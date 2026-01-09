@@ -157,11 +157,13 @@
 - ✅ 擴充 `profiles` 表（username, display_name）
 - ✅ `system_settings` 表（系統設定）
 - ✅ `audit_logs` 表（操作日誌）
-- ✅ 擴充 `order_timelines` 表（content 欄位）
-- ✅ 擴充 `profiles` 表（address, admin_notes）
-- ✅ `announcements` 表（廣告輪播）
 - ✅ 預設資料（9 個系統設定）
 - ✅ RLS Policies
+
+**⚠️ 注意**：以下欄位整合時遺漏，已於 Migration `20260109073747` 補充：
+- ❌ ~~擴充 `order_timelines` 表（content 欄位）~~ → 補充於 `20260109073747`
+- ❌ ~~擴充 `profiles` 表（address, admin_notes）~~ → 補充於 `20260109073747`
+- ❌ ~~`announcements` 表（廣告輪播）~~ → 獨立於 `20260107180000`
 
 ---
 

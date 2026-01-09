@@ -519,15 +519,21 @@ export async function getOrderById(
 
     // 查詢訂單客戶資料 (Feature 007: 新增 address 與 admin_notes)
     // 注意：客戶端不應該看到 admin_notes
+    // 🔧 修復：使用 maybeSingle() 避免客戶不存在時報錯
     const selectFields = role === 'admin'
       ? 'id, phone, display_name, tier_id, address, admin_notes, tiers(name)'
       : 'id, phone, display_name, tier_id, address, tiers(name)'
 
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select(selectFields)
       .eq('id', order.user_id)
-      .single()
+      .maybeSingle()
+
+    // 若客戶資料查詢失敗，記錄但不阻止訂單查詢
+    if (profileError) {
+      console.warn(`訂單 ${orderId} 的客戶資料查詢失敗:`, profileError)
+    }
 
     // 查詢訂單明細
     const { data: orderItems } = await supabase

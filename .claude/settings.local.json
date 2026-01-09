@@ -7,7 +7,13 @@
       "Bash(pnpm type-check:*)",
       "Bash(node --version:*)",
       "Bash(npm --version:*)",
-      "Bash(pnpm --version:*)"
+      "Bash(pnpm --version:*)",
+      "Bash(gcloud projects get-iam-policy:*)",
+      "Bash(echo:*)",
+      "Bash(gcloud projects describe:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(supabase db pull:*)",
+      "Bash(cat:*)"
     ]
   }
 }

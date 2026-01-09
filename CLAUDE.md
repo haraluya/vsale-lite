@@ -682,58 +682,25 @@ pnpm test:ui          # 啟動 Vitest UI 介面
 
 ### Supabase CLI 管理
 
-**⚠️ 重要：當前使用本地 Docker Supabase 進行開發**
+**⚠️ 重要：專案已完全使用線上 Supabase 雲端資料庫**
 
-專案配置為使用**本地 Docker Supabase**，完成後再部署到雲端。
+專案配置為使用**線上 Supabase 生產環境**，所有開發與測試均在雲端進行。
 
 ---
 
-#### 本地開發環境（Docker）✅ 當前使用
+#### 雲端資料庫管理（生產環境）✅ 當前使用
 
-**⚠️ 安全提醒**:
-- `supabase db reset` **僅限本機環境**使用
-- **絕不**在遠端/生產環境執行此指令
-- 遠端部署**必須**使用 `supabase db push`（Migration 流程）
-- 詳見 [資料庫管理與遷移協議](docs/DATABASE_SAFETY_PROTOCOL.md)
-
-```bash
-# 1. 啟動本地 Supabase（首次或重啟電腦後執行）
-supabase start
-
-# 2. 重置資料庫並執行所有 Migrations
-supabase db reset
-
-# 3. 查看本地服務資訊
-supabase status
-
-# 4. 停止本地 Supabase
-supabase stop
-```
-
-**本地服務連結**:
-- Supabase Studio: http://127.0.0.1:54323
-- API URL: http://127.0.0.1:54321
-- Database: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+**環境資訊**:
+- Supabase Dashboard: https://supabase.com/dashboard/project/qwovavytryvgchcowjof
+- API URL: https://qwovavytryvgchcowjof.supabase.co
+- 區域: AWS ap-southeast-1
+- 專案 ID: `qwovavytryvgchcowjof`
 
 **環境變數** (`.env.local`):
-- ✅ 已設定為本地 Supabase
-- 部署時需手動切換到雲端設定
-
----
-
-#### 測試資料生成（本地）
-
-```bash
-# 方法 1: 使用 Supabase Studio SQL Editor（推薦）
-# 1. 開啟 http://127.0.0.1:54323
-# 2. 左側 → SQL Editor → New Query
-# 3. 複製 specs/003-series-and-pricing/seed-test-data.sql
-# 4. 執行
-
-# 方法 2: psql 直接執行
-psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f specs/003-series-and-pricing/seed-test-data.sql
-# 密碼: postgres
-```
+- ✅ 已永久設定為線上 Supabase
+- `NEXT_PUBLIC_SUPABASE_URL`: 雲端 API URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 公開金鑰
+- `SUPABASE_SERVICE_ROLE_KEY`: 服務金鑰（Admin 權限）
 
 ---
 
@@ -743,16 +710,24 @@ psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f specs/003-series-and-prici
 - 新增 Migration 前**必須**參考 [安全 Migration 指南](docs/SAFE_MIGRATION_GUIDE.md)
 - 使用 [Migration 範本](supabase/migrations/_TEMPLATE_safe_migration.sql) 確保正確格式
 - 部署前使用 [檢查清單](supabase/migrations/_CHECKLIST.md) 逐項驗證
+- **絕對禁止**在生產環境執行 `supabase db reset`
 
 ```bash
-# 執行所有 Migrations（開發時常用）
-supabase db reset
+# 推送 Migration 到雲端（生產環境）
+pnpm db:migrate
+# 或
+supabase db push
 
 # 新增 Migration
 supabase migration new <name>
 
 # 查看 Migration 狀態
 supabase migration list
+
+# 查看資料庫差異
+pnpm db:diff
+# 或
+supabase db diff
 ```
 
 **Migration 檔案架構** (2026-01-07 整合後):
@@ -781,11 +756,12 @@ supabase migration list
 - 📋 **對應表**: `.archive/MAPPING.md`（舊檔案與新模組的對應關係）
 - 📖 **還原指引**: `.archive/README.md`
 
-**自動化工具** (PowerShell 腳本):
-- `scripts/db-backup.ps1` - 資料庫備份（支援元數據、自動清理）
-- `scripts/db-restore.ps1` - 資料庫還原（互動式選擇備份）
-- `scripts/db-health-check.ps1` - 健康檢查（225+ 檢查項目，<30 秒）
-- `scripts/safe-db-reset.ps1` - 安全重置（自動備份 + 重置）
+**雲端備份系統** (015-cloud-backup):
+- ✅ **自動備份**: 每日凌晨 2:00 自動執行（Vercel Cron）
+- ✅ **手動備份**: 管理員可在後台系統設定頁面手動觸發
+- ✅ **雲端儲存**: Google Cloud Storage（主）+ Vercel Blob（備）
+- ✅ **滾動刪除**: 自動保留最近 10 個備份
+- 📖 **完整指南**: `specs/015-cloud-backup/E2E-TESTING-GUIDE.md`
 
 **快速參考**:
 - 📚 **Migration 索引**: `supabase/migrations/README.md`
@@ -809,38 +785,6 @@ supabase migration list
 **Migration 範本位置**:
 - `supabase/migrations/_TEMPLATE_safe_migration.sql` - 安全新增功能範本
 - `supabase/migrations/_CHECKLIST.md` - 部署前檢查清單
-
----
-
-#### 雲端部署（生產環境）- 僅部署時使用
-
-**🔴 危險區域 - 生產環境操作**:
-- 執行任何操作前**必須**先備份（使用 `pnpm deploy:db` 或手動 `pg_dump`）
-- **絕對禁止**執行 `supabase db reset`
-- Migration 推送前**必須**完成 6 Phase 檢查清單
-- 詳見 [備份與還原快速參考](docs/BACKUP_RESTORE_CHEATSHEET.md)
-
-```bash
-# 1. 連結雲端專案
-supabase link --project-ref qwovavytryvgchcowjof
-
-# 2. 推送 Migrations 到雲端
-supabase db push
-
-# 3. 從雲端拉取 Schema
-supabase db pull
-```
-
-**雲端設定**:
-- 專案 ID: `qwovavytryvgchcowjof`
-- 區域: AWS ap-southeast-1
-- URL: `https://qwovavytryvgchcowjof.supabase.co`
-
-**部署流程**:
-1. 更新 `.env.local` 切換到雲端設定
-2. `supabase db push` 推送 Migrations
-3. 驗證雲端資料庫
-4. 部署到 Firebase
 
 ---
 
