@@ -47,3 +47,26 @@ export async function deleteFromVercelBlob(url: string): Promise<void> {
     )
   }
 }
+
+/**
+ * 從 Vercel Blob 下載備份
+ * @param url Vercel Blob URL（完整 URL）
+ * @returns 檔案 Buffer
+ */
+export async function downloadFromVercelBlob(url: string): Promise<Buffer> {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+    console.log(`[Vercel Blob] Download successful: ${url}`)
+    return buffer
+  } catch (error) {
+    console.error(`[Vercel Blob] Download failed: ${url}`, error)
+    throw new Error(
+      `Vercel Blob download failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
+  }
+}

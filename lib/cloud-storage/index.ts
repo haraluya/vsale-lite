@@ -3,8 +3,8 @@
  * 實作自動切換邏輯（GCS 失敗時自動切換到 Vercel Blob）
  */
 
-import { uploadBackupFromBuffer as uploadToGCS, deleteBackup as deleteGCSBackup } from './gcs'
-import { uploadToVercelBlob, deleteFromVercelBlob } from './vercel-blob'
+import { uploadBackupFromBuffer as uploadToGCS, deleteBackup as deleteGCSBackup, downloadBackupFile as downloadGCS } from './gcs'
+import { uploadToVercelBlob, deleteFromVercelBlob, downloadFromVercelBlob } from './vercel-blob'
 
 export interface UploadResult {
   storage_provider: 'gcs' | 'vercel_blob'
@@ -70,6 +70,28 @@ export async function deleteBackup(
     await deleteGCSBackup(filename)
   } else if (storageProvider === 'vercel_blob') {
     await deleteFromVercelBlob(storageUrl)
+  } else {
+    throw new Error(`Unknown storage provider: ${storageProvider}`)
+  }
+}
+
+/**
+ * 下載備份檔案（根據 storage_provider 選擇下載方式）
+ *
+ * @param filename 檔案名稱（GCS 使用）
+ * @param storageProvider 儲存位置（'gcs' | 'vercel_blob'）
+ * @param storageUrl 完整 URL（Vercel Blob 使用）
+ * @returns 檔案 Buffer
+ */
+export async function downloadBackup(
+  filename: string,
+  storageProvider: 'gcs' | 'vercel_blob',
+  storageUrl: string
+): Promise<Buffer> {
+  if (storageProvider === 'gcs') {
+    return await downloadGCS(filename)
+  } else if (storageProvider === 'vercel_blob') {
+    return await downloadFromVercelBlob(storageUrl)
   } else {
     throw new Error(`Unknown storage provider: ${storageProvider}`)
   }
