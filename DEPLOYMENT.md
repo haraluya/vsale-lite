@@ -201,9 +201,54 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=你的_SUPABASE_ANON_KEY
 
 ---
 
+## 📝 部署記錄
+
+### 2026-01-09: Vercel 環境變數設定完成 ✅
+
+**問題**：線上版本備份失敗（pg_dump 指令無法在 Vercel Serverless 環境執行）
+
+**解決方案**：
+1. ✅ 使用 Supabase 原生備份（commit 6ae5c51）
+2. ✅ 設定 GCS 環境變數到 Vercel
+3. ✅ 重新部署生產環境
+
+**新增環境變數**：
+- `GCS_PROJECT_ID` = vsale-backup
+- `GCS_BUCKET_NAME` = vsale-backups-haraluya
+- `GCS_SERVICE_ACCOUNT_KEY` = (JSON 金鑰)
+- `CRON_SECRET` = (Cron Job 驗證金鑰)
+
+**部署資訊**：
+- 部署 URL: https://vsale-lite-71dthzbpn-haraluyas-projects.vercel.app
+- 部署 ID: 3ir4PTh51b4vcCdGkT3Y4XknKE8j
+- Git Commit: 6ae5c51
+- 部署時間: 2026-01-09 17:53 (UTC+8)
+
+**測試步驟**：
+1. 前往後台系統設定頁面
+2. 點擊「立即備份」按鈕
+3. 檢查備份狀態是否顯示「成功」
+4. 檢查備份檔案大小是否 > 0 KB（通常 10-50 KB，gzip 壓縮後）
+
+**備份系統架構**：
+- ✅ Vercel Serverless 相容（無需 PostgreSQL 客戶端工具）
+- ✅ 使用 Supabase API 直接查詢資料
+- ✅ Node.js zlib 壓縮（gzip）
+- ✅ 上傳到 Google Cloud Storage
+- ✅ 備份 19 個資料表（含 admin_users 成員管理）
+
+**自動備份設定**：
+- Vercel Cron Job: 每日凌晨 2:00 (UTC+8) 自動執行
+- API 端點: `/api/cron/backup`
+- 滾動刪除舊備份（保留最近 10 個）
+
+---
+
 ## 📚 相關資源
 
 - [Vercel 文件](https://vercel.com/docs)
 - [Next.js 部署指南](https://nextjs.org/docs/deployment)
 - [Supabase 文件](https://supabase.com/docs)
 - [GitHub Actions 文件](https://docs.github.com/en/actions)
+- [詳細備份修復指南](docs/BACKUP_VERCEL_FIX.md)（本地文件）
+- [環境變數設定指南](docs/VERCEL_ENV_SETUP_COMPLETE.md)（本地文件）
