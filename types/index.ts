@@ -220,7 +220,7 @@ export type OrderStatus = 'pending' | 'shipping' | 'completed' | 'cancelled'
 export type Order = {
   id: string
   order_number: string  // 格式: ORD-YYYYMMDD-XXXX
-  user_id: string
+  user_id: string | null  // 允許 NULL（刪除客戶後訂單保留但無法連結回客戶）
   total_amount: number
   shipping_fee: number  // 🆕 Feature 011: 訂單運費金額（建立時快照儲存）
   status: OrderStatus

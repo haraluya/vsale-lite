@@ -461,29 +461,9 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       }
     }
 
-    // 3. 檢查是否有關聯的訂單 (orders.user_id 使用 ON DELETE RESTRICT)
-    const { data: orders, error: ordersCheckError } = await adminClient
-      .from('orders')
-      .select('id')
-      .eq('user_id', id)
-      .limit(1)
-
-    if (ordersCheckError) {
-      console.error('檢查訂單失敗:', ordersCheckError)
-      return {
-        success: false,
-        message: '無法檢查客戶訂單，請稍後再試',
-      }
-    }
-
-    if (orders && orders.length > 0) {
-      return {
-        success: false,
-        message: '此客戶有訂單記錄，無法刪除。請先處理或刪除相關訂單。',
-      }
-    }
-
-    // 4. 使用 Admin Client 刪除 Auth 使用者 (確保電話號碼可重新註冊)
+    // 3. 使用 Admin Client 刪除 Auth 使用者
+    // 注意：刪除客戶時，相關訂單的 user_id 會自動設為 NULL（ON DELETE SET NULL）
+    // 優惠券記錄會自動刪除（user_coupons 使用 ON DELETE CASCADE）
     const { error: authError } = await adminClient.auth.admin.deleteUser(id)
 
     if (authError) {
@@ -494,7 +474,7 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       }
     }
 
-    // 5. 再刪除 profile 資料 (cascade delete)
+    // 4. 再刪除 profile 資料 (cascade delete)
     const { error: profileError } = await adminClient
       .from('profiles')
       .delete()
@@ -510,7 +490,7 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       }
     }
 
-    // 6. 記錄操作日誌
+    // 5. 記錄操作日誌
     await logAudit({
       target_type: 'client',
       target_id: id,
@@ -521,7 +501,7 @@ export async function deleteClient(id: string): Promise<ActionResult> {
       },
     })
 
-    // 7. Revalidate
+    // 6. Revalidate
     revalidatePath('/admin/clients')
 
     return {
