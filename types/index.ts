@@ -520,3 +520,101 @@ export type GetAdminsResponse = {
   page: number
   limit: number
 }
+
+// ===================================
+// 雲端備份型別 (Feature 015)
+// ===================================
+
+// 備份檔案資訊
+export type BackupJob = {
+  id: string
+  filename: string  // vsale-backup-YYYYMMDD-HHMMSS.sql.gz
+  file_size: number  // 壓縮後檔案大小（bytes）
+  storage_provider: 'gcs' | 'vercel_blob'  // 儲存位置
+  storage_url: string  // 雲端檔案 URL
+  backup_type: 'auto' | 'manual'  // 備份類型
+  status: 'in_progress' | 'success' | 'failed'  // 執行狀態
+  metadata: BackupMetadata | null  // 備份統計資料
+  error_message: string | null  // 失敗時錯誤訊息
+  created_by: string | null  // 手動備份操作者（自動備份時為 NULL）
+  started_at: string  // ISO 8601 格式
+  completed_at: string | null
+  created_at: string
+}
+
+// 備份元數據（JSONB 結構）
+export type BackupMetadata = {
+  tables: number  // 備份資料表數量
+  rows: number  // 總記錄數量
+  compression_ratio: number  // 壓縮率（0-1）
+  original_size: number  // 原始 SQL 檔案大小（bytes）
+  compressed_size: number  // 壓縮後大小（bytes）
+  duration_ms: number  // 執行時間（毫秒）
+  table_stats: Record<string, {
+    rows: number
+    size_bytes: number
+  }>  // 各資料表統計
+}
+
+// 備份系統設定
+export type BackupSettings = {
+  backup_enabled: boolean  // 自動備份開關
+  backup_max_keep: number  // 保留備份數量
+  backup_storage_provider: 'gcs' | 'vercel_blob'  // 主要儲存位置
+  backup_last_success: string  // 上次成功時間（ISO 8601）
+  backup_last_error: string  // 上次錯誤訊息
+}
+
+// 備份統計
+export type BackupStats = {
+  total_backups: number  // 總備份數量
+  auto_backups: number  // 自動備份數量
+  manual_backups: number  // 手動備份數量
+  total_size: number  // 總大小（bytes）
+  success_rate: number  // 成功率（0-1）
+  last_success_at: string | null  // 上次成功時間
+  last_failure_at: string | null  // 上次失敗時間
+}
+
+// 備份查詢參數
+export type GetBackupsParams = {
+  backup_type?: 'auto' | 'manual'  // 備份類型篩選
+  status?: 'in_progress' | 'success' | 'failed'  // 狀態篩選
+  limit?: number  // 每頁筆數（預設 20）
+  offset?: number  // 偏移量（預設 0）
+}
+
+// 備份列表回應
+export type GetBackupsResponse = {
+  backups: BackupJob[]
+  total: number
+}
+
+// 建立備份輸入
+export type CreateBackupInput = {
+  backup_type: 'auto' | 'manual'
+  reason?: string  // 備份原因（可選）
+}
+
+// 建立備份回應
+export type CreateBackupResult = ActionResult<BackupJob>
+
+// 取得備份下載 URL 輸入
+export type GetBackupDownloadUrlInput = {
+  id: string
+  expires_in?: number  // 有效期（秒，預設 3600）
+}
+
+// 取得備份下載 URL 回應
+export type GetBackupDownloadUrlResult = ActionResult<{
+  url: string
+  expires_at: string  // ISO 8601 格式
+}>
+
+// 刪除備份輸入
+export type DeleteBackupInput = {
+  id: string
+}
+
+// 刪除備份回應
+export type DeleteBackupResult = ActionResult<void>
