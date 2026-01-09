@@ -6,11 +6,14 @@
 import { createWriteStream, createReadStream, unlinkSync, existsSync, readFileSync } from 'fs'
 import { createGunzip } from 'zlib'
 import { pipeline } from 'stream/promises'
+import { exec } from 'child_process'
+import { promisify } from 'util'
 import path from 'path'
 import os from 'os'
-import { Client } from 'pg'
 import { createClient } from '@/lib/supabase/server'
 import { downloadBackup } from '@/lib/cloud-storage'
+
+const execAsync = promisify(exec)
 
 // 資料庫連線資訊（從環境變數讀取）
 const DB_CONFIG = {
@@ -129,7 +132,13 @@ async function downloadAndDecompress(
 }
 
 /**
- * 執行 SQL 還原（使用 pg Client 直接執行 SQL）
+ * 執行 SQL 還原（使用 psql 指令）
+ *
+ * ⚠️ 需求：必須安裝 PostgreSQL 客戶端工具
+ * Windows: https://www.postgresql.org/download/windows/
+ * macOS: brew install postgresql
+ * Linux: sudo apt-get install postgresql-client
+ *
  * @param sqlPath SQL 檔案路徑
  * @param onProgress 進度回調函數
  */
@@ -139,21 +148,6 @@ async function executeSQLRestore(
 ): Promise<void> {
   validateDBConfig()
 
-  // 讀取 SQL 檔案內容
-  const sqlContent = readFileSync(sqlPath, 'utf-8')
-
-  // 建立 PostgreSQL Client
-  const client = new Client({
-    host: DB_CONFIG.host!,
-    port: parseInt(DB_CONFIG.port!, 10),
-    database: DB_CONFIG.database!,
-    user: DB_CONFIG.user!,
-    password: DB_CONFIG.password!,
-    ssl: {
-      rejectUnauthorized: false, // Supabase 使用自簽證書
-    },
-  })
-
   try {
     onProgress?.({
       stage: 'restoring',
@@ -161,20 +155,37 @@ async function executeSQLRestore(
       percentage: 70,
     })
 
-    // 連線到資料庫
-    await client.connect()
-    console.log('Connected to database for restore')
-
     onProgress?.({
       stage: 'restoring',
       message: '正在執行 SQL 還原...',
       percentage: 75,
     })
 
-    // 執行 SQL（pg_dump 產生的 SQL 是單一大檔案，直接執行）
-    await client.query(sqlContent)
+    // 使用 psql 執行 SQL 檔案
+    // 透過環境變數傳遞密碼（跨平台支援）
+    const psqlCommand = `psql -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -f "${sqlPath}"`
 
-    console.log('Database restore completed')
+    console.log('Executing restore with psql...')
+
+    const { stdout, stderr } = await execAsync(psqlCommand, {
+      maxBuffer: 50 * 1024 * 1024, // 50MB buffer
+      timeout: 600000, // 10 分鐘超時
+      env: {
+        ...process.env,
+        PGPASSWORD: DB_CONFIG.password, // 透過環境變數傳遞密碼
+        PGSSLMODE: 'require', // 強制使用 SSL
+      },
+    })
+
+    if (stderr && !stderr.includes('WARNING') && !stderr.includes('NOTICE')) {
+      console.warn('psql stderr:', stderr)
+    }
+
+    if (stdout) {
+      console.log('psql output:', stdout)
+    }
+
+    console.log('Database restore completed using psql')
 
     onProgress?.({
       stage: 'restoring',
@@ -190,26 +201,20 @@ async function executeSQLRestore(
       errorMessage = error.message
 
       // 針對常見錯誤提供解決方案
-      if (errorMessage.includes('Tenant or user not found')) {
-        errorMessage = '資料庫連線失敗（認證錯誤）\n' +
-          '請檢查 .env.local 中的 DB_USER 和 DB_PASSWORD 是否正確。\n' +
-          '提示：Supabase Pooler 的使用者名稱格式為 postgres.{project_id}'
-      } else if (errorMessage.includes('certificate')) {
-        errorMessage = 'SSL 憑證驗證失敗\n' +
-          '請確認 DB_HOST 指向正確的 Supabase 連線端點。'
+      if (errorMessage.includes('psql') && (errorMessage.includes('command not found') || errorMessage.includes('不是內部或外部命令'))) {
+        errorMessage = '⚠️ psql 指令未安裝\n\n' +
+          '還原功能需要 PostgreSQL 客戶端工具 (psql)。\n\n' +
+          '📥 安裝方式：\n' +
+          '1. 下載 PostgreSQL: https://www.postgresql.org/download/windows/\n' +
+          '2. 安裝時勾選 "Command Line Tools"\n' +
+          '3. 重新啟動終端機與開發伺服器\n' +
+          '4. 驗證安裝: 執行 psql --version\n\n' +
+          '💡 備註：僅需安裝客戶端工具，不需要執行 PostgreSQL 伺服器。'
       }
     }
 
     throw new Error(`執行 SQL 還原失敗: ${errorMessage}`)
   } finally {
-    // 確保關閉資料庫連線
-    try {
-      await client.end()
-      console.log('Database connection closed')
-    } catch (endError) {
-      console.warn('Failed to close database connection:', endError)
-    }
-
     // 清理原始 SQL 檔案
     if (existsSync(sqlPath)) {
       unlinkSync(sqlPath)
