@@ -28,6 +28,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(series?.image_url || null)
 
@@ -68,6 +69,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
     e.preventDefault()
     setLoading(true)
     setError(null)
+    setFieldErrors({})
 
     const formData = new FormData(e.currentTarget)
 
@@ -85,15 +87,32 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
 
       if (mode === 'create') {
         result = await createSeries(data)
-        if (!result.success || !result.data) {
-          throw new Error(result.message || '建立系列失敗')
+        if (!result.success) {
+          // 顯示欄位級別錯誤
+          if (result.errors) {
+            setFieldErrors(result.errors)
+          }
+          setError(result.message || '建立系列失敗')
+          return
+        }
+        if (!result.data) {
+          setError('建立系列失敗：無法取得系列資料')
+          return
         }
         seriesId = result.data.id
       } else {
-        if (!series) throw new Error('系列資料不存在')
+        if (!series) {
+          setError('系列資料不存在')
+          return
+        }
         result = await updateSeries(series.id, data)
         if (!result.success) {
-          throw new Error(result.message || '更新系列失敗')
+          // 顯示欄位級別錯誤
+          if (result.errors) {
+            setFieldErrors(result.errors)
+          }
+          setError(result.message || '更新系列失敗')
+          return
         }
         seriesId = series.id
       }
@@ -140,8 +159,17 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               name="name"
               defaultValue={series?.name}
               required
-              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full rounded-none border-2 px-4 py-2 focus:outline-none focus:ring-2 ${
+                fieldErrors.name
+                  ? 'border-red-600 bg-red-50 focus:ring-red-500'
+                  : 'border-black focus:ring-blue-500'
+              }`}
             />
+            {fieldErrors.name && (
+              <p className="mt-1 text-sm font-bold text-red-600">
+                {fieldErrors.name[0]}
+              </p>
+            )}
           </div>
 
           {/* 系列代碼 */}
@@ -158,11 +186,21 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               maxLength={10}
               pattern="^[A-Z]{3,10}$"
               placeholder="TEA"
-              className="w-full rounded-none border-2 border-black px-4 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full rounded-none border-2 px-4 py-2 uppercase focus:outline-none focus:ring-2 ${
+                fieldErrors.code
+                  ? 'border-red-600 bg-red-50 focus:ring-red-500'
+                  : 'border-black focus:ring-blue-500'
+              }`}
             />
-            <p className="mt-1 text-sm text-gray-500">
-              3-10 個大寫英文字母,用於組成商品編號 (如: DRK-TEA-01)
-            </p>
+            {fieldErrors.code ? (
+              <p className="mt-1 text-sm font-bold text-red-600">
+                {fieldErrors.code[0]}
+              </p>
+            ) : (
+              <p className="mt-1 text-sm text-gray-500">
+                3-10 個大寫英文字母,用於組成商品編號 (如: DRK-TEA-01)
+              </p>
+            )}
           </div>
 
           {/* 分類選擇 */}

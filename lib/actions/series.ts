@@ -106,6 +106,36 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
+    // 檢查系列代碼是否已存在
+    const { data: existingCode } = await adminClient
+      .from('series')
+      .select('id')
+      .eq('code', validation.data.code)
+      .single()
+
+    if (existingCode) {
+      return {
+        success: false,
+        message: `系列代碼「${validation.data.code}」已存在，請使用其他代碼`,
+        errors: { code: ['系列代碼已存在'] },
+      }
+    }
+
+    // 檢查系列名稱是否已存在
+    const { data: existingName } = await adminClient
+      .from('series')
+      .select('id')
+      .eq('name', validation.data.name)
+      .single()
+
+    if (existingName) {
+      return {
+        success: false,
+        message: `系列名稱「${validation.data.name}」已存在，請使用其他名稱`,
+        errors: { name: ['系列名稱已存在'] },
+      }
+    }
+
     // 新增系列
     const { data: newSeries, error } = await adminClient
       .from('series')
@@ -121,6 +151,29 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
 
     if (error) {
       console.error('createSeries 錯誤:', error)
+
+      // 處理資料庫約束違反錯誤（PostgreSQL 錯誤碼 23505）
+      if (error.code === '23505') {
+        if (error.message.includes('series_code_unique')) {
+          return {
+            success: false,
+            message: `系列代碼「${validation.data.code}」已存在（可能被其他管理員同時新增）`,
+            errors: { code: ['系列代碼已存在'] },
+          }
+        }
+        if (error.message.includes('series_name_unique')) {
+          return {
+            success: false,
+            message: `系列名稱「${validation.data.name}」已存在（可能被其他管理員同時新增）`,
+            errors: { name: ['系列名稱已存在'] },
+          }
+        }
+        return {
+          success: false,
+          message: '系列代碼或名稱已存在，請使用其他值',
+        }
+      }
+
       return { success: false, message: '系列建立失敗' }
     }
 
