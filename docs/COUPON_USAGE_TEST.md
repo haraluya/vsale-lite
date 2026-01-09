@@ -266,8 +266,9 @@ SELECT * FROM user_coupons WHERE used_at IS NULL AND order_id IS NULL;
 
 ---
 
-**最後更新**: 2026-01-09 (二次修復)
+**最後更新**: 2026-01-09 (完整修復)
 **Migration 檔案**:
-- `20260109082841_fix_coupon_restore_on_cancel.sql` (函數邏輯)
+- `20260109082841_fix_coupon_restore_on_cancel.sql` (訂單取消時退還優惠券)
 - `20260109083649_fix_user_coupons_update_policy.sql` (RLS Policy) 🔑
+- `20260109084244_fix_delete_order_restore_coupon.sql` (訂單刪除時退還優惠券)
 **修復者**: Claude Sonnet 4.5
