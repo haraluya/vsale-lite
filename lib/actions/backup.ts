@@ -7,6 +7,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { performBackup } from '@/lib/backup/db-backup'
+import { performSupabaseBackup } from '@/lib/backup/supabase-backup'
 import { deleteBackup as deleteGCSBackup, getDownloadUrl as getGCSDownloadUrl } from '@/lib/cloud-storage/gcs'
 import type { ActionResult } from '@/types'
 import type { BackupJob, BackupSettings } from '@/types'
@@ -55,7 +56,16 @@ export async function triggerBackup(): Promise<ActionResult<{ jobId: string }>> 
     }
 
     // 執行備份
-    const jobId = await performBackup('manual', auth.userId)
+    // 優先使用 Supabase 原生備份（適用於 Vercel Serverless 環境）
+    // 如果失敗，則 fallback 到 pg_dump 方式
+    let jobId: string
+    try {
+      console.log('Using Supabase native backup (Vercel compatible)')
+      jobId = await performSupabaseBackup('manual', auth.userId)
+    } catch (supabaseError) {
+      console.warn('Supabase native backup failed, trying pg_dump...', supabaseError)
+      jobId = await performBackup('manual', auth.userId)
+    }
 
     return {
       success: true,
