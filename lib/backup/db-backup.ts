@@ -12,6 +12,7 @@ import path from 'path'
 import os from 'os'
 import { createClient } from '@/lib/supabase/server'
 import { uploadBackup } from '@/lib/cloud-storage/gcs'
+import { cleanupOldBackups } from '@/lib/backup/cleanup'
 import type { BackupMetadata, BackupJob } from '@/types'
 
 const execAsync = promisify(exec)
@@ -264,7 +265,34 @@ export async function performBackup(
       .update({ value: '' })
       .eq('key', 'backup_last_error')
 
-    // 8. 清理臨時檔案
+    // 8. 滾動刪除舊備份（僅自動備份）
+    if (backupType === 'auto') {
+      try {
+        // 查詢保留數量設定
+        const { data: maxKeepSetting } = await supabase
+          .from('system_settings')
+          .select('value')
+          .eq('key', 'backup_max_keep')
+          .single()
+
+        const maxKeep = maxKeepSetting ? parseInt(maxKeepSetting.value, 10) : 10
+
+        console.log(`Executing cleanup: keeping ${maxKeep} most recent auto backups`)
+        const cleanupResult = await cleanupOldBackups(maxKeep)
+
+        if (cleanupResult.deleted_count > 0) {
+          console.log(
+            `Cleanup completed: ${cleanupResult.deleted_count} backups deleted, ` +
+            `${(cleanupResult.deleted_size_bytes / 1024 / 1024).toFixed(2)} MB freed`
+          )
+        }
+      } catch (error) {
+        console.error('Cleanup failed (non-critical):', error)
+        // 清理失敗不影響備份成功
+      }
+    }
+
+    // 9. 清理臨時檔案
     unlinkSync(sqlFilePath)
     unlinkSync(gzFilePath)
 
