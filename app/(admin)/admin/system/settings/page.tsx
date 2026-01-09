@@ -7,6 +7,7 @@ import { getSettings } from '@/lib/actions/system'
 import { checkAuth } from '@/lib/actions/helpers'
 import { SystemSettingsForm } from '@/components/admin/SystemSettingsForm'
 import { LogoUploader } from '@/components/admin/LogoUploader'
+import { BackupManager } from '@/components/admin/BackupManager'
 import { updateSetting, uploadLogo, deleteLogo } from '@/lib/actions/system'
 import { revalidatePath } from 'next/cache'
 
@@ -123,6 +124,15 @@ export default async function SystemSettingsPage() {
       <div>
         <h2 className="text-xl font-black mb-4">一般設定</h2>
         <SystemSettingsForm settings={generalSettings} updateAction={handleUpdateSetting} />
+      </div>
+
+      {/* 備份管理 */}
+      <div>
+        <h2 className="text-xl font-black mb-4">備份管理</h2>
+        <p className="mb-4 text-sm text-gray-600">
+          管理資料庫備份、下載與還原資料
+        </p>
+        <BackupManager />
       </div>
     </div>
   )
