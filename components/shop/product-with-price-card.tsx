@@ -8,6 +8,7 @@
  * - 顯示折扣力度
  * - 顯示庫存狀態
  * - 支援加入購物車 (Feature 004)
+ * - 點擊圖片彈窗查看大圖
  * - Neo-Brutalism 設計風格
  */
 
@@ -24,6 +25,7 @@ import type { ProductWithPrice } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
+import { ImageModal } from '@/components/ui/image-modal'
 
 interface ProductWithPriceCardProps {
   product: ProductWithPrice
@@ -35,6 +37,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
   const { addItem, getItemQuantity, items } = useCartStore()
   const alert = useAlert()
   const [isAdding, setIsAdding] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // 使用 mounted 狀態避免 hydration 不一致
   const [mounted, setMounted] = useState(false)
@@ -82,8 +85,14 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
   // 商品圖片點擊處理
   const handleImageClick = () => {
-    if (product.image_url && onImageClick) {
+    if (!product.image_url) return
+
+    // 如果有 onImageClick callback（系列頁Hero圖切換），優先使用
+    if (onImageClick) {
       onImageClick(product.image_url, product.name)
+    } else {
+      // 否則開啟彈窗
+      setIsModalOpen(true)
     }
   }
 
@@ -101,12 +110,12 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           "mb-3 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
           designTokens.neoBrutalism.border.mobile,
           "border-black",
-          product.image_url && onImageClick && "cursor-pointer",
+          product.image_url && "cursor-pointer",
           !product.image_url && "opacity-50"
         )}
         onClick={handleImageClick}
-        role={product.image_url && onImageClick ? 'button' : undefined}
-        aria-label={product.image_url && onImageClick ? `查看 ${product.name} 大圖` : undefined}
+        role={product.image_url ? 'button' : undefined}
+        aria-label={product.image_url ? `查看 ${product.name} 大圖` : undefined}
       >
         {product.image_url ? (
           <Image
@@ -116,7 +125,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             height={300}
             className={cn(
               "h-full w-full object-cover transition-transform",
-              onImageClick && "group-hover:scale-105"
+              "group-hover:scale-105"
             )}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
@@ -246,6 +255,16 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           )}
         </button>
       </div>
+
+      {/* 圖片彈窗 */}
+      {product.image_url && !onImageClick && (
+        <ImageModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          imageUrl={product.image_url}
+          imageName={product.name}
+        />
+      )}
     </div>
   )
 }

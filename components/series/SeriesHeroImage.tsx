@@ -7,13 +7,16 @@
  * - 點擊商品卡片時切換為商品圖片
  * - 點擊 X 按鈕恢復系列圖片
  * - CSS Transition 淡入淡出動畫 (300ms)
+ * - 點擊圖片彈窗查看大圖
  * - Neo-Brutalism 設計風格
  */
 
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import { X } from 'lucide-react'
+import { ImageModal } from '@/components/ui/image-modal'
 
 interface SeriesHeroImageProps {
   seriesName: string
@@ -30,32 +33,41 @@ export function SeriesHeroImage({
   currentProductName,
   onReset,
 }: SeriesHeroImageProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const isProductImage = currentImage !== seriesImageUrl
   const displayName = isProductImage ? (currentProductName ?? seriesName) : seriesName
 
   return (
-    <div className="relative h-80 w-full overflow-hidden rounded-none border-3 border-black bg-gray-100 shadow-neo">
-      {/* 圖片顯示區 */}
-      {currentImage ? (
-        <Image
-          key={currentImage} // 觸發重新渲染以實現淡入淡出效果
-          src={currentImage}
-          alt={displayName}
-          fill
-          className="object-cover transition-opacity duration-300"
-          priority
-        />
-      ) : (
-        <div className="flex h-full w-full items-center justify-center">
-          <div className="text-center">
-            <div className="text-9xl text-gray-300">📦</div>
-            <p className="mt-4 text-lg font-bold text-gray-400">
-              {displayName}
-            </p>
-            <p className="mt-2 text-sm text-gray-400">尚無圖片</p>
+    <>
+      <div className="relative h-80 w-full overflow-hidden rounded-none border-3 border-black bg-gray-100 shadow-neo">
+        {/* 圖片顯示區 */}
+        {currentImage ? (
+          <div
+            className="relative h-full w-full cursor-pointer"
+            onClick={() => setIsModalOpen(true)}
+            role="button"
+            aria-label={`查看 ${displayName} 大圖`}
+          >
+            <Image
+              key={currentImage} // 觸發重新渲染以實現淡入淡出效果
+              src={currentImage}
+              alt={displayName}
+              fill
+              className="object-cover transition-opacity duration-300 hover:opacity-90"
+              priority
+            />
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <div className="text-center">
+              <div className="text-9xl text-gray-300">📦</div>
+              <p className="mt-4 text-lg font-bold text-gray-400">
+                {displayName}
+              </p>
+              <p className="mt-2 text-sm text-gray-400">尚無圖片</p>
+            </div>
+          </div>
+        )}
 
       {/* 關閉按鈕（僅在顯示商品圖片時顯示） */}
       {isProductImage && (
@@ -68,13 +80,24 @@ export function SeriesHeroImage({
         </button>
       )}
 
-      {/* 圖片標籤 */}
-      <div className="absolute bottom-4 left-4 rounded-none border-2 border-black bg-white px-4 py-2 shadow-neo">
-        <p className="text-sm font-bold">
-          {isProductImage ? '商品圖片' : '系列圖片'}: {displayName}
-        </p>
+        {/* 圖片標籤 */}
+        <div className="absolute bottom-4 left-4 rounded-none border-2 border-black bg-white px-4 py-2 shadow-neo">
+          <p className="text-sm font-bold">
+            {isProductImage ? '商品圖片' : '系列圖片'}: {displayName}
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* 圖片彈窗 */}
+      {currentImage && (
+        <ImageModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          imageUrl={currentImage}
+          imageName={displayName}
+        />
+      )}
+    </>
   )
 }
 
