@@ -107,11 +107,17 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
     const adminClient = createAdminClient()
 
     // 檢查系列代碼是否已存在
-    const { data: existingCode } = await adminClient
+    const { data: existingCode, error: codeCheckError } = await adminClient
       .from('series')
       .select('id')
       .eq('code', validation.data.code)
-      .single()
+      .maybeSingle()  // 使用 maybeSingle() 避免 PGRST116 錯誤
+
+    // 忽略「沒有找到資料」的錯誤
+    if (codeCheckError && codeCheckError.code !== 'PGRST116') {
+      console.error('檢查系列代碼錯誤:', codeCheckError)
+      return { success: false, message: '檢查系列代碼失敗' }
+    }
 
     if (existingCode) {
       return {
@@ -122,11 +128,17 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
     }
 
     // 檢查系列名稱是否已存在
-    const { data: existingName } = await adminClient
+    const { data: existingName, error: nameCheckError } = await adminClient
       .from('series')
       .select('id')
       .eq('name', validation.data.name)
-      .single()
+      .maybeSingle()  // 使用 maybeSingle() 避免 PGRST116 錯誤
+
+    // 忽略「沒有找到資料」的錯誤
+    if (nameCheckError && nameCheckError.code !== 'PGRST116') {
+      console.error('檢查系列名稱錯誤:', nameCheckError)
+      return { success: false, message: '檢查系列名稱失敗' }
+    }
 
     if (existingName) {
       return {
