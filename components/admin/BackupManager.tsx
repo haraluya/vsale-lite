@@ -67,15 +67,16 @@ export function BackupManager() {
           setBackupProgress({ message: data.message, percentage: 100 })
           eventSource.close()
 
-          setTimeout(async () => {
-            await alert({
+          setTimeout(() => {
+            alert({
               title: '備份完成',
               message: '資料庫備份已成功完成',
               variant: 'success',
+            }).then(() => {
+              setBackupInProgress(false)
+              setBackupProgress(null)
+              loadJobs()
             })
-            setBackupInProgress(false)
-            setBackupProgress(null)
-            loadJobs()
           }, 1000)
         } else if (data.stage === 'error') {
           // 備份失敗
@@ -83,12 +84,13 @@ export function BackupManager() {
           setBackupProgress(null)
           setBackupInProgress(false)
 
-          await alert({
+          alert({
             title: '備份失敗',
             message: data.message || '執行備份時發生錯誤',
             variant: 'error',
+          }).then(() => {
+            loadJobs()
           })
-          loadJobs()
         } else {
           // 更新進度
           setBackupProgress({
@@ -98,12 +100,12 @@ export function BackupManager() {
         }
       }
 
-      eventSource.onerror = async () => {
+      eventSource.onerror = () => {
         eventSource.close()
         setBackupProgress(null)
         setBackupInProgress(false)
 
-        await alert({
+        alert({
           title: '連線錯誤',
           message: '無法連線到伺服器，請重新整理頁面後再試',
           variant: 'error',
