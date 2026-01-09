@@ -129,6 +129,16 @@ __tests__/
 supabase/snippets/
 supabase/.temp/
 
+# Database Backups (敏感資料，不應 commit)
+backups/*.sql
+backups/*.dump
+backups/*.tar.gz
+backups/*.json
+!backups/README.md
+!backups/check_db_stats.js
+!backups/DISASTER_RECOVERY_TEST_REPORT.md
+!backups/restore_from_backup.js
+
 # Scripts (不需要部署)
 /scripts/
 
