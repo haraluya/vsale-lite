@@ -15,7 +15,7 @@ import {
   XCircle,
   Clock,
 } from 'lucide-react'
-import { triggerBackup, getBackupJobs, deleteBackupJob, getBackupDownloadUrl } from '@/lib/actions/backup'
+import { triggerBackup, getBackupJobs, deleteBackupJob } from '@/lib/actions/backup'
 import { useAlert, useConfirm } from '@/lib/contexts/dialog-context'
 import type { BackupJob } from '@/types'
 import { format } from 'date-fns'
@@ -70,20 +70,27 @@ export function BackupManager() {
   }
 
   async function handleDownloadBackup(job: BackupJob) {
-    const result = await getBackupDownloadUrl(job.id)
+    try {
+      // 直接下載檔案（不使用 Signed URL）
+      const downloadUrl = `/api/backup/download/${job.id}`
 
-    if (result.success && result.data) {
-      // 開啟新視窗下載
-      window.open(result.data.url, '_blank')
+      // 建立隱藏的 <a> 標籤並觸發下載
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = job.filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
       await alert({
-        title: '下載連結已產生',
-        message: '備份檔案將在新視窗中開始下載',
+        title: '下載已開始',
+        message: `備份檔案 ${job.filename} 開始下載`,
         variant: 'success',
       })
-    } else {
+    } catch (error) {
       await alert({
         title: '下載失敗',
-        message: result.message || '無法產生下載連結',
+        message: error instanceof Error ? error.message : '無法下載備份檔案',
         variant: 'error',
       })
     }

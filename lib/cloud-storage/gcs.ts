@@ -203,6 +203,27 @@ export async function getDownloadUrl(filename: string, expiresIn = 3600): Promis
 }
 
 /**
+ * 直接下載備份檔案（返回 Buffer）
+ * @param filename 檔案名稱
+ * @returns 檔案 Buffer
+ */
+export async function downloadBackupFile(filename: string): Promise<Buffer> {
+  const storage = getStorageClient()
+  const bucket = storage.bucket(GCS_CONFIG.bucketName)
+  const file = bucket.file(filename)
+
+  try {
+    // 下載檔案到記憶體
+    const [buffer] = await file.download()
+    console.log(`GCS download successful: ${filename} (${buffer.length} bytes)`)
+    return buffer
+  } catch (error) {
+    console.error('GCS download failed:', error)
+    throw new Error(`Failed to download backup file: ${error instanceof Error ? error.message : 'Unknown error'}`)
+  }
+}
+
+/**
  * 檢查 GCS 連線狀態
  * @returns 連線是否正常
  */
