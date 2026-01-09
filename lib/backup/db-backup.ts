@@ -66,15 +66,17 @@ async function createDatabaseDump(outputPath: string): Promise<void> {
   // 驗證資料庫連線資訊
   validateDBConfig()
 
-  // 建立 pg_dump 指令（支援 SSL 連線到 Supabase）
-  const pgDumpCommand = `PGPASSWORD="${DB_CONFIG.password}" pg_dump -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -F p --no-owner --no-acl -f "${outputPath}"`
+  // 建立 pg_dump 指令（跨平台支援）
+  // Windows: 使用 env 選項設定 PGPASSWORD，不在指令中設定
+  // Linux/Mac: 同樣方式支援
+  const pgDumpCommand = `pg_dump -h ${DB_CONFIG.host} -p ${DB_CONFIG.port} -U ${DB_CONFIG.user} -d ${DB_CONFIG.database} -F p --no-owner --no-acl -f "${outputPath}"`
 
   try {
     const { stdout, stderr } = await execAsync(pgDumpCommand, {
       maxBuffer: 50 * 1024 * 1024, // 50MB buffer
       env: {
         ...process.env,
-        PGPASSWORD: DB_CONFIG.password,
+        PGPASSWORD: DB_CONFIG.password, // 透過環境變數傳遞密碼（跨平台支援）
       },
     })
 
