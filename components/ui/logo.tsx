@@ -53,8 +53,8 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
         alt={logoAlt}
         width={width}
         height={height}
-        style={{ maxWidth: width, maxHeight: height }}
-        className="h-auto w-auto object-contain"
+        style={{ width: `${width}px`, height: `${height}px`, display: 'block' }}
+        className="object-contain"
       />
     </Link>
   )

@@ -5,11 +5,20 @@
 
 import { Logo } from '@/components/ui/logo'
 import { DebugLogo } from './debug-logo'
+import { SimpleImageTest } from './simple-test'
 
 export default function TestLogoPage() {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <h1 className="text-3xl font-black mb-8">Logo 元件測試</h1>
+
+      {/* 簡單圖片測試 */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-black mb-4">簡單圖片測試（直接 &lt;img&gt; 標籤）</h2>
+        <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+          <SimpleImageTest />
+        </div>
+      </div>
 
       {/* 原始 Logo 元件測試 */}
       <div className="mb-8">
