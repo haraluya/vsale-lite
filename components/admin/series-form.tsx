@@ -78,8 +78,12 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
 
     const formData = new FormData(e.currentTarget)
 
+    // 處理 category_id：將空字串轉換為 null（Zod Schema 期望 UUID 或 null）
+    const rawCategoryId = formData.get('category_id') as string
+    const categoryId = rawCategoryId && rawCategoryId.trim() !== '' ? rawCategoryId : null
+
     const data = {
-      category_id: formData.get('category_id') as string || null,
+      category_id: categoryId,
       code: (formData.get('code') as string).toUpperCase(),
       name: formData.get('name') as string,
       description: formData.get('description') as string || '',
