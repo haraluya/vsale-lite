@@ -172,6 +172,11 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                   >
                     <div className="mb-2">
                       {tier.tier_name}
+                      {tier.is_protected && (
+                        <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
+                          自動
+                        </span>
+                      )}
                     </div>
                     {/* 快速填入 */}
                     {!tier.is_protected && (
@@ -227,15 +232,12 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                       <td key={tier.tier_id} className="border-black px-4 py-3">
                         {isRetail ? (
                           // 零售等級：顯示零售價格（禁用編輯）
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="text"
-                              value={product.retail_price ? `$${product.retail_price.toFixed(2)}` : 'N/A'}
-                              disabled
-                              className="w-28 rounded-none border-2 border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
-                            />
-                            <span className="text-xs text-gray-500">自動同步</span>
-                          </div>
+                          <input
+                            type="text"
+                            value={product.retail_price ? `$${product.retail_price.toFixed(2)}` : 'N/A'}
+                            disabled
+                            className="w-28 rounded-none border-2 border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
+                          />
                         ) : (
                           // 其他等級：可編輯價格
                           <>
