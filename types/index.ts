@@ -111,6 +111,7 @@ export type Series = {
   name: string
   description: string | null
   image_url: string | null
+  color: string  // 🆕 Feature 016: 系列顏色代碼（Hex 格式，如 #FBBF24）
   status: 'active' | 'inactive'
   sort_order: number
   created_at: string
@@ -124,6 +125,7 @@ export type Product = {
   name: string
   series_id: string  // 🔄 Feature 003: 改為關聯系列 (取代 category_id)
   series_name?: string  // JOIN 查詢時包含
+  series_color?: string  // 🆕 Feature 016: 系列顏色（JOIN 查詢時包含）
   category_name?: string  // 🆕 Feature 006: 分類名稱 (用於搜尋結果顯示)
   description: string | null
   retail_price: number | null  // 🆕 Feature 003: 原價/建議售價
@@ -177,7 +179,10 @@ export type ProductWithAllTierPrices = Product & {
 export type GetProductsParams = {
   search?: string         // 商品編號或名稱關鍵字
   series_id?: string      // 🔄 Feature 003: 改為系列篩選 (取代 category_id)
+  series_ids?: string[]   // 🆕 Feature 016: 多系列篩選（陣列）
   status?: 'active' | 'inactive' | 'all'  // 狀態篩選 (Admin only)
+  sort?: 'code' | 'series_name' | 'stock' | 'retail_price'  // 🆕 Feature 016: 排序欄位
+  order?: 'asc' | 'desc'  // 🆕 Feature 016: 排序方向
   page?: number           // 頁碼 (預設 1)
   limit?: number          // 每頁筆數 (預設 20)
 }

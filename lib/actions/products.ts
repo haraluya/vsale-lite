@@ -16,11 +16,15 @@ import type { ActionResult, Product } from '@/types'
 /**
  * 查詢商品列表 (含搜尋、篩選、分頁)
  * Feature 003 修改: 改為 series_id 篩選 (取代 category_id)
+ * Feature 016 修改: 新增多系列篩選與排序功能
  */
 export async function getProducts(params?: {
   search?: string
   series_id?: string  // 🔄 Feature 003: 改為系列篩選 (取代 category_id)
+  series_ids?: string[]  // 🆕 Feature 016: 多系列篩選（陣列）
   status?: 'active' | 'inactive' | 'all'
+  sort?: 'code' | 'series_name' | 'stock' | 'retail_price'  // 🆕 Feature 016: 排序欄位
+  order?: 'asc' | 'desc'  // 🆕 Feature 016: 排序方向
   page?: number
   limit?: number
 }): Promise<{
@@ -30,29 +34,52 @@ export async function getProducts(params?: {
   limit: number
 }> {
   try {
-    const { search = '', series_id, status = 'active', page = 1, limit = 20 } = params || {}
+    const {
+      search = '',
+      series_id,
+      series_ids,
+      status = 'active',
+      sort = 'code',
+      order = 'asc',
+      page = 1,
+      limit = 20
+    } = params || {}
 
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
     let query = adminClient
       .from('products')
-      .select('*, series(name)', { count: 'exact' })  // 🔄 Feature 003: JOIN series 表 (取代 categories)
-      .order('created_at', { ascending: false })
+      .select('*, series(name, color)', { count: 'exact' })  // 🆕 Feature 016: 包含系列顏色
 
     // 搜尋條件 (商品編號或名稱)
     if (search) {
       query = query.or(`code.ilike.%${search}%,name.ilike.%${search}%`)
     }
 
-    // 系列篩選 (Feature 003)
+    // 單一系列篩選 (Feature 003)
     if (series_id) {
       query = query.eq('series_id', series_id)
+    }
+
+    // 多系列篩選 (Feature 016)
+    if (series_ids && series_ids.length > 0) {
+      query = query.in('series_id', series_ids)
     }
 
     // 狀態篩選
     if (status !== 'all') {
       query = query.eq('status', status)
+    }
+
+    // 排序 (Feature 016)
+    const ascending = order === 'asc'
+    if (sort === 'series_name') {
+      // 系列名稱排序需要使用 foreignTable
+      query = query.order('name', { ascending, foreignTable: 'series' })
+    } else {
+      // 其他欄位直接排序
+      query = query.order(sort, { ascending })
     }
 
     // 分頁
@@ -73,6 +100,7 @@ export async function getProducts(params?: {
       name: item.name,
       series_id: item.series_id,  // 🔄 Feature 003: 改為 series_id
       series_name: item.series?.name,  // 🔄 Feature 003: 改為 series_name
+      series_color: item.series?.color,  // 🆕 Feature 016: 系列顏色
       description: item.description,
       retail_price: item.retail_price,  // 🆕 Feature 003: 原價
       stock: item.stock,
