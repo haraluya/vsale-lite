@@ -193,7 +193,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                             }))
                           }
                           placeholder="金額"
-                          className="flex-1 min-w-0 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none"
+                          className="w-16 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none"
                         />
                         <button
                           type="button"
