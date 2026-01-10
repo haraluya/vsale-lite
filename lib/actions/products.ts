@@ -762,7 +762,7 @@ export async function searchProducts(query: string): Promise<ActionResult<Produc
         series:series_id (
           id,
           name,
-          default_image_url,
+          image_url,
           category:category_id (id, name)
         ),
         tier_prices!inner (
@@ -879,7 +879,7 @@ export async function filterProducts(params: {
         series:series_id (
           id,
           name,
-          default_image_url,
+          image_url,
           category:category_id (id, name)
         ),
         tier_prices!inner (

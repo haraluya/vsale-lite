@@ -13,7 +13,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { createSeries, updateSeries, uploadSeriesImage } from '@/lib/actions/series'
+import { createSeries, updateSeries, uploadSeriesImage, deleteSeriesImage } from '@/lib/actions/series'
 import type { Series, Category } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Upload, X } from 'lucide-react'
@@ -128,8 +128,12 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
         seriesId = series.id
       }
 
-      // 如果有上傳圖片,則上傳
+      // 處理圖片變更
+      const hadImage = mode === 'edit' && series?.image_url // 原本有圖片
+      const hasImageNow = imagePreview !== null // 現在有圖片（新上傳或保留舊圖）
+
       if (imageFile && seriesId) {
+        // 情況 1: 上傳新圖片
         const uploadResult = await uploadSeriesImage(seriesId, imageFile)
         if (!uploadResult.success) {
           // 顯示錯誤對話框
@@ -141,12 +145,29 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
           setLoading(false)
           return // 停止導向，讓用戶重試
         }
+      } else if (hadImage && !hasImageNow && mode === 'edit') {
+        // 情況 2: 刪除圖片（原本有圖，現在沒圖）
+        const deleteResult = await deleteSeriesImage(seriesId)
+        if (!deleteResult.success) {
+          await alert({
+            title: '刪除圖片失敗',
+            message: deleteResult.message || '刪除圖片時發生錯誤',
+            variant: 'error',
+          })
+          setLoading(false)
+          return
+        }
       }
+      // 情況 3: 沒有變更圖片（保留原圖或一直沒圖）→ 不做任何操作
 
-      // 上傳成功，顯示成功訊息並導向列表頁
+      // 顯示成功訊息並導向列表頁
       await alert({
         title: mode === 'create' ? '建立成功' : '更新成功',
-        message: imageFile ? '系列資料與圖片已儲存' : '系列資料已儲存',
+        message: imageFile
+          ? '系列資料與圖片已儲存'
+          : hadImage && !hasImageNow
+            ? '系列資料已儲存，圖片已刪除'
+            : '系列資料已儲存',
         variant: 'success',
       })
 

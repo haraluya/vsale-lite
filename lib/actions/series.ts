@@ -451,6 +451,66 @@ export async function uploadSeriesImage(
   }
 }
 
+/**
+ * 刪除系列圖片
+ * @param series_id 系列 ID
+ */
+export async function deleteSeriesImage(series_id: string): Promise<ActionResult<void>> {
+  try {
+    await checkAuth('admin') // 僅管理員可執行
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    // 檢查系列是否存在
+    const { data: existing } = await adminClient
+      .from('series')
+      .select('id, image_url')
+      .eq('id', series_id)
+      .single()
+
+    if (!existing) {
+      return { success: false, message: '系列不存在' }
+    }
+
+    // 刪除 Storage 中的圖片檔案（所有可能的副檔名）
+    const { error: removeError } = await adminClient.storage.from('products').remove([
+      `series/${series_id}/main.jpg`,
+      `series/${series_id}/main.png`,
+      `series/${series_id}/main.webp`,
+    ])
+
+    if (removeError) {
+      console.warn('刪除 Storage 圖片失敗（可能不存在）:', removeError)
+      // 繼續執行，不影響資料庫更新
+    }
+
+    // 清空資料庫的 image_url 欄位
+    const { error: updateError } = await adminClient
+      .from('series')
+      .update({ image_url: null })
+      .eq('id', series_id)
+
+    if (updateError) {
+      console.error('清空 image_url 錯誤:', updateError)
+      return { success: false, message: '刪除圖片失敗' }
+    }
+
+    // 更新快取
+    revalidatePath(`/admin/series/${series_id}`)
+    revalidatePath('/admin/series')
+    revalidatePath('/store')
+
+    return {
+      success: true,
+      message: '圖片已刪除',
+    }
+  } catch (error) {
+    console.error('deleteSeriesImage 異常:', error)
+    return { success: false, message: error instanceof Error ? error.message : '刪除失敗' }
+  }
+}
+
 // ============================================================
 // Excel 匯入匯出功能
 // ============================================================
