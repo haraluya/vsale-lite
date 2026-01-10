@@ -172,11 +172,6 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                   >
                     <div className="mb-2">
                       {tier.tier_name}
-                      {tier.is_protected && (
-                        <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
-                          自動
-                        </span>
-                      )}
                     </div>
                     {/* 快速填入 */}
                     {!tier.is_protected && (
