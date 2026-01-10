@@ -168,28 +168,19 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                 {tiers.map((tier) => (
                   <th
                     key={tier.tier_id}
-                    className="border-b-2 border-black px-4 py-3 text-left font-bold"
+                    className="border-b-2 border-black px-3 py-2 text-left font-bold"
                   >
-                    {tier.tier_name}
-                    {tier.is_protected && (
-                      <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
-                        自動
-                      </span>
-                    )}
-                  </th>
-                ))}
-              </tr>
-              {/* 快速填入列 */}
-              <tr className="bg-blue-50 border-b-2 border-black">
-                <td className="sticky left-0 z-10 border-r-2 border-black bg-blue-50 px-4 py-2 text-sm font-bold text-gray-700">
-                  快速填入
-                </td>
-                {tiers.map((tier) => (
-                  <td key={tier.tier_id} className="border-black px-4 py-2">
-                    {tier.is_protected ? (
-                      <div className="text-xs text-gray-400 text-center">N/A</div>
-                    ) : (
-                      <div className="flex items-center gap-2">
+                    <div className="mb-2">
+                      {tier.tier_name}
+                      {tier.is_protected && (
+                        <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
+                          自動
+                        </span>
+                      )}
+                    </div>
+                    {/* 快速填入 */}
+                    {!tier.is_protected && (
+                      <div className="flex items-center gap-1 mt-1">
                         <input
                           type="number"
                           min="0"
@@ -202,18 +193,18 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                             }))
                           }
                           placeholder="金額"
-                          className="flex-1 min-w-0 rounded-none border-2 border-gray-400 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                          className="flex-1 min-w-0 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none"
                         />
                         <button
                           type="button"
                           onClick={() => handleQuickFill(tier.tier_id)}
-                          className="rounded-none border-2 border-black bg-green-400 px-3 py-1 text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none whitespace-nowrap"
+                          className="rounded-none border border-black bg-green-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
                         >
                           帶入
                         </button>
                       </div>
                     )}
-                  </td>
+                  </th>
                 ))}
               </tr>
             </thead>
