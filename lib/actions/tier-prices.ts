@@ -343,7 +343,7 @@ export async function getSeriesProductsForPricing(
     }
 
     // 2. 查詢所有等級 (包含 is_protected)
-    const { data: tiers, error: tiersError } = await adminClient
+    const { data: tiersData, error: tiersError } = await adminClient
       .from('tiers')
       .select('id, name, rank, is_protected')
       .order('rank', { ascending: true })
@@ -352,6 +352,13 @@ export async function getSeriesProductsForPricing(
       console.error('getSeriesProductsForPricing 等級查詢錯誤:', tiersError)
       return { success: false, message: '查詢等級失敗' }
     }
+
+    // 2.1 重新排序：is_protected 的等級（零售）永遠在最前面
+    const tiers = [...(tiersData || [])].sort((a, b) => {
+      if (a.is_protected && !b.is_protected) return -1
+      if (!a.is_protected && b.is_protected) return 1
+      return a.rank - b.rank
+    })
 
     // 3. 查詢該系列所有商品的等級價格
     const productIds = products.map((p) => p.id)
