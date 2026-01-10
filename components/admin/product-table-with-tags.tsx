@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/admin/pagination'
 import { BatchTagManager } from '@/components/admin/batch-tag-manager'
 import { SortableTableHeader } from '@/components/admin/products/sortable-table-header'
+import { ProductNameWithSeries } from '@/components/admin/products/product-name-with-series'
 import { TagBadgeList } from '@/components/ui/tag-badge'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
@@ -376,9 +377,8 @@ export function ProductTableWithTags({
                 <th className="px-4 py-3 text-left">
                   <SortableTableHeader label="商品編號" sortKey="code" />
                 </th>
-                <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>商品名稱</th>
-                <th className="px-4 py-3 text-left">
-                  <SortableTableHeader label="系列" sortKey="series_name" />
+                <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.large)}>
+                  商品名稱 / 系列
                 </th>
                 {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>標籤</th>}
                 <th className="px-4 py-3 text-right">
@@ -425,21 +425,32 @@ export function ProductTableWithTags({
                       </td>
                       <td className={cn("px-4 py-3 font-mono", designTokens.typography.caption)}>{product.code}</td>
 
-                      {/* 商品名稱 - 批次編輯模式下可編輯 */}
-                      <td className={cn("px-4 py-3", designTokens.typography.body.base)}>
+                      {/* 商品名稱 / 系列 - 批次編輯模式下可編輯 */}
+                      <td className={cn("px-4 py-3", designTokens.typography.body.large)}>
                         {isInBatchEdit ? (
-                          <input
-                            type="text"
-                            value={editedData?.name || ''}
-                            onChange={(e) => handleUpdateEditedProduct(product.id, 'name', e.target.value)}
-                            className="w-full rounded-none border-2 border-black px-2 py-1 font-medium"
-                          />
+                          <div className="flex flex-col gap-1">
+                            <input
+                              type="text"
+                              value={editedData?.name || ''}
+                              onChange={(e) => handleUpdateEditedProduct(product.id, 'name', e.target.value)}
+                              className={cn(
+                                "w-full rounded-none border-2 border-black px-2 py-1 font-medium",
+                                designTokens.typography.body.base
+                              )}
+                              placeholder="商品名稱"
+                            />
+                            <span className={cn("text-xs text-gray-500")}>
+                              系列：{product.series_name}
+                            </span>
+                          </div>
                         ) : (
-                          <span className="font-medium">{product.name}</span>
+                          <ProductNameWithSeries
+                            productName={product.name}
+                            seriesName={product.series_name || '未知系列'}
+                            seriesColor={product.series_color || '#94A3B8'}
+                          />
                         )}
                       </td>
-
-                      <td className={cn("px-4 py-3 text-gray-600", designTokens.typography.caption)}>{product.series_name}</td>
 
                       {/* 標籤 - 僅在非批次編輯模式顯示 */}
                       {!batchEditMode && (

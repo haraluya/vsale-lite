@@ -20,16 +20,17 @@ export function ProductNameWithSeries({
   className,
 }: ProductNameWithSeriesProps) {
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      {/* 系列 Badge - 使用系列專屬顏色 */}
+    <div className={cn('flex items-center gap-2.5', className)}>
+      {/* 系列 Badge - 使用系列專屬顏色，字體放大 */}
       <span
         className="
           inline-flex items-center justify-center
-          px-2 py-1
-          text-xs font-bold
+          px-3 py-1.5
+          text-sm font-bold
           border-2 border-black
           shadow-neo-sm
           rounded-none
+          whitespace-nowrap
           transition-transform
           hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
         "
@@ -41,8 +42,10 @@ export function ProductNameWithSeries({
         {seriesName}
       </span>
 
-      {/* 商品名稱 */}
-      <span className="text-sm font-medium text-gray-900">{productName}</span>
+      {/* 商品名稱 - 字體放大，增加識別度 */}
+      <span className="text-base font-semibold text-gray-900 leading-relaxed">
+        {productName}
+      </span>
     </div>
   )
 }
