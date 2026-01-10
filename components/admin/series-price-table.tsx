@@ -146,9 +146,6 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                 <th className="sticky left-0 z-10 border-b-2 border-r-2 border-black bg-gray-100 px-4 py-3 text-left font-bold">
                   商品編號 / 名稱
                 </th>
-                <th className="border-b-2 border-r-2 border-black px-4 py-3 text-left font-bold">
-                  零售價格
-                </th>
                 {tiers.map((tier) => (
                   <th
                     key={tier.tier_id}
@@ -157,7 +154,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                     {tier.tier_name}
                     {tier.is_protected && (
                       <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
-                        固定
+                        自動
                       </span>
                     )}
                   </th>
@@ -176,13 +173,6 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                   <td className="sticky left-0 z-10 border-r-2 border-black bg-white px-4 py-3">
                     <div className="font-bold">{product.code}</div>
                     <div className="text-sm text-gray-600">{product.name}</div>
-                  </td>
-
-                  {/* 零售價格 (唯讀) */}
-                  <td className="border-r-2 border-black px-4 py-3">
-                    <div className="font-bold text-blue-600">
-                      ${product.retail_price?.toFixed(2) || 'N/A'}
-                    </div>
                   </td>
 
                   {/* 各等級價格 */}
