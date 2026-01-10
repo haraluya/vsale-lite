@@ -201,7 +201,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                             }))
                           }
                           placeholder="金額"
-                          className="w-16 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none"
+                          className="w-16 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                         <button
                           type="button"
@@ -226,8 +226,8 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                 >
                   {/* 商品資訊 */}
                   <td className="sticky left-0 z-10 border-r-2 border-black bg-white px-4 py-3">
-                    <div className="font-bold">{product.code}</div>
-                    <div className="text-sm text-gray-600">{product.name}</div>
+                    <div className="font-bold">{product.name}</div>
+                    <div className="text-sm text-gray-600">{product.code}</div>
                   </td>
 
                   {/* 各等級價格 */}
@@ -242,7 +242,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                           // 零售等級：顯示零售價格（禁用編輯）
                           <input
                             type="text"
-                            value={product.retail_price ? `$${product.retail_price.toFixed(2)}` : 'N/A'}
+                            value={product.retail_price ? `$${Math.round(product.retail_price)}` : 'N/A'}
                             disabled
                             className="w-28 rounded-none border-2 border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
                           />
@@ -258,7 +258,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                                 handlePriceChange(product.id, tier.tier_id, e.target.value)
                               }
                               placeholder="未設定"
-                              className="w-28 rounded-none border-2 border-gray-300 px-3 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                              className="w-28 rounded-none border-2 border-gray-300 px-3 py-1 text-sm focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                             {/* 折扣率顯示 */}
                             {currentPrice && product.retail_price && (
