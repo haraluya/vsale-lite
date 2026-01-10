@@ -10,12 +10,13 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save } from 'lucide-react'
 import { batchSetTierPrices } from '@/lib/actions/tier-prices'
 import type { Series, ProductWithAllTierPrices } from '@/types'
 import { Button } from '@/components/ui/button'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 interface SeriesPriceTableProps {
   series: Series
@@ -24,9 +25,9 @@ interface SeriesPriceTableProps {
 
 export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
   const router = useRouter()
+  const alert = useAlert()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   // 初始化價格狀態 (key: "product_id_tier_id", value: price)
   const [prices, setPrices] = useState<Record<string, number | null>>(() => {
@@ -42,6 +43,11 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
 
   // 快速填入狀態 (key: tier_id, value: amount)
   const [quickFillAmounts, setQuickFillAmounts] = useState<Record<string, string>>({})
+
+  // 當系列變更時，重置快速填入輸入框
+  useEffect(() => {
+    setQuickFillAmounts({})
+  }, [series.id])
 
   const handlePriceChange = (productId: string, tierId: string, value: string) => {
     const key = `${productId}_${tierId}`
@@ -63,13 +69,18 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
       updatedPrices[key] = numValue
     })
     setPrices(updatedPrices)
+
+    // 清空該等級的快速填入輸入框
+    setQuickFillAmounts((prev) => ({
+      ...prev,
+      [tierId]: '',
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
-    setSuccess(false)
 
     try {
       // 過濾出非零售等級的價格（允許 null，這樣可以清空價格）
@@ -115,7 +126,13 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
         throw new Error(errorDetails || '批量設定價格失敗')
       }
 
-      setSuccess(true)
+      // 顯示成功彈窗
+      await alert({
+        title: '批量設定價格成功',
+        message: `系列「${series.name}」的價格已更新`,
+        variant: 'success',
+      })
+
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : '操作失敗')
@@ -133,15 +150,6 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
       {error && (
         <div className="rounded-none border-2 border-red-600 bg-red-50 p-4">
           <p className="font-bold text-red-800">{error}</p>
-        </div>
-      )}
-
-      {/* 成功訊息 */}
-      {success && (
-        <div className="rounded-none border-2 border-green-600 bg-green-50 p-4">
-          <p className="font-bold text-green-800">
-            批量設定價格成功!系列「{series.name}」的價格已更新。
-          </p>
         </div>
       )}
 
