@@ -40,10 +40,29 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
     return initialPrices
   })
 
+  // 快速填入狀態 (key: tier_id, value: amount)
+  const [quickFillAmounts, setQuickFillAmounts] = useState<Record<string, string>>({})
+
   const handlePriceChange = (productId: string, tierId: string, value: string) => {
     const key = `${productId}_${tierId}`
     const numValue = value === '' ? null : parseFloat(value)
     setPrices((prev) => ({ ...prev, [key]: numValue }))
+  }
+
+  // 快速填入該等級所有商品的價格
+  const handleQuickFill = (tierId: string) => {
+    const amount = quickFillAmounts[tierId]
+    if (!amount || amount === '') return
+
+    const numValue = parseFloat(amount)
+    if (isNaN(numValue) || numValue < 0) return
+
+    const updatedPrices = { ...prices }
+    products.forEach((product) => {
+      const key = `${product.id}_${tierId}`
+      updatedPrices[key] = numValue
+    })
+    setPrices(updatedPrices)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -160,6 +179,43 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                   </th>
                 ))}
               </tr>
+              {/* 快速填入列 */}
+              <tr className="bg-blue-50 border-b-2 border-black">
+                <td className="sticky left-0 z-10 border-r-2 border-black bg-blue-50 px-4 py-2 text-sm font-bold text-gray-700">
+                  快速填入
+                </td>
+                {tiers.map((tier) => (
+                  <td key={tier.tier_id} className="border-black px-4 py-2">
+                    {tier.is_protected ? (
+                      <div className="text-xs text-gray-400 text-center">N/A</div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={quickFillAmounts[tier.tier_id] || ''}
+                          onChange={(e) =>
+                            setQuickFillAmounts((prev) => ({
+                              ...prev,
+                              [tier.tier_id]: e.target.value,
+                            }))
+                          }
+                          placeholder="金額"
+                          className="flex-1 min-w-0 rounded-none border-2 border-gray-400 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleQuickFill(tier.tier_id)}
+                          className="rounded-none border-2 border-black bg-green-400 px-3 py-1 text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none whitespace-nowrap"
+                        >
+                          帶入
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                ))}
+              </tr>
             </thead>
             <tbody>
               {products.map((product, idx) => (
@@ -242,6 +298,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
           <div className="text-sm text-gray-600">
             <p>💡 提示:</p>
             <ul className="ml-4 mt-1 list-disc space-y-1">
+              <li>使用「快速填入」功能可一鍵將該等級所有商品設定為相同價格</li>
               <li>零售等級價格自動同步商品的零售價格,無法手動修改</li>
               <li>留空的價格欄位，客戶端會自動顯示原價（零售價格）</li>
               <li>支援批量設定,一次儲存所有變更</li>
