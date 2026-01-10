@@ -11,6 +11,7 @@ import { checkAuth } from './helpers'
 import { createSeriesSchema, updateSeriesSchema } from '@/lib/validations/series.schema'
 import type { ActionResult, Series } from '@/types'
 import type { CreateSeriesInput, UpdateSeriesInput } from '@/lib/validations/series.schema'
+import { uploadWithRetry, formatUploadError } from '@/lib/utils/upload-helpers'
 
 /**
  * 查詢所有系列 (管理員可見全部,客戶僅可見 active)
@@ -379,28 +380,40 @@ export async function uploadSeriesImage(
     }
 
     // 上傳前先刪除所有可能的舊圖片（避免不同副檔名的孤兒檔案）
-    await adminClient.storage.from('products').remove([
+    const { error: removeError } = await adminClient.storage.from('products').remove([
       `series/${series_id}/main.jpg`,
       `series/${series_id}/main.png`,
       `series/${series_id}/main.webp`,
     ])
-    // 註: 即使檔案不存在也不會報錯
 
     // 取得檔案副檔名
     const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `series/${series_id}/main.${ext}`
 
-    // 上傳新圖片到 Supabase Storage
-    const { error: uploadError } = await adminClient.storage
-      .from('products')
-      .upload(filePath, file, {
-        upsert: false, // 已刪除舊檔案，不需要 upsert
-        contentType: file.type,
-      })
+    // 如果刪除失敗，使用 upsert 模式覆寫；否則使用 upsert: false
+    const shouldUpsert = !!removeError
 
-    if (uploadError) {
-      console.error('上傳圖片錯誤:', uploadError)
-      return { success: false, message: '圖片上傳失敗' }
+    if (removeError) {
+      console.warn('刪除舊圖片失敗，將使用覆寫模式上傳:', removeError)
+    }
+
+    // 使用帶重試機制的上傳函式
+    const uploadResult = await uploadWithRetry(
+      () =>
+        adminClient.storage.from('products').upload(filePath, file, {
+          upsert: shouldUpsert, // 刪除失敗時允許覆寫
+          contentType: file.type,
+        }),
+      3, // 最多重試 3 次
+      30000 // 單次上傳超時 30 秒
+    )
+
+    if (uploadResult.error) {
+      console.error('上傳圖片錯誤:', uploadResult.error, `(嘗試 ${uploadResult.attempts} 次)`)
+      return {
+        success: false,
+        message: formatUploadError(uploadResult.error, uploadResult.attempts),
+      }
     }
 
     // 取得公開 URL
@@ -416,7 +429,10 @@ export async function uploadSeriesImage(
 
     if (updateError) {
       console.error('更新 image_url 錯誤:', updateError)
-      return { success: false, message: '更新圖片 URL 失敗' }
+      return {
+        success: false,
+        message: '圖片已上傳，但資料庫同步失敗，請重新整理頁面或聯絡管理員',
+      }
     }
 
     // 更新快取

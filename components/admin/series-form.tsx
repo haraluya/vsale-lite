@@ -17,6 +17,7 @@ import { createSeries, updateSeries, uploadSeriesImage } from '@/lib/actions/ser
 import type { Series, Category } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Upload, X } from 'lucide-react'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 interface SeriesFormProps {
   series?: Series
@@ -26,6 +27,7 @@ interface SeriesFormProps {
 
 export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
   const router = useRouter()
+  const alert = useAlert()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
@@ -130,9 +132,23 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
       if (imageFile && seriesId) {
         const uploadResult = await uploadSeriesImage(seriesId, imageFile)
         if (!uploadResult.success) {
-          console.warn('圖片上傳失敗:', uploadResult.message)
+          // 顯示錯誤對話框
+          await alert({
+            title: '圖片上傳失敗',
+            message: uploadResult.message || '圖片上傳時發生錯誤，請重試',
+            variant: 'error',
+          })
+          setLoading(false)
+          return // 停止導向，讓用戶重試
         }
       }
+
+      // 上傳成功，顯示成功訊息並導向列表頁
+      await alert({
+        title: mode === 'create' ? '建立成功' : '更新成功',
+        message: imageFile ? '系列資料與圖片已儲存' : '系列資料已儲存',
+        variant: 'success',
+      })
 
       router.push('/admin/series')
       router.refresh()
