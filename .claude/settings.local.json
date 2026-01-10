@@ -13,7 +13,8 @@
       "Bash(gcloud projects describe:*)",
       "Bash(powershell.exe:*)",
       "Bash(supabase db pull:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(New-Item -ItemType Directory -Path \"d:\\\\APP\\\\vsale\\\\backups\" -Force)"
     ]
   }
 }

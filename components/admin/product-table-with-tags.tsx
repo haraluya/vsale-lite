@@ -382,6 +382,9 @@ export function ProductTableWithTags({
                 </th>
                 {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>標籤</th>}
                 <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
+                  零售價格
+                </th>
+                <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
                   庫存
                 </th>
                 {batchEditMode && (
@@ -460,6 +463,15 @@ export function ProductTableWithTags({
                           ) : (
                             <span className={cn("text-gray-400", designTokens.typography.caption)}>無標籤</span>
                           )}
+                        </td>
+                      )}
+
+                      {/* 零售價格 - 一般模式顯示 */}
+                      {!batchEditMode && (
+                        <td className="px-4 py-3 text-right">
+                          <span className={cn("font-mono", designTokens.typography.caption)}>
+                            {product.retail_price !== null ? `$${product.retail_price}` : 'N/A'}
+                          </span>
                         </td>
                       )}
 
@@ -663,6 +675,14 @@ export function ProductTableWithTags({
                   ) : (
                     <span className={cn("text-gray-400 italic", designTokens.typography.caption)}>無標籤</span>
                   )}
+                </div>
+
+                {/* 零售價格 */}
+                <div className="mb-3 pb-3 border-b border-gray-200">
+                  <div className={cn("text-gray-600 mb-2", designTokens.typography.caption)}>零售價格:</div>
+                  <div className={cn("font-mono font-bold text-blue-600", designTokens.typography.body.base)}>
+                    {product.retail_price !== null ? `$${product.retail_price}` : 'N/A'}
+                  </div>
                 </div>
 
                 {/* 庫存編輯 */}

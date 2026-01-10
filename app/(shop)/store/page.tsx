@@ -15,9 +15,8 @@ import { redirect } from 'next/navigation'
 import { getActiveSeries } from '@/lib/actions/shop'
 import { getActiveAnnouncements } from '@/lib/actions/announcements'
 import { getActiveCategories, getAvailableTags } from '@/lib/actions/products'
-import { SeriesCard } from '@/components/shop/series-card'
 import { AnnouncementCarousel } from '@/components/announcements/AnnouncementCarousel'
-import { StoreSearch } from '@/components/shop/store-search'
+import { StorePageClient } from '@/components/shop/store-page-client'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
@@ -99,38 +98,12 @@ export default async function StorePage() {
           </div>
         )}
 
-        {/* Search Bar & Filters (Feature 006 - US1, US2) */}
-        <div className={designTokens.spacing.section.marginBottom}>
-          <StoreSearch
-            categories={categories || []}
-            availableTags={availableTags || []}
-          />
-        </div>
-
-        {/* Series Grid */}
-        {!series || series.length === 0 ? (
-          <div className={cn(
-            "rounded-none bg-white text-center",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
-            "p-8 md:p-12"
-          )}>
-            <p className={cn(
-              designTokens.typography.body.large,
-              "text-gray-500"
-            )}>目前沒有可用的商品系列</p>
-          </div>
-        ) : (
-          <div className={cn(
-            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-            designTokens.spacing.grid.gap
-          )}>
-            {series?.map((s) => (
-              <SeriesCard key={s.id} series={s} />
-            ))}
-          </div>
-        )}
+        {/* Store Content (Search, Filters, Series Grid) */}
+        <StorePageClient
+          series={series || []}
+          categories={categories || []}
+          availableTags={availableTags || []}
+        />
       </div>
     </div>
   )

@@ -15,9 +15,10 @@ import { ProductCard } from '@/components/shop/product-card'
 interface StoreSearchProps {
   categories: { id: string; name: string }[]
   availableTags: string[]
+  onActiveChange?: (isActive: boolean) => void
 }
 
-export function StoreSearch({ categories, availableTags }: StoreSearchProps) {
+export function StoreSearch({ categories, availableTags, onActiveChange }: StoreSearchProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [isActive, setIsActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -71,6 +72,7 @@ export function StoreSearch({ categories, availableTags }: StoreSearchProps) {
       if (result.success && result.data) {
         setProducts(result.data)
         setIsActive(true)
+        onActiveChange?.(true)
       }
       return
     }
@@ -84,6 +86,7 @@ export function StoreSearch({ categories, availableTags }: StoreSearchProps) {
       if (result.success && result.data) {
         setProducts(result.data)
         setIsActive(true)
+        onActiveChange?.(true)
       }
       return
     }
@@ -91,6 +94,7 @@ export function StoreSearch({ categories, availableTags }: StoreSearchProps) {
     // 沒有任何條件，清空結果
     setIsActive(false)
     setProducts([])
+    onActiveChange?.(false)
   }
 
   // 監聽篩選條件變化
@@ -107,6 +111,7 @@ export function StoreSearch({ categories, availableTags }: StoreSearchProps) {
       if (selectedCategories.length === 0 && selectedTags.length === 0) {
         setIsActive(false)
         setProducts([])
+        onActiveChange?.(false)
       } else {
         // 有篩選條件，執行篩選
         executeSearchOrFilter()
@@ -119,9 +124,11 @@ export function StoreSearch({ categories, availableTags }: StoreSearchProps) {
     if (result.success && result.data) {
       setProducts(result.data)
       setIsActive(true)
+      onActiveChange?.(true)
     } else {
       setProducts([])
       setIsActive(true)
+      onActiveChange?.(true)
     }
   }
 
@@ -147,6 +154,7 @@ export function StoreSearch({ categories, availableTags }: StoreSearchProps) {
     setSearchQuery('')
     setIsActive(false)
     setProducts([])
+    onActiveChange?.(false)
   }
 
   const hasFilters = selectedCategories.length > 0 || selectedTags.length > 0
