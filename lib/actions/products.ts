@@ -10,7 +10,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { checkAuth } from './helpers'
 import { logAudit } from './audit'
-import { createProductSchema, updateProductSchema } from '@/lib/validations/product.schema'
+import { createProductSchema, updateProductSchema, batchUpdateProductsSchema } from '@/lib/validations/product.schema'
 import type { ActionResult, Product } from '@/types'
 
 /**
@@ -1534,6 +1534,113 @@ export async function downloadProductTemplate(): Promise<
     return {
       success: false,
       message: error instanceof Error ? error.message : '下載範本失敗',
+    }
+  }
+}
+
+
+/**
+ * 批次編輯商品
+ * Feature: 016-product-management-enhancements (Phase 3)
+ * 支援批次修改商品名稱、庫存、價格、單位
+ */
+export async function batchUpdateProducts(
+  data: {
+    products: {
+      id: string
+      name?: string
+      stock?: number
+      retail_price?: number | null
+      unit?: string
+    }[]
+  }
+): Promise<ActionResult<{ updated_count: number }>> {
+  try {
+    // 1. 驗證管理員權限
+    const authContext = await checkAuth("admin")
+
+    // 2. 驗證輸入資料
+    const validation = batchUpdateProductsSchema.safeParse(data)
+    if (!validation.success) {
+      const errors: Record<string, string[]> = {}
+      validation.error.issues.forEach((err) => {
+        const path = err.path.join(".")
+        if (!errors[path]) errors[path] = []
+        errors[path].push(err.message)
+      })
+      return { success: false, errors, message: "資料驗證失敗" }
+    }
+
+    const { products } = validation.data
+    const adminClient = createAdminClient()
+
+    // 3. 批次更新商品（逐一更新以支援 RLS 與 Trigger）
+    let updated_count = 0
+    const errors: string[] = []
+
+    for (const product of products) {
+      try {
+        // 建立更新物件（僅包含有提供的欄位）
+        const updateData: Record<string, any> = {}
+        if (product.name !== undefined) updateData.name = product.name
+        if (product.stock !== undefined) updateData.stock = product.stock
+        if (product.retail_price !== undefined) updateData.retail_price = product.retail_price
+        if (product.unit !== undefined) updateData.unit = product.unit
+        updateData.updated_at = new Date().toISOString()
+
+        // 執行更新
+        const { error } = await adminClient
+          .from("products")
+          .update(updateData)
+          .eq("id", product.id)
+
+        if (error) {
+          // 檢查是否為唯一性約束違反（同系列內名稱重複）
+          if (error.code === "23505" && error.message.includes("products_series_id_name_key")) {
+            errors.push(`商品 ${product.id}: 同系列內已有相同名稱的商品`)
+          } else {
+            errors.push(`商品 ${product.id}: ${error.message}`)
+          }
+        } else {
+          updated_count++
+        }
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : "更新失敗"
+        errors.push(`商品 ${product.id}: ${errMsg}`)
+      }
+    }
+
+    // 4. 更新快取
+    revalidatePath("/admin/products")
+
+    // 5. 記錄操作日誌
+    await logAudit({
+      target_type: "product",
+      target_id: "batch",
+      action_type: "updated",
+      new_values: { products, updated_count, errors },
+      notes: `批次編輯 ${products.length} 個商品，成功 ${updated_count} 個`,
+    })
+
+    // 6. 回傳結果
+    if (errors.length > 0) {
+      return {
+        success: true, // 部分成功
+        data: { updated_count },
+        message: `批次編輯完成：成功 ${updated_count} 個，失敗 ${errors.length} 個\n\n錯誤詳情：\n${errors.join("\n")}`,
+      }
+    }
+
+    return {
+      success: true,
+      data: { updated_count },
+      message: `成功更新 ${updated_count} 個商品`,
+    }
+  } catch (error) {
+    console.error("batchUpdateProducts 錯誤:", error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "批次編輯失敗",
     }
   }
 }

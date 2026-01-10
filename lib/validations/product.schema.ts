@@ -107,3 +107,37 @@ export function validateImageFile(file: File): { valid: boolean; error?: string 
 
   return { valid: true }
 }
+
+/**
+ * 批次編輯商品驗證 Schema
+ * Feature: 016-product-management-enhancements (Phase 3)
+ */
+export const batchUpdateProductsSchema = z.object({
+  products: z
+    .array(
+      z.object({
+        id: z.string().uuid('無效的商品 ID'),
+        name: z
+          .string()
+          .min(1, '商品名稱不可為空')
+          .max(200, '商品名稱最多 200 字元')
+          .optional(),
+        stock: z.coerce
+          .number()
+          .int('庫存必須為整數')
+          .optional(), // 支援負庫存
+        retail_price: z.coerce
+          .number()
+          .min(0, '零售價格不可為負數')
+          .nullable()
+          .optional(),
+        unit: z
+          .string()
+          .min(1, '單位不可為空')
+          .max(20, '單位最多 20 字元')
+          .optional(),
+      })
+    )
+    .min(1, '至少需要一個商品')
+    .max(50, '單次最多修改 50 個商品'),
+})
