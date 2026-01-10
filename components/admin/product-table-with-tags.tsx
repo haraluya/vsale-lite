@@ -62,6 +62,13 @@ export function ProductTableWithTags({
     unit?: string
   }>>({})
 
+  // 批次帶入狀態
+  const [quickFillValues, setQuickFillValues] = useState({
+    namePrefix: '',
+    retail_price: '',
+    unit: ''
+  })
+
   const handleSearch = () => {
     const params = new URLSearchParams()
     if (search) params.set('search', search)
@@ -230,6 +237,72 @@ export function ProductTableWithTags({
     setEditedProducts({})
   }
 
+  // 批次帶入處理函數
+  const handleQuickFillNamePrefix = () => {
+    if (!quickFillValues.namePrefix || quickFillValues.namePrefix.trim() === '') return
+
+    setEditedProducts(prev => {
+      const updated = { ...prev }
+      selectedProductIds.forEach(productId => {
+        const product = products.find(p => p.id === productId)
+        if (product && updated[productId]) {
+          updated[productId] = {
+            ...updated[productId],
+            name: quickFillValues.namePrefix + (updated[productId].name || product.name)
+          }
+        }
+      })
+      return updated
+    })
+
+    // 清空輸入框
+    setQuickFillValues(prev => ({ ...prev, namePrefix: '' }))
+  }
+
+  const handleQuickFillRetailPrice = () => {
+    const price = quickFillValues.retail_price
+    if (!price || price === '') return
+
+    const numValue = parseFloat(price)
+    if (isNaN(numValue) || numValue < 0) return
+
+    setEditedProducts(prev => {
+      const updated = { ...prev }
+      selectedProductIds.forEach(productId => {
+        if (updated[productId]) {
+          updated[productId] = {
+            ...updated[productId],
+            retail_price: numValue
+          }
+        }
+      })
+      return updated
+    })
+
+    // 清空輸入框
+    setQuickFillValues(prev => ({ ...prev, retail_price: '' }))
+  }
+
+  const handleQuickFillUnit = () => {
+    if (!quickFillValues.unit || quickFillValues.unit.trim() === '') return
+
+    setEditedProducts(prev => {
+      const updated = { ...prev }
+      selectedProductIds.forEach(productId => {
+        if (updated[productId]) {
+          updated[productId] = {
+            ...updated[productId],
+            unit: quickFillValues.unit
+          }
+        }
+      })
+      return updated
+    })
+
+    // 清空輸入框
+    setQuickFillValues(prev => ({ ...prev, unit: '' }))
+  }
+
   return (
     <div className={designTokens.spacing.page.gap}>
       <div className={cn("card-neo", designTokens.spacing.card.padding)}>
@@ -378,21 +451,74 @@ export function ProductTableWithTags({
                   <SortableTableHeader label="商品編號" sortKey="code" />
                 </th>
                 <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.large)}>
-                  商品名稱 / 系列
+                  <div className="mb-2">商品名稱 / 系列</div>
+                  {batchEditMode && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <input
+                        type="text"
+                        value={quickFillValues.namePrefix}
+                        onChange={(e) => setQuickFillValues(prev => ({ ...prev, namePrefix: e.target.value }))}
+                        placeholder="前方插入文字"
+                        className="w-32 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleQuickFillNamePrefix}
+                        className="rounded-none border border-black bg-blue-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                      >
+                        帶入
+                      </button>
+                    </div>
+                  )}
                 </th>
                 {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>標籤</th>}
                 <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
-                  零售價格
-                </th>
-                <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
                   庫存
                 </th>
+                <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
+                  <div className="mb-2">零售價格</div>
+                  {batchEditMode && (
+                    <div className="flex items-center gap-1 mt-1 justify-end">
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={quickFillValues.retail_price}
+                        onChange={(e) => setQuickFillValues(prev => ({ ...prev, retail_price: e.target.value }))}
+                        placeholder="金額"
+                        className="w-20 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleQuickFillRetailPrice}
+                        className="rounded-none border border-black bg-green-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                      >
+                        帶入
+                      </button>
+                    </div>
+                  )}
+                </th>
                 {batchEditMode && (
-                  <th className="px-4 py-3 text-right">
-                    <SortableTableHeader label="零售價格" sortKey="retail_price" className="justify-end" />
+                  <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>
+                    <div className="mb-2">單位</div>
+                    <div className="flex items-center gap-1 mt-1">
+                      <input
+                        type="text"
+                        value={quickFillValues.unit}
+                        onChange={(e) => setQuickFillValues(prev => ({ ...prev, unit: e.target.value }))}
+                        placeholder="單位"
+                        className="w-16 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleQuickFillUnit}
+                        className="rounded-none border border-black bg-green-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                      >
+                        帶入
+                      </button>
+                    </div>
                   </th>
                 )}
-                {batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>單位</th>}
                 {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>狀態</th>}
                 {!batchEditMode && <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>操作</th>}
               </tr>
@@ -466,15 +592,6 @@ export function ProductTableWithTags({
                         </td>
                       )}
 
-                      {/* 零售價格 - 一般模式顯示 */}
-                      {!batchEditMode && (
-                        <td className="px-4 py-3 text-right">
-                          <span className={cn("font-mono", designTokens.typography.caption)}>
-                            {product.retail_price !== null ? `$${product.retail_price}` : 'N/A'}
-                          </span>
-                        </td>
-                      )}
-
                       {/* 庫存 - 批次編輯模式下可編輯 */}
                       <td className="px-4 py-3 text-right">
                         {isInBatchEdit ? (
@@ -482,7 +599,7 @@ export function ProductTableWithTags({
                             type="number"
                             value={editedData?.stock ?? 0}
                             onChange={(e) => handleUpdateEditedProduct(product.id, 'stock', parseInt(e.target.value) || 0)}
-                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono"
+                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         ) : editingStockId === product.id ? (
                           <div className="flex items-center justify-end gap-2">
@@ -491,7 +608,7 @@ export function ProductTableWithTags({
                               value={stockValue}
                               onChange={(e) => setStockValue(parseInt(e.target.value) || 0)}
                               className={cn(
-                                "w-20 rounded-none border-2 border-black px-2 py-1 text-right font-mono",
+                                "w-20 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                                 designTokens.typography.caption
                               )}
                               autoFocus
@@ -531,24 +648,22 @@ export function ProductTableWithTags({
                         )}
                       </td>
 
-                      {/* 零售價格 - 僅在批次編輯模式顯示 */}
-                      {batchEditMode && (
-                        <td className="px-4 py-3 text-right">
-                          {isInBatchEdit ? (
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={editedData?.retail_price ?? ''}
-                              onChange={(e) => handleUpdateEditedProduct(product.id, 'retail_price', e.target.value ? parseFloat(e.target.value) : null)}
-                              className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono"
-                            />
-                          ) : (
-                            <span className={cn("font-mono", designTokens.typography.caption)}>
-                              {product.retail_price !== null ? `$${product.retail_price}` : 'N/A'}
-                            </span>
-                          )}
-                        </td>
-                      )}
+                      {/* 零售價格 */}
+                      <td className="px-4 py-3 text-right">
+                        {isInBatchEdit ? (
+                          <input
+                            type="number"
+                            step="1"
+                            value={editedData?.retail_price ?? ''}
+                            onChange={(e) => handleUpdateEditedProduct(product.id, 'retail_price', e.target.value ? parseFloat(e.target.value) : null)}
+                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        ) : (
+                          <span className={cn("font-mono", designTokens.typography.caption)}>
+                            {product.retail_price !== null ? `$${Math.round(product.retail_price)}` : 'N/A'}
+                          </span>
+                        )}
+                      </td>
 
                       {/* 單位 - 僅在批次編輯模式顯示 */}
                       {batchEditMode && (
