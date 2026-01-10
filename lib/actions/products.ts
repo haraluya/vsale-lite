@@ -23,7 +23,7 @@ export async function getProducts(params?: {
   series_id?: string  // 🔄 Feature 003: 改為系列篩選 (取代 category_id)
   series_ids?: string[]  // 🆕 Feature 016: 多系列篩選（陣列）
   status?: 'active' | 'inactive' | 'all'
-  sort?: 'code' | 'series_name' | 'stock' | 'retail_price'  // 🆕 Feature 016: 排序欄位
+  sort?: 'code' | 'series_name' | 'retail_price'  // 🆕 Feature 016: 排序欄位（庫存不可排序）
   order?: 'asc' | 'desc'  // 🆕 Feature 016: 排序方向
   page?: number
   limit?: number

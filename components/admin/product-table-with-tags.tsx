@@ -381,8 +381,8 @@ export function ProductTableWithTags({
                   商品名稱 / 系列
                 </th>
                 {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>標籤</th>}
-                <th className="px-4 py-3 text-right">
-                  <SortableTableHeader label="庫存" sortKey="stock" className="justify-end" />
+                <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
+                  庫存
                 </th>
                 {batchEditMode && (
                   <th className="px-4 py-3 text-right">
@@ -632,15 +632,17 @@ export function ProductTableWithTags({
                     <div className={cn("font-mono text-gray-600 mb-1", designTokens.typography.caption)}>
                       {product.code}
                     </div>
-                    <h3 className={cn(designTokens.typography.h3, "mb-1")}>{product.name}</h3>
+                    {/* 使用 ProductNameWithSeries 元件顯示商品名稱與彩色系列 Badge */}
+                    <ProductNameWithSeries
+                      productName={product.name}
+                      seriesName={product.series_name || '未知系列'}
+                      seriesColor={product.series_color || '#94A3B8'}
+                    />
                   </div>
                 </div>
 
-                {/* 系列與狀態 */}
+                {/* 狀態 */}
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={cn("text-gray-600", designTokens.typography.caption)}>
-                    系列: {product.series_name}
-                  </span>
                   <span
                     className={cn(
                       "rounded-none border-2 border-black px-2 py-1 font-bold",

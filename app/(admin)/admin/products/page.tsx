@@ -27,7 +27,7 @@ export default async function ProductsPage({
   const series_id = params.series || ''  // 🔄 Feature 003: 改為 series_id
   const series_ids_param = params.series_ids || ''  // 🆕 Feature 016: 多系列篩選
   const series_ids = series_ids_param ? series_ids_param.split(',').filter(Boolean) : undefined
-  const sort = (params.sort as 'code' | 'series_name' | 'stock' | 'retail_price') || 'code'  // 🆕 Feature 016
+  const sort = (params.sort as 'code' | 'series_name' | 'retail_price') || 'code'  // 🆕 Feature 016
   const order = (params.order as 'asc' | 'desc') || 'asc'  // 🆕 Feature 016
   const page = parseInt(params.page || '1')
   const limit = parseInt(params.limit || '20')
