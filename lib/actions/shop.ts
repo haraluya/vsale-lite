@@ -48,9 +48,13 @@ export async function getActiveSeries(category_id?: string): Promise<ActionResul
 /**
  * 查詢系列詳情頁的所有商品與當前用戶等級價格
  * @param series_id 系列 ID
+ * @param filters 篩選條件（選填）
  */
 export async function getSeriesProductsWithPrice(
-  series_id: string
+  series_id: string,
+  filters?: {
+    tags?: string[]
+  }
 ): Promise<ActionResult<ProductWithPrice[]>> {
   try {
     const supabase = await createClient()
@@ -72,7 +76,7 @@ export async function getSeriesProductsWithPrice(
     }
 
     // 查詢該系列下所有 active 商品,並 LEFT JOIN tier_prices
-    const { data, error } = await supabase
+    let query = supabase
       .from('products')
       .select(`
         *,
@@ -83,6 +87,13 @@ export async function getSeriesProductsWithPrice(
       .eq('series_id', series_id)
       .eq('status', 'active')
       .eq('tier_prices.tier_id', auth.tierId || '')
+
+    // 套用標籤篩選
+    if (filters?.tags && filters.tags.length > 0) {
+      query = query.overlaps('tags', filters.tags)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       console.error('getSeriesProductsWithPrice 錯誤:', error)
@@ -150,6 +161,100 @@ export async function getCurrentUser(): Promise<ActionResult<CurrentUser>> {
   } catch (error) {
     console.error('getCurrentUser 異常:', error)
     return { success: false, message: error instanceof Error ? error.message : '查詢失敗' }
+  }
+}
+
+/**
+ * 全域搜尋系列與商品
+ * 搜尋範圍：系列名稱+編號、商品名稱+編號
+ * @param query 搜尋關鍵字（至少 2 個字元）
+ */
+export async function globalSearch(
+  query: string
+): Promise<ActionResult<{
+  series: Series[]
+  products: ProductWithPrice[]
+}>> {
+  try {
+    const supabase = await createClient()
+    const auth = await checkAuth() // 驗證登入並取得 tier_id
+
+    // 關鍵字太短，直接返回空結果
+    if (query.trim().length < 2) {
+      return {
+        success: true,
+        data: {
+          series: [],
+          products: [],
+        },
+      }
+    }
+
+    const searchTerm = query.trim()
+
+    // 1. 搜尋系列（名稱 + 編號）
+    const { data: seriesData, error: seriesError } = await supabase
+      .from('series')
+      .select('*')
+      .eq('status', 'active')
+      .or(`name.ilike.%${searchTerm}%,code.ilike.%${searchTerm}%`)
+      .order('sort_order', { ascending: true })
+      .limit(20)
+
+    if (seriesError) {
+      console.error('globalSearch series error:', seriesError)
+    }
+
+    // 2. 搜尋商品（名稱 + 編號），包含等級價格
+    const { data: productsData, error: productsError } = await supabase
+      .from('products')
+      .select(`
+        *,
+        series:series_id (
+          id,
+          name,
+          code,
+          image_url
+        ),
+        tier_prices!left (
+          price
+        )
+      `)
+      .eq('status', 'active')
+      .eq('tier_prices.tier_id', auth.tierId || '')
+      .or(`name.ilike.%${searchTerm}%,code.ilike.%${searchTerm}%`)
+      .order('updated_at', { ascending: false })
+      .limit(50)
+
+    if (productsError) {
+      console.error('globalSearch products error:', productsError)
+    }
+
+    // 3. 整合商品價格
+    const products: ProductWithPrice[] = (productsData || []).map((product: any) => {
+      const tierPrice = product.tier_prices?.[0]
+      return {
+        ...product,
+        series_id: product.series?.id,
+        series_name: product.series?.name,
+        user_price: tierPrice?.price ?? product.retail_price ?? null,
+        tier_prices: undefined, // 移除 JOIN 資料
+      }
+    })
+
+    return {
+      success: true,
+      data: {
+        series: (seriesData || []) as Series[],
+        products,
+      },
+    }
+  } catch (error) {
+    console.error('globalSearch 異常:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '搜尋失敗',
+    }
   }
 }
 
