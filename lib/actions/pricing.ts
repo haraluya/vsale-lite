@@ -135,43 +135,71 @@ export async function getProductsForPricing(): Promise<ActionResult<any[]>> {
     // 1. 驗證管理員權限
     await checkAuth('admin')
 
-    // 2. 查詢商品列表（包含系列與分類資訊）
+    // 2. 查詢商品列表
     const adminClient = createAdminClient()
 
-    const { data, error } = await adminClient
+    const { data: productsData, error: productsError } = await adminClient
       .from('products')
-      .select(`
-        id,
-        code,
-        name,
-        series_id,
-        series (
-          id,
-          name,
-          category_id,
-          categories (
-            name,
-            color
-          )
-        )
-      `)
+      .select('id, code, name, series_id')
       .eq('status', 'active')
       .order('code', { ascending: true })
 
-    if (error) {
-      console.error('getProductsForPricing 錯誤:', error)
-      return { success: false, message: '查詢商品失敗' }
+    if (productsError) {
+      console.error('getProductsForPricing 錯誤:', JSON.stringify(productsError, null, 2))
+      return { success: false, message: `查詢商品失敗: ${productsError.message || JSON.stringify(productsError)}` }
     }
 
-    // 3. 處理資料並排序
-    const processedData = (data || []).map((p: any) => ({
+    if (!productsData || productsData.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    // 3. 查詢系列資料
+    const seriesIds = [...new Set(productsData.map((p: any) => p.series_id).filter(Boolean))]
+    const seriesMap = new Map<string, any>()
+
+    if (seriesIds.length > 0) {
+      const { data: seriesData } = await adminClient
+        .from('series')
+        .select('id, name, category_id')
+        .in('id', seriesIds)
+
+      if (seriesData && seriesData.length > 0) {
+        // 4. 查詢分類資料
+        const categoryIds = [...new Set(seriesData.map((s: any) => s.category_id).filter(Boolean))]
+        const categoriesMap = new Map<string, any>()
+
+        if (categoryIds.length > 0) {
+          const { data: categoriesData } = await adminClient
+            .from('categories')
+            .select('id, name, color')
+            .in('id', categoryIds)
+
+          if (categoriesData) {
+            categoriesData.forEach((cat: any) => {
+              categoriesMap.set(cat.id, { name: cat.name, color: cat.color })
+            })
+          }
+        }
+
+        // 組合系列與分類資料
+        seriesData.forEach((s: any) => {
+          seriesMap.set(s.id, {
+            id: s.id,
+            name: s.name,
+            category_id: s.category_id,
+            categories: s.category_id ? categoriesMap.get(s.category_id) || null : null
+          })
+        })
+      }
+    }
+
+    // 5. 組合最終資料
+    const processedData = productsData.map((p: any) => ({
       ...p,
-      series: p.series ? {
-        ...p.series,
-        categories: p.series.categories || null
-      } : null
+      series: p.series_id ? seriesMap.get(p.series_id) || null : null
     }))
 
+    // 6. 排序
     const sortedData = processedData.sort((a: any, b: any) => {
       const categoryA = a.series?.categories?.name || '未分類'
       const categoryB = b.series?.categories?.name || '未分類'

@@ -24,38 +24,54 @@ export async function getSeries(category_id?: string): Promise<ActionResult<Seri
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
-    let query = adminClient
+    // 1. 查詢系列資料
+    let seriesQuery = adminClient
       .from('series')
-      .select(`
-        *,
-        categories (
-          name,
-          color
-        )
-      `)
+      .select('*')
       .order('sort_order', { ascending: true })
 
     // 若提供 category_id,過濾分類
     if (category_id) {
-      query = query.eq('category_id', category_id)
+      seriesQuery = seriesQuery.eq('category_id', category_id)
     }
 
     // 若是客戶,僅顯示 active
     if (auth.role === 'client') {
-      query = query.eq('status', 'active')
+      seriesQuery = seriesQuery.eq('status', 'active')
     }
 
-    const { data, error } = await query
+    const { data: seriesData, error: seriesError } = await seriesQuery
 
-    if (error) {
-      console.error('getSeries 錯誤:', error)
-      return { success: false, message: '查詢系列失敗' }
+    if (seriesError) {
+      console.error('getSeries 錯誤:', JSON.stringify(seriesError, null, 2))
+      return { success: false, message: `查詢系列失敗: ${seriesError.message || JSON.stringify(seriesError)}` }
     }
 
-    // 處理沒有分類的系列（確保 categories 為 null 而非 undefined）
-    const processedData = (data || []).map((s: any) => ({
+    if (!seriesData || seriesData.length === 0) {
+      return { success: true, data: [] }
+    }
+
+    // 2. 查詢分類資料 (批次查詢所有需要的分類)
+    const categoryIds = [...new Set(seriesData.map((s: any) => s.category_id).filter(Boolean))]
+
+    let categoriesMap = new Map<string, any>()
+    if (categoryIds.length > 0) {
+      const { data: categoriesData } = await adminClient
+        .from('categories')
+        .select('id, name, color')
+        .in('id', categoryIds)
+
+      if (categoriesData) {
+        categoriesData.forEach((cat: any) => {
+          categoriesMap.set(cat.id, { name: cat.name, color: cat.color })
+        })
+      }
+    }
+
+    // 3. 組合資料
+    const processedData = seriesData.map((s: any) => ({
       ...s,
-      categories: s.categories || null
+      categories: s.category_id ? categoriesMap.get(s.category_id) || null : null
     }))
 
     return { success: true, data: processedData as Series[] }
