@@ -14,7 +14,7 @@
 
 import type { Series } from '@/types'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { X } from 'lucide-react'
+import { X, Check } from 'lucide-react'
 
 interface SeriesFilterTagsProps {
   series: Series[]
@@ -58,68 +58,92 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
     router.push(`?${params.toString()}`)
   }
 
+  // 分離已選中和未選中的系列
+  const selectedSeries = series.filter((s) => selectedSeriesIds.includes(s.id))
+  const unselectedSeries = series.filter((s) => !selectedSeriesIds.includes(s.id))
+
   return (
     <div className="flex flex-col gap-3">
-      {/* 標題與清除按鈕 */}
+      {/* 標題 */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold uppercase text-gray-600">系列篩選</h3>
-        {selectedSeriesIds.length > 0 && (
-          <button
-            onClick={handleClearAll}
-            className="
-              flex items-center gap-1
-              rounded-none border-2 border-black
-              bg-red-500
-              px-2 py-1
-              text-xs font-bold text-black
-              shadow-neo-sm
-              transition-transform
-              hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
-            "
-          >
-            <X className="h-3 w-3" />
-            清除篩選 ({selectedSeriesIds.length})
-          </button>
-        )}
       </div>
 
-      {/* 系列標籤 */}
+      {/* 所有系列標籤（未選中的） */}
       <div className="flex flex-wrap gap-2">
-        {series.map((s) => {
-          const isSelected = selectedSeriesIds.includes(s.id)
-
-          return (
-            <button
-              key={s.id}
-              onClick={() => handleToggleSeries(s.id)}
-              className={`
-                rounded-none border-2 border-black
-                px-3 py-1.5
-                text-sm font-bold
-                transition-transform
-                ${
-                  isSelected
-                    ? 'shadow-neo-sm translate-x-[0px] translate-y-[0px]'
-                    : 'shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                }
-              `}
-              style={{
-                backgroundColor: s.color,
-                color: '#000000',
-                opacity: isSelected ? 1 : 0.7,
-              }}
-            >
-              {s.name}
-            </button>
-          )
-        })}
+        {unselectedSeries.map((s) => (
+          <button
+            key={s.id}
+            onClick={() => handleToggleSeries(s.id)}
+            className="
+              rounded-none border-2 border-black
+              px-3 py-1.5
+              text-sm font-bold
+              shadow-neo
+              transition-transform
+              hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+            "
+            style={{
+              backgroundColor: s.color,
+              color: '#000000',
+              opacity: 0.7,
+            }}
+          >
+            {s.name}
+          </button>
+        ))}
       </div>
 
-      {/* 篩選狀態提示 */}
-      {selectedSeriesIds.length > 0 && (
-        <p className="text-xs text-gray-600">
-          已選擇 {selectedSeriesIds.length} 個系列
-        </p>
+      {/* 已選中的系列（獨立群組） */}
+      {selectedSeries.length > 0 && (
+        <div className="flex flex-col gap-2 rounded-none border-2 border-black bg-gray-50 p-3">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-gray-700">
+              已選擇 {selectedSeries.length} 個系列
+            </h4>
+            <button
+              onClick={handleClearAll}
+              className="
+                flex items-center gap-1
+                rounded-none border-2 border-black
+                bg-red-500
+                px-2 py-1
+                text-xs font-bold text-black
+                shadow-neo-sm
+                transition-transform
+                hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+              "
+            >
+              <X className="h-3 w-3" />
+              清除篩選 ({selectedSeries.length})
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {selectedSeries.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => handleToggleSeries(s.id)}
+                className="
+                  rounded-none border-2 border-black
+                  px-3 py-1.5
+                  text-sm font-bold
+                  shadow-neo-sm
+                  transition-transform
+                  hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+                "
+                style={{
+                  backgroundColor: s.color,
+                  color: '#000000',
+                }}
+              >
+                <span className="flex items-center gap-1.5">
+                  <Check className="h-4 w-4 stroke-[3px]" />
+                  {s.name}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

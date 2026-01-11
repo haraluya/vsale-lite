@@ -26,7 +26,7 @@ export async function getSeries(category_id?: string): Promise<ActionResult<Seri
 
     let query = adminClient
       .from('series')
-      .select('*')
+      .select('*, categories(name, color)')
       .order('sort_order', { ascending: true })
 
     // 若提供 category_id,過濾分類

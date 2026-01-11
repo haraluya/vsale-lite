@@ -127,22 +127,32 @@ export async function batchSetProductPrices(
 
 /**
  * 查詢商品列表（用於下拉選單）
- * - 依系列分組排序
- * - 包含系列名稱
+ * - 依分類 > 系列分組排序
+ * - 包含分類名稱與顏色
  */
 export async function getProductsForPricing(): Promise<ActionResult<any[]>> {
   try {
     // 1. 驗證管理員權限
     await checkAuth('admin')
 
-    // 2. 查詢商品列表
+    // 2. 查詢商品列表（包含系列與分類資訊）
     const adminClient = createAdminClient()
 
     const { data, error } = await adminClient
       .from('products')
-      .select('id, code, name, series_id, series(name)')
+      .select(`
+        id,
+        code,
+        name,
+        series_id,
+        series(
+          id,
+          name,
+          category_id,
+          categories(name, color)
+        )
+      `)
       .eq('status', 'active')
-      .order('series_id', { ascending: true })
       .order('code', { ascending: true })
 
     if (error) {
@@ -150,7 +160,28 @@ export async function getProductsForPricing(): Promise<ActionResult<any[]>> {
       return { success: false, message: '查詢商品失敗' }
     }
 
-    return { success: true, data: data || [] }
+    // 3. 依分類和系列排序
+    const sortedData = (data || []).sort((a: any, b: any) => {
+      const categoryA = a.series?.categories?.name || '未分類'
+      const categoryB = b.series?.categories?.name || '未分類'
+      const seriesA = a.series?.name || '未分類'
+      const seriesB = b.series?.name || '未分類'
+
+      // 先按分類排序
+      if (categoryA !== categoryB) {
+        return categoryA.localeCompare(categoryB, 'zh-TW')
+      }
+
+      // 再按系列排序
+      if (seriesA !== seriesB) {
+        return seriesA.localeCompare(seriesB, 'zh-TW')
+      }
+
+      // 最後按商品代碼排序
+      return a.code.localeCompare(b.code)
+    })
+
+    return { success: true, data: sortedData }
   } catch (error) {
     console.error('getProductsForPricing 異常:', error)
     return { success: false, message: '查詢商品失敗' }
