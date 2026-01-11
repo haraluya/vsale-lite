@@ -116,6 +116,10 @@ export type Series = {
   sort_order: number
   created_at: string
   updated_at: string
+  // 🆕 JOIN 查詢時包含分類資訊（可選）
+  categories?: {
+    name: string
+  } | null
 }
 
 // 商品

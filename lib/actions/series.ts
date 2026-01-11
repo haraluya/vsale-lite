@@ -15,9 +15,13 @@ import { uploadWithRetry, formatUploadError } from '@/lib/utils/upload-helpers'
 
 /**
  * 查詢所有系列 (管理員可見全部,客戶僅可見 active)
- * @param category_id 選填:過濾特定分類的系列
+ * @param options.category_id 選填:過濾特定分類的系列
+ * @param options.search 選填:搜尋系列代碼或名稱
  */
-export async function getSeries(category_id?: string): Promise<ActionResult<Series[]>> {
+export async function getSeries(options?: {
+  category_id?: string
+  search?: string
+}): Promise<ActionResult<Series[]>> {
   try {
     const auth = await checkAuth() // 驗證登入
 
@@ -31,8 +35,13 @@ export async function getSeries(category_id?: string): Promise<ActionResult<Seri
       .order('sort_order', { ascending: true })
 
     // 若提供 category_id,過濾分類
-    if (category_id) {
-      seriesQuery = seriesQuery.eq('category_id', category_id)
+    if (options?.category_id) {
+      seriesQuery = seriesQuery.eq('category_id', options.category_id)
+    }
+
+    // 若提供 search,搜尋代碼或名稱
+    if (options?.search) {
+      seriesQuery = seriesQuery.or(`code.ilike.%${options.search}%,name.ilike.%${options.search}%`)
     }
 
     // 若是客戶,僅顯示 active
