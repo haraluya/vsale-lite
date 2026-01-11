@@ -56,14 +56,18 @@ export async function getSeries(category_id?: string): Promise<ActionResult<Seri
 
     let categoriesMap = new Map<string, any>()
     if (categoryIds.length > 0) {
-      const { data: categoriesData } = await adminClient
+      const { data: categoriesData, error: categoriesError } = await adminClient
         .from('categories')
-        .select('id, name, color')
+        .select('id, name')
         .in('id', categoryIds)
+
+      if (categoriesError) {
+        console.error('getSeries 查詢分類錯誤:', categoriesError)
+      }
 
       if (categoriesData) {
         categoriesData.forEach((cat: any) => {
-          categoriesMap.set(cat.id, { name: cat.name, color: cat.color })
+          categoriesMap.set(cat.id, { name: cat.name })
         })
       }
     }

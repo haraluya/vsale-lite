@@ -95,15 +95,13 @@ export function ProductPricingForm() {
     setIsSaving(false)
   }
 
-  // 依分類分組商品（含顏色資訊）
+  // 依分類分組商品
   const groupedProducts = products.reduce((acc, product) => {
     const categoryName = product.series?.categories?.name || '未分類'
-    const categoryColor = product.series?.categories?.color || '#94a3b8' // 預設灰色
     const seriesName = product.series?.name || '未分類'
 
     if (!acc[categoryName]) {
       acc[categoryName] = {
-        color: categoryColor,
         series: {}
       }
     }
@@ -114,30 +112,11 @@ export function ProductPricingForm() {
 
     acc[categoryName].series[seriesName].push(product)
     return acc
-  }, {} as Record<string, { color: string; series: Record<string, any[]> }>)
+  }, {} as Record<string, { series: Record<string, any[]> }>)
 
-  // 定義10個循環顏色
-  const categoryColors = [
-    '#93c5fd', // 藍色
-    '#86efac', // 綠色
-    '#fcd34d', // 黃色
-    '#fca5a5', // 紅色
-    '#c4b5fd', // 紫色
-    '#fdba74', // 橘色
-    '#a5f3fc', // 青色
-    '#fda4af', // 粉紅色
-    '#d9f99d', // 萊姆綠
-    '#cbd5e1', // 灰色
-  ]
-
-  // 為每個分類分配顏色（循環使用）
   const categoryList = Object.keys(groupedProducts).sort((a, b) =>
     a.localeCompare(b, 'zh-TW')
   )
-  const categoryColorMap = categoryList.reduce((acc, category, index) => {
-    acc[category] = groupedProducts[category].color || categoryColors[index % categoryColors.length]
-    return acc
-  }, {} as Record<string, string>)
 
   return (
     <div className="space-y-6">
@@ -152,7 +131,6 @@ export function ProductPricingForm() {
           <option value="">請選擇商品...</option>
           {categoryList.map((categoryName) => {
             const categoryData = groupedProducts[categoryName]
-            const categoryColor = categoryColorMap[categoryName]
 
             return (
               <optgroup key={categoryName} label={`━━ ${categoryName} ━━`}>
@@ -169,23 +147,6 @@ export function ProductPricingForm() {
             )
           })}
         </select>
-
-        {/* 分類顏色圖例 */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {categoryList.map((categoryName) => (
-            <div
-              key={categoryName}
-              className="flex items-center gap-1.5 rounded-none border-2 border-black px-2 py-1 text-xs"
-              style={{ backgroundColor: categoryColorMap[categoryName] }}
-            >
-              <div
-                className="h-3 w-3 rounded-none border border-black"
-                style={{ backgroundColor: categoryColorMap[categoryName] }}
-              />
-              <span className="font-bold">{categoryName}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* 載入中 */}

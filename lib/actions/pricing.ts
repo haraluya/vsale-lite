@@ -171,12 +171,12 @@ export async function getProductsForPricing(): Promise<ActionResult<any[]>> {
         if (categoryIds.length > 0) {
           const { data: categoriesData } = await adminClient
             .from('categories')
-            .select('id, name, color')
+            .select('id, name')
             .in('id', categoryIds)
 
           if (categoriesData) {
             categoriesData.forEach((cat: any) => {
-              categoriesMap.set(cat.id, { name: cat.name, color: cat.color })
+              categoriesMap.set(cat.id, { name: cat.name })
             })
           }
         }
