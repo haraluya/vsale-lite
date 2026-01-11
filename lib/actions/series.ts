@@ -26,7 +26,13 @@ export async function getSeries(category_id?: string): Promise<ActionResult<Seri
 
     let query = adminClient
       .from('series')
-      .select('*, categories(name, color)')
+      .select(`
+        *,
+        categories (
+          name,
+          color
+        )
+      `)
       .order('sort_order', { ascending: true })
 
     // 若提供 category_id,過濾分類
@@ -46,7 +52,13 @@ export async function getSeries(category_id?: string): Promise<ActionResult<Seri
       return { success: false, message: '查詢系列失敗' }
     }
 
-    return { success: true, data: data as Series[] }
+    // 處理沒有分類的系列（確保 categories 為 null 而非 undefined）
+    const processedData = (data || []).map((s: any) => ({
+      ...s,
+      categories: s.categories || null
+    }))
+
+    return { success: true, data: processedData as Series[] }
   } catch (error) {
     console.error('getSeries 異常:', error)
     return { success: false, message: error instanceof Error ? error.message : '查詢失敗' }

@@ -145,11 +145,14 @@ export async function getProductsForPricing(): Promise<ActionResult<any[]>> {
         code,
         name,
         series_id,
-        series(
+        series (
           id,
           name,
           category_id,
-          categories(name, color)
+          categories (
+            name,
+            color
+          )
         )
       `)
       .eq('status', 'active')
@@ -160,8 +163,16 @@ export async function getProductsForPricing(): Promise<ActionResult<any[]>> {
       return { success: false, message: '查詢商品失敗' }
     }
 
-    // 3. 依分類和系列排序
-    const sortedData = (data || []).sort((a: any, b: any) => {
+    // 3. 處理資料並排序
+    const processedData = (data || []).map((p: any) => ({
+      ...p,
+      series: p.series ? {
+        ...p.series,
+        categories: p.series.categories || null
+      } : null
+    }))
+
+    const sortedData = processedData.sort((a: any, b: any) => {
       const categoryA = a.series?.categories?.name || '未分類'
       const categoryB = b.series?.categories?.name || '未分類'
       const seriesA = a.series?.name || '未分類'
