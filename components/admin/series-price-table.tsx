@@ -262,20 +262,26 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                             />
                             {/* 折扣率顯示 */}
                             {currentPrice && product.retail_price && (
-                              <div className="mt-1 text-xs text-gray-500">
-                                {currentPrice < product.retail_price
-                                  ? `省 ${Math.round(
+                              <div className="mt-1 text-xs">
+                                {currentPrice < product.retail_price ? (
+                                  <span className="text-green-600 font-medium">
+                                    省 {Math.round(
                                       ((product.retail_price - currentPrice) /
                                         product.retail_price) *
                                         100
-                                    )}%`
-                                  : currentPrice === product.retail_price
-                                    ? '原價'
-                                    : `+${Math.round(
-                                        ((currentPrice - product.retail_price) /
-                                          product.retail_price) *
-                                          100
-                                      )}%`}
+                                    )}%
+                                  </span>
+                                ) : currentPrice === product.retail_price ? (
+                                  <span className="text-gray-500">原價</span>
+                                ) : (
+                                  <span className="text-red-600 font-medium">
+                                    +{Math.round(
+                                      ((currentPrice - product.retail_price) /
+                                        product.retail_price) *
+                                        100
+                                    )}%
+                                  </span>
+                                )}
                               </div>
                             )}
                           </>
