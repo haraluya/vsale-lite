@@ -26,7 +26,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   const [copied, setCopied] = useState(false)
 
   const [state, formAction, pending] = useActionState<
-    ActionResult<{ id: string; password?: string; phone?: string }> | null,
+    ActionResult<{ id: string; password?: string; phone?: string; display_name?: string }> | null,
     FormData
   >(isEdit && client ? updateClient.bind(null, client.id) : createClient, null)
 
@@ -56,15 +56,17 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
     const loginUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login'
     const phone = state.data.phone || ''
     const password = state.data.password
+    const displayName = state.data.display_name || '客戶'
 
     // 完整的登入指引文字
-    const fullGuide = `【Vsale 訂貨系統 - 登入資訊】
+    const fullGuide = `【快速下單系統 - 登入資訊】
 
+客戶名稱: ${displayName}
 前台網址: ${loginUrl}
 登入電話: ${phone}
 登入密碼: ${password}
 
-請使用以上資訊登入系統進行下單。`
+請使用以上資訊登入系統進行下單，首次使用輸入"NEW100"領取百元折價券。`
 
     const handleCopyGuide = () => {
       navigator.clipboard.writeText(fullGuide)
@@ -84,6 +86,12 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
                 請將以下登入資訊提供給客戶:
               </p>
               <div className="bg-white border-2 border-green-500 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600">客戶名稱:</span>
+                  <span className="font-bold text-lg">
+                    {displayName}
+                  </span>
+                </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">前台網址:</span>
                   <a
@@ -118,12 +126,12 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
               {copied ? (
                 <>
                   <Check className="h-4 w-4 mr-2" />
-                  已複製完整登入指引!
+                  已複製登入資訊!
                 </>
               ) : (
                 <>
                   <Copy className="h-4 w-4 mr-2" />
-                  複製完整登入指引 (含網址、電話、密碼)
+                  複製登入資訊
                 </>
               )}
             </Button>

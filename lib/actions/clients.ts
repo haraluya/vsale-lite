@@ -21,7 +21,7 @@ function generatePassword(phone: string): string {
 export async function createClient(
   prevState: any,
   formData: FormData
-): Promise<ActionResult<{ id: string; password: string; phone: string }>> {
+): Promise<ActionResult<{ id: string; password: string; phone: string; display_name?: string }>> {
   try {
     // 1. 驗證權限
     await checkAuth('admin')
@@ -160,6 +160,7 @@ export async function createClient(
         id: authData.user.id,
         password, // 返回密碼供管理員複製
         phone: validatedFields.data.phone, // 返回手機號碼
+        display_name: validatedFields.data.display_name, // 返回顯示名稱
       },
       message: '客戶建立成功',
     }
