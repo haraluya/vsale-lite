@@ -24,16 +24,22 @@ export default async function SeriesPage({
   searchParams: Promise<{
     search?: string
     category?: string
+    sort?: string
+    order?: string
   }>
 }) {
   const params = await searchParams
   const search = params.search || ''
   const category_id = params.category || ''
+  const sort = (params.sort as 'code' | 'category_name') || undefined
+  const order = (params.order as 'asc' | 'desc') || 'asc'
 
   // 取得系列列表與分類列表
   const seriesResult = await getSeries({
     search,
     category_id,
+    sort,
+    order,
   })
   const series = (seriesResult.success ? seriesResult.data : []) || []
   const categories = await getCategories()

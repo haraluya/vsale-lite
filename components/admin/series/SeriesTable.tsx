@@ -4,7 +4,8 @@
  * Series Table Component (列表式系列管理)
  * Feature: 系列管理 UI 優化
  *
- * 欄位順序：縮圖-系列代碼-系列名稱-分類-狀態-[編輯鈕]-[刪除鈕]
+ * 欄位順序：縮圖-系列代碼-[分類] 系列名稱-狀態-[編輯鈕]-[刪除鈕]
+ * 支援排序：系列代碼、分類+系列名稱
  */
 
 import { useState } from 'react'
@@ -15,6 +16,8 @@ import { Edit, Trash2, Search } from 'lucide-react'
 import { deleteSeries } from '@/lib/actions/series'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { CategoryBadge } from './CategoryBadge'
+import { SortableHeader } from './SortableHeader'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Series, Category } from '@/types'
@@ -122,9 +125,12 @@ export function SeriesTable({
             <thead>
               <tr className="border-b-3 border-black">
                 <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>縮圖</th>
-                <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>系列代碼</th>
-                <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>系列名稱</th>
-                <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>分類</th>
+                <th className={cn('px-4 py-3 text-left', designTokens.typography.body.base)}>
+                  <SortableHeader label="系列代碼" sortKey="code" />
+                </th>
+                <th className={cn('px-4 py-3 text-left', designTokens.typography.body.base)}>
+                  <SortableHeader label="分類 / 系列名稱" sortKey="category_name" />
+                </th>
                 <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>狀態</th>
                 <th className={cn('px-4 py-3 text-right font-bold', designTokens.typography.body.base)}>操作</th>
               </tr>
@@ -132,7 +138,7 @@ export function SeriesTable({
             <tbody>
               {series.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className={cn('px-4 py-8 text-center text-gray-500', designTokens.typography.body.base)}>
+                  <td colSpan={5} className={cn('px-4 py-8 text-center text-gray-500', designTokens.typography.body.base)}>
                     {searchQuery || selectedCategory
                       ? '找不到符合條件的系列'
                       : '尚未建立任何系列'}
@@ -165,14 +171,12 @@ export function SeriesTable({
                       {s.code}
                     </td>
 
-                    {/* 系列名稱 */}
-                    <td className={cn('px-4 py-3 font-medium', designTokens.typography.body.base)}>
-                      {s.name}
-                    </td>
-
-                    {/* 分類 */}
-                    <td className={cn('px-4 py-3 text-gray-600', designTokens.typography.caption)}>
-                      {s.categories?.name || '未分類'}
+                    {/* 分類 / 系列名稱 */}
+                    <td className={cn('px-4 py-3', designTokens.typography.body.base)}>
+                      <div className="flex flex-col gap-1">
+                        <CategoryBadge categoryName={s.categories?.name || '未分類'} size="sm" />
+                        <div className="font-medium">{s.name}</div>
+                      </div>
                     </td>
 
                     {/* 狀態 */}
@@ -256,11 +260,11 @@ export function SeriesTable({
                     <div className={cn('font-mono text-gray-600 mb-1', designTokens.typography.caption)}>
                       {s.code}
                     </div>
+                    <div className="mb-1">
+                      <CategoryBadge categoryName={s.categories?.name || '未分類'} size="sm" />
+                    </div>
                     <div className={cn('font-bold truncate', designTokens.typography.body.base)}>
                       {s.name}
-                    </div>
-                    <div className={cn('text-gray-600', designTokens.typography.caption)}>
-                      {s.categories?.name || '未分類'}
                     </div>
                   </div>
                 </div>

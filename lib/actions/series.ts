@@ -17,10 +17,14 @@ import { uploadWithRetry, formatUploadError } from '@/lib/utils/upload-helpers'
  * 查詢所有系列 (管理員可見全部,客戶僅可見 active)
  * @param options.category_id 選填:過濾特定分類的系列
  * @param options.search 選填:搜尋系列代碼或名稱
+ * @param options.sort 選填:排序欄位 (code | category_name)
+ * @param options.order 選填:排序方向 (asc | desc)
  */
 export async function getSeries(options?: {
   category_id?: string
   search?: string
+  sort?: 'code' | 'category_name'
+  order?: 'asc' | 'desc'
 }): Promise<ActionResult<Series[]>> {
   try {
     const auth = await checkAuth() // 驗證登入
@@ -32,7 +36,6 @@ export async function getSeries(options?: {
     let seriesQuery = adminClient
       .from('series')
       .select('*')
-      .order('sort_order', { ascending: true })
 
     // 若提供 category_id,過濾分類
     if (options?.category_id) {
@@ -47,6 +50,13 @@ export async function getSeries(options?: {
     // 若是客戶,僅顯示 active
     if (auth.role === 'client') {
       seriesQuery = seriesQuery.eq('status', 'active')
+    }
+
+    // 若提供排序參數,使用指定排序;否則使用 sort_order
+    if (options?.sort === 'code') {
+      seriesQuery = seriesQuery.order('code', { ascending: options.order !== 'desc' })
+    } else {
+      seriesQuery = seriesQuery.order('sort_order', { ascending: true })
     }
 
     const { data: seriesData, error: seriesError } = await seriesQuery
@@ -82,10 +92,20 @@ export async function getSeries(options?: {
     }
 
     // 3. 組合資料
-    const processedData = seriesData.map((s: any) => ({
+    let processedData = seriesData.map((s: any) => ({
       ...s,
       categories: s.category_id ? categoriesMap.get(s.category_id) || null : null
     }))
+
+    // 4. 若依分類名稱排序,需在記憶體中處理（因為分類是 JOIN 後的資料）
+    if (options?.sort === 'category_name') {
+      processedData.sort((a, b) => {
+        const nameA = a.categories?.name || '未分類'
+        const nameB = b.categories?.name || '未分類'
+        const comparison = nameA.localeCompare(nameB, 'zh-TW')
+        return options.order === 'desc' ? -comparison : comparison
+      })
+    }
 
     return { success: true, data: processedData as Series[] }
   } catch (error) {
