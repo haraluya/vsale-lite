@@ -12,8 +12,8 @@ export const createAnnouncementSchema = z.object({
     .max(100, '標題不得超過 100 字'),
   imageUrl: z.string()
     .url('圖片 URL 格式錯誤'),
-  linkUrl: z.string()
-    .url('連結 URL 格式錯誤')
+  seriesId: z.string()
+    .uuid('無效的系列 ID')
     .optional()
     .nullable(),
   sortOrder: z.number()
@@ -33,8 +33,8 @@ export const updateAnnouncementSchema = z.object({
   imageUrl: z.string()
     .url('圖片 URL 格式錯誤')
     .optional(),
-  linkUrl: z.string()
-    .url('連結 URL 格式錯誤')
+  seriesId: z.string()
+    .uuid('無效的系列 ID')
     .optional()
     .nullable(),
   sortOrder: z.number()

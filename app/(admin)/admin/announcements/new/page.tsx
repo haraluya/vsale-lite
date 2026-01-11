@@ -4,10 +4,20 @@
  */
 
 import { AnnouncementForm } from '@/components/admin/announcements/AnnouncementForm'
+import { getSeries } from '@/lib/actions/series'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { redirect } from 'next/navigation'
 
-export default function NewAnnouncementPage() {
+export default async function NewAnnouncementPage() {
+  // 查詢所有系列（含分類資訊）
+  const seriesResult = await getSeries()
+
+  if (!seriesResult.success || !seriesResult.data) {
+    redirect('/admin/announcements')
+  }
+
+  const series = seriesResult.data
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -26,7 +36,7 @@ export default function NewAnnouncementPage() {
 
       {/* Form */}
       <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
-        <AnnouncementForm />
+        <AnnouncementForm series={series} />
       </div>
     </div>
   )

@@ -336,7 +336,7 @@ export type Announcement = {
   id: string
   title: string
   image_url: string
-  link_url: string | null
+  series_id: string | null  // 關聯的系列 ID（取代 link_url）
   sort_order: number
   is_active: boolean
   created_at: string

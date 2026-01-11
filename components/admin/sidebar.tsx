@@ -27,7 +27,6 @@ import {
   UserCog,
   FileText,
   Settings,
-  Trash2,
   type LucideIcon
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
@@ -81,7 +80,6 @@ const navSections: NavSection[] = [
       { label: '成員管理', href: '/admin/system/members', icon: UserCog },
       { label: '操作日誌', href: '/admin/system/audit-logs', icon: FileText },
       { label: '系統設定', href: '/admin/system/settings', icon: Settings },
-      { label: '資料清理', href: '/admin/system/cleanup', icon: Trash2 },
     ],
   },
   {

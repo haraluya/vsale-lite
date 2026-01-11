@@ -128,7 +128,7 @@ export async function createAnnouncement(
       .insert({
         title: validated.data.title,
         image_url: validated.data.imageUrl,
-        link_url: validated.data.linkUrl ?? null,
+        series_id: validated.data.seriesId ?? null,
         sort_order: validated.data.sortOrder,
         is_active: validated.data.isActive,
       })
@@ -176,7 +176,7 @@ export async function updateAnnouncement(
     const updateData: Partial<{
       title: string
       image_url: string
-      link_url: string | null
+      series_id: string | null
       sort_order: number
       is_active: boolean
       updated_at: string
@@ -186,7 +186,7 @@ export async function updateAnnouncement(
 
     if (validated.data.title) updateData.title = validated.data.title
     if (validated.data.imageUrl) updateData.image_url = validated.data.imageUrl
-    if (validated.data.linkUrl !== undefined) updateData.link_url = validated.data.linkUrl
+    if (validated.data.seriesId !== undefined) updateData.series_id = validated.data.seriesId
     if (validated.data.sortOrder !== undefined) updateData.sort_order = validated.data.sortOrder
     if (validated.data.isActive !== undefined) updateData.is_active = validated.data.isActive
 

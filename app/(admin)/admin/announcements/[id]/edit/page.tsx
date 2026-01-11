@@ -4,6 +4,7 @@
  */
 
 import { getAllAnnouncements } from '@/lib/actions/announcements'
+import { getSeries } from '@/lib/actions/series'
 import { AnnouncementForm } from '@/components/admin/announcements/AnnouncementForm'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
@@ -26,6 +27,15 @@ export default async function EditAnnouncementPage({ params }: EditAnnouncementP
     notFound()
   }
 
+  // 查詢所有系列（含分類資訊）
+  const seriesResult = await getSeries()
+
+  if (!seriesResult.success || !seriesResult.data) {
+    notFound()
+  }
+
+  const series = seriesResult.data
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -44,7 +54,7 @@ export default async function EditAnnouncementPage({ params }: EditAnnouncementP
 
       {/* Form */}
       <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
-        <AnnouncementForm announcement={announcement} />
+        <AnnouncementForm announcement={announcement} series={series} />
       </div>
     </div>
   )

@@ -14,20 +14,21 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Upload } from 'lucide-react'
 import { createAnnouncement, updateAnnouncement, uploadAnnouncementImage } from '@/lib/actions/announcements'
-import type { Announcement } from '@/types'
+import type { Announcement, Series } from '@/types'
 import { toast } from 'sonner'
 
 interface AnnouncementFormProps {
   announcement?: Announcement
+  series: Series[]  // 從伺服器傳入所有系列（含分類資訊）
 }
 
-export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
+export function AnnouncementForm({ announcement, series }: AnnouncementFormProps) {
   const router = useRouter()
   const isEdit = !!announcement
 
   const [formData, setFormData] = useState({
     title: announcement?.title || '',
-    linkUrl: announcement?.link_url || '',
+    seriesId: announcement?.series_id || '',
     isActive: announcement?.is_active ?? true,
   })
 
@@ -56,6 +57,20 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
     setImagePreview(URL.createObjectURL(file))
   }
 
+  // 依分類分組系列（與 SeriesSelector 相同邏輯）
+  const groupedSeries = series.reduce((acc, s: any) => {
+    const categoryName = s.categories?.name || '未分類'
+    if (!acc[categoryName]) {
+      acc[categoryName] = { series: [] }
+    }
+    acc[categoryName].series.push(s)
+    return acc
+  }, {} as Record<string, { series: typeof series }>)
+
+  const categoryList = Object.keys(groupedSeries).sort((a, b) =>
+    a.localeCompare(b, 'zh-TW')
+  )
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -67,7 +82,7 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         const result = await updateAnnouncement({
           announcementId: announcement.id,
           title: formData.title,
-          linkUrl: formData.linkUrl || null,
+          seriesId: formData.seriesId || null,
           isActive: formData.isActive,
         })
 
@@ -100,7 +115,7 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         const result = await createAnnouncement({
           title: formData.title,
           imageUrl: 'https://placeholder.com/temp.jpg', // 暫時 URL
-          linkUrl: formData.linkUrl || null,
+          seriesId: formData.seriesId || null,
           sortOrder: 0, // 預設排序為 0，後續可用拖曳調整
           isActive: formData.isActive,
         })
@@ -151,21 +166,35 @@ export function AnnouncementForm({ announcement }: AnnouncementFormProps) {
         )}
       </div>
 
-      {/* 連結 URL */}
+      {/* 系列選擇器 */}
       <div>
-        <label className="mb-2 block font-bold">連結 URL（選填）</label>
-        <input
-          type="url"
-          value={formData.linkUrl}
-          onChange={(e) => setFormData({ ...formData, linkUrl: e.target.value })}
-          className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-          placeholder="https://example.com"
-        />
-        {errors.linkUrl && (
-          <p className="mt-1 text-sm text-red-600">{errors.linkUrl[0]}</p>
+        <label className="mb-2 block font-bold">連結系列（選填）</label>
+        <select
+          value={formData.seriesId}
+          onChange={(e) => setFormData({ ...formData, seriesId: e.target.value })}
+          className="w-full rounded-none border-3 border-black bg-white px-4 py-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-black"
+        >
+          <option value="">請選擇系列（不選則不跳轉）</option>
+          {categoryList.map((categoryName) => {
+            const categoryData = groupedSeries[categoryName]
+            return (
+              <optgroup key={categoryName} label={`━━ ${categoryName} ━━`}>
+                {categoryData.series
+                  .sort((a, b) => a.name.localeCompare(b.name, 'zh-TW'))
+                  .map((s: any) => (
+                    <option key={s.id} value={s.id}>
+                      {`  ├─ ${s.name}`} {s.status === 'inactive' && '(已停用)'}
+                    </option>
+                  ))}
+              </optgroup>
+            )
+          })}
+        </select>
+        {errors.seriesId && (
+          <p className="mt-1 text-sm text-red-600">{errors.seriesId[0]}</p>
         )}
         <p className="mt-1 text-sm text-gray-500">
-          點擊廣告時的跳轉連結，留空則不跳轉
+          點擊廣告時跳轉至指定系列的商品頁面，留空則不跳轉
         </p>
       </div>
 

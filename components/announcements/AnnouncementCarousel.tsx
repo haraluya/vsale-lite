@@ -61,8 +61,8 @@ export function AnnouncementCarousel({ announcements }: AnnouncementCarouselProp
   return (
     <div className="relative h-96 w-full overflow-hidden rounded-none border-3 border-black bg-gray-100 shadow-neo">
       {/* 廣告圖片 */}
-      {current.link_url ? (
-        <Link href={current.link_url} className="block h-full w-full">
+      {current.series_id ? (
+        <Link href={`/store/series/${current.series_id}`} className="block h-full w-full">
           <Image
             src={current.image_url}
             alt={current.title}

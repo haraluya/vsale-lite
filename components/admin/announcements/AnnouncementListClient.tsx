@@ -114,10 +114,10 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
           <div className="space-y-2">
             <h3 className="line-clamp-1 text-lg font-bold">{announcement.title}</h3>
 
-            {announcement.link_url && (
+            {announcement.series_id && (
               <div className="flex items-center gap-1 text-sm text-gray-600">
                 <ExternalLink className="h-3 w-3" />
-                <span className="line-clamp-1">{announcement.link_url}</span>
+                <span className="line-clamp-1">連結至系列商品頁</span>
               </div>
             )}
 
