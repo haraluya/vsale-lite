@@ -18,6 +18,7 @@ import { Pagination } from '@/components/admin/pagination'
 import { BatchTagManager } from '@/components/admin/batch-tag-manager'
 import { SortableTableHeader } from '@/components/admin/products/sortable-table-header'
 import { ProductNameWithSeries } from '@/components/admin/products/product-name-with-series'
+import { ProductThumbnail } from '@/components/admin/products/product-thumbnail'
 import { TagBadgeList } from '@/components/ui/tag-badge'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
@@ -439,17 +440,18 @@ export function ProductTableWithTags({
           <table className="w-full">
             <thead>
               <tr className="border-b-3 border-black">
+                {/* 勾選框 */}
                 <th className="px-4 py-3">
                   <input
                     type="checkbox"
                     checked={selectedProductIds.length === products.length && products.length > 0}
                     onChange={toggleAllSelection}
-                    className="h-4 w-4 rounded border-2 border-black"
+                    className="h-5 w-5 rounded border-2 border-black"
                   />
                 </th>
-                <th className="px-4 py-3 text-left">
-                  <SortableTableHeader label="商品編號" sortKey="code" />
-                </th>
+                {/* 縮圖 */}
+                {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>圖示</th>}
+                {/* 商品名稱 / 系列 */}
                 <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.large)}>
                   <div className="mb-2">商品名稱 / 系列</div>
                   {batchEditMode && (
@@ -471,10 +473,11 @@ export function ProductTableWithTags({
                     </div>
                   )}
                 </th>
-                {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>標籤</th>}
-                <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
-                  庫存
+                {/* 商品編號 */}
+                <th className="px-4 py-3 text-left">
+                  <SortableTableHeader label="商品編號" sortKey="code" />
                 </th>
+                {/* 零售價格 */}
                 <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
                   <div className="mb-2">零售價格</div>
                   {batchEditMode && (
@@ -498,6 +501,13 @@ export function ProductTableWithTags({
                     </div>
                   )}
                 </th>
+                {/* 標籤 */}
+                {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>標籤</th>}
+                {/* 庫存 */}
+                <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
+                  庫存
+                </th>
+                {/* 單位（批次編輯模式） */}
                 {batchEditMode && (
                   <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>
                     <div className="mb-2">單位</div>
@@ -519,7 +529,9 @@ export function ProductTableWithTags({
                     </div>
                   </th>
                 )}
+                {/* 狀態 */}
                 {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>狀態</th>}
+                {/* 操作 */}
                 {!batchEditMode && <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>操作</th>}
               </tr>
             </thead>
@@ -543,16 +555,28 @@ export function ProductTableWithTags({
                       "border-b border-gray-200",
                       isInBatchEdit ? "bg-green-50" : "hover:bg-gray-50"
                     )}>
+                      {/* 勾選框 */}
                       <td className="px-4 py-3">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => !batchEditMode && toggleProductSelection(product.id)}
                           disabled={batchEditMode}
-                          className="h-4 w-4 rounded border-2 border-black disabled:opacity-50"
+                          className="h-5 w-5 rounded border-2 border-black disabled:opacity-50"
                         />
                       </td>
-                      <td className={cn("px-4 py-3 font-mono", designTokens.typography.caption)}>{product.code}</td>
+
+                      {/* 縮圖 - 僅在非批次編輯模式顯示 */}
+                      {!batchEditMode && (
+                        <td className="px-4 py-3">
+                          <ProductThumbnail
+                            productId={product.id}
+                            imageUrl={product.image_url}
+                            productName={product.name}
+                            onUploadSuccess={() => router.refresh()}
+                          />
+                        </td>
+                      )}
 
                       {/* 商品名稱 / 系列 - 批次編輯模式下可編輯 */}
                       <td className={cn("px-4 py-3", designTokens.typography.body.large)}>
@@ -578,6 +602,26 @@ export function ProductTableWithTags({
                             seriesName={product.series_name || '未知系列'}
                             seriesColor={product.series_color || '#94A3B8'}
                           />
+                        )}
+                      </td>
+
+                      {/* 商品編號 */}
+                      <td className={cn("px-4 py-3 font-mono", designTokens.typography.caption)}>{product.code}</td>
+
+                      {/* 零售價格 */}
+                      <td className="px-4 py-3 text-right">
+                        {isInBatchEdit ? (
+                          <input
+                            type="number"
+                            step="1"
+                            value={editedData?.retail_price ?? ''}
+                            onChange={(e) => handleUpdateEditedProduct(product.id, 'retail_price', e.target.value ? parseFloat(e.target.value) : null)}
+                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        ) : (
+                          <span className={cn("font-mono", designTokens.typography.caption)}>
+                            {product.retail_price !== null ? `$${Math.round(product.retail_price)}` : 'N/A'}
+                          </span>
                         )}
                       </td>
 
@@ -645,23 +689,6 @@ export function ProductTableWithTags({
                           >
                             {product.stock}
                           </button>
-                        )}
-                      </td>
-
-                      {/* 零售價格 */}
-                      <td className="px-4 py-3 text-right">
-                        {isInBatchEdit ? (
-                          <input
-                            type="number"
-                            step="1"
-                            value={editedData?.retail_price ?? ''}
-                            onChange={(e) => handleUpdateEditedProduct(product.id, 'retail_price', e.target.value ? parseFloat(e.target.value) : null)}
-                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                          />
-                        ) : (
-                          <span className={cn("font-mono", designTokens.typography.caption)}>
-                            {product.retail_price !== null ? `$${Math.round(product.retail_price)}` : 'N/A'}
-                          </span>
                         )}
                       </td>
 
@@ -747,13 +774,19 @@ export function ProductTableWithTags({
                   designTokens.spacing.card.padding
                 )}
               >
-                {/* 選擇框與商品編號 */}
+                {/* 選擇框、縮圖與商品編號 */}
                 <div className="flex items-start gap-3 mb-3">
                   <input
                     type="checkbox"
                     checked={selectedProductIds.includes(product.id)}
                     onChange={() => toggleProductSelection(product.id)}
                     className="mt-1 h-5 w-5 min-w-[44px] min-h-[44px] rounded border-2 border-black"
+                  />
+                  <ProductThumbnail
+                    productId={product.id}
+                    imageUrl={product.image_url}
+                    productName={product.name}
+                    onUploadSuccess={() => router.refresh()}
                   />
                   <div className="flex-1">
                     <div className={cn("font-mono text-gray-600 mb-1", designTokens.typography.caption)}>
