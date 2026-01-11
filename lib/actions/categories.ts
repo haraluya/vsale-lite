@@ -12,7 +12,7 @@ import { createCategorySchema, updateCategorySchema } from '@/lib/validations/ca
 import type { ActionResult, Category } from '@/types'
 
 /**
- * 查詢所有商品分類
+ * 查詢所有商品分類（依 sort_order 排序）
  */
 export async function getCategories(): Promise<Category[]> {
   try {
@@ -22,6 +22,8 @@ export async function getCategories(): Promise<Category[]> {
     const { data, error } = await adminClient
       .from('categories')
       .select('*')
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
 
     if (error) {
       console.error('getCategories error:', error)
@@ -396,6 +398,63 @@ export async function migrateCategoryProducts(
     return {
       success: false,
       message: '遷移商品失敗',
+    }
+  }
+}
+
+/**
+ * 批次更新分類排序
+ */
+export async function updateCategoriesOrder(
+  categoryOrders: Array<{ id: string; sort_order: number }>
+): Promise<ActionResult> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    const adminClient = createAdminClient()
+
+    // 2. 批次更新排序
+    const updates = categoryOrders.map(({ id, sort_order }) =>
+      adminClient
+        .from('categories')
+        .update({ sort_order })
+        .eq('id', id)
+    )
+
+    const results = await Promise.all(updates)
+
+    // 3. 檢查是否有錯誤
+    const errors = results.filter(r => r.error)
+    if (errors.length > 0) {
+      console.error('updateCategoriesOrder errors:', errors)
+      return {
+        success: false,
+        message: '更新排序失敗',
+      }
+    }
+
+    // 4. 重新驗證快取
+    revalidatePath('/admin/categories')
+    revalidatePath('/admin/products')
+    revalidatePath('/admin/series')
+    revalidatePath('/store')
+
+    return {
+      success: true,
+      message: '排序更新成功',
+    }
+  } catch (error: unknown) {
+    console.error('updateCategoriesOrder error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '更新排序失敗',
     }
   }
 }
