@@ -20,11 +20,17 @@ export async function getActiveSeries(category_id?: string): Promise<ActionResul
     const supabase = await createClient()
     await checkAuth() // 驗證登入
 
+    // JOIN categories 表以取得分類排序欄位
     let query = supabase
       .from('series')
-      .select('*')
+      .select(`
+        *,
+        categories!inner (
+          sort_order
+        )
+      `)
       .eq('status', 'active')
-      .order('sort_order', { ascending: true })
+      .eq('categories.status', 'active')
 
     // 若提供 category_id,過濾分類
     if (category_id) {
@@ -38,7 +44,23 @@ export async function getActiveSeries(category_id?: string): Promise<ActionResul
       return { success: false, message: '查詢失敗' }
     }
 
-    return { success: true, data: data as Series[] }
+    // 手動排序：1. 分類排序 2. 系列編號
+    const sortedData = (data || [])
+      .map((item: any) => ({
+        ...item,
+        category_sort_order: item.categories?.sort_order ?? 999,
+      }))
+      .sort((a, b) => {
+        // 第一優先：分類排序
+        if (a.category_sort_order !== b.category_sort_order) {
+          return a.category_sort_order - b.category_sort_order
+        }
+        // 第二優先：系列編號（字母排序）
+        return a.code.localeCompare(b.code, 'zh-TW')
+      })
+      .map(({ category_sort_order, categories, ...series }) => series) // 移除臨時欄位
+
+    return { success: true, data: sortedData as Series[] }
   } catch (error) {
     console.error('getActiveSeries 異常:', error)
     return { success: false, message: error instanceof Error ? error.message : '查詢失敗' }
@@ -192,13 +214,18 @@ export async function globalSearch(
 
     const searchTerm = query.trim()
 
-    // 1. 搜尋系列（名稱 + 編號）
+    // 1. 搜尋系列（名稱 + 編號）JOIN 分類以取得排序
     const { data: seriesData, error: seriesError } = await supabase
       .from('series')
-      .select('*')
+      .select(`
+        *,
+        categories!inner (
+          sort_order
+        )
+      `)
       .eq('status', 'active')
+      .eq('categories.status', 'active')
       .or(`name.ilike.%${searchTerm}%,code.ilike.%${searchTerm}%`)
-      .order('sort_order', { ascending: true })
       .limit(20)
 
     if (seriesError) {
@@ -230,6 +257,22 @@ export async function globalSearch(
       console.error('globalSearch products error:', productsError)
     }
 
+    // 2.5. 手動排序系列：1. 分類排序 2. 系列編號
+    const sortedSeriesData = (seriesData || [])
+      .map((item: any) => ({
+        ...item,
+        category_sort_order: item.categories?.sort_order ?? 999,
+      }))
+      .sort((a, b) => {
+        // 第一優先：分類排序
+        if (a.category_sort_order !== b.category_sort_order) {
+          return a.category_sort_order - b.category_sort_order
+        }
+        // 第二優先：系列編號（字母排序）
+        return a.code.localeCompare(b.code, 'zh-TW')
+      })
+      .map(({ category_sort_order, categories, ...series }) => series) // 移除臨時欄位
+
     // 3. 整合商品價格
     const products: ProductWithPrice[] = (productsData || []).map((product: any) => {
       const tierPrice = product.tier_prices?.[0]
@@ -245,7 +288,7 @@ export async function globalSearch(
     return {
       success: true,
       data: {
-        series: (seriesData || []) as Series[],
+        series: sortedSeriesData as Series[],
         products,
       },
     }
