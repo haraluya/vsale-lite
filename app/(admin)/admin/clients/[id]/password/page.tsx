@@ -1,4 +1,4 @@
-import { getClients } from '@/lib/actions/clients'
+import { getAdminClientProfile } from '@/lib/actions/clients'
 import { UpdatePasswordForm } from '@/components/admin/update-password-form'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
@@ -11,12 +11,13 @@ export default async function UpdateClientPasswordPage({
 }) {
   const { id } = await params
 
-  const { clients } = await getClients()
-  const client = clients.find((c) => c.id === id)
+  const profileResult = await getAdminClientProfile(id)
 
-  if (!client) {
+  if (!profileResult.success || !profileResult.data) {
     notFound()
   }
+
+  const client = profileResult.data
 
   return (
     <div className="space-y-6">
@@ -38,7 +39,7 @@ export default async function UpdateClientPasswordPage({
       <div className="card-neo max-w-2xl p-8">
         <UpdatePasswordForm
           clientId={client.id}
-          clientName={client.display_name || client.phone}
+          clientName={client.display_name || client.phone || '未知客戶'}
         />
       </div>
     </div>

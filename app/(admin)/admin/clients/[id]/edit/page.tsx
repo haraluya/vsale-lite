@@ -1,7 +1,8 @@
 import { getTiers } from '@/lib/actions/tiers'
-import { getClients } from '@/lib/actions/clients'
+import { getAdminClientProfile } from '@/lib/actions/clients'
 import { ClientFormV2 } from '@/components/admin/client-form-v2'
 import { notFound } from 'next/navigation'
+import type { Client } from '@/types'
 
 export default async function EditClientPage({
   params,
@@ -10,15 +11,33 @@ export default async function EditClientPage({
 }) {
   const { id } = await params
 
-  const [{ clients }, tiers] = await Promise.all([
-    getClients(),
+  const [profileResult, tiers] = await Promise.all([
+    getAdminClientProfile(id),
     getTiers(),
   ])
 
-  const client = clients.find((c) => c.id === id)
-
-  if (!client) {
+  if (!profileResult.success || !profileResult.data) {
     notFound()
+  }
+
+  const profile = profileResult.data
+
+  // 查詢會員等級名稱
+  const tier = tiers.find((t) => t.id === profile.tier_id)
+
+  // 轉換為 Client 型別
+  const client: Client = {
+    id: profile.id,
+    phone: profile.phone || '',
+    display_name: profile.display_name,
+    role: profile.role,
+    tier_id: profile.tier_id,
+    tier_name: tier?.name || null,
+    notes: profile.notes,
+    address: profile.address,
+    admin_notes: profile.admin_notes,
+    created_at: profile.created_at,
+    updated_at: profile.created_at, // Profile 沒有 updated_at，使用 created_at
   }
 
   return (
