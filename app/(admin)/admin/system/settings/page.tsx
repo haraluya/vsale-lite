@@ -102,14 +102,10 @@ export default async function SystemSettingsPage() {
   }
 
   const tabs = [
-    { id: 'general', label: '一般設定', icon: <Settings className="h-4 w-4" /> },
-    { id: 'branding', label: '品牌設定', icon: <ImageIcon className="h-4 w-4" /> },
-    {
-      id: 'notifications',
-      label: '客戶通知',
-      icon: <Bell className="h-4 w-4" />,
-    },
-    { id: 'system', label: '備份管理', icon: <Database className="h-4 w-4" /> },
+    { id: 'general', label: '一般設定', icon: Settings },
+    { id: 'branding', label: '品牌設定', icon: ImageIcon },
+    { id: 'notifications', label: '客戶通知', icon: Bell },
+    { id: 'system', label: '備份管理', icon: Database },
   ]
 
   return (
