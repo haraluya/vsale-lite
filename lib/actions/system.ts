@@ -98,6 +98,7 @@ export async function getSettings(
       key: s.key,
       value: parseSettingValue(s.value, s.value_type as SettingValueType),
       value_type: s.value_type as SettingValueType,
+      category: s.category as SettingCategory,
       description: s.description,
     }))
 
@@ -123,7 +124,7 @@ export async function getPublicSettings(): Promise<ActionResult<ParsedSetting[]>
 
     const { data: settings, error } = await supabase
       .from('system_settings')
-      .select('key, value, value_type, description')
+      .select('key, value, value_type, category, description')
       .eq('is_public', true)
       .order('key', { ascending: true })
 
@@ -140,6 +141,7 @@ export async function getPublicSettings(): Promise<ActionResult<ParsedSetting[]>
       key: s.key,
       value: parseSettingValue(s.value, s.value_type as SettingValueType),
       value_type: s.value_type as SettingValueType,
+      category: s.category as SettingCategory,
       description: s.description,
     }))
 
@@ -428,6 +430,48 @@ export async function deleteLogo(
     return {
       success: false,
       message: error instanceof Error ? error.message : '刪除失敗',
+    }
+  }
+}
+
+/**
+ * 查詢客戶登入資訊範本
+ * Feature: 系統設定頁面重構
+ */
+export async function getClientLoginTemplate(): Promise<ActionResult<string>> {
+  try {
+    const adminClient = createAdminClient()
+
+    const { data: setting, error } = await adminClient
+      .from('system_settings')
+      .select('value')
+      .eq('key', 'client_login_info_template')
+      .single()
+
+    if (error || !setting) {
+      // 回傳預設範本
+      return {
+        success: true,
+        data: `【快速下單系統 - 登入資訊】
+
+客戶名稱: {客戶名稱}
+前台網址: {前台網址}
+登入電話: {登入電話}
+登入密碼: {登入密碼}
+
+請使用以上資訊登入系統進行下單,首次使用輸入"NEW100"領取百元折價券。`,
+      }
+    }
+
+    return {
+      success: true,
+      data: setting.value,
+    }
+  } catch (error) {
+    console.error('[getClientLoginTemplate] Error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢範本失敗',
     }
   }
 }

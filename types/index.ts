@@ -453,7 +453,7 @@ export type AdminProfile = Profile & {
 export type SettingValueType = 'text' | 'number' | 'boolean' | 'json' | 'image_url'
 
 // 系統設定分類
-export type SettingCategory = 'general' | 'branding' | 'carousel' | 'system'
+export type SettingCategory = 'general' | 'branding' | 'carousel' | 'system' | 'client_notifications'
 
 // 系統設定
 export type SystemSetting = {
@@ -474,6 +474,7 @@ export type ParsedSetting = {
   key: string
   value: string | number | boolean | object
   value_type: SettingValueType
+  category: SettingCategory
   description: string | null
 }
 

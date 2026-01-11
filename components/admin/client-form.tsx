@@ -1,7 +1,9 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useState, useEffect } from 'react'
 import { createClient, updateClient } from '@/lib/actions/clients'
+import { getClientLoginTemplate } from '@/lib/actions/system'
+import { replaceTemplateVariables } from '@/lib/utils/template-helpers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,7 +11,6 @@ import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { Tier, Client, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { useAlert } from '@/lib/contexts/dialog-context'
 
@@ -24,11 +25,23 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   const alert = useAlert()
   const isEdit = mode === 'edit'
   const [copied, setCopied] = useState(false)
+  const [template, setTemplate] = useState('')
 
   const [state, formAction, pending] = useActionState<
     ActionResult<{ id: string; password?: string; phone?: string; display_name?: string }> | null,
     FormData
   >(isEdit && client ? updateClient.bind(null, client.id) : createClient, null)
+
+  // 載入範本
+  useEffect(() => {
+    const loadTemplate = async () => {
+      const result = await getClientLoginTemplate()
+      if (result.success && result.data) {
+        setTemplate(result.data)
+      }
+    }
+    loadTemplate()
+  }, [])
 
   useEffect(() => {
     const handleSuccess = async () => {
@@ -58,8 +71,15 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
     const password = state.data.password
     const displayName = state.data.display_name || '客戶'
 
-    // 完整的登入指引文字
-    const fullGuide = `【快速下單系統 - 登入資訊】
+    // 使用系統設定的範本 + 變數替換
+    const fullGuide = template
+      ? replaceTemplateVariables(template, {
+          客戶名稱: displayName,
+          前台網址: loginUrl,
+          登入電話: phone,
+          登入密碼: password,
+        })
+      : `【快速下單系統 - 登入資訊】
 
 客戶名稱: ${displayName}
 前台網址: ${loginUrl}
