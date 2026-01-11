@@ -6,7 +6,7 @@
 
 import { NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { performBackupWithProgress } from '@/lib/backup/db-backup'
+import { performSupabaseBackupWithProgress } from '@/lib/backup/supabase-backup'
 
 // EventSource 只支援 GET 請求
 export async function GET(request: NextRequest) {
@@ -46,12 +46,12 @@ export async function GET(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          // 執行備份並回報進度（傳遞 includeStorage 參數）
-          await performBackupWithProgress('manual', user.id, (progress) => {
+          // 執行備份並回報進度（使用 Supabase 原生備份，不需要 pg_dump）
+          await performSupabaseBackupWithProgress('manual', user.id, (progress) => {
             // 發送進度更新
             const data = `data: ${JSON.stringify(progress)}\n\n`
             controller.enqueue(encoder.encode(data))
-          }, includeStorage)
+          })
 
           // 備份完成
           controller.close()

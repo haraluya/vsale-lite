@@ -318,3 +318,222 @@ SET standard_conforming_strings = on;
     throw error
   }
 }
+
+/**
+ * 備份進度資訊
+ */
+export type BackupProgress = {
+  stage: 'starting' | 'dumping' | 'compressing' | 'uploading' | 'calculating' | 'updating' | 'completed' | 'error'
+  message: string
+  percentage: number
+}
+
+/**
+ * 執行完整備份流程（使用 Supabase API）並回報進度
+ * @param backupType 備份類型（'auto' | 'manual'）
+ * @param userId 執行者 ID（手動備份時提供）
+ * @param onProgress 進度回調函數
+ * @returns 備份任務 ID
+ */
+export async function performSupabaseBackupWithProgress(
+  backupType: 'auto' | 'manual',
+  userId: string | undefined,
+  onProgress: (progress: BackupProgress) => void
+): Promise<string> {
+  const supabase = await createClient()
+  const startTime = Date.now()
+
+  // 產生備份檔案名稱
+  const filename = generateBackupFilename()
+
+  let backupJobId: string | undefined = undefined
+
+  try {
+    // 1. 建立備份任務記錄（status = 'in_progress'）
+    onProgress({ stage: 'starting', message: '建立備份任務記錄...', percentage: 0 })
+
+    const { data: backupJob, error: createError } = await supabase
+      .from('backup_jobs')
+      .insert({
+        filename,
+        file_size: 0,
+        storage_provider: 'gcs',
+        storage_url: '',
+        backup_type: backupType,
+        status: 'in_progress',
+        created_by: userId || null,
+      })
+      .select()
+      .single()
+
+    if (createError || !backupJob) {
+      throw new Error(`Failed to create backup job record: ${createError?.message}`)
+    }
+
+    backupJobId = backupJob.id
+
+    if (!backupJobId) {
+      throw new Error('Backup job ID is missing')
+    }
+
+    // 2. 備份所有資料表
+    onProgress({ stage: 'dumping', message: '正在匯出資料庫...', percentage: 10 })
+    console.log('Starting database backup...')
+
+    let sqlContent = `-- Vsale Database Backup
+-- Generated at: ${new Date().toISOString()}
+-- Backup type: ${backupType}
+-- Tables: ${BACKUP_TABLES.length}
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+
+`
+
+    const tableStats: Record<string, { rows: number; size_bytes: number }> = {}
+    let totalRows = 0
+
+    for (let i = 0; i < BACKUP_TABLES.length; i++) {
+      const tableName = BACKUP_TABLES[i]
+      const progress = 10 + Math.floor((i / BACKUP_TABLES.length) * 40)
+      onProgress({
+        stage: 'dumping',
+        message: `正在備份資料表: ${tableName} (${i + 1}/${BACKUP_TABLES.length})`,
+        percentage: progress,
+      })
+
+      try {
+        // 查詢記錄數
+        const { count } = await supabase
+          .from(tableName)
+          .select('*', { count: 'exact', head: true })
+
+        const rowCount = count || 0
+        tableStats[tableName] = { rows: rowCount, size_bytes: 0 }
+        totalRows += rowCount
+
+        // 備份資料
+        const tableSQL = await backupTable(supabase, tableName)
+        sqlContent += tableSQL
+      } catch (error) {
+        console.error(`Failed to backup table ${tableName}:`, error)
+        // 繼續備份其他資料表
+      }
+    }
+
+    sqlContent += `-- Backup completed: ${BACKUP_TABLES.length} tables, ${totalRows} rows\n`
+
+    // 3. 壓縮備份檔案
+    onProgress({ stage: 'compressing', message: '正在壓縮備份檔案...', percentage: 50 })
+    console.log('Compressing backup...')
+    const compressedBuffer = await compressString(sqlContent)
+    const compressedSize = compressedBuffer.length
+    const originalSize = Buffer.byteLength(sqlContent, 'utf8')
+
+    console.log(`Compression: ${originalSize} -> ${compressedSize} (${((compressedSize / originalSize) * 100).toFixed(2)}%)`)
+
+    // 4. 上傳到雲端
+    onProgress({ stage: 'uploading', message: '正在上傳到雲端儲存...', percentage: 70 })
+    console.log('Uploading to cloud storage...')
+    const uploadResult = await uploadBackup(filename, compressedBuffer)
+
+    // 5. 計算備份元數據
+    onProgress({ stage: 'calculating', message: '正在計算備份統計資訊...', percentage: 85 })
+    const durationMs = Date.now() - startTime
+    const metadata: BackupMetadata = {
+      tables: BACKUP_TABLES.length,
+      rows: totalRows,
+      compression_ratio: parseFloat((compressedSize / originalSize).toFixed(2)),
+      original_size: originalSize,
+      compressed_size: compressedSize,
+      duration_ms: durationMs,
+      table_stats: tableStats,
+    }
+
+    // 6. 更新備份任務記錄（status = 'success'）
+    onProgress({ stage: 'updating', message: '正在更新備份記錄...', percentage: 95 })
+    const { error: updateError } = await supabase
+      .from('backup_jobs')
+      .update({
+        file_size: compressedSize,
+        storage_provider: uploadResult.storage_provider,
+        storage_url: uploadResult.storage_url,
+        status: 'success',
+        metadata,
+        error_message: uploadResult.error_message || null,
+        completed_at: new Date().toISOString(),
+      })
+      .eq('id', backupJobId)
+
+    if (updateError) {
+      throw new Error(`Failed to update backup job: ${updateError.message}`)
+    }
+
+    // 7. 更新 system_settings（上次成功時間）
+    await supabase
+      .from('system_settings')
+      .update({ value: new Date().toISOString() })
+      .eq('key', 'backup_last_success')
+
+    await supabase
+      .from('system_settings')
+      .update({ value: '' })
+      .eq('key', 'backup_last_error')
+
+    // 8. 滾動刪除舊備份（僅自動備份）
+    if (backupType === 'auto') {
+      try {
+        const { data: maxKeepSetting } = await supabase
+          .from('system_settings')
+          .select('value')
+          .eq('key', 'backup_max_keep')
+          .single()
+
+        const maxKeep = maxKeepSetting ? parseInt(maxKeepSetting.value, 10) : 10
+
+        console.log(`Executing cleanup: keeping ${maxKeep} most recent auto backups`)
+        const cleanupResult = await cleanupOldBackups(maxKeep)
+
+        if (cleanupResult.deleted_count > 0) {
+          console.log(
+            `Cleanup completed: ${cleanupResult.deleted_count} backups deleted, ` +
+              `${(cleanupResult.deleted_size_bytes / 1024 / 1024).toFixed(2)} MB freed`
+          )
+        }
+      } catch (error) {
+        console.error('Cleanup failed (non-critical):', error)
+      }
+    }
+
+    // 9. 完成
+    onProgress({ stage: 'completed', message: '備份完成！', percentage: 100 })
+    console.log(`Backup completed successfully: ${filename}`)
+    return backupJobId
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    console.error('Backup failed:', errorMessage)
+
+    // 更新備份任務記錄（status = 'failed'）
+    if (backupJobId) {
+      await supabase
+        .from('backup_jobs')
+        .update({
+          status: 'failed',
+          error_message: errorMessage,
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', backupJobId)
+    }
+
+    // 更新 system_settings（上次錯誤訊息）
+    await supabase
+      .from('system_settings')
+      .update({ value: errorMessage })
+      .eq('key', 'backup_last_error')
+
+    // 回報錯誤
+    onProgress({ stage: 'error', message: errorMessage, percentage: 0 })
+
+    throw error
+  }
+}
