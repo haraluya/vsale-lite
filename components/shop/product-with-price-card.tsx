@@ -102,12 +102,12 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       designTokens.neoBrutalism.border.full,
       "border-black",
       designTokens.neoBrutalism.shadow.full,
-      "p-3 md:p-4"
+      "p-2 md:p-4"
     )}>
       {/* 商品圖片 */}
       <div
         className={cn(
-          "mb-3 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
+          "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
           designTokens.neoBrutalism.border.mobile,
           "border-black",
           product.image_url && "cursor-pointer",
@@ -127,26 +127,24 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
               "h-full w-full object-cover transition-transform",
               "group-hover:scale-105"
             )}
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-5xl md:text-6xl text-gray-300">
+          <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-gray-300">
             📦
           </div>
         )}
       </div>
 
       {/* 商品資訊 */}
-      <div className="space-y-2 md:space-y-3">
-        <h3 className={cn(
-          "line-clamp-2 font-bold",
-          designTokens.typography.body.large
-        )}>{product.name}</h3>
+      <div className="space-y-1.5 md:space-y-3">
+        <h3 className="line-clamp-2 font-bold text-sm md:text-base leading-tight">
+          {product.name}
+        </h3>
 
-        <p className={cn(
-          designTokens.typography.caption,
-          "text-gray-600"
-        )}>編號: {product.code}</p>
+        <p className="text-xs text-gray-600">
+          編號: {product.code}
+        </p>
 
         {/* 價格顯示 */}
         {product.user_price !== null ? (
@@ -154,19 +152,13 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             "rounded-none bg-blue-50",
             designTokens.neoBrutalism.border.mobile,
             "border-black",
-            "p-2.5 md:p-3"
+            "p-2 md:p-3"
           )}>
             {/* 原價 */}
             {product.retail_price && product.retail_price > product.user_price && (
-              <div className="mb-1 flex items-center gap-2">
-                <span className={cn(
-                  designTokens.typography.caption,
-                  "text-gray-500"
-                )}>原價</span>
-                <span className={cn(
-                  designTokens.typography.caption,
-                  "text-gray-400 line-through"
-                )}>
+              <div className="mb-1 flex items-center gap-1.5 flex-wrap">
+                <span className="text-xs text-gray-500">原價</span>
+                <span className="text-xs text-gray-400 line-through">
                   ${product.retail_price}
                 </span>
                 {discountPercent > 0 && (
@@ -175,21 +167,18 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
                     "px-1 py-0.5",
                     "text-xs font-bold text-red-700"
                   )}>
-                    省 {discountPercent}%
+                    省{discountPercent}%
                   </span>
                 )}
               </div>
             )}
 
             {/* 會員價 */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl md:text-2xl font-bold text-blue-600">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg md:text-2xl font-bold text-blue-600">
                 ${product.user_price}
               </span>
-              <span className={cn(
-                designTokens.typography.caption,
-                "text-gray-600"
-              )}>
+              <span className="text-xs text-gray-600">
                 ({tierName})
               </span>
             </div>
@@ -198,12 +187,9 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           <div className={cn(
             "rounded-none bg-gray-100",
             "border-2 border-gray-400",
-            "p-2.5 md:p-3"
+            "p-2 md:p-3"
           )}>
-            <p className={cn(
-              "text-center font-bold text-gray-600",
-              designTokens.typography.caption
-            )}>
+            <p className="text-center font-bold text-gray-600 text-xs">
               價格未設定
             </p>
           </div>
@@ -211,27 +197,27 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
         {/* 庫存狀態 */}
         <div className="flex justify-center">
-          <StockStatus status={product.stock_status} size="md" />
+          <StockStatus status={product.stock_status} size="sm" />
         </div>
 
         {/* 單位 */}
-        <p className={cn(
-          designTokens.typography.caption,
-          "text-gray-500"
-        )}>單位: {product.unit}</p>
+        <p className="text-xs text-gray-500">
+          單位: {product.unit}
+        </p>
 
         {/* 加入購物車按鈕 */}
         <button
           onClick={handleAddToCart}
           disabled={isAdding || !product.user_price}
           className={cn(
-            "mt-2 md:mt-3 w-full rounded-none bg-green-400 font-bold transition-all",
+            "mt-1.5 md:mt-3 w-full rounded-none bg-green-400 font-bold transition-all",
             designTokens.neoBrutalism.border.full,
             "border-black",
             designTokens.neoBrutalism.shadow.full,
             designTokens.neoBrutalism.hover,
-            "px-3 py-2.5 md:px-4 md:py-3",
+            "px-2 py-2 md:px-4 md:py-3",
             "min-h-[44px]",  // WCAG 2.1 AA
+            "text-sm md:text-base",
             "disabled:cursor-not-allowed disabled:bg-gray-200 disabled:opacity-50",
             "disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
           )}
@@ -242,15 +228,17 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             '價格未設定'
           ) : !mounted || cartQuantity === 0 ? (
             // SSR 時與首次渲染時統一顯示 Plus 圖示
-            <span className="flex items-center justify-center gap-2">
-              <Plus className="h-5 w-5" />
-              加入購物車
+            <span className="flex items-center justify-center gap-1.5">
+              <Plus className="h-4 w-4 md:h-5 md:w-5" />
+              <span className="hidden sm:inline">加入購物車</span>
+              <span className="sm:hidden">加入</span>
             </span>
           ) : (
             // 客戶端 hydration 完成且購物車有商品時顯示 ShoppingCart 圖示
-            <span className="flex items-center justify-center gap-2">
-              <ShoppingCart className="h-5 w-5" />
-              再加一件 (已有 {cartQuantity} 件)
+            <span className="flex items-center justify-center gap-1.5">
+              <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
+              <span className="hidden sm:inline">再加一件 ({cartQuantity})</span>
+              <span className="sm:hidden">+1 ({cartQuantity})</span>
             </span>
           )}
         </button>

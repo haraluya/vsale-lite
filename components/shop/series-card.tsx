@@ -43,39 +43,34 @@ export function SeriesCard({ series }: SeriesCardProps) {
               alt={series.name}
               fill
               className="object-cover transition-transform group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
           ) : (
             <div className="flex h-full items-center justify-center bg-gray-100">
-              <span className="text-5xl md:text-6xl">📦</span>
+              <span className="text-4xl md:text-6xl">📦</span>
             </div>
           )}
         </div>
 
         {/* 系列資訊 */}
-        <div className="p-3 md:p-4">
-          <h3 className={cn(
-            designTokens.typography.h3,
-            "mb-2"
-          )}>{series.name}</h3>
+        <div className="p-2 md:p-4">
+          <h3 className="text-base md:text-xl font-bold mb-1.5 md:mb-2 leading-tight">
+            {series.name}
+          </h3>
           {series.description && (
-            <p className={cn(
-              "line-clamp-2",
-              designTokens.typography.caption,
-              "text-gray-600"
-            )}>
+            <p className="line-clamp-2 text-xs md:text-sm text-gray-600">
               {series.description}
             </p>
           )}
 
           {/* 查看詳情按鈕 */}
-          <div className="mt-3 md:mt-4">
+          <div className="mt-2 md:mt-4">
             <span className={cn(
               "inline-block rounded-none bg-yellow-300 font-bold transition-all group-hover:bg-yellow-400",
               designTokens.neoBrutalism.border.mobile,
               "border-black",
-              "px-3 py-2 md:px-4",
-              designTokens.typography.caption
+              "px-2 py-1.5 md:px-4 md:py-2",
+              "text-xs md:text-sm"
             )}>
               查看商品 →
             </span>

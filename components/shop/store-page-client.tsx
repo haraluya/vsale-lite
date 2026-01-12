@@ -215,10 +215,7 @@ export function StorePageClient({
                     designTokens.typography.h2,
                     "mb-4"
                   )}>系列 ({searchedSeries.length})</h2>
-                  <div className={cn(
-                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-                    designTokens.spacing.grid.gap
-                  )}>
+                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                     {searchedSeries.map((s) => (
                       <SeriesCard key={s.id} series={s} />
                     ))}
@@ -233,10 +230,7 @@ export function StorePageClient({
                     designTokens.typography.h2,
                     "mb-4"
                   )}>商品 ({searchedProducts.length})</h2>
-                  <div className={cn(
-                    "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-                    designTokens.spacing.grid.gap
-                  )}>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
                     {searchedProducts.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
@@ -268,10 +262,7 @@ export function StorePageClient({
               )}
             </div>
           ) : (
-            <div className={cn(
-              "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3",
-              designTokens.spacing.grid.gap
-            )}>
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {displaySeries.map((s) => (
                 <SeriesCard key={s.id} series={s} />
               ))}

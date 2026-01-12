@@ -45,20 +45,20 @@ export function ProductCard({ product }: ProductCardProps) {
         designTokens.neoBrutalism.border.full,
         designTokens.neoBrutalism.shadow.full,
         designTokens.neoBrutalism.hover,
-        "p-3 md:p-4",
+        "p-2 md:p-4",
         borderColor
       )}
     >
       {/* 標籤徽章（左上角） */}
       {product.tags && product.tags.length > 0 && (
-        <div className="absolute left-2 top-2 z-10">
+        <div className="absolute left-1.5 top-1.5 z-10">
           <TagBadgeList tags={product.tags} maxTags={2} size="sm" />
         </div>
       )}
 
       {/* 商品圖片 */}
       <div className={cn(
-        "mb-3 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
+        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
         designTokens.neoBrutalism.border.mobile,
         "border-black"
       )}>
@@ -69,26 +69,24 @@ export function ProductCard({ product }: ProductCardProps) {
             width={300}
             height={300}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-5xl md:text-6xl text-gray-300">
+          <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-gray-300">
             📦
           </div>
         )}
       </div>
 
       {/* 商品資訊 */}
-      <div className="space-y-2">
+      <div className="space-y-1.5 md:space-y-2">
         <h3 className={cn(
-          "line-clamp-2 font-bold",
-          designTokens.typography.body.large
+          "line-clamp-2 font-bold text-sm md:text-base leading-tight"
         )}>{product.name}</h3>
 
-        <p className={cn(
-          designTokens.typography.caption,
-          "text-gray-600"
-        )}>編號: {product.code}</p>
+        <p className="text-xs text-gray-600">
+          編號: {product.code}
+        </p>
 
         {/* 系列標籤 */}
         {product.series_name && (
@@ -96,9 +94,7 @@ export function ProductCard({ product }: ProductCardProps) {
             "inline-block rounded-none bg-blue-100",
             designTokens.neoBrutalism.border.mobile,
             "border-black",
-            "px-2 py-1",
-            designTokens.typography.caption,
-            "font-bold"
+            "px-1.5 py-0.5 text-xs font-bold"
           )}>
             {product.series_name}
           </div>
@@ -106,42 +102,35 @@ export function ProductCard({ product }: ProductCardProps) {
 
         {/* 價格顯示（優化） */}
         {hasUserPrice ? (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {/* 原價（刪除線） */}
             {product.retail_price && product.retail_price > 0 && (
-              <p className={cn(
-                designTokens.typography.caption,
-                "text-gray-500 line-through"
-              )}>
+              <p className="text-xs text-gray-500 line-through">
                 原價 ${product.retail_price}
               </p>
             )}
             {/* 您的價格（醒目） */}
-            <p className="text-xl md:text-2xl font-bold text-brand-primary">
+            <p className="text-lg md:text-2xl font-bold text-brand-primary">
               ${product.user_price}
-              <span className={cn(
-                designTokens.typography.caption,
-                "ml-2 font-normal text-gray-600"
-              )}>/{product.unit || '件'}</span>
+              <span className="text-xs ml-1 font-normal text-gray-600">
+                /{product.unit || '件'}
+              </span>
             </p>
           </div>
         ) : (
-          <p className={cn(
-            designTokens.typography.caption,
-            "font-bold text-red-600"
-          )}>價格未設定</p>
+          <p className="text-xs font-bold text-red-600">
+            價格未設定
+          </p>
         )}
 
         {/* 庫存狀態與提示 */}
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           <div className="flex justify-start">
             <StockStatus status={product.stock_status} size="sm" />
           </div>
           {/* 預購商品提示 */}
           {(product.stock || 0) < 0 && (
-            <p className={cn(
-              "text-xs font-bold text-red-600"
-            )}>可預購</p>
+            <p className="text-xs font-bold text-red-600">可預購</p>
           )}
         </div>
       </div>
