@@ -277,7 +277,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
       editedNotes !== (order.notes || '')
         ? {
             old_notes: order.notes || null,
-            new_notes: editedNotes || null,
+            new_notes: editedNotes.trim() === '' ? null : editedNotes,
           }
         : undefined
 
