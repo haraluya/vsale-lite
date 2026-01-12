@@ -87,15 +87,16 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
     return itemsSubtotal - couponDiscount + editedShippingFee + feesTotal
   }, [itemsSubtotal, couponDiscount, editedShippingFee, feesTotal])
 
-  // 修改商品單價
+  // 修改商品單價（進位為整數）
   const handlePriceChange = (itemId: string, newPrice: number) => {
+    const roundedPrice = Math.ceil(newPrice)
     setEditedItems(prev =>
       prev.map(item =>
         item.id === itemId
           ? {
               ...item,
-              deal_price: newPrice,
-              subtotal: newPrice * item.quantity,
+              deal_price: roundedPrice,
+              subtotal: roundedPrice * item.quantity,
             }
           : item
       )
@@ -440,7 +441,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                     <Input
                       type="number"
                       min="0"
-                      step="0.01"
+                      step="1"
                       value={item.deal_price}
                       onChange={e => handlePriceChange(item.id, parseFloat(e.target.value) || 0)}
                       className="w-32 border-2 border-black"
@@ -568,9 +569,9 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           <Input
             type="number"
             min="0"
-            step="0.01"
+            step="1"
             value={editedShippingFee}
-            onChange={e => setEditedShippingFee(parseFloat(e.target.value) || 0)}
+            onChange={e => setEditedShippingFee(Math.ceil(parseFloat(e.target.value)) || 0)}
             className="w-32 border-2 border-black"
             disabled={loading}
           />
