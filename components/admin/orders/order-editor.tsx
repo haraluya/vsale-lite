@@ -440,7 +440,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                     <Input
                       type="number"
                       min="0"
-                      step="1"
+                      step="0.01"
                       value={item.deal_price}
                       onChange={e => handlePriceChange(item.id, parseFloat(e.target.value) || 0)}
                       className="w-32 border-2 border-black"
@@ -568,7 +568,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           <Input
             type="number"
             min="0"
-            step="1"
+            step="0.01"
             value={editedShippingFee}
             onChange={e => setEditedShippingFee(parseFloat(e.target.value) || 0)}
             className="w-32 border-2 border-black"
