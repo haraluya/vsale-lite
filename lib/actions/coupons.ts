@@ -645,6 +645,7 @@ export async function getUserCoupons(filters?: {
     }
 
     // 4. 過濾後的優惠券包含過期狀態標記
+    // 注意：將所有 Date 物件轉換為字串，以便從 Server Component 傳遞到 Client Component
     const now = new Date()
     const filteredCoupons = (userCoupons || []).map((uc: any) => {
       const coupon = uc.coupon
@@ -659,8 +660,15 @@ export async function getUserCoupons(filters?: {
 
       return {
         ...uc,
+        // 確保所有日期欄位都是字串格式（序列化）
+        claimed_at: typeof uc.claimed_at === 'string' ? uc.claimed_at : uc.claimed_at?.toISOString(),
+        used_at: typeof uc.used_at === 'string' ? uc.used_at : uc.used_at?.toISOString(),
         coupon: {
           ...coupon,
+          // 確保優惠券的日期欄位也是字串格式
+          valid_from: typeof coupon.valid_from === 'string' ? coupon.valid_from : validFrom.toISOString(),
+          valid_until: typeof coupon.valid_until === 'string' ? coupon.valid_until : validUntil.toISOString(),
+          created_at: typeof coupon.created_at === 'string' ? coupon.created_at : coupon.created_at?.toISOString?.(),
           _is_expired: isExpired,
           _is_not_started: isNotStarted,
         },
