@@ -7,8 +7,40 @@
     @apply border-black;
   }
 
+  html {
+    /* 防止水平滾動 */
+    overflow-x: hidden;
+    /* 確保 100% 寬度不會超出視窗 */
+    max-width: 100vw;
+    /* 防止 box-sizing 導致寬度溢出 */
+    box-sizing: border-box;
+  }
+
+  *,
+  *::before,
+  *::after {
+    /* 確保所有元素使用 border-box */
+    box-sizing: border-box;
+  }
+
   body {
     @apply bg-background text-black;
+    /* 防止水平滾動 */
+    overflow-x: hidden;
+    /* 確保 100% 寬度不會超出視窗 */
+    max-width: 100vw;
+    /* 防止 body 有多餘的 margin */
+    margin: 0;
+    padding: 0;
+    /* 防止字體溢出 */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* 確保所有圖片不會超出容器 */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
 

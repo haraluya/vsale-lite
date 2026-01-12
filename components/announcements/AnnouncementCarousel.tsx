@@ -59,7 +59,7 @@ export function AnnouncementCarousel({ announcements }: AnnouncementCarouselProp
   const current = announcements[currentIndex]
 
   return (
-    <div className="relative h-96 w-full overflow-hidden rounded-none border-3 border-black bg-gray-100 shadow-neo">
+    <div className="relative h-96 w-full max-w-full overflow-hidden rounded-none border-3 border-black bg-gray-100 shadow-neo">
       {/* 廣告圖片 */}
       {current.series_id ? (
         <Link href={`/store/series/${current.series_id}`} className="block h-full w-full">
