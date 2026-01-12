@@ -118,6 +118,11 @@ export const orderModificationsSchema = z.object({
   coupon: z.object({
     action: z.enum(['kept', 'removed']),
   }).optional(),
+
+  notes: z.object({
+    old_notes: z.string().nullable(),
+    new_notes: z.string().max(500, '備註不可超過 500 字').nullable(),
+  }).optional(),
 })
 
 // 型別推導

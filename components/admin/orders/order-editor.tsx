@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { updateOrderDetails } from '@/lib/actions/orders'
 import type { OrderDetail } from '@/types'
 import type { OrderModificationsInput } from '@/lib/validations/order.schema'
@@ -61,6 +62,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
   )
 
   const [editedShippingFee, setEditedShippingFee] = useState(order.shipping_fee || 0)
+  const [editedNotes, setEditedNotes] = useState(order.notes || '')
   const [loading, setLoading] = useState(false)
 
   // 計算商品總額（不含已移除）
@@ -270,10 +272,20 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           }
         : undefined
 
+    // 備註修改
+    const notesModified: OrderModificationsInput['notes'] =
+      editedNotes !== (order.notes || '')
+        ? {
+            old_notes: order.notes || null,
+            new_notes: editedNotes || null,
+          }
+        : undefined
+
     return {
       items: itemsModified.length > 0 ? itemsModified : undefined,
       fees: feesModified.length > 0 ? feesModified : undefined,
       shipping: shippingModified,
+      notes: notesModified,
       coupon: undefined, // 優惠券處理由 US5 實作
     }
   }
@@ -286,7 +298,8 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
     if (
       (!modifications.items || modifications.items.length === 0) &&
       (!modifications.fees || modifications.fees.length === 0) &&
-      !modifications.shipping
+      !modifications.shipping &&
+      !modifications.notes
     ) {
       await alert({
         title: '無任何修改',
@@ -566,6 +579,28 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           )}
           {editedShippingFee === 0 && (
             <span className="text-green-600 font-bold">免運</span>
+          )}
+        </div>
+      </div>
+
+      {/* 客戶備註 */}
+      <div className="space-y-2">
+        <h4 className="font-bold text-lg">📝 客戶備註</h4>
+        <Textarea
+          value={editedNotes}
+          onChange={e => setEditedNotes(e.target.value)}
+          placeholder="輸入客戶備註..."
+          maxLength={500}
+          rows={3}
+          className="border-2 border-black resize-none"
+          disabled={loading}
+        />
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-500">
+            {editedNotes.length} / 500 字
+          </span>
+          {editedNotes !== (order.notes || '') && (
+            <span className="text-red-600 font-bold">已修改</span>
           )}
         </div>
       </div>
