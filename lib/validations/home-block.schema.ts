@@ -51,14 +51,27 @@ export const HomeBlockConfigSchema = z.discriminatedUnion('block_type', [
   }),
 ])
 
-// 建立區塊 Schema
+// 建立區塊 Schema（使用條件驗證）
 export const CreateHomeBlockSchema = z.object({
   name: z.string().min(1, '區塊名稱不可為空').max(100, '區塊名稱最多 100 字元'),
   block_type: z.enum(['image_carousel', 'product_display', 'text_block'], {
     message: '區塊類型必須為 image_carousel, product_display, text_block 之一',
   }),
-  config: z.union([ImageCarouselConfigSchema, ProductDisplayConfigSchema, TextBlockConfigSchema]),
+  config: z.any(), // 暫時使用 any，由 refine 驗證
   is_active: z.boolean().default(true),
+}).refine((data) => {
+  // 根據 block_type 驗證對應的 config
+  if (data.block_type === 'image_carousel') {
+    return ImageCarouselConfigSchema.safeParse(data.config).success
+  } else if (data.block_type === 'product_display') {
+    return ProductDisplayConfigSchema.safeParse(data.config).success
+  } else if (data.block_type === 'text_block') {
+    return TextBlockConfigSchema.safeParse(data.config).success
+  }
+  return false
+}, {
+  message: 'config 格式與 block_type 不符',
+  path: ['config'],
 })
 
 // 更新區塊 Schema
@@ -66,8 +79,23 @@ export const UpdateHomeBlockSchema = z.object({
   id: z.string().uuid('區塊 ID 格式不正確'),
   name: z.string().min(1, '區塊名稱不可為空').max(100, '區塊名稱最多 100 字元').optional(),
   block_type: z.enum(['image_carousel', 'product_display', 'text_block']).optional(),
-  config: z.union([ImageCarouselConfigSchema, ProductDisplayConfigSchema, TextBlockConfigSchema]).optional(),
+  config: z.any().optional(), // 暫時使用 any，由 refine 驗證
   is_active: z.boolean().optional(),
+}).refine((data) => {
+  // 如果提供了 config，根據 block_type 驗證
+  if (data.config !== undefined && data.block_type !== undefined) {
+    if (data.block_type === 'image_carousel') {
+      return ImageCarouselConfigSchema.safeParse(data.config).success
+    } else if (data.block_type === 'product_display') {
+      return ProductDisplayConfigSchema.safeParse(data.config).success
+    } else if (data.block_type === 'text_block') {
+      return TextBlockConfigSchema.safeParse(data.config).success
+    }
+  }
+  return true // 如果沒有提供 config 或 block_type，跳過驗證
+}, {
+  message: 'config 格式與 block_type 不符',
+  path: ['config'],
 })
 
 // ===================================
