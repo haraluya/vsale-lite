@@ -55,9 +55,13 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
     }
   }, [mounted, items, product.id, getItemQuantity])
 
-  // 計算折扣百分比
+  // 計算實際顯示的價格（等級價格優先，沒有則使用零售價）
+  const displayPrice = product.user_price ?? product.retail_price
+  const priceLabel = product.user_price ? tierName : '零售價'
+
+  // 計算折扣百分比（僅當有等級價格且低於零售價時）
   const discountPercent =
-    product.retail_price && product.user_price
+    product.retail_price && product.user_price && product.user_price < product.retail_price
       ? Math.round(((product.retail_price - product.user_price) / product.retail_price) * 100)
       : 0
 
@@ -153,62 +157,42 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         </p>
 
         {/* 價格顯示 */}
-        {product.user_price !== null ? (
-          // 有會員價：顯示會員價（可能包含原價與折扣）
+        {displayPrice ? (
           <div className={cn(
             "rounded-none bg-blue-50",
             designTokens.neoBrutalism.border.mobile,
             "border-black",
             "p-2 md:p-3"
           )}>
-            {/* 原價 */}
-            {product.retail_price && product.retail_price > product.user_price && (
+            {/* 折扣提示（僅當有等級價格且有折扣時顯示） */}
+            {discountPercent > 0 && (
               <div className="mb-1 flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs text-gray-500">原價</span>
+                <span className="text-xs text-gray-500">零售價</span>
                 <span className="text-xs text-gray-400 line-through">
                   ${product.retail_price}
                 </span>
-                {discountPercent > 0 && (
-                  <span className={cn(
-                    "rounded-none border border-red-600 bg-red-100",
-                    "px-1 py-0.5",
-                    "text-xs font-bold text-red-700"
-                  )}>
-                    省{discountPercent}%
-                  </span>
-                )}
+                <span className={cn(
+                  "rounded-none border border-red-600 bg-red-100",
+                  "px-1 py-0.5",
+                  "text-xs font-bold text-red-700"
+                )}>
+                  省{discountPercent}%
+                </span>
               </div>
             )}
 
-            {/* 會員價 */}
+            {/* 顯示價格（等級價格或零售價） */}
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg md:text-2xl font-bold text-blue-600">
-                ${product.user_price}
+                ${displayPrice}
               </span>
               <span className="text-xs text-gray-600">
-                ({tierName})
-              </span>
-            </div>
-          </div>
-        ) : product.retail_price ? (
-          // 沒有會員價但有原價：顯示原價
-          <div className={cn(
-            "rounded-none bg-gray-50",
-            designTokens.neoBrutalism.border.mobile,
-            "border-black",
-            "p-2 md:p-3"
-          )}>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-lg md:text-2xl font-bold text-gray-700">
-                ${product.retail_price}
-              </span>
-              <span className="text-xs text-gray-500">
-                (原價)
+                ({priceLabel})
               </span>
             </div>
           </div>
         ) : (
-          // 兩者都沒有：顯示「價格未設定」
+          // 沒有任何價格：顯示「價格未設定」
           <div className={cn(
             "rounded-none bg-gray-100",
             "border-2 border-gray-400",
