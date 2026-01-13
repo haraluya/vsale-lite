@@ -643,3 +643,65 @@ export type DeleteBackupInput = {
 
 // 刪除備份回應
 export type DeleteBackupResult = ActionResult<void>
+
+// ===================================
+// 首頁廣告區塊型別 (Feature 016)
+// ===================================
+
+// 區塊類型
+export type BlockType = 'image_carousel' | 'product_display' | 'text_block'
+
+// 圖片輪播 Config
+export interface ImageCarouselConfig {
+  images: Array<{
+    url: string                  // 圖片 URL（Supabase Storage 公開 URL）
+    series_id?: string | null    // 可選：連結到系列頁面的 UUID
+    width?: number               // 可選：圖片原始寬度（px）
+    height?: number              // 可選：圖片原始高度（px）
+  }>
+  auto_play: boolean             // 是否自動播放
+  interval_ms: number            // 輪播間隔（毫秒，最小 1000ms）
+}
+
+// 商品展示 Config
+export interface ProductDisplayConfig {
+  series_ids?: string[] | null   // 可選：系列 UUID 陣列（AND 邏輯）
+  tag_ids?: string[] | null      // 可選：標籤 UUID 陣列（AND 邏輯）
+  max_items?: number | null      // 可選：最大顯示數量（預設 50）
+}
+
+// 文字區塊 Config
+export interface TextBlockConfig {
+  content: string                // 文字內容（最多 1000 字元）
+  font_size: '12' | '16' | '20' | '24' | '32' | '40' | '48'  // 字體大小（px）
+  color: string                  // 字體顏色（Hex 格式 #RRGGBB）
+}
+
+// 首頁廣告區塊
+export interface HomePageBlock {
+  id: string
+  name: string
+  block_type: BlockType
+  config: ImageCarouselConfig | ProductDisplayConfig | TextBlockConfig
+  sort_order: number
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+// 建立區塊輸入
+export type CreateHomeBlockInput = {
+  name: string
+  block_type: BlockType
+  config: ImageCarouselConfig | ProductDisplayConfig | TextBlockConfig
+  is_active?: boolean
+}
+
+// 更新區塊輸入
+export type UpdateHomeBlockInput = {
+  id: string
+  name?: string
+  block_type?: BlockType
+  config?: ImageCarouselConfig | ProductDisplayConfig | TextBlockConfig
+  is_active?: boolean
+}

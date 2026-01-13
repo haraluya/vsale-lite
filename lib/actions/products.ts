@@ -107,6 +107,7 @@ export async function getProducts(params?: {
       stock_status: item.stock_status,  // 🆕 Feature 003: 庫存狀態
       unit: item.unit,
       image_url: item.image_url,
+      tags: item.tags || [],  // 🆕 Feature 006: 商品標籤
       status: item.status,
       created_at: item.created_at,
       updated_at: item.updated_at,
@@ -156,6 +157,7 @@ export async function getProduct(id: string): Promise<Product | null> {
       stock_status: data.stock_status,  // 🆕 Feature 003: 庫存狀態
       unit: data.unit,
       image_url: data.image_url,
+      tags: data.tags || [],  // 🆕 Feature 006: 商品標籤
       status: data.status,
       created_at: data.created_at,
       updated_at: data.updated_at,
@@ -738,6 +740,64 @@ export async function uploadProductImage(
     return {
       success: false,
       message: '圖片上傳失敗',
+    }
+  }
+}
+
+/**
+ * 根據商品 ID 陣列查詢商品（用於批次標籤管理）
+ * Feature: 006-ux-enhancement (US9)
+ */
+export async function getProductsByIds(productIds: string[]): Promise<ActionResult<Product[]>> {
+  try {
+    // 驗證權限
+    await checkAuth('admin')
+
+    if (!productIds || productIds.length === 0) {
+      return {
+        success: true,
+        data: [],
+      }
+    }
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    const { data, error } = await adminClient
+      .from('products')
+      .select('id, name, tags')
+      .in('id', productIds)
+
+    if (error) {
+      console.error('getProductsByIds error:', error)
+      return {
+        success: false,
+        message: '查詢商品失敗',
+      }
+    }
+
+    const products: Product[] = (data || []).map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      tags: item.tags || [],
+      // 其他欄位不需要
+    } as Product))
+
+    return {
+      success: true,
+      data: products,
+    }
+  } catch (error: unknown) {
+    console.error('getProductsByIds error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '查詢商品失敗',
     }
   }
 }

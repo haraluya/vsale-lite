@@ -55,9 +55,13 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
     }
   }, [mounted, items, product.id, getItemQuantity])
 
-  // 計算折扣百分比
+  // 計算實際顯示的價格（等級價格優先，沒有則使用零售價）
+  const displayPrice = product.user_price ?? product.retail_price
+  const priceLabel = product.user_price ? tierName : '零售價'
+
+  // 計算折扣百分比（僅當有等級價格且低於零售價時）
   const discountPercent =
-    product.retail_price && product.user_price
+    product.retail_price && product.user_price && product.user_price < product.retail_price
       ? Math.round(((product.retail_price - product.user_price) / product.retail_price) * 100)
       : 0
 
@@ -138,52 +142,53 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
       {/* 商品資訊 */}
       <div className="space-y-1.5 md:space-y-3">
-        <h3 className="line-clamp-2 font-bold text-sm md:text-base leading-tight">
-          {product.name}
-        </h3>
-
-        <p className="text-xs text-gray-600">
-          編號: {product.code}
-        </p>
+        {/* 商品名稱與庫存狀況 */}
+        <div className="flex items-start gap-2">
+          <h3 className="flex-1 line-clamp-2 font-bold text-sm md:text-base leading-tight">
+            {product.name}
+          </h3>
+          <div className="flex-shrink-0">
+            <StockStatus status={product.stock_status} size="sm" />
+          </div>
+        </div>
 
         {/* 價格顯示 */}
-        {product.user_price !== null ? (
+        {displayPrice ? (
           <div className={cn(
             "rounded-none bg-blue-50",
             designTokens.neoBrutalism.border.mobile,
             "border-black",
             "p-2 md:p-3"
           )}>
-            {/* 原價 */}
-            {product.retail_price && product.retail_price > product.user_price && (
+            {/* 折扣提示（僅當有等級價格且有折扣時顯示） */}
+            {discountPercent > 0 && (
               <div className="mb-1 flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs text-gray-500">原價</span>
+                <span className="text-xs text-gray-500">零售價</span>
                 <span className="text-xs text-gray-400 line-through">
                   ${product.retail_price}
                 </span>
-                {discountPercent > 0 && (
-                  <span className={cn(
-                    "rounded-none border border-red-600 bg-red-100",
-                    "px-1 py-0.5",
-                    "text-xs font-bold text-red-700"
-                  )}>
-                    省{discountPercent}%
-                  </span>
-                )}
+                <span className={cn(
+                  "rounded-none border border-red-600 bg-red-100",
+                  "px-1 py-0.5",
+                  "text-xs font-bold text-red-700"
+                )}>
+                  省{discountPercent}%
+                </span>
               </div>
             )}
 
-            {/* 會員價 */}
+            {/* 顯示價格（等級價格或零售價） */}
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg md:text-2xl font-bold text-blue-600">
-                ${product.user_price}
+                ${displayPrice}
               </span>
               <span className="text-xs text-gray-600">
-                ({tierName})
+                ({priceLabel})
               </span>
             </div>
           </div>
         ) : (
+          // 沒有任何價格：顯示「價格未設定」
           <div className={cn(
             "rounded-none bg-gray-100",
             "border-2 border-gray-400",
@@ -194,11 +199,6 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             </p>
           </div>
         )}
-
-        {/* 庫存狀態 */}
-        <div className="flex justify-center">
-          <StockStatus status={product.stock_status} size="sm" />
-        </div>
 
         {/* 單位 */}
         <p className="text-xs text-gray-500">
@@ -225,7 +225,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           {isAdding ? (
             '加入中...'
           ) : !product.user_price ? (
-            '價格未設定'
+            product.retail_price ? '會員價未設定' : '價格未設定'
           ) : !mounted || cartQuantity === 0 ? (
             // SSR 時與首次渲染時統一顯示 Plus 圖示
             <span className="flex items-center justify-center gap-1.5">
