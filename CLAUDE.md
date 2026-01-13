@@ -6,23 +6,24 @@
 
 ---
 
-## ⚠️ 重要：Supabase 操作協議
+## ⚠️ 重要：Supabase 生產環境操作協議
 
-**所有 Supabase 資料庫操作必須遵守 `.claude/skills/supabase-manager.md` 協議**
+**本專案使用線上 Supabase 生產資料庫，所有操作必須極度謹慎**
 
-當處理以下任務時，**強制啟用** Supabase Manager Skill：
-- 執行 Migration
-- 資料庫重置
-- 資料庫結構修改
-- 錯誤診斷與修復
+**核心原則（生產環境）**：
+1. ⚠️ **每次操作都影響生產資料** - 所有 Migration 直接在線上資料庫執行
+2. ❌ **絕對禁止** `supabase db reset` 或 `pnpm db:reset` - 會清空所有生產資料
+3. ✅ **執行前必須備份** - 使用雲端備份系統手動備份
+4. ✅ **僅使用增量式 Migration** - 避免破壞性變更（DROP、TRUNCATE）
+5. 🔍 **執行前檢查** - 使用 `pnpm db:diff` 確認變更內容
 
-**核心原則**：
-1. ❌ **絕對禁止**直接執行 `supabase db reset` 或 `pnpm db:reset`
-2. ✅ **必須先詢問**使用者，並提供保留資料的替代方案
-3. ✅ **必須說明風險**，讓使用者做出明智決定
-4. ✅ **執行前備份**，除非使用者明確拒絕
+**允許的操作**:
+- ✅ `supabase migration new <name>` - 建立新 Migration
+- ✅ `pnpm db:migrate` / `supabase db push` - 推送 Migration（執行前必須備份）
+- ✅ `supabase migration list` - 查看 Migration 狀態
+- ✅ `pnpm db:diff` - 檢查資料庫差異
 
-詳見：`.claude/skills/supabase-manager.md`
+詳見：[資料庫安全協議](docs/DATABASE_SAFETY_PROTOCOL.md)
 
 ---
 
@@ -553,11 +554,11 @@ const value = await prompt({
 
 ## 重要提醒
 
-### 🚀 Migration 工作流程（日常開發必讀）⭐
+### 🚀 Migration 工作流程（生產環境）⭐
 
-**本專案已改用 Supabase 官方推薦的增量式 Migration 工作流程**
+**⚠️ 重要：本專案使用線上 Supabase 生產資料庫，所有操作必須謹慎執行**
 
-#### ✅ 日常開發標準流程（保留資料）
+#### ✅ 標準 Migration 流程（生產環境）
 
 ```bash
 # 1. 建立新 Migration
@@ -566,82 +567,64 @@ supabase migration new add_feature_name
 # 2. 編輯 Migration 檔案
 # 檔案位置: supabase/migrations/YYYYMMDD_add_feature_name.sql
 
-# 3. 套用 Migration（保留現有資料）⭐ 推薦
+# 3. 推送到生產環境（會直接影響線上資料）⭐
 pnpm db:migrate
-
-# 或使用 Supabase CLI 直接執行
-supabase db push --local
+# 或
+supabase db push
 ```
 
-**為什麼推薦使用 `pnpm db:migrate`？**
-- ✅ **保留所有測試資料**（訂單、商品、客戶）
-- ✅ **僅套用新的 Migration**（增量更新）
-- ✅ **官方推薦做法**（Supabase 標準流程）
-- ✅ **適合日常開發**（每天多次使用）
-
-#### ⚠️ 何時使用 `pnpm db:reset`（清空資料）
-
-```bash
-# 警告：此操作會清空所有資料！
-pnpm db:reset
-```
-
-**僅在以下情況使用**:
-- 需要全新的資料庫環境
-- 測試資料已污染
-- 測試完整 Migration 流程
-- **必須先詢問使用者同意**
+**🛡️ 生產環境操作注意事項**:
+- ⚠️ **每次 Migration 都會直接影響線上資料庫**
+- ✅ **執行前必須備份**（使用雲端備份系統）
+- ✅ **必須先在測試分支驗證**
+- ✅ **增量式更新**（避免破壞性變更）
+- ❌ **絕對禁止**使用 `supabase db reset` 或 `pnpm db:reset`
 
 #### 📚 完整文件
 
-- 📖 **Migration 工作流程指南**: [`docs/MIGRATION_WORKFLOW.md`](docs/MIGRATION_WORKFLOW.md) - 詳細的工作流程說明
-- 🔍 **官方研究報告**: [`docs/SUPABASE_MIGRATION_RESEARCH.md`](docs/SUPABASE_MIGRATION_RESEARCH.md) - Supabase 官方最佳實踐
-- 📋 **決策樹**: [`docs/MIGRATION_DECISION_TREE.md`](docs/MIGRATION_DECISION_TREE.md) - 快速選擇正確工具
-- 🔧 **系統分析**: [`docs/VSALE_MIGRATION_SYSTEM_ANALYSIS.md`](docs/VSALE_MIGRATION_SYSTEM_ANALYSIS.md) - 專案 Migration 基礎設施
+- 📖 **安全 Migration 指南**: [`docs/SAFE_MIGRATION_GUIDE.md`](docs/SAFE_MIGRATION_GUIDE.md) - 生產環境操作規範
+- 🚀 **快速參考**: [`docs/BACKUP_RESTORE_CHEATSHEET.md`](docs/BACKUP_RESTORE_CHEATSHEET.md) - 備份與回滾指令
+- ⚡ **安全協議**: [`docs/DATABASE_SAFETY_PROTOCOL.md`](docs/DATABASE_SAFETY_PROTOCOL.md) - 資料庫安全最高指導原則
 
 ---
 
-### ⚠️ 資料庫安全最高指導原則
+### ⚠️ 資料庫安全最高指導原則（生產環境）
 
-**🛡️ 絕對禁止在遠端/生產環境執行 `supabase db reset`**
+**🛡️ 專案使用線上 Supabase 生產資料庫，所有操作必須極度謹慎**
 
-此指令會**清除所有資料庫資料**。若需要更新資料庫結構，必須嚴格遵守以下流程：
+**絕對禁止的操作**:
+- ❌ **嚴格禁止**: `supabase db reset`（會清空所有生產資料）
+- ❌ **嚴格禁止**: `pnpm db:reset`（會清空所有生產資料）
+- ❌ **嚴格禁止**: 任何包含 `DROP TABLE`、`TRUNCATE` 的 Migration
 
-**標準開發流程（SOP）**:
-1. **本機優先**: 確保本機 Supabase 正在執行（`supabase start`），先在本機環境測試
-2. **生成遷移**: 執行 `supabase migration new <描述性名稱>` 或使用安全腳本 `.\scripts\safe-migration.ps1 -Name "add_feature"`
-3. **編輯 SQL**: 編輯生成的 Migration 檔案，檢查是否有意外的 `DROP` 指令
-4. **安全部署**: 使用 `pnpm db:migrate` 或 `supabase db push --local` 推送變更（**保留現有資料**）
-5. **本機開發禁令**: **絕對禁止**使用 `supabase db reset`，除非獲得使用者明確同意
+**標準開發流程（生產環境 SOP）**:
+1. **建立 Migration**: 執行 `supabase migration new <描述性名稱>`
+2. **編輯 SQL**: 編輯生成的 Migration 檔案
+   - ✅ 優先使用 `ADD COLUMN`、`CREATE TABLE`、`CREATE INDEX`
+   - ⚠️ 避免 `DROP COLUMN`、`DROP TABLE`（先重新命名，保留 30 天）
+   - 🔍 檢查是否有意外的破壞性變更
+3. **執行前備份**: 使用雲端備份系統手動備份（後台系統設定頁面）
+4. **推送到生產**: 使用 `pnpm db:migrate` 或 `supabase db push`
+5. **驗證結果**: 確認 Migration 成功且資料完整
 
-**🚨 重要：本機開發資料保護**:
-- ❌ **絕對禁止**: 在本機環境執行 `supabase db reset`（會清空測試資料）
-- ✅ **必須使用**: `pnpm db:migrate` 或 `supabase db push --local` 推送 Migration（保留現有資料）
-- ⚠️ **例外情況**: 若必須重置，**必須先詢問使用者**並獲得明確同意
-- 📝 **使用者測試資料**: 使用者在測試過程中會建立資料（訂單、商品、客戶），這些資料必須被保留
-
-**指令管控**:
-- ✅ **推薦使用**（日常開發）:
-  - `pnpm db:migrate` - 套用新 Migration（保留資料）⭐ **首選**
-  - `pnpm db:migrate:preview` - 預覽將套用的 Migration
+**指令管控（生產環境）**:
+- ✅ **允許使用**:
+  - `pnpm db:migrate` - 推送 Migration 到生產環境 ⭐
+  - `supabase db push` - 推送 Migration 到生產環境
   - `supabase migration new <name>` - 建立新 Migration
-  - `.\scripts\safe-migration.ps1` - 安全 Migration 輔助腳本
-- ⚠️ **謹慎使用**（清空資料）:
-  - `pnpm db:reset` - 完全重建資料庫 - **必須先詢問使用者同意**
-- ❌ **嚴格禁止**:
-  - 在遠端/生產環境執行任何重置指令
-  - 未經使用者同意在本機執行 `supabase db reset` 或 `pnpm db:reset`
+  - `supabase migration list` - 查看 Migration 狀態
+- ❌ **絕對禁止**:
+  - `pnpm db:reset` - 會清空所有生產資料
+  - `supabase db reset` - 會清空所有生產資料
 
-**四層安全機制**:
-1. **預防層**: Migration 流程 + 增量式更新 + Git Pre-commit Hook
-2. **提示層**: Pre-DB-Reset Hook (需雙重確認)
-3. **檢查層**: 部署前檢查清單（6 Phase） + 自動備份腳本
-4. **回滾層**: 完整備份（pg_dump） + 回滾程序
+**三層安全防護**:
+1. **預防層**: 使用增量式 Migration + 避免破壞性變更
+2. **備份層**: 雲端自動備份（每日 02:00）+ 手動備份
+3. **回滾層**: 完整備份檔案（保留最近 10 個）
 
 📖 **完整安全指南**: [docs/SAFE_MIGRATION_GUIDE.md](docs/SAFE_MIGRATION_GUIDE.md)
 🚀 **快速參考**: [docs/BACKUP_RESTORE_CHEATSHEET.md](docs/BACKUP_RESTORE_CHEATSHEET.md)
-⚡ **協議全文**: [docs/DATABASE_SAFETY_PROTOCOL.md](docs/DATABASE_SAFETY_PROTOCOL.md)
-🛠️ **安全腳本**: `.\scripts\safe-migration.ps1` - 增量式 Migration 工作流程
+⚡ **安全協議**: [docs/DATABASE_SAFETY_PROTOCOL.md](docs/DATABASE_SAFETY_PROTOCOL.md)
 
 ---
 
@@ -683,55 +666,61 @@ pnpm test             # 執行所有測試 (Vitest)
 pnpm test:ui          # 啟動 Vitest UI 介面
 ```
 
-### Supabase CLI 管理
+### Supabase 生產環境管理
 
-**⚠️ 重要：專案已完全使用線上 Supabase 雲端資料庫**
+**⚠️ 重要：本專案使用線上 Supabase 生產資料庫**
 
-專案配置為使用**線上 Supabase 生產環境**，所有開發與測試均在雲端進行。
+專案配置為**線上 Supabase 生產環境**，所有操作會直接影響生產資料。
 
 ---
 
-#### 雲端資料庫管理（生產環境）✅ 當前使用
+#### 生產環境資訊
 
-**環境資訊**:
-- Supabase Dashboard: https://supabase.com/dashboard/project/qwovavytryvgchcowjof
+**Supabase 專案**:
+- Dashboard: https://supabase.com/dashboard/project/qwovavytryvgchcowjof
 - API URL: https://qwovavytryvgchcowjof.supabase.co
-- 區域: AWS ap-southeast-1
+- 區域: AWS ap-southeast-1 (新加坡)
 - 專案 ID: `qwovavytryvgchcowjof`
 
 **環境變數** (`.env.local`):
-- ✅ 已永久設定為線上 Supabase
-- `NEXT_PUBLIC_SUPABASE_URL`: 雲端 API URL
+- `NEXT_PUBLIC_SUPABASE_URL`: 生產環境 API URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 公開金鑰
 - `SUPABASE_SERVICE_ROLE_KEY`: 服務金鑰（Admin 權限）
 
 ---
 
-#### Migration 管理
+#### Migration 管理（生產環境）
 
-**⚠️ Migration 安全提醒**:
+**⚠️ 生產環境 Migration 安全提醒**:
+- **每次 Migration 都會直接影響生產資料**
 - 新增 Migration 前**必須**參考 [安全 Migration 指南](docs/SAFE_MIGRATION_GUIDE.md)
 - 使用 [Migration 範本](supabase/migrations/_TEMPLATE_safe_migration.sql) 確保正確格式
-- 部署前使用 [檢查清單](supabase/migrations/_CHECKLIST.md) 逐項驗證
-- **絕對禁止**在生產環境執行 `supabase db reset`
+- 執行前使用 [檢查清單](supabase/migrations/_CHECKLIST.md) 逐項驗證
+- **絕對禁止**執行 `supabase db reset` 或 `pnpm db:reset`
 
 ```bash
-# 推送 Migration 到雲端（生產環境）
+# 建立新 Migration
+supabase migration new <name>
+
+# 推送到生產環境（謹慎執行）
 pnpm db:migrate
 # 或
 supabase db push
 
-# 新增 Migration
-supabase migration new <name>
-
 # 查看 Migration 狀態
 supabase migration list
 
-# 查看資料庫差異
+# 查看資料庫差異（執行前檢查）
 pnpm db:diff
 # 或
 supabase db diff
 ```
+
+**執行前檢查清單**:
+- [ ] 已手動備份資料庫（後台系統設定 > 資料庫備份）
+- [ ] 已確認 Migration SQL 無破壞性變更
+- [ ] 已使用 `pnpm db:diff` 檢查差異
+- [ ] 已在測試分支驗證
 
 **Migration 檔案架構** (2026-01-07 整合後):
 
