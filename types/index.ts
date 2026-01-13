@@ -656,6 +656,8 @@ export interface ImageCarouselConfig {
   images: Array<{
     url: string                  // 圖片 URL（Supabase Storage 公開 URL）
     series_id?: string | null    // 可選：連結到系列頁面的 UUID
+    width?: number               // 可選：圖片原始寬度（px）
+    height?: number              // 可選：圖片原始高度（px）
   }>
   auto_play: boolean             // 是否自動播放
   interval_ms: number            // 輪播間隔（毫秒，最小 1000ms）

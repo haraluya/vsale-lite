@@ -4,7 +4,7 @@
  *
  * 商品展示區塊元件
  * - 呼叫 Server Action 查詢商品
- * - 響應式網格（手機 2 列 / 桌面 3 列）
+ * - 單排橫向滾動（手機 160px / 桌面 200px 固定寬度）
  * - 水平滑動支援（CSS scroll-snap）
  * - 滑動提示（商品數量過多時顯示）
  * - 整合等級價格
@@ -63,7 +63,7 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
   }, [config])
 
   // 計算是否顯示滑動提示
-  const showScrollHint = products.length > 6 // 手機一排 2 個，超過 3 排顯示提示
+  const showScrollHint = products.length > 3 // 單排橫向滾動，超過 3 個商品顯示提示
 
   if (isLoading) {
     return (
@@ -91,20 +91,24 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
 
   return (
     <div className="w-full">
-      {/* 商品網格 */}
+      {/* 商品橫向滾動容器 */}
       <div
         className={cn(
-          'grid gap-4 md:gap-6',
-          'grid-cols-2 md:grid-cols-3',
+          'flex gap-4 md:gap-6',
           'overflow-x-auto',
           'snap-x snap-mandatory',
-          'scrollbar-hide' // 隱藏滾動條（需要在 globals.css 中定義）
+          'scrollbar-hide', // 隱藏滾動條（需要在 globals.css 中定義）
+          'pb-2' // 底部留白避免卡片陰影被截斷
         )}
       >
         {products.map((product) => (
           <div
             key={product.id}
-            className="snap-start"
+            className={cn(
+              'snap-start',
+              'flex-shrink-0', // 防止卡片被壓縮
+              'w-[160px] md:w-[200px]' // 固定卡片寬度（手機 160px / 桌面 200px）
+            )}
           >
             <ProductWithPriceCard
               product={product}

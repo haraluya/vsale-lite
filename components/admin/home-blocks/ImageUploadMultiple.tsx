@@ -7,20 +7,20 @@ import { designTokens } from '@/lib/design-tokens'
 import { uploadBlockImage } from '@/lib/actions/home-blocks'
 import { deleteBlockImages } from '@/lib/utils/block-image-cleanup'
 import { getActiveSeries } from '@/lib/actions/shop'
-import type { Series } from '@/types'
+import type { Series, ImageCarouselConfig } from '@/types'
 import { useAlert } from '@/lib/contexts/dialog-context'
 
 interface ImageUploadMultipleProps {
   blockId: string | null // 新建時為 null
-  images: Array<{ url: string; series_id?: string | null }>
-  onChange: (images: Array<{ url: string; series_id?: string | null }>) => void
+  images: ImageCarouselConfig['images']
+  onChange: (images: ImageCarouselConfig['images']) => void
 }
 
 /**
  * 多圖片上傳元件
  * 支援最多 5 張圖片，每張圖片可選擇性設定系列連結
  */
-export function ImageUploadMultiple({ blockId, images, onChange }: ImageUploadMultipleProps) {
+export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUploadMultipleProps) {
   const alert = useAlert()
   const [uploading, setUploading] = useState<number | null>(null) // 正在上傳的圖片索引
   const [series, setSeries] = useState<Series[]>([])
@@ -73,6 +73,9 @@ export function ImageUploadMultiple({ blockId, images, onChange }: ImageUploadMu
 
     setUploading(index)
 
+    // 讀取圖片尺寸
+    const dimensions = await getImageDimensions(file)
+
     // 上傳圖片
     const result = await uploadBlockImage(blockId, index, file)
 
@@ -87,10 +90,35 @@ export function ImageUploadMultiple({ blockId, images, onChange }: ImageUploadMu
       return
     }
 
-    // 更新圖片列表
+    // 更新圖片列表（包含尺寸資訊）
     const newImages = [...images]
-    newImages[index] = { url: result.data!.url, series_id: null }
+    newImages[index] = {
+      url: result.data!.url,
+      series_id: null,
+      width: dimensions.width,
+      height: dimensions.height,
+    }
     onChange(newImages)
+  }
+
+  // 取得圖片尺寸
+  const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image()
+      const url = URL.createObjectURL(file)
+
+      img.onload = () => {
+        URL.revokeObjectURL(url)
+        resolve({ width: img.width, height: img.height })
+      }
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url)
+        reject(new Error('無法讀取圖片尺寸'))
+      }
+
+      img.src = url
+    })
   }
 
   // 處理圖片刪除
@@ -135,23 +163,31 @@ export function ImageUploadMultiple({ blockId, images, onChange }: ImageUploadMu
             `}
           >
             {/* 縮圖與刪除按鈕 */}
-            <div className="relative w-32 h-32 shrink-0">
-              <Image
-                src={image.url}
-                alt={`圖片 ${index + 1}`}
-                fill
-                className="object-cover border-2 border-black"
-              />
-              <button
-                type="button"
-                onClick={() => handleDelete(index)}
-                className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 border-2 border-black"
-              >
-                <X className="w-4 h-4" />
-              </button>
-              <div className="absolute bottom-0 left-0 right-0 bg-black text-white text-xs text-center py-1">
-                第 {index + 1} 張
+            <div className="relative w-32 shrink-0">
+              <div className="relative w-full aspect-square">
+                <Image
+                  src={image.url}
+                  alt={`圖片 ${index + 1}`}
+                  fill
+                  className="object-cover border-2 border-black"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleDelete(index)}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 border-2 border-black"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                <div className="absolute bottom-0 left-0 right-0 bg-black text-white text-xs text-center py-1">
+                  第 {index + 1} 張
+                </div>
               </div>
+              {/* 圖片尺寸資訊 */}
+              {(image as any).width && (image as any).height && (
+                <div className="mt-1 text-xs text-gray-600 text-center">
+                  {(image as any).width} × {(image as any).height} px
+                </div>
+              )}
             </div>
 
             {/* 系列連結設定 */}
