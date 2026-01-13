@@ -152,10 +152,6 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           </div>
         </div>
 
-        <p className="text-xs text-gray-600">
-          編號: {product.code}
-        </p>
-
         {/* 價格顯示 */}
         {displayPrice ? (
           <div className={cn(
