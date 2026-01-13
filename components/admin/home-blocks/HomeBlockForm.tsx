@@ -22,6 +22,7 @@ import { Loader2 } from 'lucide-react'
 interface HomeBlockFormProps {
   blockId?: string // 編輯模式時提供
   initialData?: HomePageBlock // 編輯模式時提供
+  presetType?: BlockType // 從對話框預設的類型（建立模式）
   onSuccess?: () => void
   onCancel?: () => void
 }
@@ -30,13 +31,15 @@ interface HomeBlockFormProps {
  * 首頁廣告區塊表單元件
  * 支援建立與編輯三種區塊類型：圖片輪播、商品展示、文字區塊
  */
-export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: HomeBlockFormProps) {
+export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onCancel }: HomeBlockFormProps) {
   const alert = useAlert()
   const confirm = useConfirm()
 
   // 表單狀態
   const [name, setName] = useState(initialData?.name || '')
-  const [blockType, setBlockType] = useState<BlockType>(initialData?.block_type || 'image_carousel')
+  const [blockType, setBlockType] = useState<BlockType>(
+    initialData?.block_type || presetType || 'image_carousel'
+  )
   const [isActive, setIsActive] = useState(initialData?.is_active ?? true)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -321,7 +324,7 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
         <BlockTypeSelector
           value={blockType}
           onChange={setBlockType}
-          disabled={!!blockId} // 編輯模式不可更改類型
+          disabled={!!blockId || !!presetType} // 編輯模式或預設類型時不可更改
         />
 
         {/* 是否啟用 */}

@@ -24,7 +24,7 @@ interface AnnouncementsPageProps {
 
 export default async function AnnouncementsPage({ searchParams }: AnnouncementsPageProps) {
   const resolvedParams = await searchParams
-  const tab = (resolvedParams?.tab as string) || 'products'
+  const tab = (resolvedParams?.tab as string) || 'home'
 
   // 僅在 products tab 時載入商品頁廣告
   let announcements: Array<any> = []
@@ -43,6 +43,17 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
 
       {/* Tab 切換器 */}
       <TabSwitcher />
+
+      {/* 首頁廣告 */}
+      {tab === 'home' && (
+        <>
+          <div>
+            <h2 className="text-2xl font-bold">首頁廣告</h2>
+            <p className="mt-1 text-gray-600">首頁上的廣告區塊（圖片輪播、商品展示、文字區塊）</p>
+          </div>
+          <HomeBlockList />
+        </>
+      )}
 
       {/* 商品頁廣告 */}
       {tab === 'products' && (
@@ -76,17 +87,6 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
           ) : (
             <AnnouncementListClient announcements={announcements} />
           )}
-        </>
-      )}
-
-      {/* 首頁廣告 */}
-      {tab === 'home' && (
-        <>
-          <div>
-            <h2 className="text-2xl font-bold">首頁廣告</h2>
-            <p className="mt-1 text-gray-600">首頁上的廣告區塊（圖片輪播、商品展示、文字區塊）</p>
-          </div>
-          <HomeBlockList />
         </>
       )}
     </div>

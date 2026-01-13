@@ -7,7 +7,7 @@ import { getAllHomeBlocks, getHomeBlockById, deleteHomeBlock, moveBlockUp, moveB
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { HomeBlockCard } from './HomeBlockCard'
 import { HomeBlockForm } from './HomeBlockForm'
-import { BlockTypeChoice } from './BlockTypeChoice'
+import { BlockTypeDialog } from './BlockTypeDialog'
 import type { HomePageBlock, BlockType } from '@/types'
 
 /**
@@ -59,8 +59,8 @@ export function HomeBlockList() {
     setShowForm(true)
   }
 
-  // 處理取消類型選擇
-  const handleTypeCancelChoice = () => {
+  // 處理關閉類型選擇對話框
+  const handleTypeDialogClose = () => {
     setShowTypeChoice(false)
   }
 
@@ -164,16 +164,6 @@ export function HomeBlockList() {
     )
   }
 
-  // 顯示類型選擇
-  if (showTypeChoice) {
-    return (
-      <BlockTypeChoice
-        onSelect={handleTypeSelect}
-        onCancel={handleTypeCancelChoice}
-      />
-    )
-  }
-
   // 顯示表單
   if (showForm) {
     return (
@@ -183,7 +173,8 @@ export function HomeBlockList() {
         </h2>
         <HomeBlockForm
           blockId={editingBlock?.id}
-          initialData={editingBlock || (selectedType ? { block_type: selectedType } as any : undefined)}
+          initialData={editingBlock || undefined}
+          presetType={selectedType || undefined}
           onSuccess={handleFormSuccess}
           onCancel={handleCancel}
         />
@@ -239,6 +230,13 @@ export function HomeBlockList() {
           ))}
         </div>
       )}
+
+      {/* 類型選擇對話框 */}
+      <BlockTypeDialog
+        open={showTypeChoice}
+        onClose={handleTypeDialogClose}
+        onSelect={handleTypeSelect}
+      />
     </div>
   )
 }
