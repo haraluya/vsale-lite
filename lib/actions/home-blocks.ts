@@ -197,8 +197,14 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
     const updates: Record<string, unknown> = {}
     if (validated.name !== undefined) updates.name = validated.name
     if (validated.block_type !== undefined) updates.block_type = validated.block_type
-    if (validated.config !== undefined) updates.config = validated.config
+    if (validated.config !== undefined) {
+      // 確保 config 是正確的 JSON 物件
+      updates.config = JSON.parse(JSON.stringify(validated.config))
+    }
     if (validated.is_active !== undefined) updates.is_active = validated.is_active
+
+    // 除錯：印出更新物件
+    console.log('🔍 準備更新的資料:', JSON.stringify(updates, null, 2))
 
     const { data, error } = await supabase
       .from('home_page_blocks')
@@ -206,6 +212,9 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
       .eq('id', validated.id)
       .select()
       .single()
+
+    // 除錯：印出資料庫回傳結果
+    console.log('📊 資料庫回傳:', JSON.stringify({ data, error }, null, 2))
 
     if (error) throw error
 

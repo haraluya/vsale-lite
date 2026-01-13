@@ -156,6 +156,10 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
       is_active: isActive,
     }
 
+    // 除錯：印出提交資料
+    console.log('📤 前端提交資料:', JSON.stringify(input, null, 2))
+    console.log('📤 config 型別:', typeof config, 'blockType:', blockType)
+
     if (blockId) {
       // 更新模式
       const validation = UpdateHomeBlockSchema.safeParse({ id: blockId, ...input })
@@ -194,6 +198,9 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
     const result = blockId
       ? await updateHomeBlock({ id: blockId, ...input })
       : await createHomeBlock(input)
+
+    // 除錯：印出 Server Action 回傳結果
+    console.log('📥 Server Action 回傳:', JSON.stringify(result, null, 2))
 
     setIsSubmitting(false)
 
