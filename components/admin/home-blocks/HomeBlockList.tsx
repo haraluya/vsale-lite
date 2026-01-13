@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
 import { designTokens } from '@/lib/design-tokens'
-import { getAllHomeBlocks, deleteHomeBlock, moveBlockUp, moveBlockDown } from '@/lib/actions/home-blocks'
+import { getAllHomeBlocks, getHomeBlockById, deleteHomeBlock, moveBlockUp, moveBlockDown } from '@/lib/actions/home-blocks'
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { HomeBlockCard } from './HomeBlockCard'
 import { HomeBlockForm } from './HomeBlockForm'
@@ -49,12 +49,21 @@ export function HomeBlockList() {
   }
 
   // 處理編輯
-  const handleEdit = (blockId: string) => {
-    const block = blocks.find((b) => b.id === blockId)
-    if (block) {
-      setEditingBlock(block)
-      setShowForm(true)
+  const handleEdit = async (blockId: string) => {
+    // 從資料庫重新取得最新資料，避免使用舊快照
+    const result = await getHomeBlockById(blockId)
+
+    if (!result.success || !result.data) {
+      await alert({
+        title: '載入失敗',
+        message: result.message || '無法載入區塊資料',
+        variant: 'error',
+      })
+      return
     }
+
+    setEditingBlock(result.data)
+    setShowForm(true)
   }
 
   // 處理刪除

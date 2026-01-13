@@ -174,13 +174,8 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
   try {
     await checkAuth('admin')
 
-    // 除錯：印出接收到的資料
-    console.log('📥 Server Action 接收到的資料:', JSON.stringify(input, null, 2))
-
     // Zod 驗證
     const validated = UpdateHomeBlockSchema.parse(input)
-
-    console.log('✅ Zod 驗證通過:', JSON.stringify(validated, null, 2))
 
     const supabase = await createClient()
 
@@ -205,16 +200,12 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
     if (validated.config !== undefined) updates.config = validated.config
     if (validated.is_active !== undefined) updates.is_active = validated.is_active
 
-    console.log('💾 準備更新到資料庫:', JSON.stringify(updates, null, 2))
-
     const { data, error } = await supabase
       .from('home_page_blocks')
       .update(updates)
       .eq('id', validated.id)
       .select()
       .single()
-
-    console.log('📊 資料庫回傳結果:', JSON.stringify({ data, error }, null, 2))
 
     if (error) throw error
 
