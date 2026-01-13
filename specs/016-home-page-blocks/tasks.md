@@ -8,18 +8,18 @@
 
 | Phase | Description | Tasks | Completed |
 |-------|-------------|-------|-----------|
-| **Phase 1** | Setup & Infrastructure | 6 | 0/6 |
-| **Phase 2** | Foundational (Blocking Prerequisites) | 8 | 0/8 |
-| **Phase 3** | US1 - 前台路由與導覽切換 | 7 | 0/7 |
-| **Phase 4** | US2 - 圖片輪播區塊 | 5 | 0/5 |
-| **Phase 5** | US3 - 商品展示區塊 | 5 | 0/5 |
-| **Phase 6** | US4 - 文字區塊 | 3 | 0/3 |
+| **Phase 1** | Setup & Infrastructure | 6 | 6/6 |
+| **Phase 2** | Foundational (Blocking Prerequisites) | 8 | 8/8 |
+| **Phase 3** | US1 - 前台路由與導覽切換 | 7 | 7/7 |
+| **Phase 4** | US2 - 圖片輪播區塊 | 5 | 5/5 |
+| **Phase 5** | US3 - 商品展示區塊 | 5 | 5/5 |
+| **Phase 6** | US4 - 文字區塊 | 3 | 3/3 |
 | **Phase 7** | US5 - 管理員建立與管理首頁廣告區塊 | 12 | 0/12 |
 | **Phase 8** | US6 - 管理員調整區塊排序 | 4 | 0/4 |
 | **Phase 9** | US7 - 圖片清理與資料一致性 | 7 | 0/7 |
 | **Phase 10** | US8 - 後台廣告管理整合與 Tab 切換 | 3 | 0/3 |
 | **Phase 11** | Polish & Quality Assurance | 8 | 0/8 |
-| **Total** | | **68** | **0/68** |
+| **Total** | | **68** | **34/68** |
 
 ---
 
@@ -31,12 +31,12 @@
 
 ### Tasks
 
-- [ ] T000 [CRITICAL] Execute Migration safety check: run `pnpm db:migrate:preview` to preview changes, confirm no destructive operations (DROP TABLE/COLUMN), and execute backup if in production environment (follows Database Safety Protocol from CLAUDE.md)
-- [ ] T001 Create database migration file at supabase/migrations/20260113_home_page_blocks.sql with table schema, indexes, triggers, RLS policies, and comments
-- [ ] T002 Execute database migration using pnpm db:migrate and verify table creation in Supabase dashboard (verify home_page_blocks table exists, RLS enabled, indexes created)
-- [ ] T003 [P] Update types/index.ts to add BlockType, ImageCarouselConfig, ProductDisplayConfig, TextBlockConfig, and HomePageBlock type definitions
-- [ ] T004 [P] Create lib/validations/home-block.schema.ts with Zod schemas for all three block types using discriminated union
-- [ ] T004a [P] Verify JSONB Config default values and NULL handling logic for all three block types (optional fields must use .optional() or .nullable(), required fields must have default values documented)
+- [X] T000 [CRITICAL] Execute Migration safety check: run `pnpm db:migrate:preview` to preview changes, confirm no destructive operations (DROP TABLE/COLUMN), and execute backup if in production environment (follows Database Safety Protocol from CLAUDE.md)
+- [X] T001 Create database migration file at supabase/migrations/20260113_home_page_blocks.sql with table schema, indexes, triggers, RLS policies, and comments
+- [X] T002 Execute database migration using pnpm db:migrate and verify table creation in Supabase dashboard (verify home_page_blocks table exists, RLS enabled, indexes created)
+- [X] T003 [P] Update types/index.ts to add BlockType, ImageCarouselConfig, ProductDisplayConfig, TextBlockConfig, and HomePageBlock type definitions
+- [X] T004 [P] Create lib/validations/home-block.schema.ts with Zod schemas for all three block types using discriminated union
+- [X] T004a [P] Verify JSONB Config default values and NULL handling logic for all three block types (optional fields must use .optional() or .nullable(), required fields must have default values documented)
 
 **Acceptance Criteria**:
 - ✅ home_page_blocks table exists with all columns and constraints
@@ -58,14 +58,14 @@
 
 ### Tasks
 
-- [ ] T005 Create lib/actions/home-blocks.ts with getActiveHomeBlocks() Server Action for frontend query (returns active blocks sorted by sort_order)
-- [ ] T006 [P] Implement getAllHomeBlocks() Server Action in lib/actions/home-blocks.ts for admin query (includes checkAuth('admin'))
-- [ ] T007 [P] Implement getHomeBlockById(blockId: string) Server Action in lib/actions/home-blocks.ts with admin permission check
-- [ ] T008 Implement createHomeBlock(input: CreateHomeBlockInput) Server Action in lib/actions/home-blocks.ts with Zod validation and revalidatePath
-- [ ] T009 Implement updateHomeBlock(input: UpdateHomeBlockInput) Server Action in lib/actions/home-blocks.ts with partial update support
-- [ ] T010 Implement deleteHomeBlock(blockId: string) Server Action in lib/actions/home-blocks.ts (image cleanup will be added in Phase 9)
-- [ ] T011 [P] Implement moveBlockUp(blockId: string) Server Action in lib/actions/home-blocks.ts to swap sort_order with previous block
-- [ ] T012 [P] Implement moveBlockDown(blockId: string) Server Action in lib/actions/home-blocks.ts to swap sort_order with next block
+- [X] T005 Create lib/actions/home-blocks.ts with getActiveHomeBlocks() Server Action for frontend query (returns active blocks sorted by sort_order)
+- [X] T006 [P] Implement getAllHomeBlocks() Server Action in lib/actions/home-blocks.ts for admin query (includes checkAuth('admin'))
+- [X] T007 [P] Implement getHomeBlockById(blockId: string) Server Action in lib/actions/home-blocks.ts with admin permission check
+- [X] T008 Implement createHomeBlock(input: CreateHomeBlockInput) Server Action in lib/actions/home-blocks.ts with Zod validation and revalidatePath
+- [X] T009 Implement updateHomeBlock(input: UpdateHomeBlockInput) Server Action in lib/actions/home-blocks.ts with partial update support
+- [X] T010 Implement deleteHomeBlock(blockId: string) Server Action in lib/actions/home-blocks.ts (image cleanup will be added in Phase 9)
+- [X] T011 [P] Implement moveBlockUp(blockId: string) Server Action in lib/actions/home-blocks.ts to swap sort_order with previous block
+- [X] T012 [P] Implement moveBlockDown(blockId: string) Server Action in lib/actions/home-blocks.ts to swap sort_order with next block
 
 **Acceptance Criteria**:
 - ✅ All Server Actions return ActionResult<T> format
@@ -88,13 +88,13 @@
 
 ### Tasks
 
-- [ ] T013 [US1] Create app/(shop)/store/home/page.tsx as homepage container (placeholder for blocks, will be populated in Phase 4-6)
-- [ ] T014 [US1] Create app/(shop)/store/products/page.tsx by moving existing /store/page.tsx content (series and product list)
-- [ ] T015 [US1] Update app/(shop)/store/page.tsx to redirect('/store/home') with permanent redirect (301 status code)
-- [ ] T016 [US1] Create components/shop/home-blocks/SegmentControl.tsx with two buttons ('首頁', '商品'), using usePathname() for active state highlighting
-- [ ] T017 [US1] Update SegmentControl.tsx to ensure touch target >= 44px x 44px with min-h-[44px] and Neo-Brutalism active state (green bg + shadow)
-- [ ] T018 [US1] Update app/(shop)/layout.tsx to add SegmentControl component and welcome message "{userName} 您好！會員等級: {tierName}"
-- [ ] T019 [US1] Test route redirection, segment control switching, and welcome message display across mobile and desktop viewports
+- [X] T013 [US1] Create app/(shop)/store/home/page.tsx as homepage container (placeholder for blocks, will be populated in Phase 4-6)
+- [X] T014 [US1] Create app/(shop)/store/products/page.tsx by moving existing /store/page.tsx content (series and product list)
+- [X] T015 [US1] Update app/(shop)/store/page.tsx to redirect('/store/home') with permanent redirect (301 status code)
+- [X] T016 [US1] Create components/shop/home-blocks/SegmentControl.tsx with two buttons ('首頁', '商品'), using usePathname() for active state highlighting
+- [X] T017 [US1] Update SegmentControl.tsx to ensure touch target >= 44px x 44px with min-h-[44px] and Neo-Brutalism active state (green bg + shadow)
+- [X] T018 [US1] Update app/(shop)/layout.tsx to add SegmentControl component and welcome message "{userName} 您好！會員等級: {tierName}"
+- [X] T019 [US1] Test route redirection, segment control switching, and welcome message display across mobile and desktop viewports
 
 **Acceptance Criteria**:
 - ✅ Accessing /store automatically redirects to /store/home
@@ -117,11 +117,11 @@
 
 ### Tasks
 
-- [ ] T020 [US2] Create components/shop/home-blocks/ImageCarousel.tsx with auto-play logic using useEffect and setInterval (default 5s interval)
-- [ ] T021 [US2] Implement manual switch with indicator dots in ImageCarousel.tsx (clicking dot switches image and resets auto-play timer)
-- [ ] T022 [US2] Add series link support in ImageCarousel.tsx (onClick redirects to /store/products/series/{seriesId} if series_id exists)
-- [ ] T023 [US2] Apply responsive image height in ImageCarousel.tsx (h-64 on mobile, h-96 on desktop) using Next.js Image with sizes attribute
-- [ ] T024 [US2] Apply Neo-Brutalism styling to ImageCarousel.tsx (border-2 md:border-3, shadow-neo-sm md:shadow-neo, rounded-none)
+- [X] T020 [US2] Create components/shop/home-blocks/ImageCarousel.tsx with auto-play logic using useEffect and setInterval (default 5s interval)
+- [X] T021 [US2] Implement manual switch with indicator dots in ImageCarousel.tsx (clicking dot switches image and resets auto-play timer)
+- [X] T022 [US2] Add series link support in ImageCarousel.tsx (onClick redirects to /store/products/series/{seriesId} if series_id exists)
+- [X] T023 [US2] Apply responsive image height in ImageCarousel.tsx (h-64 on mobile, h-96 on desktop) using Next.js Image with sizes attribute
+- [X] T024 [US2] Apply Neo-Brutalism styling to ImageCarousel.tsx (border-2 md:border-3, shadow-neo-sm md:shadow-neo, rounded-none)
 
 **Acceptance Criteria**:
 - ✅ Images auto-play with configurable interval (default 5 seconds)
@@ -145,11 +145,11 @@
 
 ### Tasks
 
-- [ ] T025 [US3] Implement getProductsByBlockConfig(config: ProductDisplayConfig) Server Action in lib/actions/home-blocks.ts with series and tag filtering (AND logic)
-- [ ] T026 [US3] Create components/shop/home-blocks/ProductDisplay.tsx calling getProductsByBlockConfig() and using ProductWithPriceCard component
-- [ ] T027 [US3] Implement responsive grid in ProductDisplay.tsx (grid-cols-2 on mobile, grid-cols-3 on desktop) with CSS scroll-snap for horizontal scrolling
-- [ ] T028 [US3] Add scroll hint "← 左右滑動查看更多 →" in ProductDisplay.tsx when products exceed one row (conditionally rendered)
-- [ ] T029 [US3] Integrate tier-based pricing in ProductDisplay.tsx by passing user tier to getProductsByBlockConfig() (shows "價格未設定" if no tier price)
+- [X] T025 [US3] Implement getProductsByBlockConfig(config: ProductDisplayConfig) Server Action in lib/actions/home-blocks.ts with series and tag filtering (AND logic)
+- [X] T026 [US3] Create components/shop/home-blocks/ProductDisplay.tsx calling getProductsByBlockConfig() and using ProductWithPriceCard component
+- [X] T027 [US3] Implement responsive grid in ProductDisplay.tsx (grid-cols-2 on mobile, grid-cols-3 on desktop) with CSS scroll-snap for horizontal scrolling
+- [X] T028 [US3] Add scroll hint "← 左右滑動查看更多 →" in ProductDisplay.tsx when products exceed one row (conditionally rendered)
+- [X] T029 [US3] Integrate tier-based pricing in ProductDisplay.tsx by passing user tier to getProductsByBlockConfig() (shows "價格未設定" if no tier price)
 
 **Acceptance Criteria**:
 - ✅ Product query filters by series_ids AND tag_ids correctly
@@ -173,9 +173,9 @@
 
 ### Tasks
 
-- [ ] T030 [US4] Create components/shop/home-blocks/TextBlock.tsx displaying config.content with dynamic font size and color
-- [ ] T031 [US4] Implement responsive width in TextBlock.tsx (w-full, padding adjusts to viewport) with Neo-Brutalism styling
-- [ ] T032 [US4] Add support for 7 font sizes (12px, 16px, 20px, 24px, 32px, 40px, 48px) using Tailwind text-* classes
+- [X] T030 [US4] Create components/shop/home-blocks/TextBlock.tsx displaying config.content with dynamic font size and color
+- [X] T031 [US4] Implement responsive width in TextBlock.tsx (w-full, padding adjusts to viewport) with Neo-Brutalism styling
+- [X] T032 [US4] Add support for 7 font sizes (12px, 16px, 20px, 24px, 32px, 40px, 48px) using Tailwind text-* classes
 
 **Acceptance Criteria**:
 - ✅ Text block displays custom content, font size, and color correctly
