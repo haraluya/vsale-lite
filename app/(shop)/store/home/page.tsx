@@ -31,34 +31,31 @@ export default async function HomePage() {
   const blocks = blocksResult.success && blocksResult.data ? blocksResult.data : []
 
   return (
-    <div className={cn(
-      "min-h-screen bg-background",
-      designTokens.spacing.page.padding
-    )}>
-      <div className={cn(
-        designTokens.container.default,
-        designTokens.spacing.page.gap
-      )}>
+    <div className="min-h-screen bg-background">
+      <div className="w-full space-y-6 md:space-y-8">
         {/* 首頁廣告區塊 */}
         {blocks.length === 0 ? (
           <div className={cn(
-            "rounded-none bg-white",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.spacing.card.padding,
+            designTokens.container.default,
+            designTokens.spacing.page.padding
           )}>
-            <h2 className={designTokens.typography.h2}>首頁廣告區塊</h2>
-            <p className="mt-2 text-gray-600">
-              目前沒有啟用的首頁廣告區塊
-            </p>
+            <div className={cn(
+              "rounded-none bg-white",
+              designTokens.neoBrutalism.border.full,
+              "border-black",
+              designTokens.neoBrutalism.shadow.full,
+              designTokens.spacing.card.padding,
+            )}>
+              <h2 className={designTokens.typography.h2}>首頁廣告區塊</h2>
+              <p className="mt-2 text-gray-600">
+                目前沒有啟用的首頁廣告區塊
+              </p>
+            </div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {blocks.map((block) => (
-              <BlockRenderer key={block.id} block={block} />
-            ))}
-          </div>
+          blocks.map((block) => (
+            <BlockRenderer key={block.id} block={block} />
+          ))
         )}
       </div>
     </div>

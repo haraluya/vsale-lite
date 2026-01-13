@@ -107,7 +107,7 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
             className={cn(
               'snap-start',
               'flex-shrink-0', // 防止卡片被壓縮
-              'w-[160px] md:w-[200px]' // 固定卡片寬度（手機 160px / 桌面 200px）
+              'w-[calc(50%-0.5rem)] md:w-[calc(20%-1.2rem)]' // 手機版一排 2 個（50% - gap/2），電腦版一排 5 個（20% - gap/1.25）
             )}
           >
             <ProductWithPriceCard

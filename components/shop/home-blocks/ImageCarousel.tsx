@@ -104,29 +104,32 @@ function ImageCarouselComponent({ config }: ImageCarouselProps) {
             <span className="text-4xl md:text-6xl">🖼️</span>
           </div>
         )}
-      </div>
 
-      {/* 指示器點（僅多張圖片時顯示） */}
-      {images.length > 1 && (
-        <div className="mt-3 md:mt-4 flex items-center justify-center gap-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => handleDotClick(index)}
-              className={cn(
-                'w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all',
-                'border-2 border-black',
-                currentIndex === index
-                  ? 'bg-black scale-125'
-                  : 'bg-white hover:bg-gray-200',
-                'focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2'
-              )}
-              aria-label={`跳至第 ${index + 1} 張圖片`}
-              aria-current={currentIndex === index}
-            />
-          ))}
-        </div>
-      )}
+        {/* 指示器點（在圖片內部底部中央，僅多張圖片時顯示） */}
+        {images.length > 1 && (
+          <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 z-10">
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={(e) => {
+                  e.stopPropagation() // 防止觸發圖片點擊事件
+                  handleDotClick(index)
+                }}
+                className={cn(
+                  'w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all',
+                  'border-2 border-white shadow-lg', // 白色邊框 + 陰影確保可見性
+                  currentIndex === index
+                    ? 'bg-white scale-125'
+                    : 'bg-black/50 hover:bg-black/70',
+                  'focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black/50'
+                )}
+                aria-label={`跳至第 ${index + 1} 張圖片`}
+                aria-current={currentIndex === index}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
