@@ -121,24 +121,32 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
     | ImageCarouselConfig
     | ProductDisplayConfig
     | TextBlockConfig => {
+    console.log('🔧 buildConfig 被呼叫，blockType:', blockType)
+
     if (blockType === 'image_carousel') {
-      return {
+      const config = {
         images: carouselImages,
         auto_play: autoPlay,
         interval_ms: intervalMs,
       }
+      console.log('🔧 回傳 image_carousel config:', config)
+      return config
     } else if (blockType === 'product_display') {
-      return {
+      const config = {
         series_ids: selectedSeriesIds.length > 0 ? selectedSeriesIds : null,
         tag_ids: selectedTagIds.length > 0 ? selectedTagIds : null,
         max_items: maxItems,
       }
+      console.log('🔧 回傳 product_display config:', config)
+      return config
     } else {
-      return {
+      const config = {
         content: textContent,
         font_size: fontSize,
         color: textColor,
       }
+      console.log('🔧 回傳 text_block config:', config)
+      return config
     }
   }
 
