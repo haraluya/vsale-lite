@@ -73,46 +73,62 @@ export async function getActiveSeries(category_id?: string): Promise<ActionResul
  * @param filters 篩選條件（選填）
  */
 export async function getSeriesProductsWithPrice(
-  series_id: string,
+  series_id: string | string[],
   filters?: {
     tags?: string[]
+    maxItems?: number
   }
 ): Promise<ActionResult<ProductWithPrice[]>> {
   try {
     const supabase = await createClient()
     const auth = await checkAuth() // 取得當前用戶與 tier_id
 
-    // 檢查系列是否存在且 active
-    const { data: series } = await supabase
-      .from('series')
-      .select('id, status')
-      .eq('id', series_id)
-      .single()
+    // 支援單一系列或多系列查詢
+    const seriesIds = Array.isArray(series_id) ? series_id : [series_id]
 
-    if (!series) {
-      return { success: false, message: '系列不存在' }
+    // 若指定系列，檢查系列是否都存在且 active（多系列查詢時跳過個別檢查）
+    if (seriesIds.length === 1) {
+      const { data: series } = await supabase
+        .from('series')
+        .select('id, status')
+        .eq('id', seriesIds[0])
+        .single()
+
+      if (!series) {
+        return { success: false, message: '系列不存在' }
+      }
+
+      if (series.status !== 'active') {
+        return { success: false, message: '系列已下架' }
+      }
     }
 
-    if (series.status !== 'active') {
-      return { success: false, message: '系列已下架' }
-    }
-
-    // 查詢該系列下所有 active 商品,並 LEFT JOIN tier_prices
+    // 查詢商品,並 LEFT JOIN tier_prices
     let query = supabase
       .from('products')
       .select(`
         *,
+        series:series_id(name, color),
         tier_prices!left (
           price
         )
       `)
-      .eq('series_id', series_id)
       .eq('status', 'active')
       .eq('tier_prices.tier_id', auth.tierId || '')
+
+    // 篩選系列（支援多系列）
+    if (seriesIds.length > 0) {
+      query = query.in('series_id', seriesIds)
+    }
 
     // 套用標籤篩選
     if (filters?.tags && filters.tags.length > 0) {
       query = query.overlaps('tags', filters.tags)
+    }
+
+    // 限制數量
+    if (filters?.maxItems) {
+      query = query.limit(filters.maxItems)
     }
 
     const { data, error } = await query
@@ -129,7 +145,10 @@ export async function getSeriesProductsWithPrice(
       return {
         ...product,
         user_price: tierPrice?.price ?? product.retail_price ?? null,
+        series_name: product.series?.name || null,
+        series_color: product.series?.color || null,
         tier_prices: undefined, // 移除 JOIN 資料
+        series: undefined, // 移除 JOIN 資料
       }
     })
 

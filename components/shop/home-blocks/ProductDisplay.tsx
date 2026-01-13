@@ -14,8 +14,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { getProductsByBlockConfig } from '@/lib/actions/home-blocks'
-import { getCurrentUser } from '@/lib/actions/shop'
+import { getSeriesProductsWithPrice, getCurrentUser } from '@/lib/actions/shop'
 import { ProductWithPriceCard } from '@/components/shop/product-with-price-card'
 import type { ProductDisplayConfig, ProductWithPrice } from '@/types'
 import { cn } from '@/lib/utils'
@@ -49,20 +48,25 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
 
         // 取得當前使用者等級
         const userResult = await getCurrentUser()
-        const tierId = userResult.success ? userResult.data?.tier_id || null : null
         const tierNameValue = userResult.success ? userResult.data?.tier_name || '訪客' : '訪客'
 
         setTierName(tierNameValue)
 
-        // 查詢商品
-        const result = await getProductsByBlockConfig(config, tierId)
+        // 查詢商品（使用與商品頁相同的 API）
+        const result = await getSeriesProductsWithPrice(
+          config.series_ids || [],
+          {
+            tags: config.tag_ids || undefined,
+            maxItems: config.max_items || undefined
+          }
+        )
 
         if (!result.success) {
           setError(result.message || '查詢商品失敗')
           return
         }
 
-        setProducts(result.data as ProductWithPrice[])
+        setProducts(result.data || [])
       } catch (err) {
         console.error('查詢商品失敗:', err)
         setError('查詢商品失敗')
