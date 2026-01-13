@@ -15,7 +15,7 @@ interface BlockRendererProps {
  *
  * 容器寬度策略：
  * - 所有區塊都使用 container.default (max-w-7xl) 與上方版面對齊
- * - 左右 padding 與頁面一致
+ * - 僅左右 padding，上下間距由父層的 space-y 控制
  */
 export function BlockRenderer({ block }: BlockRendererProps) {
   switch (block.block_type) {
@@ -23,7 +23,7 @@ export function BlockRenderer({ block }: BlockRendererProps) {
       return (
         <div className={cn(
           designTokens.container.default,
-          designTokens.spacing.page.padding
+          'px-4 md:px-6 lg:px-8'
         )}>
           <ImageCarousel config={block.config as ImageCarouselConfig} />
         </div>
@@ -33,7 +33,7 @@ export function BlockRenderer({ block }: BlockRendererProps) {
       return (
         <div className={cn(
           designTokens.container.default,
-          designTokens.spacing.page.padding
+          'px-4 md:px-6 lg:px-8'
         )}>
           <ProductDisplay config={block.config as ProductDisplayConfig} />
         </div>
@@ -43,7 +43,7 @@ export function BlockRenderer({ block }: BlockRendererProps) {
       return (
         <div className={cn(
           designTokens.container.default,
-          designTokens.spacing.page.padding
+          'px-4 md:px-6 lg:px-8'
         )}>
           <TextBlock config={block.config as TextBlockConfig} />
         </div>
@@ -53,7 +53,7 @@ export function BlockRenderer({ block }: BlockRendererProps) {
       return (
         <div className={cn(
           designTokens.container.default,
-          designTokens.spacing.page.padding
+          'px-4 md:px-6 lg:px-8'
         )}>
           <div className="p-6 bg-red-50 border-2 border-red-600 rounded-none">
             <p className="text-red-600 font-bold">
