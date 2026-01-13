@@ -375,9 +375,20 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
           <h3 className="font-bold text-lg">商品展示設定</h3>
 
           <div className="space-y-2">
-            <label className={`${designTokens.typography.label} text-foreground`}>
-              篩選系列（可選）
-            </label>
+            <div className="flex items-center justify-between">
+              <label className={`${designTokens.typography.label} text-foreground`}>
+                篩選系列（可選）
+              </label>
+              {selectedSeriesIds.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedSeriesIds([])}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium underline"
+                >
+                  清除選擇 ({selectedSeriesIds.length})
+                </button>
+              )}
+            </div>
             <select
               multiple
               value={selectedSeriesIds}
@@ -404,9 +415,20 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
           </div>
 
           <div className="space-y-2">
-            <label className={`${designTokens.typography.label} text-foreground`}>
-              篩選標籤（可選）
-            </label>
+            <div className="flex items-center justify-between">
+              <label className={`${designTokens.typography.label} text-foreground`}>
+                篩選標籤（可選）
+              </label>
+              {selectedTagIds.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedTagIds([])}
+                  className="text-xs text-blue-600 hover:text-blue-800 font-medium underline"
+                >
+                  清除選擇 ({selectedTagIds.length})
+                </button>
+              )}
+            </div>
             <select
               multiple
               value={selectedTagIds}

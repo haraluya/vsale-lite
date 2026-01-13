@@ -22,7 +22,7 @@ export const ImageCarouselConfigSchema = z.object({
 // 商品展示 Config Schema
 export const ProductDisplayConfigSchema = z.object({
   series_ids: z.array(z.string().uuid('系列 ID 格式不正確')).nullable().optional(),
-  tag_ids: z.array(z.string().uuid('標籤 ID 格式不正確')).nullable().optional(),
+  tag_ids: z.array(z.string().min(1, '標籤名稱不可為空')).nullable().optional(),
   max_items: z.number().int().min(1, '最少顯示 1 個商品').max(50, '最多顯示 50 個商品').nullable().optional().default(50),
 })
 
