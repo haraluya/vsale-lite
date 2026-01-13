@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Tags, Plus, Minus } from 'lucide-react'
 import { batchUpdateProductTags, getAvailableTags } from '@/lib/actions/tags'
+import { getProductsByIds } from '@/lib/actions/products'
 import { TagBadge } from '@/components/ui/tag-badge'
 
 /**
@@ -14,6 +15,7 @@ import { TagBadge } from '@/components/ui/tag-badge'
  * - 選擇多個商品
  * - 顯示操作結果
  * - Neo-Brutalism 設計風格
+ * - 移除模式：顯示所選商品的共同標籤
  */
 
 interface BatchTagManagerProps {
@@ -26,6 +28,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
   const [inputValue, setInputValue] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [availableTags, setAvailableTags] = useState<string[]>([])
+  const [commonTags, setCommonTags] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
 
@@ -39,6 +42,36 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
     }
     loadAvailableTags()
   }, [])
+
+  // 載入所選商品的共同標籤（用於移除模式）
+  useEffect(() => {
+    if (operation === 'remove' && selectedProductIds.length > 0) {
+      const loadCommonTags = async () => {
+        const result = await getProductsByIds(selectedProductIds)
+        if (result.success && result.data) {
+          // 計算共同標籤（所有商品都擁有的標籤）
+          const products = result.data
+          if (products.length === 0) {
+            setCommonTags([])
+            return
+          }
+
+          // 取第一個商品的標籤作為基礎
+          const firstProductTags = products[0].tags || []
+
+          // 篩選出所有商品都擁有的標籤
+          const common = firstProductTags.filter(tag =>
+            products.every(product => (product.tags || []).includes(tag))
+          )
+
+          setCommonTags(common)
+        }
+      }
+      loadCommonTags()
+    } else {
+      setCommonTags([])
+    }
+  }, [operation, selectedProductIds])
 
   // 過濾建議標籤
   const suggestedTags = availableTags
@@ -160,30 +193,77 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
         </div>
       </div>
 
+      {/* 移除模式：顯示共同標籤 */}
+      {operation === 'remove' && (
+        <div className="mb-4">
+          <label className="mb-2 block text-sm font-bold">
+            共同標籤（所有商品都擁有的標籤）
+          </label>
+          {commonTags.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {commonTags.map(tag => (
+                <button
+                  key={tag}
+                  onClick={() => {
+                    if (selectedTags.includes(tag)) {
+                      handleRemoveFromSelection(tag)
+                    } else {
+                      handleAddToSelection(tag)
+                    }
+                  }}
+                  className={`inline-flex items-center gap-1 rounded-none border-2 border-black px-3 py-2 font-medium shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none ${
+                    selectedTags.includes(tag)
+                      ? 'bg-red-100 border-red-600'
+                      : 'bg-white hover:bg-red-50'
+                  }`}
+                >
+                  <TagBadge tag={tag} size="sm" className="border-0" />
+                  {selectedTags.includes(tag) && (
+                    <span className="text-xs text-red-600">✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-4 text-center">
+              <p className="text-sm text-gray-600">
+                所選商品沒有共同標籤
+              </p>
+              <p className="mt-1 text-xs text-gray-500">
+                提示：你可以使用下方輸入框手動輸入要移除的標籤
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 已選擇的標籤 */}
       {selectedTags.length > 0 && (
         <div className="mb-4">
           <label className="mb-2 block text-sm font-bold">
-            已選擇標籤 ({selectedTags.length})
+            {operation === 'add' ? '將新增的標籤' : '將移除的標籤'} ({selectedTags.length})
           </label>
           <div className="flex flex-wrap gap-2">
             {selectedTags.map(tag => (
               <button
                 key={tag}
                 onClick={() => handleRemoveFromSelection(tag)}
-                className="group inline-flex items-center gap-1 rounded-none border-2 border-black bg-white px-3 py-1 shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:bg-red-50 hover:shadow-none"
+                className={`group inline-flex items-center gap-1 rounded-none border-2 border-black px-3 py-1 shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none ${
+                  operation === 'add' ? 'bg-white hover:bg-red-50' : 'bg-red-100 hover:bg-red-200'
+                }`}
               >
                 <TagBadge tag={tag} size="sm" className="border-0" />
-                <span className="text-xs text-gray-500 group-hover:text-red-600">×</span>
+                <span className={`text-xs ${operation === 'add' ? 'text-gray-500 group-hover:text-red-600' : 'text-red-600'}`}>×</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* 標籤輸入 */}
-      <div className="relative mb-4">
-        <label className="mb-2 block text-sm font-bold">選擇或輸入標籤</label>
+      {/* 標籤輸入（新增模式 or 移除模式備用） */}
+      {operation === 'add' && (
+        <div className="relative mb-4">
+          <label className="mb-2 block text-sm font-bold">選擇或輸入標籤</label>
         <div className="relative">
           <input
             type="text"
@@ -228,6 +308,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
           </div>
         )}
       </div>
+      )}
 
       {/* 執行按鈕 */}
       <div className="flex items-center justify-between border-t-2 border-gray-200 pt-4">
