@@ -61,3 +61,15 @@
     @apply focus:outline-none focus:ring-2 focus:ring-primary;
   }
 }
+
+@layer utilities {
+  /* 隱藏滾動條但保留滾動功能 */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
