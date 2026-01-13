@@ -4,10 +4,9 @@
  *
  * 商品展示區塊元件
  * - 呼叫 Server Action 查詢商品
- * - 單排橫向滾動（手機 160px / 桌面 200px 固定寬度）
- * - 水平滑動支援（CSS scroll-snap + 滑鼠拖曳）
- * - 左右箭頭導引（商品超過可視範圍時顯示）
- * - 滑動提示（商品數量過多時顯示）
+ * - 固定寬度網格（手機 160px / 桌面 200px，與商品頁一致）
+ * - 橫向滾動（隱藏滾動條）
+ * - 左右箭頭導引（商品超過可視範圍時顯示，縮小版避免遮擋）
  * - 整合等級價格
  */
 
@@ -34,11 +33,6 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [showLeftArrow, setShowLeftArrow] = useState(false)
   const [showRightArrow, setShowRightArrow] = useState(false)
-
-  // 滑鼠拖曳狀態
-  const [isDragging, setIsDragging] = useState(false)
-  const [startX, setStartX] = useState(0)
-  const [scrollLeft, setScrollLeft] = useState(0)
 
   useEffect(() => {
     async function fetchProducts() {
@@ -107,43 +101,20 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
     }
   }, [products])
 
-  // 滑鼠拖曳開始
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!scrollContainerRef.current) return
-
-    setIsDragging(true)
-    setStartX(e.pageX - scrollContainerRef.current.offsetLeft)
-    setScrollLeft(scrollContainerRef.current.scrollLeft)
-  }
-
-  // 滑鼠拖曳中
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !scrollContainerRef.current) return
-
-    e.preventDefault()
-    const x = e.pageX - scrollContainerRef.current.offsetLeft
-    const walk = (x - startX) * 2 // 拖曳速度倍率
-    scrollContainerRef.current.scrollLeft = scrollLeft - walk
-  }
-
-  // 滑鼠拖曳結束
-  const handleMouseUpOrLeave = () => {
-    setIsDragging(false)
-  }
-
-  // 箭頭點擊滾動
+  // 箭頭點擊滾動（滾動一個商品卡片的寬度 + gap）
   const handleScrollLeft = () => {
     if (!scrollContainerRef.current) return
-    scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' })
+    // 手機版 160px + 12px gap，桌面版 200px + 16px gap
+    const scrollAmount = window.innerWidth < 768 ? 172 : 216
+    scrollContainerRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
   }
 
   const handleScrollRight = () => {
     if (!scrollContainerRef.current) return
-    scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' })
+    // 手機版 160px + 12px gap，桌面版 200px + 16px gap
+    const scrollAmount = window.innerWidth < 768 ? 172 : 216
+    scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
   }
-
-  // 計算是否顯示滑動提示
-  const showScrollHint = products.length > 3 // 單排橫向滾動，超過 3 個商品顯示提示
 
   if (isLoading) {
     return (
@@ -171,17 +142,18 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
 
   return (
     <div className="w-full relative">
-      {/* 左箭頭 */}
+      {/* 左箭頭 - 縮小版 */}
       {showLeftArrow && (
         <button
           type="button"
           onClick={handleScrollLeft}
           className={cn(
             'absolute left-0 top-1/2 -translate-y-1/2 z-10',
-            'w-10 h-10 md:w-12 md:h-12',
-            'bg-white border-2 md:border-3 border-black',
-            'shadow-neo-sm md:shadow-neo',
-            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]',
+            'w-8 h-8 md:w-10 md:h-10', // 縮小尺寸
+            'bg-white/90 backdrop-blur-sm', // 半透明背景
+            'border-2 border-black',
+            'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]', // 縮小陰影
+            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
             'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
             'transition-all duration-100',
             'flex items-center justify-center',
@@ -189,21 +161,22 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
           )}
           aria-label="向左滑動"
         >
-          <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+          <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
         </button>
       )}
 
-      {/* 右箭頭 */}
+      {/* 右箭頭 - 縮小版 */}
       {showRightArrow && (
         <button
           type="button"
           onClick={handleScrollRight}
           className={cn(
             'absolute right-0 top-1/2 -translate-y-1/2 z-10',
-            'w-10 h-10 md:w-12 md:h-12',
-            'bg-white border-2 md:border-3 border-black',
-            'shadow-neo-sm md:shadow-neo',
-            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]',
+            'w-8 h-8 md:w-10 md:h-10', // 縮小尺寸
+            'bg-white/90 backdrop-blur-sm', // 半透明背景
+            'border-2 border-black',
+            'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]', // 縮小陰影
+            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
             'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
             'transition-all duration-100',
             'flex items-center justify-center',
@@ -211,52 +184,37 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
           )}
           aria-label="向右滑動"
         >
-          <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+          <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
         </button>
       )}
 
-      {/* 商品橫向滾動容器 */}
+      {/* 商品網格容器（橫向滾動，移除拖曳） */}
       <div
         ref={scrollContainerRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUpOrLeave}
-        onMouseLeave={handleMouseUpOrLeave}
         className={cn(
-          'flex gap-4 md:gap-6',
           'overflow-x-auto',
-          'snap-x snap-mandatory',
-          'scrollbar-hide', // 隱藏滾動條（需要在 globals.css 中定義）
+          'scrollbar-hide', // 隱藏滾動條
           'pb-2', // 底部留白避免卡片陰影被截斷
-          'px-12 md:px-14', // 左右留白避免箭頭遮擋商品
-          isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'
         )}
       >
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className={cn(
-              'snap-start',
-              'flex-shrink-0', // 防止卡片被壓縮
-              'w-[calc(50%-0.5rem)] md:w-[calc(20%-1.2rem)]' // 手機版一排 2 個（50% - gap/2），電腦版一排 5 個（20% - gap/1.25）
-            )}
-          >
-            <ProductWithPriceCard
-              product={product}
-              tierName={tierName}
-            />
-          </div>
-        ))}
-      </div>
-
-      {/* 滑動提示 */}
-      {showScrollHint && (
-        <div className="mt-4 md:mt-6 text-center">
-          <p className="text-xs md:text-sm text-gray-500">
-            ← 左右滑動查看更多 →
-          </p>
+        <div className={cn(
+          'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
+          'gap-3 md:gap-4',
+          'min-w-max' // 確保內容不會被壓縮
+        )}>
+          {products.map((product) => (
+            <div
+              key={product.id}
+              className="w-[160px] md:w-[200px]" // 固定寬度
+            >
+              <ProductWithPriceCard
+                product={product}
+                tierName={tierName}
+              />
+            </div>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }
