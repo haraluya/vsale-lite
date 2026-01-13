@@ -156,6 +156,9 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
       is_active: isActive,
     }
 
+    // 除錯：印出提交的資料
+    console.log('📤 提交的資料:', JSON.stringify(input, null, 2))
+
     if (blockId) {
       // 更新模式
       const validation = UpdateHomeBlockSchema.safeParse({ id: blockId, ...input })
