@@ -4,8 +4,8 @@
  *
  * 商品展示區塊元件
  * - 呼叫 Server Action 查詢商品
- * - 固定寬度網格（手機 160px / 桌面 200px，與商品頁一致）
- * - 橫向滾動（隱藏滾動條）
+ * - 響應式網格（2/3/4/5 列，與商品頁一致）
+ * - 橫向滾動（隱藏滾動條，百分比寬度）
  * - 左右箭頭導引（商品超過可視範圍時顯示，縮小版避免遮擋）
  * - 整合等級價格
  */
@@ -101,18 +101,16 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
     }
   }, [products])
 
-  // 箭頭點擊滾動（滾動一個商品卡片的寬度 + gap）
+  // 箭頭點擊滾動（滾動容器寬度的 50%）
   const handleScrollLeft = () => {
     if (!scrollContainerRef.current) return
-    // 手機版 160px + 12px gap，桌面版 200px + 16px gap
-    const scrollAmount = window.innerWidth < 768 ? 172 : 216
+    const scrollAmount = scrollContainerRef.current.clientWidth * 0.5
     scrollContainerRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' })
   }
 
   const handleScrollRight = () => {
     if (!scrollContainerRef.current) return
-    // 手機版 160px + 12px gap，桌面版 200px + 16px gap
-    const scrollAmount = window.innerWidth < 768 ? 172 : 216
+    const scrollAmount = scrollContainerRef.current.clientWidth * 0.5
     scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
   }
 
@@ -188,7 +186,7 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
         </button>
       )}
 
-      {/* 商品網格容器（橫向滾動，移除拖曳） */}
+      {/* 商品網格容器（橫向滾動） */}
       <div
         ref={scrollContainerRef}
         className={cn(
@@ -198,20 +196,15 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
         )}
       >
         <div className={cn(
-          'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
-          'gap-3 md:gap-4',
-          'min-w-max' // 確保內容不會被壓縮
+          'grid grid-flow-col auto-cols-[50%] md:auto-cols-[33.333%] lg:auto-cols-[25%] xl:auto-cols-[20%]',
+          'gap-3 md:gap-4'
         )}>
           {products.map((product) => (
-            <div
+            <ProductWithPriceCard
               key={product.id}
-              className="w-[160px] md:w-[200px]" // 固定寬度
-            >
-              <ProductWithPriceCard
-                product={product}
-                tierName={tierName}
-              />
-            </div>
+              product={product}
+              tierName={tierName}
+            />
           ))}
         </div>
       </div>
