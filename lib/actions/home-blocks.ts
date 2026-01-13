@@ -121,8 +121,14 @@ export async function createHomeBlock(input: CreateHomeBlockInput): Promise<Acti
   try {
     await checkAuth('admin')
 
+    // 除錯：印出原始輸入
+    console.log('🔍 Server Action 收到的原始輸入:', JSON.stringify(input, null, 2))
+
     // Zod 驗證
     const validated = CreateHomeBlockSchema.parse(input)
+
+    // 除錯：印出 Zod 驗證後的結果
+    console.log('✅ Zod 驗證通過，validated:', JSON.stringify(validated, null, 2))
 
     const supabase = await createClient()
 
@@ -182,8 +188,14 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
   try {
     await checkAuth('admin')
 
+    // 除錯：印出原始輸入
+    console.log('🔍 Server Action 收到的原始輸入:', JSON.stringify(input, null, 2))
+
     // Zod 驗證
     const validated = UpdateHomeBlockSchema.parse(input)
+
+    // 除錯：印出 Zod 驗證後的結果
+    console.log('✅ Zod 驗證通過，validated:', JSON.stringify(validated, null, 2))
 
     const supabase = await createClient()
 

@@ -116,6 +116,14 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
     fetchData()
   }, [])
 
+  // 除錯：監控 blockType 變化
+  useEffect(() => {
+    console.log('🔄 blockType 已變更:', blockType)
+    console.log('  - textContent:', textContent)
+    console.log('  - fontSize:', fontSize)
+    console.log('  - textColor:', textColor)
+  }, [blockType, textContent, fontSize, textColor])
+
   // 建構 Config 物件
   const buildConfig = ():
     | ImageCarouselConfig
@@ -153,6 +161,16 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
   // 處理表單提交
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // 除錯：印出當前所有狀態
+    console.log('📋 表單提交前的狀態:')
+    console.log('  - blockType:', blockType)
+    console.log('  - textContent:', textContent)
+    console.log('  - fontSize:', fontSize)
+    console.log('  - textColor:', textColor)
+    console.log('  - selectedSeriesIds:', selectedSeriesIds)
+    console.log('  - selectedTagIds:', selectedTagIds)
+    console.log('  - maxItems:', maxItems)
 
     const config = buildConfig()
 
