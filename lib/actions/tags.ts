@@ -157,16 +157,23 @@ export async function batchUpdateProductTags(
       }
     })
 
-    // 5. 批次更新
+    // 5. 批次更新（追蹤成功與失敗數量）
+    let successCount = 0
+    let failureCount = 0
+    const errors: string[] = []
+
     for (const update of updates) {
       const { error } = await adminClient
         .from('products')
-        .update({ tags: update.tags })
+        .update({ tags: update.tags, updated_at: new Date().toISOString() })
         .eq('id', update.id)
 
       if (error) {
         console.error(`Failed to update product ${update.id}:`, error)
-        // 繼續處理其他商品，不中斷整個批次操作
+        failureCount++
+        errors.push(`商品 ${update.id}: ${error.message}`)
+      } else {
+        successCount++
       }
     }
 
@@ -174,9 +181,22 @@ export async function batchUpdateProductTags(
     revalidatePath('/admin/products')
     revalidatePath('/store')
 
-    return {
-      success: true,
-      message: `成功更新 ${products.length} 個商品的標籤`,
+    // 7. 根據結果回傳適當訊息
+    if (failureCount === 0) {
+      return {
+        success: true,
+        message: `成功更新 ${successCount} 個商品的標籤`,
+      }
+    } else if (successCount === 0) {
+      return {
+        success: false,
+        message: `批次更新失敗：所有 ${failureCount} 個商品都更新失敗\n\n錯誤詳情：\n${errors.join('\n')}`,
+      }
+    } else {
+      return {
+        success: true, // 部分成功
+        message: `批次更新完成：成功 ${successCount} 個，失敗 ${failureCount} 個\n\n錯誤詳情：\n${errors.join('\n')}`,
+      }
     }
   } catch (error: unknown) {
     console.error('batchUpdateProductTags error:', error)

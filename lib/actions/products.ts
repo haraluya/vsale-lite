@@ -107,6 +107,7 @@ export async function getProducts(params?: {
       stock_status: item.stock_status,  // 🆕 Feature 003: 庫存狀態
       unit: item.unit,
       image_url: item.image_url,
+      tags: item.tags || [],  // 🆕 Feature 006: 商品標籤
       status: item.status,
       created_at: item.created_at,
       updated_at: item.updated_at,
@@ -156,6 +157,7 @@ export async function getProduct(id: string): Promise<Product | null> {
       stock_status: data.stock_status,  // 🆕 Feature 003: 庫存狀態
       unit: data.unit,
       image_url: data.image_url,
+      tags: data.tags || [],  // 🆕 Feature 006: 商品標籤
       status: data.status,
       created_at: data.created_at,
       updated_at: data.updated_at,
