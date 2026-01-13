@@ -12,7 +12,7 @@
 
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, memo } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import type { ImageCarouselConfig } from '@/types'
@@ -23,7 +23,7 @@ interface ImageCarouselProps {
   config: ImageCarouselConfig
 }
 
-export function ImageCarousel({ config }: ImageCarouselProps) {
+function ImageCarouselComponent({ config }: ImageCarouselProps) {
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
   const { images, auto_play, interval_ms } = config
@@ -130,3 +130,6 @@ export function ImageCarousel({ config }: ImageCarouselProps) {
     </div>
   )
 }
+
+// 使用 React.memo 優化效能，防止不必要的重新渲染
+export const ImageCarousel = memo(ImageCarouselComponent)

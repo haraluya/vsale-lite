@@ -14,12 +14,12 @@
 | **Phase 4** | US2 - 圖片輪播區塊 | 5 | 5/5 |
 | **Phase 5** | US3 - 商品展示區塊 | 5 | 5/5 |
 | **Phase 6** | US4 - 文字區塊 | 3 | 3/3 |
-| **Phase 7** | US5 - 管理員建立與管理首頁廣告區塊 | 12 | 0/12 |
-| **Phase 8** | US6 - 管理員調整區塊排序 | 4 | 0/4 |
-| **Phase 9** | US7 - 圖片清理與資料一致性 | 7 | 0/7 |
-| **Phase 10** | US8 - 後台廣告管理整合與 Tab 切換 | 3 | 0/3 |
-| **Phase 11** | Polish & Quality Assurance | 8 | 0/8 |
-| **Total** | | **68** | **34/68** |
+| **Phase 7** | US5 - 管理員建立與管理首頁廣告區塊 | 12 | 12/12 |
+| **Phase 8** | US6 - 管理員調整區塊排序 | 4 | 4/4 |
+| **Phase 9** | US7 - 圖片清理與資料一致性 | 7 | 7/7 |
+| **Phase 10** | US8 - 後台廣告管理整合與 Tab 切換 | 3 | 3/3 |
+| **Phase 11** | Polish & Quality Assurance | 8 | 8/8 |
+| **Total** | | **68** | **68/68** |
 
 ---
 
@@ -198,18 +198,18 @@
 
 ### Tasks
 
-- [ ] T033 [US5] Create components/admin/home-blocks/BlockTypeSelector.tsx with dropdown for 3 block types (image_carousel, product_display, text_block)
-- [ ] T034 [US5] Create components/admin/home-blocks/ImageUploadMultiple.tsx supporting up to 5 images with preview and delete functionality
-- [ ] T035 [US5] Implement uploadBlockImage(blockId, index, file) Server Action in lib/actions/home-blocks.ts with file validation (JPG/PNG/WebP, max 5MB)
-- [ ] T036 [US5] Update uploadBlockImage() to delete old images at all extensions (.jpg/.png/.webp) before uploading new image
-- [ ] T037 [US5] Create components/admin/home-blocks/HomeBlockForm.tsx with block name, type selector, and is_active toggle
-- [ ] T038 [US5] Add conditional fields to HomeBlockForm.tsx for image_carousel type (ImageUploadMultiple, auto_play toggle, interval_ms input)
-- [ ] T039 [US5] Add conditional fields to HomeBlockForm.tsx for product_display type (series dropdown, tags dropdown, max_items input)
-- [ ] T040 [US5] Add conditional fields to HomeBlockForm.tsx for text_block type (content textarea, font_size dropdown, color picker)
-- [ ] T041 [US5] Implement form submission in HomeBlockForm.tsx calling createHomeBlock() or updateHomeBlock() with Zod validation and useConfirm for delete
-- [ ] T042 [US5] Create components/admin/home-blocks/HomeBlockCard.tsx displaying block thumbnail (first image for carousel), name, type, and edit/delete buttons
-- [ ] T043 [US5] Create components/admin/home-blocks/HomeBlockList.tsx calling getAllHomeBlocks() and rendering HomeBlockCard components with "新增區塊" button
-- [ ] T044 [US5] Test admin can create all 3 block types, edit parameters, upload images, and delete blocks with confirmation dialog
+- [X] T033 [US5] Create components/admin/home-blocks/BlockTypeSelector.tsx with dropdown for 3 block types (image_carousel, product_display, text_block)
+- [X] T034 [US5] Create components/admin/home-blocks/ImageUploadMultiple.tsx supporting up to 5 images with preview and delete functionality
+- [X] T035 [US5] Implement uploadBlockImage(blockId, index, file) Server Action in lib/actions/home-blocks.ts with file validation (JPG/PNG/WebP, max 5MB)
+- [X] T036 [US5] Update uploadBlockImage() to delete old images at all extensions (.jpg/.png/.webp) before uploading new image
+- [X] T037 [US5] Create components/admin/home-blocks/HomeBlockForm.tsx with block name, type selector, and is_active toggle
+- [X] T038 [US5] Add conditional fields to HomeBlockForm.tsx for image_carousel type (ImageUploadMultiple, auto_play toggle, interval_ms input)
+- [X] T039 [US5] Add conditional fields to HomeBlockForm.tsx for product_display type (series dropdown, tags dropdown, max_items input)
+- [X] T040 [US5] Add conditional fields to HomeBlockForm.tsx for text_block type (content textarea, font_size dropdown, color picker)
+- [X] T041 [US5] Implement form submission in HomeBlockForm.tsx calling createHomeBlock() or updateHomeBlock() with Zod validation and useConfirm for delete
+- [X] T042 [US5] Create components/admin/home-blocks/HomeBlockCard.tsx displaying block thumbnail (first image for carousel), name, type, and edit/delete buttons
+- [X] T043 [US5] Create components/admin/home-blocks/HomeBlockList.tsx calling getAllHomeBlocks() and rendering HomeBlockCard components with "新增區塊" button
+- [X] T044 [US5] Test admin can create all 3 block types, edit parameters, upload images, and delete blocks with confirmation dialog
 
 **Acceptance Criteria**:
 - ✅ Admin can select block type and see corresponding form fields
@@ -234,10 +234,10 @@
 
 ### Tasks
 
-- [ ] T045 [US6] Add "向上移動" and "向下移動" buttons to components/admin/home-blocks/HomeBlockCard.tsx
-- [ ] T046 [US6] Implement button click handlers in HomeBlockCard.tsx calling moveBlockUp() or moveBlockDown() Server Actions
-- [ ] T047 [US6] Disable "向上移動" button for first block and "向下移動" button for last block (gray color, cursor-not-allowed)
-- [ ] T048 [US6] Test sort order changes reflect immediately in admin list and frontend homepage after revalidation
+- [X] T045 [US6] Add "向上移動" and "向下移動" buttons to components/admin/home-blocks/HomeBlockCard.tsx
+- [X] T046 [US6] Implement button click handlers in HomeBlockCard.tsx calling moveBlockUp() or moveBlockDown() Server Actions
+- [X] T047 [US6] Disable "向上移動" button for first block and "向下移動" button for last block (gray color, cursor-not-allowed)
+- [X] T048 [US6] Test sort order changes reflect immediately in admin list and frontend homepage after revalidation
 
 **Acceptance Criteria**:
 - ✅ "向上移動" button swaps current block with previous block
@@ -260,13 +260,13 @@
 
 ### Tasks
 
-- [ ] T049 [US7] Create lib/utils/block-image-cleanup.ts with deleteBlockImages(blockId, scenario) function supporting 4 cleanup scenarios
-- [ ] T050 [US7] Implement Scenario 1 in deleteBlockImages(): delete entire block directory when deleting block (home-page-blocks/{blockId}/*)
-- [ ] T051 [US7] Implement Scenario 2 in deleteBlockImages(): delete specific index image when replacing (home-page-blocks/{blockId}/image-{index}.*)
-- [ ] T052 [US7] Implement Scenario 3 in deleteBlockImages(): delete excess images when reducing image count (delete image-{oldCount-1} to image-{newCount})
-- [ ] T053 [US7] Implement Scenario 4 in deleteBlockImages(): delete all images when changing block type from image_carousel to non-image type
-- [ ] T054 [US7] Add error tolerance to deleteBlockImages(): log warnings on failure but do not throw errors (prevent blocking main flow)
-- [ ] T054a [US7] Manually test image deletion failure scenarios (disconnect network during deletion, simulate permission error) and verify warning logs appear in console without blocking main operations
+- [X] T049 [US7] Create lib/utils/block-image-cleanup.ts with deleteBlockImages(blockId, scenario) function supporting 4 cleanup scenarios
+- [X] T050 [US7] Implement Scenario 1 in deleteBlockImages(): delete entire block directory when deleting block (home-page-blocks/{blockId}/*)
+- [X] T051 [US7] Implement Scenario 2 in deleteBlockImages(): delete specific index image when replacing (home-page-blocks/{blockId}/image-{index}.*)
+- [X] T052 [US7] Implement Scenario 3 in deleteBlockImages(): delete excess images when reducing image count (delete image-{oldCount-1} to image-{newCount})
+- [X] T053 [US7] Implement Scenario 4 in deleteBlockImages(): delete all images when changing block type from image_carousel to non-image type
+- [X] T054 [US7] Add error tolerance to deleteBlockImages(): log warnings on failure but do not throw errors (prevent blocking main flow)
+- [X] T054a [US7] Manually test image deletion failure scenarios (disconnect network during deletion, simulate permission error) and verify warning logs appear in console without blocking main operations
 
 **Acceptance Criteria**:
 - ✅ Deleting block removes all images from Storage
@@ -291,9 +291,9 @@
 
 ### Tasks
 
-- [ ] T055 [US8] Create components/admin/announcements/TabSwitcher.tsx with two tabs ('商品頁廣告', '首頁廣告') using URL query params ?tab=products|home
-- [ ] T056 [US8] Update app/(admin)/admin/announcements/page.tsx to integrate TabSwitcher and conditionally render announcement list or HomeBlockList based on tab
-- [ ] T057 [US8] Test tab switching preserves state, URL query params update correctly, and both features work independently
+- [X] T055 [US8] Create components/admin/announcements/TabSwitcher.tsx with two tabs ('商品頁廣告', '首頁廣告') using URL query params ?tab=products|home
+- [X] T056 [US8] Update app/(admin)/admin/announcements/page.tsx to integrate TabSwitcher and conditionally render announcement list or HomeBlockList based on tab
+- [X] T057 [US8] Test tab switching preserves state, URL query params update correctly, and both features work independently
 
 **Acceptance Criteria**:
 - ✅ Tab switcher displays "商品頁廣告" and "首頁廣告" tabs
@@ -312,14 +312,14 @@
 
 ### Tasks
 
-- [ ] T058 Create components/shop/home-blocks/BlockRenderer.tsx with switch statement rendering ImageCarousel, ProductDisplay, or TextBlock based on block_type
-- [ ] T059 Update app/(shop)/store/home/page.tsx to call getActiveHomeBlocks() and use BlockRenderer to render all blocks in sort_order
-- [ ] T060 Optimize ImageCarousel.tsx with React.memo() to prevent unnecessary re-renders
-- [ ] T061 Add priority attribute to Next.js Image in ImageCarousel.tsx for first image (above-the-fold optimization)
-- [ ] T062 [P] Add error handling to all Server Actions with try-catch blocks and meaningful error messages
-- [ ] T063 [P] Add loading states to admin forms using isSubmitting flag and disabled buttons during submission
-- [ ] T064 Run TypeScript type check (pnpm type-check) and ESLint (pnpm lint) ensuring 0 errors
-- [ ] T065 Update specs/016-home-page-blocks/quickstart.md with usage examples, troubleshooting, and best practices
+- [X] T058 Create components/shop/home-blocks/BlockRenderer.tsx with switch statement rendering ImageCarousel, ProductDisplay, or TextBlock based on block_type
+- [X] T059 Update app/(shop)/store/home/page.tsx to call getActiveHomeBlocks() and use BlockRenderer to render all blocks in sort_order
+- [X] T060 Optimize ImageCarousel.tsx with React.memo() to prevent unnecessary re-renders
+- [X] T061 Add priority attribute to Next.js Image in ImageCarousel.tsx for first image (above-the-fold optimization)
+- [X] T062 [P] Add error handling to all Server Actions with try-catch blocks and meaningful error messages
+- [X] T063 [P] Add loading states to admin forms using isSubmitting flag and disabled buttons during submission
+- [X] T064 Run TypeScript type check (pnpm type-check) and ESLint (pnpm lint) ensuring 0 errors
+- [X] T065 Update specs/016-home-page-blocks/quickstart.md with usage examples, troubleshooting, and best practices
 
 **Acceptance Criteria**:
 - ✅ Homepage loads in < 2 seconds on Mobile 4G

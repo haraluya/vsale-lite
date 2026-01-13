@@ -10,6 +10,7 @@ import {
   ProductDisplayConfigSchema,
   TextBlockConfigSchema,
 } from '@/lib/validations/home-block.schema'
+import { deleteBlockImages } from '@/lib/utils/block-image-cleanup'
 import type {
   ActionResult,
   HomePageBlock,
@@ -178,6 +179,20 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
 
     const supabase = await createClient()
 
+    // 檢查 block_type 是否變更（用於圖片清理）
+    if (validated.block_type !== undefined) {
+      const { data: oldBlock } = await supabase
+        .from('home_page_blocks')
+        .select('block_type')
+        .eq('id', validated.id)
+        .single()
+
+      // 若從 image_carousel 變更為其他類型，刪除所有圖片
+      if (oldBlock && oldBlock.block_type === 'image_carousel' && validated.block_type !== 'image_carousel') {
+        await deleteBlockImages(validated.id, 'change_type')
+      }
+    }
+
     // 建立部分更新物件
     const updates: Record<string, unknown> = {}
     if (validated.name !== undefined) updates.name = validated.name
@@ -213,7 +228,7 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
 
 /**
  * 刪除首頁廣告區塊（後台）
- * 注意：圖片清理將在 Phase 9 實作
+ * 自動清理 Supabase Storage 中的所有圖片
  */
 export async function deleteHomeBlock(blockId: string): Promise<ActionResult<void>> {
   try {
@@ -221,6 +236,10 @@ export async function deleteHomeBlock(blockId: string): Promise<ActionResult<voi
 
     const supabase = await createClient()
 
+    // 先刪除圖片（容錯機制，不阻斷主流程）
+    await deleteBlockImages(blockId, 'delete_block')
+
+    // 刪除資料庫記錄
     const { error } = await supabase.from('home_page_blocks').delete().eq('id', blockId)
 
     if (error) throw error
@@ -437,6 +456,91 @@ export async function getProductsByBlockConfig(
     return {
       success: false,
       message: '查詢商品失敗',
+    }
+  }
+}
+
+// ===================================
+// 圖片上傳 Server Action (Phase 7)
+// ===================================
+
+/**
+ * 上傳區塊圖片到 Supabase Storage
+ * @param blockId 區塊 ID
+ * @param index 圖片索引（0-4）
+ * @param file 圖片檔案
+ * @returns 公開 URL
+ */
+export async function uploadBlockImage(
+  blockId: string,
+  index: number,
+  file: File
+): Promise<ActionResult<{ url: string }>> {
+  try {
+    await checkAuth('admin')
+
+    // 1. 檔案驗證
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      return {
+        success: false,
+        message: '僅支援 JPG、PNG、WebP 格式',
+      }
+    }
+
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      return {
+        success: false,
+        message: '檔案大小不可超過 5MB',
+      }
+    }
+
+    const supabase = await createClient()
+
+    // 2. 刪除舊圖片（所有可能的副檔名）
+    const extensions = ['jpg', 'png', 'webp']
+    const deletePromises = extensions.map((ext) => {
+      const oldPath = `home-page-blocks/${blockId}/image-${index}.${ext}`
+      return supabase.storage.from('products').remove([oldPath])
+    })
+
+    // 執行所有刪除操作（不關心是否成功，因為檔案可能不存在）
+    await Promise.allSettled(deletePromises)
+
+    // 3. 上傳新圖片
+    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const fileName = `image-${index}.${fileExt}`
+    const filePath = `home-page-blocks/${blockId}/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('products')
+      .upload(filePath, file, {
+        upsert: true, // 覆寫模式
+        contentType: file.type,
+      })
+
+    if (uploadError) {
+      console.error('上傳圖片失敗:', uploadError)
+      return {
+        success: false,
+        message: `上傳失敗: ${uploadError.message}`,
+      }
+    }
+
+    // 4. 取得公開 URL
+    const { data: publicUrlData } = supabase.storage.from('products').getPublicUrl(filePath)
+
+    return {
+      success: true,
+      data: { url: publicUrlData.publicUrl },
+      message: '圖片上傳成功',
+    }
+  } catch (error) {
+    console.error('上傳區塊圖片失敗:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '上傳區塊圖片失敗',
     }
   }
 }
