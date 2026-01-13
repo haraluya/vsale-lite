@@ -400,20 +400,14 @@ export async function getProductsByBlockConfig(
   try {
     const supabase = await createClient()
 
-    // 查詢商品並 JOIN 等級價格
+    // 查詢商品（先查詢商品，再查詢等級價格）
     let query = supabase
       .from('products')
       .select(`
         *,
-        series:series_id(name, color),
-        tier_prices!inner(price)
+        series:series_id(name, color)
       `)
       .eq('status', 'active')
-
-    // 若有 tier_id，查詢該等級價格
-    if (tierId) {
-      query = query.eq('tier_prices.tier_id', tierId)
-    }
 
     // 篩選系列（AND 邏輯）
     if (config.series_ids && config.series_ids.length > 0) {
@@ -432,13 +426,45 @@ export async function getProductsByBlockConfig(
     const maxItems = config.max_items ?? 50
     query = query.limit(maxItems)
 
-    const { data, error } = await query
+    const { data: products, error } = await query
 
     if (error) throw error
 
+    // 如果沒有商品，直接回傳空陣列
+    if (!products || products.length === 0) {
+      return {
+        success: true,
+        data: [],
+      }
+    }
+
+    // 查詢等級價格（批次查詢）
+    const productIds = products.map((p) => p.id)
+    let pricesQuery = supabase
+      .from('tier_prices')
+      .select('product_id, price')
+      .in('product_id', productIds)
+
+    // 若有 tier_id，只查詢該等級價格
+    if (tierId) {
+      pricesQuery = pricesQuery.eq('tier_id', tierId)
+    }
+
+    const { data: tierPrices, error: priceError } = await pricesQuery
+
+    if (priceError) throw priceError
+
+    // 建立價格對照表
+    const priceMap = new Map<string, number>()
+    if (tierPrices) {
+      tierPrices.forEach((tp: any) => {
+        priceMap.set(tp.product_id, tp.price)
+      })
+    }
+
     // 轉換為 ProductWithPrice 格式
-    const products = (data || []).map((item: any) => {
-      const tierPrice = item.tier_prices?.[0]?.price ?? null
+    const productsWithPrice = products.map((item: any) => {
+      const tierPrice = priceMap.get(item.id) ?? null
       return {
         ...item,
         user_price: tierPrice,
@@ -449,7 +475,7 @@ export async function getProductsByBlockConfig(
 
     return {
       success: true,
-      data: products,
+      data: productsWithPrice,
     }
   } catch (error) {
     console.error('查詢商品失敗:', error)
