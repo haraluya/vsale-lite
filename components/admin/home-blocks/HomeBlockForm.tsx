@@ -77,17 +77,17 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
   // 文字區塊 Config
   const [textContent, setTextContent] = useState(
     initialData?.block_type === 'text_block'
-      ? (initialData.config as TextBlockConfig).content
+      ? ((initialData.config as TextBlockConfig).content || '')
       : ''
   )
   const [fontSize, setFontSize] = useState<'12' | '16' | '20' | '24' | '32' | '40' | '48'>(
     initialData?.block_type === 'text_block'
-      ? (initialData.config as TextBlockConfig).font_size
+      ? ((initialData.config as TextBlockConfig).font_size || '16')
       : '16'
   )
   const [textColor, setTextColor] = useState(
     initialData?.block_type === 'text_block'
-      ? (initialData.config as TextBlockConfig).color
+      ? ((initialData.config as TextBlockConfig).color || '#000000')
       : '#000000'
   )
 
