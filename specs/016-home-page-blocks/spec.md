@@ -153,11 +153,10 @@
 ## Functional Requirements *(mandatory)*
 
 ### FR1 - 前台路由架構
-1. **路由重構**: `/store` 自動導向 `/store/home`（永久重定向 301）
-2. **首頁路由**: `/store/home` 顯示廣告區塊容器
-3. **商品頁路由**: `/store/products` 顯示現有的系列與商品列表（移動現有 `/store/page.tsx` 內容）
-4. **Segment Control**: 前台 Layout 新增切換器，支援「首頁」與「商品」兩個按鈕，當前頁面高亮（綠色背景 + Neo-Brutalism 陰影）
-5. **歡迎字樣**: Segment Control 下方顯示「{用戶名} 您好！會員等級: {等級名稱}」
+1. **路由重構與重定向**: `/store` 自動導向 `/store/home`（永久重定向 HTTP 301），`/store/home` 顯示廣告區塊容器
+2. **商品頁路由**: `/store/products` 顯示現有的系列與商品列表（移動現有 `/store/page.tsx` 內容）
+3. **Segment Control**: 前台 Layout 新增切換器，支援「首頁」與「商品」兩個按鈕，當前頁面高亮（綠色背景 + Neo-Brutalism 陰影）
+4. **歡迎字樣**: Segment Control 下方顯示「{用戶名} 您好！會員等級: {等級名稱}」
 
 ### FR2 - 圖片輪播區塊前台顯示
 1. **自動播放**: 支援自動輪播（間隔可設定，預設 5 秒）
@@ -225,7 +224,9 @@
 
 1. **功能完整性**: 所有 User Story 的 Acceptance Scenarios 全部通過測試
 2. **響應式設計**: 手機版與桌面版的邊框、陰影、間距符合 Neo-Brutalism 規範
-3. **效能指標**: 首頁載入時間 < 2 秒（Mobile 4G），商品查詢時間 < 300ms
+3. **效能指標**:
+   - **首頁載入時間 < 2 秒**: 從 `/store/home` 導航開始到 FCP (First Contentful Paint)，使用 Chrome DevTools Lighthouse，模擬 4G Fast (4Mbps)
+   - **商品查詢時間 < 300ms**: 商品展示區塊的 `getProductsByBlockConfig()` Server Action 響應時間
 4. **圖片清理成功率**: 四種清理場景的成功率 > 95%（允許 5% 的網路錯誤容錯）
 5. **權限安全**: 非管理員無法訪問後台管理 API，客戶僅能查看啟用區塊
 6. **無障礙支援**: 所有按鈕提供 aria-label，觸控目標符合 WCAG 2.1 AA 標準（≥ 44px）
