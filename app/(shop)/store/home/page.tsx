@@ -32,7 +32,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="w-full space-y-6 md:space-y-8">
+      <div className="w-full space-y-3 md:space-y-4">
         {/* 首頁廣告區塊 */}
         {blocks.length === 0 ? (
           <div className={cn(
