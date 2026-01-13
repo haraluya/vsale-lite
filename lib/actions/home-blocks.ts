@@ -136,17 +136,25 @@ export async function createHomeBlock(input: CreateHomeBlockInput): Promise<Acti
 
     const nextSortOrder = maxSortOrder ? maxSortOrder.sort_order + 1 : 0
 
+    // 除錯：印出即將插入的資料
+    const insertData = {
+      name: validated.name,
+      block_type: validated.block_type,
+      config: validated.config,
+      is_active: validated.is_active ?? true,
+      sort_order: nextSortOrder,
+    }
+    console.log('🔍 準備插入的資料:', JSON.stringify(insertData, null, 2))
+
     const { data, error } = await supabase
       .from('home_page_blocks')
-      .insert({
-        name: validated.name,
-        block_type: validated.block_type,
-        config: validated.config,
-        is_active: validated.is_active ?? true,
-        sort_order: nextSortOrder,
-      })
+      .insert(insertData)
       .select()
       .single()
+
+    // 除錯：印出資料庫回傳結果
+    console.log('📊 插入後資料庫回傳 data:', data)
+    console.log('📊 插入後資料庫回傳 error:', error)
 
     if (error) throw error
 
@@ -205,6 +213,7 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
 
     // 除錯：印出更新物件
     console.log('🔍 準備更新的資料:', JSON.stringify(updates, null, 2))
+    console.log('🔍 更新的 block_id:', validated.id)
 
     const { data, error } = await supabase
       .from('home_page_blocks')
@@ -214,7 +223,8 @@ export async function updateHomeBlock(input: UpdateHomeBlockInput): Promise<Acti
       .single()
 
     // 除錯：印出資料庫回傳結果
-    console.log('📊 資料庫回傳:', JSON.stringify({ data, error }, null, 2))
+    console.log('📊 資料庫回傳 data:', data)
+    console.log('📊 資料庫回傳 error:', error)
 
     if (error) throw error
 
