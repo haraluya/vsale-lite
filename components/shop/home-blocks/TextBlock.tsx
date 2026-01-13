@@ -50,7 +50,7 @@ export function TextBlock({ config }: TextBlockProps) {
       <p
         className={cn(
           fontSizeClass,
-          'whitespace-pre-wrap break-words'
+          'whitespace-pre-wrap break-words text-center'
         )}
         style={{ color }}
       >

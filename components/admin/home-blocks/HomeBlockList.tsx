@@ -7,7 +7,8 @@ import { getAllHomeBlocks, getHomeBlockById, deleteHomeBlock, moveBlockUp, moveB
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { HomeBlockCard } from './HomeBlockCard'
 import { HomeBlockForm } from './HomeBlockForm'
-import type { HomePageBlock } from '@/types'
+import { BlockTypeChoice } from './BlockTypeChoice'
+import type { HomePageBlock, BlockType } from '@/types'
 
 /**
  * 首頁廣告區塊列表元件
@@ -17,7 +18,9 @@ export function HomeBlockList() {
   const alert = useAlert()
   const [blocks, setBlocks] = useState<HomePageBlock[]>([])
   const [loading, setLoading] = useState(true)
+  const [showTypeChoice, setShowTypeChoice] = useState(false)
   const [showForm, setShowForm] = useState(false)
+  const [selectedType, setSelectedType] = useState<BlockType | null>(null)
   const [editingBlock, setEditingBlock] = useState<HomePageBlock | null>(null)
 
   // 載入區塊列表
@@ -42,10 +45,23 @@ export function HomeBlockList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 處理新增
+  // 處理新增 - 先顯示類型選擇
   const handleAdd = () => {
     setEditingBlock(null)
+    setSelectedType(null)
+    setShowTypeChoice(true)
+  }
+
+  // 處理類型選擇
+  const handleTypeSelect = (type: BlockType) => {
+    setSelectedType(type)
+    setShowTypeChoice(false)
     setShowForm(true)
+  }
+
+  // 處理取消類型選擇
+  const handleTypeCancelChoice = () => {
+    setShowTypeChoice(false)
   }
 
   // 處理編輯
@@ -93,6 +109,7 @@ export function HomeBlockList() {
   const handleFormSuccess = () => {
     setShowForm(false)
     setEditingBlock(null)
+    setSelectedType(null)
     // 重新載入列表
     fetchBlocks()
   }
@@ -101,6 +118,7 @@ export function HomeBlockList() {
   const handleCancel = () => {
     setShowForm(false)
     setEditingBlock(null)
+    setSelectedType(null)
   }
 
   // 處理向上移動
@@ -146,6 +164,16 @@ export function HomeBlockList() {
     )
   }
 
+  // 顯示類型選擇
+  if (showTypeChoice) {
+    return (
+      <BlockTypeChoice
+        onSelect={handleTypeSelect}
+        onCancel={handleTypeCancelChoice}
+      />
+    )
+  }
+
   // 顯示表單
   if (showForm) {
     return (
@@ -155,7 +183,7 @@ export function HomeBlockList() {
         </h2>
         <HomeBlockForm
           blockId={editingBlock?.id}
-          initialData={editingBlock || undefined}
+          initialData={editingBlock || (selectedType ? { block_type: selectedType } as any : undefined)}
           onSuccess={handleFormSuccess}
           onCancel={handleCancel}
         />

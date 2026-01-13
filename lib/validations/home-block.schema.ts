@@ -23,7 +23,7 @@ export const ImageCarouselConfigSchema = z.object({
 export const ProductDisplayConfigSchema = z.object({
   series_ids: z.array(z.string().uuid('系列 ID 格式不正確')).nullable().optional(),
   tag_ids: z.array(z.string().min(1, '標籤名稱不可為空')).nullable().optional(),
-  max_items: z.number().int().min(1, '最少顯示 1 個商品').max(50, '最多顯示 50 個商品').nullable().optional().default(50),
+  max_items: z.number().int().min(1, '最少顯示 1 個商品').nullable().optional(),
 })
 
 // 文字區塊 Config Schema
@@ -122,6 +122,6 @@ export const UpdateHomeBlockSchema = z.object({
  *
  * NULL 處理邏輯：
  * - series_ids/tag_ids 為 null 或 undefined 時，視為「不篩選」
- * - max_items 為 null 或 undefined 時，使用預設值 50
+ * - max_items 為 null 或 undefined 時，不限制顯示數量（顯示所有符合條件的商品）
  * - series_id 為 null 時，圖片不可點擊（純展示）
  */

@@ -68,10 +68,10 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
       ? (initialData.config as ProductDisplayConfig).tag_ids || []
       : []
   )
-  const [maxItems, setMaxItems] = useState(
+  const [maxItems, setMaxItems] = useState<number | null>(
     initialData?.block_type === 'product_display'
-      ? (initialData.config as ProductDisplayConfig).max_items || 50
-      : 50
+      ? (initialData.config as ProductDisplayConfig).max_items ?? null
+      : null
   )
 
   // 文字區塊 Config
@@ -486,14 +486,14 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
 
           <div className="space-y-2">
             <label className={`${designTokens.typography.label} text-foreground`}>
-              最大顯示數量
+              最大顯示數量（可選）
             </label>
             <input
               type="number"
-              value={maxItems}
-              onChange={(e) => setMaxItems(Number(e.target.value))}
+              value={maxItems ?? ''}
+              onChange={(e) => setMaxItems(e.target.value === '' ? null : Number(e.target.value))}
               min={1}
-              max={50}
+              placeholder="不填入則不限制數量"
               className={`
                 w-full rounded-none bg-white text-foreground
                 ${designTokens.neoBrutalism.border.mobile}
@@ -502,7 +502,7 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
               `}
             />
             <p className="text-xs text-gray-600">
-              範圍 1-50，預設 50
+              不填入則顯示所有符合條件的商品，填入則限制顯示數量（最少 1 個）
             </p>
           </div>
         </div>
@@ -590,6 +590,7 @@ export function HomeBlockForm({ blockId, initialData, onSuccess, onCancel }: Hom
               `}
             >
               <p
+                className="text-center"
                 style={{
                   fontSize: `${fontSize}px`,
                   color: textColor,
