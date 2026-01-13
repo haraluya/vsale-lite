@@ -13,14 +13,15 @@
 3. **Phase 2 (US2/US3/US4 - 前台區塊顯示)**: 三種區塊類型的前台渲染元件
 4. **Phase 3 (US5 - 後台區塊管理)**: CRUD Server Actions、表單元件
 5. **Phase 4 (US6 - 區塊排序)**: 上移/下移按鈕、排序邏輯
-6. **Phase 5 (US7 - 圖片清理)**: 四種清理場景、容錯機制
+6. **Phase 5 (US7 - 圖片清理)**: 三種清理場景、容錯機制
 7. **Phase 6 (US8 - Tab 整合)**: 廣告管理頁面 Tab 切換器
 8. **Phase 7 (Polish)**: 測試、文件、效能優化
 
 **核心亮點**:
 - ✅ 雙入口設計：首頁（廣告區塊）vs 商品頁（系列商品）
+- ✅ 區塊類型鎖定：建立時先選擇類型，建立後不可變更（避免資料遺失）
 - ✅ JSONB Config 彈性儲存：支援三種區塊類型的不同配置
-- ✅ 圖片清理機制：自動清理孤兒檔案（刪除、更換、減少數量、類型變更）
+- ✅ 圖片清理機制：自動清理孤兒檔案（刪除、更換、減少數量）
 - ✅ CSS scroll-snap 原生滑動：無需第三方套件
 - ✅ Neo-Brutalism 設計：響應式邊框、硬陰影、點擊效果
 
@@ -171,8 +172,14 @@ app/(shop)/
 
 # ========== 後台管理整合 ==========
 app/(admin)/admin/
-└── announcements/
-    └── page.tsx                            # 📝 新增 Tab 切換器（商品頁廣告 + 首頁廣告）
+├── announcements/
+│   └── page.tsx                            # 📝 新增 Tab 切換器（商品頁廣告 + 首頁廣告）
+└── home-blocks/
+    ├── new/
+    │   └── page.tsx                        # ✅ 新增區塊建立頁面（從 URL 參數取得 type）
+    └── [id]/
+        └── edit/
+            └── page.tsx                    # ✅ 新增區塊編輯頁面（類型欄位唯讀）
 
 # ========== 前台區塊元件 ==========
 components/shop/
@@ -186,9 +193,11 @@ components/shop/
 # ========== 後台管理元件 ==========
 components/admin/home-blocks/
 ├── HomeBlockList.tsx                       # ✅ 區塊列表
-├── HomeBlockForm.tsx                       # ✅ 區塊表單（依類型顯示欄位）
 ├── HomeBlockCard.tsx                       # ✅ 區塊卡片（縮圖、排序按鈕）
-├── BlockTypeSelector.tsx                   # ✅ 區塊類型選擇器
+├── BlockTypeSelector.tsx                   # ✅ 區塊類型選擇對話框
+├── ImageCarouselForm.tsx                   # ✅ 圖片輪播表單（類型鎖定）
+├── ProductDisplayForm.tsx                  # ✅ 商品展示表單（類型鎖定）
+├── TextBlockForm.tsx                       # ✅ 文字區塊表單（類型鎖定）
 └── ImageUploadMultiple.tsx                 # ✅ 多圖上傳元件
 
 # ========== Server Actions ==========
@@ -672,37 +681,63 @@ interface ProductDisplayConfig {
 - 建立 `lib/actions/home-blocks.ts`:
   - `getActiveHomeBlocks()` - 前台查詢
   - `getAllHomeBlocks()` - 管理端查詢
-  - `createHomeBlock()` - 建立區塊
-  - `updateHomeBlock()` - 更新區塊
+  - `getHomeBlockById()` - 查詢單一區塊（編輯用）
+  - `createHomeBlock()` - 建立區塊（**區塊類型透過路由參數傳入，不可變更**）
+  - `updateHomeBlock()` - 更新區塊（**不允許變更 block_type**）
   - `deleteHomeBlock()` - 刪除區塊（含圖片清理）
   - `getProductsByBlockConfig()` - 商品展示查詢
 
-**Task 3.2**: 區塊表單元件
-- 建立 `components/admin/home-blocks/HomeBlockForm.tsx`:
-  - 區塊名稱欄位
-  - 區塊類型下拉選單（圖片輪播/商品展示/文字區塊）
-  - 啟用狀態開關
-  - 依區塊類型顯示對應欄位:
-    - 圖片輪播: 上傳圖片（最多 5 張）、自動播放、輪播間隔
-    - 商品展示: 選擇系列、選擇標籤、最大顯示數量
-    - 文字區塊: 文字內容、字體大小、字體顏色
-  - 表單驗證與錯誤提示
+**Task 3.2**: 區塊類型選擇對話框
+- 建立 `components/admin/home-blocks/BlockTypeSelector.tsx`:
+  - 對話框包含三個按鈕：「圖片輪播」、「商品展示」、「文字區塊」
+  - 點擊按鈕後導航至對應的建立頁面：
+    - `/admin/home-blocks/new?type=image_carousel`
+    - `/admin/home-blocks/new?type=product_display`
+    - `/admin/home-blocks/new?type=text_block`
+  - 使用統一對話框系統（013-unified-dialog）或 shadcn Dialog
+  - Neo-Brutalism 按鈕樣式（綠色背景、3px 黑邊框、硬陰影）
 
-**Task 3.3**: 區塊列表元件
+**Task 3.3**: 區塊表單元件（分類型）
+- 建立 `components/admin/home-blocks/ImageCarouselForm.tsx`:
+  - 區塊名稱欄位、上傳圖片（最多 5 張）、自動播放、輪播間隔、啟用狀態開關
+  - **區塊類型欄位隱藏或唯讀顯示「圖片輪播」**
+- 建立 `components/admin/home-blocks/ProductDisplayForm.tsx`:
+  - 區塊名稱欄位、選擇系列、選擇標籤、最大顯示數量、啟用狀態開關
+  - **區塊類型欄位隱藏或唯讀顯示「商品展示」**
+- 建立 `components/admin/home-blocks/TextBlockForm.tsx`:
+  - 區塊名稱欄位、文字內容、字體大小、字體顏色、啟用狀態開關
+  - **區塊類型欄位隱藏或唯讀顯示「文字區塊」**
+- 所有表單支援「離開確認」：使用 `useEffect` + `beforeunload` 或 React Router `usePrompt`
+- 表單驗證與錯誤提示
+
+**Task 3.4**: 區塊建立頁面
+- 建立 `app/(admin)/admin/home-blocks/new/page.tsx`:
+  - 從 URL 查詢參數取得 `type`（image_carousel / product_display / text_block）
+  - 根據 `type` 渲染對應的表單元件
+  - 若 `type` 參數無效，顯示錯誤訊息並返回列表頁
+
+**Task 3.5**: 區塊編輯頁面
+- 建立 `app/(admin)/admin/home-blocks/[id]/edit/page.tsx`:
+  - 呼叫 `getHomeBlockById()` 查詢區塊
+  - 根據 `block_type` 渲染對應的表單元件
+  - **區塊類型欄位顯示為唯讀（灰色背景、禁用狀態）**
+  - 支援「離開確認」對話框
+
+**Task 3.6**: 區塊列表元件
 - 建立 `components/admin/home-blocks/HomeBlockList.tsx`:
   - 呼叫 `getAllHomeBlocks()` 查詢所有區塊
   - 使用 `HomeBlockCard` 顯示區塊卡片
-  - 新增區塊按鈕
+  - 「新增區塊」按鈕點擊時彈出 `BlockTypeSelector` 對話框
 
-**Task 3.4**: 區塊卡片元件
+**Task 3.7**: 區塊卡片元件
 - 建立 `components/admin/home-blocks/HomeBlockCard.tsx`:
   - 顯示縮圖（圖片輪播類型）
   - 顯示區塊名稱、類型、啟用狀態
-  - 編輯按鈕、刪除按鈕
+  - 編輯按鈕、刪除按鈕（使用統一對話框確認）
   - 上移/下移按鈕（Phase 4 實作）
   - Neo-Brutalism 樣式
 
-**Task 3.5**: 多圖上傳元件
+**Task 3.8**: 多圖上傳元件
 - 建立 `components/admin/home-blocks/ImageUploadMultiple.tsx`:
   - 支援上傳最多 5 張圖片
   - 每張圖片可設定連結系列
@@ -710,8 +745,10 @@ interface ProductDisplayConfig {
   - 拖曳排序（可選）
 
 **驗收標準**:
-- ✅ 管理員可建立三種類型的區塊
-- ✅ 區塊表單依類型顯示對應欄位
+- ✅ 點擊「新增區塊」彈出類型選擇對話框
+- ✅ 選擇類型後進入對應的建立頁面，**區塊類型不可變更**
+- ✅ 編輯時區塊類型顯示為唯讀（灰色背景）
+- ✅ 離開確認對話框正常運作（未儲存變更時）
 - ✅ 區塊列表顯示所有區塊（含停用）
 - ✅ 編輯與刪除功能正常運作
 - ✅ 圖片上傳成功並顯示預覽
@@ -752,11 +789,11 @@ interface ProductDisplayConfig {
 **Task 5.2**: 圖片清理函式
 - 建立 `lib/utils/block-image-cleanup.ts`:
   - `deleteBlockImages()` - 批次刪除區塊圖片
-  - 支援四種清理場景:
+  - 支援三種清理場景:
     1. 刪除區塊: 刪除整個目錄
     2. 更換圖片: 刪除指定索引的圖片
     3. 減少數量: 刪除多餘的圖片
-    4. 類型變更: 刪除所有圖片（若新類型不需圖片）
+  - ~~類型變更場景已移除~~（**區塊類型建立後不可變更，見 spec.md Out of Scope 第 1 項**）
   - 容錯機制: 刪除失敗記錄警告但不拋出錯誤
 
 **Task 5.3**: 整合圖片清理
@@ -764,8 +801,7 @@ interface ProductDisplayConfig {
   - 刪除前查詢 `block_type` 和 `config`
   - 若為 `image_carousel`，呼叫 `deleteBlockImages()`
   - 刪除失敗記錄警告但繼續執行
-- 修改 `updateHomeBlock()`:
-  - 若 `block_type` 變更為非 `image_carousel`，呼叫 `deleteBlockImages()`
+- ~~修改 `updateHomeBlock()` 處理類型變更~~（**不再支援類型變更**）
 
 **驗收標準**:
 - ✅ 刪除區塊時自動清理圖片
