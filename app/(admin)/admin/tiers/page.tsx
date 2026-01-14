@@ -6,7 +6,8 @@ import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
 
 export default async function TiersPage() {
-  const tiers = await getTiers()
+  const tiersResult = await getTiers()
+  const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
   return (
     <div className={getPageContainerClasses('default')}>

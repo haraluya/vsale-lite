@@ -89,11 +89,7 @@ export async function checkBugs(rootDir: string): Promise<BugsReport> {
       ...dataConsistencyTests,
       ...concurrencyTests,
       ...errorRecoveryTests,
-    ].map((test) => ({
-      name: test.scenario,
-      passed: true,
-      details: `${test.feature}: ${test.given} → ${test.when} → ${test.then}`,
-    })),
+    ],  // 直接使用 TestCase 物件，不需要 map
     issues: [],
     recommendations: [],
   }
@@ -277,7 +273,7 @@ function generateConcurrencyTests(): TestCase[] {
       given: '會員等級「批發」存在',
       when: '兩位管理員同時編輯並儲存',
       then: '應使用「最後寫入者獲勝」策略，或顯示衝突錯誤要求重新載入',
-      priority: 'low',
+      priority: 'p2',  // 修正：應為 'p0' | 'p1' | 'p2'
       automated: false,
     },
   ]
@@ -380,7 +376,7 @@ async function main() {
 
   // 輸出高優先級測試案例
   console.log('\n=== 高優先級測試案例（前 5 個）===\n')
-  const highPriorityTests = report.testCases.filter((t) => t.priority === 'high').slice(0, 5)
+  const highPriorityTests = report.testCases.filter((t) => t.priority === 'p0').slice(0, 5)
 
   highPriorityTests.forEach((test, index) => {
     console.log(`\n${index + 1}. ${test.scenario}`)

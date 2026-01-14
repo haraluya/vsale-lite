@@ -11,7 +11,7 @@ export default async function EditClientPage({
 }) {
   const { id } = await params
 
-  const [profileResult, tiers] = await Promise.all([
+  const [profileResult, tiersResult] = await Promise.all([
     getAdminClientProfile(id),
     getTiers(),
   ])
@@ -19,6 +19,9 @@ export default async function EditClientPage({
   if (!profileResult.success || !profileResult.data) {
     notFound()
   }
+
+  // 處理 getTiers() 的 ActionResult (確保不為 undefined)
+  const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
   const profile = profileResult.data
 

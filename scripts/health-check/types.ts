@@ -127,6 +127,7 @@ export type IssueStatus = 'open' | 'fixed' | 'acknowledged' | 'wont_fix'
 export interface IssueLocation {
   type: 'file' | 'component' | 'function' | 'route' | 'database'
 
+  file?: string  // 新增：檔案名稱（不含路徑）
   filePath?: string
   lineStart?: number
   lineEnd?: number
@@ -212,8 +213,10 @@ export interface CheckResult {
  */
 export interface CheckItem {
   location: IssueLocation
-  status: 'pass' | 'fail' | 'warning'
+  status: 'pass' | 'fail' | 'warning' | 'info'  // 新增 'info' 狀態
   message: string
+  details?: string  // 新增：詳細說明
+  severity?: 'critical' | 'high' | 'medium' | 'low'  // 新增：嚴重程度
 }
 
 /**
@@ -280,9 +283,11 @@ export interface UXReport {
 
   flows: {
     name: string
+    route: string  // 新增：路由
     steps: number
     passed: boolean
     issues: string[]
+    checklist?: string[]  // 新增：測試清單
   }[]
 
   issues: Issue[]
@@ -378,6 +383,7 @@ export interface TestCase {
   given: string
   when: string
   then: string
+  automated?: boolean  // 是否可自動化測試
 }
 
 /**
@@ -395,11 +401,7 @@ export interface BugsReport {
     errorRecovery: CheckResult
   }
 
-  testCases: {
-    name: string
-    passed: boolean
-    details: string
-  }[]
+  testCases: TestCase[]  // 修正：使用 TestCase 型別
 
   issues: Issue[]
   recommendations: Recommendation[]

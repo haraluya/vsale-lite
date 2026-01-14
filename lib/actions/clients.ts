@@ -269,60 +269,67 @@ export async function getClients(params?: {
   page: number
   limit: number
 }> {
-  const { search = '', tier_id, page = 1, limit = 20 } = params || {}
+  try {
+    const { search = '', tier_id, page = 1, limit = 20 } = params || {}
 
-  // 使用 Admin Client 繞過 RLS
-  const adminClient = createAdminClient()
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-  // 建立查詢
-  let query = adminClient
-    .from('profiles')
-    .select('*, tiers(name)', { count: 'exact' })
-    .eq('role', 'client')
-    .order('created_at', { ascending: false })
+    // 建立查詢
+    let query = adminClient
+      .from('profiles')
+      .select('*, tiers(name)', { count: 'exact' })
+      .eq('role', 'client')
+      .order('created_at', { ascending: false })
 
-  // 搜尋條件 (手機號碼或顯示名稱)
-  if (search) {
-    query = query.or(`phone.ilike.%${search}%,display_name.ilike.%${search}%`)
-  }
+    // 搜尋條件 (手機號碼或顯示名稱)
+    if (search) {
+      query = query.or(`phone.ilike.%${search}%,display_name.ilike.%${search}%`)
+    }
 
-  // 等級篩選
-  if (tier_id) {
-    query = query.eq('tier_id', tier_id)
-  }
+    // 等級篩選
+    if (tier_id) {
+      query = query.eq('tier_id', tier_id)
+    }
 
-  // 分頁
-  const from = (page - 1) * limit
-  const to = from + limit - 1
-  query = query.range(from, to)
+    // 分頁
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+    query = query.range(from, to)
 
-  const { data, error, count } = await query
+    const { data, error, count } = await query
 
-  if (error) {
+    if (error) throw error
+
+    // 轉換資料格式 (Feature 007: 新增 address 與 admin_notes 摘要)
+    const clients: Client[] = (data || []).map((item: any) => ({
+      id: item.id,
+      phone: item.phone,
+      display_name: item.display_name,
+      role: item.role,
+      tier_id: item.tier_id,
+      tier_name: item.tiers?.name,
+      notes: item.notes,
+      address: item.address,  // 🆕 Feature 007
+      admin_notes: item.admin_notes,  // 🆕 Feature 007
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+    }))
+
+    return {
+      clients,
+      total: count || 0,
+      page,
+      limit,
+    }
+  } catch (error) {
     console.error('查詢客戶列表失敗:', error)
-    return { clients: [], total: 0, page, limit }
-  }
-
-  // 轉換資料格式 (Feature 007: 新增 address 與 admin_notes 摘要)
-  const clients: Client[] = (data || []).map((item: any) => ({
-    id: item.id,
-    phone: item.phone,
-    display_name: item.display_name,
-    role: item.role,
-    tier_id: item.tier_id,
-    tier_name: item.tiers?.name,
-    notes: item.notes,
-    address: item.address,  // 🆕 Feature 007
-    admin_notes: item.admin_notes,  // 🆕 Feature 007
-    created_at: item.created_at,
-    updated_at: item.updated_at,
-  }))
-
-  return {
-    clients,
-    total: count || 0,
-    page,
-    limit,
+    return {
+      clients: [],
+      total: 0,
+      page: params?.page || 1,
+      limit: params?.limit || 20,
+    }
   }
 }
 

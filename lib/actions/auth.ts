@@ -177,29 +177,35 @@ export async function loginWithPhone(
  * 自動根據當前用戶角色導向對應的登入頁
  */
 export async function logout(): Promise<void> {
-  const supabase = await createClient()
+  try {
+    const supabase = await createClient()
 
-  // 先查詢當前用戶角色（在登出前）
-  const { data: { user } } = await supabase.auth.getUser()
-  let targetLoginPage = '/login' // 預設前台登入頁
+    // 先查詢當前用戶角色（在登出前）
+    const { data: { user } } = await supabase.auth.getUser()
+    let targetLoginPage = '/login' // 預設前台登入頁
 
-  if (user) {
-    // 使用 Admin Client 繞過 RLS 查詢角色
-    const adminClient = createAdminClient()
-    const { data: profile } = await adminClient
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
+    if (user) {
+      // 使用 Admin Client 繞過 RLS 查詢角色
+      const adminClient = createAdminClient()
+      const { data: profile } = await adminClient
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
 
-    // 如果是管理員，導向後台登入頁
-    if (profile?.role === 'admin') {
-      targetLoginPage = '/admin/login'
+      // 如果是管理員，導向後台登入頁
+      if (profile?.role === 'admin') {
+        targetLoginPage = '/admin/login'
+      }
     }
-  }
 
-  // 執行登出
-  await supabase.auth.signOut()
-  revalidatePath('/', 'layout')
-  redirect(targetLoginPage)
+    // 執行登出
+    await supabase.auth.signOut()
+    revalidatePath('/', 'layout')
+    redirect(targetLoginPage)
+  } catch (error) {
+    console.error('登出失敗:', error)
+    // 即使發生錯誤，也嘗試導向登入頁
+    redirect('/login')
+  }
 }

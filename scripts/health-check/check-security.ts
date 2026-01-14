@@ -414,10 +414,24 @@ async function checkDatabaseIndexes(rootDir: string): Promise<CheckResult> {
  */
 function calculateSecurityStats(checks: Record<string, CheckResult>) {
   return {
-    rlsCoverage: '待計算',
-    migrationsCount: '待計算',
-    backupSystemEnabled: '待計算',
-    indexesCount: '待計算',
+    rls: {
+      totalTables: 0,
+      tablesWithRLS: 0,
+      tablesWithoutRLS: [],
+      totalPolicies: 0,
+    },
+    migration: {
+      totalMigrations: 0,
+      safeMigrations: 0,
+      riskyMigrations: 0,
+      riskyFiles: [],
+    },
+    backup: {
+      automated: false,
+      lastBackup: '',
+      backupCount: 0,
+      cloudStorage: false,
+    },
   }
 }
 

@@ -76,12 +76,16 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   useEffect(() => {
     async function loadData() {
       try {
-        const [tiersData, seriesResult] = await Promise.all([
+        const [tiersResult, seriesResult] = await Promise.all([
           getTiers(),
           getSeries(),
         ])
 
-        setTiers(tiersData)
+        // 處理 getTiers() 的 ActionResult
+        if (tiersResult.success && tiersResult.data) {
+          setTiers(tiersResult.data)
+        }
+
         if (seriesResult.success && seriesResult.data) {
           setSeries(seriesResult.data)
         }

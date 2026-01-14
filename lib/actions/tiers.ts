@@ -9,21 +9,29 @@ import { revalidatePath } from 'next/cache'
 /**
  * 查詢所有會員等級 (依 rank 排序)
  */
-export async function getTiers(): Promise<Tier[]> {
-  // 使用 Admin Client 繞過 RLS
-  const adminClient = createAdminClient()
+export async function getTiers(): Promise<ActionResult<Tier[]>> {
+  try {
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
 
-  const { data, error } = await adminClient
-    .from('tiers')
-    .select('*')
-    .order('rank', { ascending: true })
+    const { data, error } = await adminClient
+      .from('tiers')
+      .select('*')
+      .order('rank', { ascending: true })
 
-  if (error) {
+    if (error) throw error
+
+    return {
+      success: true,
+      data: data || [],
+    }
+  } catch (error) {
     console.error('查詢會員等級失敗:', error)
-    return []
+    return {
+      success: false,
+      message: '無法載入會員等級資料，請稍後再試',
+    }
   }
-
-  return data || []
 }
 
 /**

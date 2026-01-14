@@ -2,7 +2,8 @@ import { getTiers } from '@/lib/actions/tiers'
 import { ClientForm } from '@/components/admin/client-form'
 
 export default async function NewClientPage() {
-  const tiers = await getTiers()
+  const tiersResult = await getTiers()
+  const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
   return (
     <div className="max-w-2xl space-y-6">

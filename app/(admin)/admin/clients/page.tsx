@@ -31,10 +31,12 @@ export default async function ClientsPage({
   // 如果有多選等級,使用第一個等級進行查詢 (向後兼容)
   const tier_id = tier_ids[0] || ''
 
-  const [{ clients, total }, tiers] = await Promise.all([
+  const [{ clients, total }, tiersResult] = await Promise.all([
     getClients({ search, tier_id, page, limit: 20 }),
     getTiers(),
   ])
+
+  const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
   return (
     <div className={getPageContainerClasses('default')}>
