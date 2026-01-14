@@ -48,7 +48,7 @@ export default async function AdminLoginPage() {
 
         {/* 特色說明卡片（手機隱藏，桌面顯示） */}
         <div className="hidden md:grid grid-cols-3 gap-4 w-full max-w-3xl mb-8">
-          <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+          <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
             <div className="flex justify-center mb-3">
               <div className="rounded-none border-2 border-black bg-gradient-to-br from-blue-400 to-indigo-400 p-2">
                 <FileText className="h-6 w-6 text-white" />
@@ -58,7 +58,7 @@ export default async function AdminLoginPage() {
             <p className="text-xs font-medium text-gray-700 text-center">快速確認訂單與出貨管理</p>
           </div>
 
-          <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+          <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
             <div className="flex justify-center mb-3">
               <div className="rounded-none border-2 border-black bg-gradient-to-br from-purple-400 to-pink-400 p-2">
                 <Users2 className="h-6 w-6 text-white" />
@@ -68,7 +68,7 @@ export default async function AdminLoginPage() {
             <p className="text-xs font-medium text-gray-700 text-center">細膩的客戶管理系統</p>
           </div>
 
-          <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+          <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
             <div className="flex justify-center mb-3">
               <div className="rounded-none border-2 border-black bg-gradient-to-br from-indigo-400 to-purple-400 p-2">
                 <Settings className="h-6 w-6 text-white" />
@@ -81,9 +81,9 @@ export default async function AdminLoginPage() {
 
         {/* 登入卡片 */}
         <div className="w-full max-w-md">
-          <div className="rounded-none border-4 border-black bg-white p-6 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="rounded-none border-2 md:border-4 border-black bg-white p-6 md:p-8 shadow-neo-sm md:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
             <div className="mb-6">
-              <div className="inline-flex items-center gap-2 rounded-none border-3 border-black bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-2 mb-4 shadow-neo-sm">
+              <div className="inline-flex items-center gap-2 rounded-none border-2 md:border-3 border-black bg-gradient-to-r from-blue-500 to-indigo-500 px-4 py-2 mb-4 shadow-neo-sm">
                 <Shield className="h-5 w-5 text-white" />
                 <h2 className="text-sm font-black uppercase tracking-wider text-white">管理後台</h2>
               </div>
@@ -94,7 +94,7 @@ export default async function AdminLoginPage() {
 
             {/* 已登入提示 */}
             {user && currentUserRole === 'client' && (
-              <div className="rounded-none border-3 border-yellow-600 bg-yellow-50 p-6 mb-6 shadow-neo-sm">
+              <div className="rounded-none border-2 md:border-3 border-yellow-600 bg-yellow-50 p-6 mb-6 shadow-neo-sm">
                 <p className="text-sm font-bold text-yellow-800 mb-3">
                   ⚠️ 您目前已登入為「客戶」身份
                 </p>

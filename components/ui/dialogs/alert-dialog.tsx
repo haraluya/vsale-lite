@@ -84,8 +84,8 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
       <div
         className={cn(
           'w-full max-w-md',
-          'border-3 border-black bg-white',
-          'shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]',
+          'border-2 md:border-3 border-black bg-white',
+          'shadow-neo-sm md:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]',
           'animate-in zoom-in-95 duration-200'
         )}
         onClick={(e) => e.stopPropagation()}
@@ -93,7 +93,7 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
         {/* 標題欄 */}
         <div
           className={cn(
-            'flex items-center gap-3 border-b-3 border-black p-4',
+            'flex items-center gap-3 border-b-2 md:border-b-3 border-black p-4',
             config.headerBg,
             'text-white'
           )}
@@ -112,18 +112,18 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
         </div>
 
         {/* 按鈕 */}
-        <div className="border-t-3 border-black p-4">
+        <div className="border-t-2 md:border-t-3 border-black p-4">
           <button
             type="button"
             onClick={onClose}
             className={cn(
               'w-full px-4 py-2',
-              'border-3 border-black',
+              'border-2 md:border-3 border-black',
               config.buttonBg,
               'text-white font-bold text-sm uppercase',
-              'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+              'shadow-neo-sm md:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
               'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
               'focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2'
             )}
             autoFocus
