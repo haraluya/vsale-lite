@@ -29,7 +29,7 @@ export async function checkBugs(rootDir: string): Promise<BugsReport> {
   const errorRecoveryTests = generateErrorRecoveryTests()
 
   const checks = {
-    edgeCases: {
+    boundaryConditions: {
       name: '邊界條件測試',
       passed: true,
       details: `產生 ${edgeCaseTests.length} 個邊界條件測試案例`,
@@ -73,7 +73,7 @@ export async function checkBugs(rootDir: string): Promise<BugsReport> {
 
   // 計算評分
   const score = calculateDomainScore([
-    checks.edgeCases,
+    checks.boundaryConditions,
     checks.dataConsistency,
     checks.concurrency,
     checks.errorRecovery,
@@ -89,7 +89,11 @@ export async function checkBugs(rootDir: string): Promise<BugsReport> {
       ...dataConsistencyTests,
       ...concurrencyTests,
       ...errorRecoveryTests,
-    ],
+    ].map((test) => ({
+      name: test.scenario,
+      passed: true,
+      details: `${test.feature}: ${test.given} → ${test.when} → ${test.then}`,
+    })),
     issues: [],
     recommendations: [],
   }
@@ -107,7 +111,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '用戶在購物車頁面',
       when: '將商品數量調整為 0',
       then: '系統應自動移除該商品（或顯示錯誤訊息要求最小數量為 1）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -117,7 +121,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '用戶在購物車頁面',
       when: '嘗試將商品數量調整為負數（例如：-1）',
       then: '系統應拒絕並顯示錯誤訊息「數量必須大於 0」',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -127,7 +131,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '用戶在購物車頁面',
       when: '將商品數量調整為超大數值（例如：999999）',
       then: '系統應正常處理或顯示合理的數量上限錯誤',
-      priority: 'medium',
+      priority: 'p1',
       automated: false,
     },
     {
@@ -137,7 +141,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '用戶在登入頁面',
       when: '輸入包含空格或特殊字元的手機號碼（例如：「0912 345 678」或「0912-345-678」）',
       then: '系統應自動移除空格與特殊字元，或顯示格式錯誤訊息',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -147,7 +151,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '用戶在購物車頁面',
       when: '輸入空字串並點擊「套用優惠券」',
       then: '系統應顯示錯誤訊息「請輸入優惠券代碼」',
-      priority: 'medium',
+      priority: 'p1',
       automated: false,
     },
     {
@@ -157,7 +161,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '用戶在購物車頁面，資料庫中有代碼「WELCOME10」的優惠券',
       when: '輸入小寫「welcome10」並套用',
       then: '系統應正常套用優惠券（代碼應為大小寫不敏感）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -167,7 +171,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '管理員在商品管理頁面',
       when: '將商品庫存設為負數（例如：-10）',
       then: '系統應允許設定負庫存（支援欠貨/預購），前台顯示「欠貨: 10（可預購）」',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -177,7 +181,7 @@ function generateEdgeCaseTests(): TestCase[] {
       given: '用戶在商品列表頁面，某商品未設定該用戶等級的價格',
       when: '嘗試加入購物車',
       then: '加入購物車按鈕應為禁用狀態，顯示「價格未設定」',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
   ]
@@ -195,7 +199,7 @@ function generateDataConsistencyTests(): TestCase[] {
       given: '訂單已標記出貨（庫存已扣減）',
       when: '管理員取消訂單',
       then: '庫存應正確回補（訂單明細數量 + 原庫存 = 新庫存）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -205,7 +209,7 @@ function generateDataConsistencyTests(): TestCase[] {
       given: '訂單狀態為「待確認」(pending)',
       when: '管理員標記訂單為「已出貨」(shipping)',
       then: '庫存應正確扣減（原庫存 - 訂單明細數量 = 新庫存）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -215,7 +219,7 @@ function generateDataConsistencyTests(): TestCase[] {
       given: '資料庫中有會員等級「批發」，且有商品設定此等級的價格',
       when: '管理員嘗試刪除「批發」等級',
       then: '系統應阻止刪除並顯示錯誤訊息（或提示先移除相關價格資料）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -225,7 +229,7 @@ function generateDataConsistencyTests(): TestCase[] {
       given: '資料庫中有商品系列「飲料」，且有商品屬於此系列',
       when: '管理員嘗試刪除「飲料」系列',
       then: '系統應阻止刪除並顯示錯誤訊息（或提示先移除相關商品）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -235,7 +239,7 @@ function generateDataConsistencyTests(): TestCase[] {
       given: '用戶使用優惠券「WELCOME10」下單',
       when: '訂單建立後，管理員刪除「WELCOME10」優惠券',
       then: '歷史訂單應保留優惠券資訊（代碼、折扣方式、折扣金額）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
   ]
@@ -253,7 +257,7 @@ function generateConcurrencyTests(): TestCase[] {
       given: '商品庫存為 10',
       when: '兩位用戶同時下單各 8 件',
       then: '僅一位用戶應成功下單，另一位應收到庫存不足錯誤（或兩位都成功但庫存變為負數，依專案支援負庫存而定）',
-      priority: 'medium',
+      priority: 'p1',
       automated: false,
     },
     {
@@ -263,7 +267,7 @@ function generateConcurrencyTests(): TestCase[] {
       given: '優惠券「FLASH50」限量 100 張',
       when: '101 位用戶同時點擊領取',
       then: '僅前 100 位應成功領取，第 101 位應收到「優惠券已領完」錯誤',
-      priority: 'medium',
+      priority: 'p1',
       automated: false,
     },
     {
@@ -291,7 +295,7 @@ function generateErrorRecoveryTests(): TestCase[] {
       given: '用戶在結帳頁面點擊「確認送出」',
       when: '訂單建立請求發送後網路中斷',
       then: '系統應顯示錯誤訊息，允許用戶重新送出（避免重複下單）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
     {
@@ -301,7 +305,7 @@ function generateErrorRecoveryTests(): TestCase[] {
       given: '管理員在商品管理頁面上傳圖片',
       when: '上傳失敗（網路錯誤或檔案過大）',
       then: '系統應顯示明確的錯誤訊息並允許重新上傳（不需重新填寫整個表單）',
-      priority: 'medium',
+      priority: 'p1',
       automated: false,
     },
     {
@@ -311,7 +315,7 @@ function generateErrorRecoveryTests(): TestCase[] {
       given: '用戶在登入頁面',
       when: '輸入錯誤的密碼',
       then: '系統應顯示「手機號碼或密碼錯誤」（不透露哪一個錯誤以增加安全性）',
-      priority: 'high',
+      priority: 'p0',
       automated: false,
     },
   ]

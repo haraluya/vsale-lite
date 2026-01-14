@@ -368,6 +368,19 @@ export interface PerformanceReport {
 }
 
 /**
+ * 測試案例
+ */
+export interface TestCase {
+  id: string
+  scenario: string
+  feature: string
+  priority: 'p0' | 'p1' | 'p2'
+  given: string
+  when: string
+  then: string
+}
+
+/**
  * Bug 檢查報告
  */
 export interface BugsReport {

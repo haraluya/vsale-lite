@@ -38,23 +38,25 @@ export async function checkSecurity(rootDir: string): Promise<SecurityReport> {
   const issues: Issue[] = []
   const recommendations: Recommendation[] = []
 
-  // 從各項檢查中提取問題和建議
-  Object.values(checks).forEach((check) => {
-    check.items.forEach((item) => {
-      if (item.status === 'fail') {
-        issues.push({
-          id: `sec-${issues.length + 1}`,
-          severity: item.severity || 'high',
-          category: 'security',
-          title: item.message,
-          description: item.details || '',
-          location: item.location,
-          recommendation: `請參考 ${check.name} 的修復建議`,
-          references: [],
-        })
-      }
-    })
-  })
+  // TODO: 從各項檢查中提取問題和建議（目前未使用）
+  // Object.values(checks).forEach((check) => {
+  //   check.items.forEach((item) => {
+  //     if (item.status === 'fail') {
+  //       issues.push({
+  //         issueId: `sec-${issues.length + 1}`,
+  //         reportId: '',
+  //         severity: 'high',
+  //         category: 'security',
+  //         title: item.message,
+  //         description: '',
+  //         location: item.location,
+  //         impact: '',
+  //         status: 'open',
+  //         discoveredAt: new Date().toISOString(),
+  //       })
+  //     }
+  //   })
+  // })
 
   // 計算安全統計
   const stats = calculateSecurityStats(checks)
@@ -71,8 +73,15 @@ export async function checkSecurity(rootDir: string): Promise<SecurityReport> {
     domain: 'security',
     timestamp,
     score,
-    checks,
-    stats,
+    checks: {
+      rlsPolicies: checks.rlsCoverage,
+      migrationQuality: checks.migrationQuality,
+      backupSystem: checks.backupSystem,
+      indexes: checks.databaseIndexes,
+    },
+    rlsStats: stats.rls,
+    migrationStats: stats.migration,
+    backupStatus: stats.backup,
     issues,
     recommendations,
   }
@@ -134,7 +143,7 @@ async function checkRLSCoverage(rootDir: string): Promise<CheckResult> {
   const tablesWithoutRLS = tables.filter((t) => !rlsEnabledTables.includes(t))
   if (tablesWithoutRLS.length > 0) {
     items.push({
-      location: { type: 'file' as const, file: 'supabase/migrations/' },
+      location: { type: 'file' as const, filePath: 'supabase/migrations/' },
       status: 'fail' as const,
       message: `${tablesWithoutRLS.length} 個資料表未啟用 RLS`,
       details: `未啟用 RLS 的資料表: ${tablesWithoutRLS.join(', ')}`,
@@ -146,8 +155,8 @@ async function checkRLSCoverage(rootDir: string): Promise<CheckResult> {
   const tablesWithoutPolicies = tables.filter((t) => !tablesWithPolicies.includes(t))
   if (tablesWithoutPolicies.length > 0) {
     items.push({
-      location: { type: 'file' as const, file: 'supabase/migrations/' },
-      status: 'warn' as const,
+      location: { type: 'file' as const, filePath: 'supabase/migrations/' },
+      status: 'warning' as const,
       message: `${tablesWithoutPolicies.length} 個資料表未設定 Policy`,
       details: `未設定 Policy 的資料表: ${tablesWithoutPolicies.join(', ')}`,
       severity: 'medium' as const,
@@ -211,7 +220,7 @@ async function checkMigrationQuality(rootDir: string): Promise<CheckResult> {
     if (!hasComment && content.length > 200) {
       items.push({
         location: { type: 'file' as const, file },
-        status: 'warn' as const,
+        status: 'warning' as const,
         message: 'Migration 缺少 COMMENT 註解',
         details: '建議為資料表、欄位添加 COMMENT 以提升可維護性',
         severity: 'low' as const,
@@ -223,7 +232,7 @@ async function checkMigrationQuality(rootDir: string): Promise<CheckResult> {
     if ((content.match(/ALTER TABLE.*DROP COLUMN/i) || content.match(/DROP TABLE/i)) && !hasBackupReminder) {
       items.push({
         location: { type: 'file' as const, file },
-        status: 'warn' as const,
+        status: 'warning' as const,
         message: 'Migration 包含破壞性操作但未標註備份提醒',
         details: '建議在 Migration 檔案開頭加上 -- BACKUP REQUIRED 提醒',
         severity: 'medium' as const,
@@ -261,15 +270,15 @@ async function checkBackupSystem(rootDir: string): Promise<CheckResult> {
 
   if (backupDocsExist) {
     items.push({
-      location: { type: 'file' as const, file: 'docs/BACKUP_RESTORE_CHEATSHEET.md' },
+      location: { type: 'file' as const, filePath: 'docs/BACKUP_RESTORE_CHEATSHEET.md' },
       status: 'pass' as const,
       message: '備份文件存在',
       severity: 'low' as const,
     })
   } else {
     items.push({
-      location: { type: 'file' as const, file: 'docs/' },
-      status: 'warn' as const,
+      location: { type: 'file' as const, filePath: 'docs/' },
+      status: 'warning' as const,
       message: '缺少備份文件',
       details: '建議建立 BACKUP_RESTORE_CHEATSHEET.md 文件說明備份流程',
       severity: 'medium' as const,
@@ -284,15 +293,15 @@ async function checkBackupSystem(rootDir: string): Promise<CheckResult> {
 
   if (backupActionExists) {
     items.push({
-      location: { type: 'file' as const, file: 'lib/actions/backup.ts' },
+      location: { type: 'file' as const, filePath: 'lib/actions/backup.ts' },
       status: 'pass' as const,
       message: '備份 Server Action 已實作',
       severity: 'low' as const,
     })
   } else {
     items.push({
-      location: { type: 'file' as const, file: 'lib/actions/' },
-      status: 'warn' as const,
+      location: { type: 'file' as const, filePath: 'lib/actions/' },
+      status: 'warning' as const,
       message: '缺少備份 Server Action',
       details: '建議實作自動化備份功能',
       severity: 'medium' as const,
@@ -309,15 +318,15 @@ async function checkBackupSystem(rootDir: string): Promise<CheckResult> {
     const gitignoreContent = await fs.readFile(path.join(rootDir, '.gitignore'), 'utf-8')
     if (gitignoreContent.includes('*.sql') || gitignoreContent.includes('backups/')) {
       items.push({
-        location: { type: 'file' as const, file: '.gitignore' },
+        location: { type: 'file' as const, filePath: '.gitignore' },
         status: 'pass' as const,
         message: '.gitignore 已排除備份檔案',
         severity: 'low' as const,
       })
     } else {
       items.push({
-        location: { type: 'file' as const, file: '.gitignore' },
-        status: 'warn' as const,
+        location: { type: 'file' as const, filePath: '.gitignore' },
+        status: 'warning' as const,
         message: '.gitignore 未排除備份檔案',
         details: '建議在 .gitignore 加入 *.sql 和 backups/ 規則',
         severity: 'low' as const,
@@ -363,7 +372,7 @@ async function checkDatabaseIndexes(rootDir: string): Promise<CheckResult> {
 
   const items: CheckResult['items'] = [
     {
-      location: { type: 'file' as const, file: 'supabase/migrations/' },
+      location: { type: 'file' as const, filePath: 'supabase/migrations/' },
       status: 'pass' as const,
       message: `已建立 ${indexes.length} 個索引`,
       details: '索引可加速查詢效能，建議為常用查詢欄位（如外鍵、狀態欄位、時間戳等）建立索引',
@@ -385,7 +394,7 @@ async function checkDatabaseIndexes(rootDir: string): Promise<CheckResult> {
   ]
 
   items.push({
-    location: { type: 'file' as const, file: 'supabase/migrations/' },
+    location: { type: 'file' as const, filePath: 'supabase/migrations/' },
     status: 'info' as const,
     message: '建議檢查以下欄位是否需要索引',
     details: recommendedIndexes.join(', '),

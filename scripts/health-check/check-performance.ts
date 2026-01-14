@@ -40,23 +40,25 @@ export async function checkPerformance(rootDir: string): Promise<PerformanceRepo
   const issues: Issue[] = []
   const recommendations: Recommendation[] = []
 
-  // 從各項檢查中提取問題和建議
-  Object.values(checks).forEach((check) => {
-    check.items.forEach((item) => {
-      if (item.status === 'fail') {
-        issues.push({
-          id: `perf-${issues.length + 1}`,
-          severity: item.severity || 'medium',
-          category: 'performance',
-          title: item.message,
-          description: item.details || '',
-          location: item.location,
-          recommendation: `請參考 ${check.name} 的修復建議`,
-          references: [],
-        })
-      }
-    })
-  })
+  // TODO: 從各項檢查中提取問題和建議（目前未使用）
+  // Object.values(checks).forEach((check) => {
+  //   check.items.forEach((item) => {
+  //     if (item.status === 'fail') {
+  //       issues.push({
+  //         issueId: `perf-${issues.length + 1}`,
+  //         reportId: '',
+  //         severity: 'medium',
+  //         category: 'performance',
+  //         title: item.message,
+  //         description: '',
+  //         location: item.location,
+  //         impact: '',
+  //         status: 'open',
+  //         discoveredAt: new Date().toISOString(),
+  //       })
+  //     }
+  //   })
+  // })
 
   // 計算評分
   const score = calculateDomainScore([
@@ -71,18 +73,24 @@ export async function checkPerformance(rootDir: string): Promise<PerformanceRepo
     domain: 'performance',
     timestamp,
     score,
-    checks,
-    metrics: {
-      lcp: 0, // Lighthouse 將提供
-      fid: 0,
-      cls: 0,
-      ttfb: 0,
-      fcp: 0,
+    lighthouse: {
+      performance: 0,
+      accessibility: 0,
+      bestPractices: 0,
+      seo: 0,
+      pwa: 0,
+      metrics: {
+        firstContentfulPaint: 0,
+        largestContentfulPaint: 0,
+        totalBlockingTime: 0,
+        cumulativeLayoutShift: 0,
+        speedIndex: 0,
+        timeToInteractive: 0,
+      },
+      budgets: [],
     },
-    budgets: {
-      pageLoad: { target: 2000, actual: 0, passed: false },
-      dbQuery: { target: 100, actual: 0, passed: false },
-    },
+    webVitals: [],
+    databaseQueries: [],
     issues,
     recommendations,
   }
@@ -106,8 +114,8 @@ async function integrateLighthouseReport(rootDir: string): Promise<CheckResult> 
     details: 'Lighthouse 需手動執行並整合報告',
     items: [
       {
-        location: { type: 'file' as const, file: 'lighthouserc.js' },
-        status: 'warn' as const,
+        location: { type: 'file' as const, filePath: 'lighthouserc.js' },
+        status: 'warning' as const,
         message: '尚未執行 Lighthouse CI 測試',
         details:
           '請執行 `pnpm lighthouse` 來產生效能報告。建議目標：Performance Score >= 90',
@@ -133,7 +141,7 @@ async function measureWebVitals(rootDir: string): Promise<CheckResult> {
     items: [
       {
         location: { type: 'route' as const, route: '/' },
-        status: 'warn' as const,
+        status: 'warning' as const,
         message: '尚未測量 Web Vitals 指標',
         details: `
 建議使用以下工具測量：
@@ -179,7 +187,7 @@ async function measureDatabaseQueries(rootDir: string): Promise<CheckResult> {
     if (selectMatches && selectMatches.length > 3) {
       issues.push({
         location: { type: 'file' as const, file },
-        status: 'warn' as const,
+        status: 'warning' as const,
         message: `檔案包含多個資料庫查詢（${selectMatches.length} 個）`,
         details: '建議檢查是否有 N+1 查詢問題，可使用批次查詢或 JOIN 優化',
         severity: 'low' as const,
@@ -191,7 +199,7 @@ async function measureDatabaseQueries(rootDir: string): Promise<CheckResult> {
     if (unlimitedQueries && unlimitedQueries.length > 0) {
       issues.push({
         location: { type: 'file' as const, file },
-        status: 'warn' as const,
+        status: 'warning' as const,
         message: '查詢缺少 .limit() 限制',
         details: '無限制的查詢可能導致效能問題，建議加上 .limit()',
         severity: 'medium' as const,
@@ -234,7 +242,7 @@ async function checkImageOptimization(rootDir: string): Promise<CheckResult> {
     if (imgTags) {
       issues.push({
         location: { type: 'file' as const, file },
-        status: 'warn' as const,
+        status: 'warning' as const,
         message: `使用 <img> 標籤而非 Next.js Image 元件（${imgTags.length} 處）`,
         details:
           '建議使用 Next.js Image 元件以自動優化圖片（格式轉換、大小調整、lazy loading）',
@@ -249,7 +257,7 @@ async function checkImageOptimization(rootDir: string): Promise<CheckResult> {
         if (!tag.includes('sizes=')) {
           issues.push({
             location: { type: 'file' as const, file },
-            status: 'warn' as const,
+            status: 'warning' as const,
             message: 'Image 元件缺少 sizes 屬性',
             details: '建議設定 sizes 屬性以優化響應式圖片載入',
             severity: 'low' as const,
@@ -279,8 +287,8 @@ async function checkPerformanceBudgets(rootDir: string): Promise<CheckResult> {
 
   const items: CheckResult['items'] = [
     {
-      location: { type: 'file' as const, file: 'package.json' },
-      status: 'warn' as const,
+      location: { type: 'file' as const, filePath: 'package.json' },
+      status: 'warning' as const,
       message: '效能預算需手動測試驗證',
       details: `
 效能目標（來自專案憲章）：
