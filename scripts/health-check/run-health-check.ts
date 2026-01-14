@@ -8,6 +8,11 @@ import * as path from 'path'
 import * as fs from 'fs/promises'
 import { checkArchitecture } from './check-architecture'
 import { checkAPI } from './check-api'
+import { checkUX } from './check-ux'
+import { checkDesign } from './check-design'
+import { checkPerformance } from './check-performance'
+import { checkBugs } from './check-bugs'
+import { checkSecurity } from './check-security'
 import { generateReport } from './generate-report'
 
 /**
@@ -65,9 +70,9 @@ async function runHealthCheck() {
     'api',
     'ux',
     'design',
-    // 'performance', // 未實作
-    // 'bugs', // 未實作
-    // 'security', // 未實作
+    'performance',
+    'bugs',
+    'security',
   ]
 
   console.log(`📋 執行領域: ${domains.join(', ')}`)
@@ -82,16 +87,56 @@ async function runHealthCheck() {
     domains.includes('api')
       ? runCheck('API 整合度', async () => {
           const report = await checkAPI(rootDir)
-          // 儲存 JSON 報告
           const outputPath = path.join(reportsDir, 'api.json')
           await fs.writeFile(outputPath, JSON.stringify(report, null, 2))
           return report
         })
       : Promise.resolve(null),
 
-    // UX 和 Design 檢查需要手動執行對應的腳本
-    // domains.includes('ux') ? runCheck('使用者體驗', ...) : Promise.resolve(null),
-    // domains.includes('design') ? runCheck('設計一致性', ...) : Promise.resolve(null),
+    domains.includes('ux')
+      ? runCheck('使用者體驗', async () => {
+          const report = await checkUX(rootDir)
+          const outputPath = path.join(reportsDir, 'ux.json')
+          await fs.writeFile(outputPath, JSON.stringify(report, null, 2))
+          return report
+        })
+      : Promise.resolve(null),
+
+    domains.includes('design')
+      ? runCheck('設計一致性', async () => {
+          const report = await checkDesign(rootDir)
+          const outputPath = path.join(reportsDir, 'design.json')
+          await fs.writeFile(outputPath, JSON.stringify(report, null, 2))
+          return report
+        })
+      : Promise.resolve(null),
+
+    domains.includes('performance')
+      ? runCheck('效能表現', async () => {
+          const report = await checkPerformance(rootDir)
+          const outputPath = path.join(reportsDir, 'performance.json')
+          await fs.writeFile(outputPath, JSON.stringify(report, null, 2))
+          return report
+        })
+      : Promise.resolve(null),
+
+    domains.includes('bugs')
+      ? runCheck('Bug 檢查', async () => {
+          const report = await checkBugs(rootDir)
+          const outputPath = path.join(reportsDir, 'bugs.json')
+          await fs.writeFile(outputPath, JSON.stringify(report, null, 2))
+          return report
+        })
+      : Promise.resolve(null),
+
+    domains.includes('security')
+      ? runCheck('安全性', async () => {
+          const report = await checkSecurity(rootDir)
+          const outputPath = path.join(reportsDir, 'security.json')
+          await fs.writeFile(outputPath, JSON.stringify(report, null, 2))
+          return report
+        })
+      : Promise.resolve(null),
   ])
 
   // 檢查是否有失敗的檢查

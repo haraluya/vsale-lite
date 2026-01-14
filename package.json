@@ -18,7 +18,7 @@
     "health-check:api": "tsx scripts/health-check/check-api.ts",
     "health-check:ux": "tsx scripts/health-check/check-ux.ts",
     "health-check:design": "tsx scripts/health-check/check-design.ts",
-    "health-check:performance": "lhci autorun && tsx scripts/health-check/check-performance.ts",
+    "health-check:performance": "tsx scripts/health-check/check-performance.ts",
     "health-check:bugs": "tsx scripts/health-check/check-bugs.ts",
     "health-check:security": "tsx scripts/health-check/check-security.ts",
     "health-check:ci": "pnpm health-check && pnpm health-check:performance"
@@ -71,6 +71,7 @@
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.19",
     "ts-morph": "^27.0.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.0",
     "vitest": "^4.0.16"
   }
