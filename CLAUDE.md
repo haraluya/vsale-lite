@@ -1,8 +1,8 @@
-﻿# Vsale-lite - Claude Code Context
+# Vsale-lite - Claude Code Context
 
 **專案名稱**: Vsale-lite
 **專案類型**: B2B 批發訂貨系統
-**最後更新**: 2026-01-08
+**最後更新**: 2026-01-14
 
 ---
 
@@ -29,19 +29,18 @@
 
 ## 專案概述
 
-Vsale-lite 是一個專為批發業務設計的輕量級 B2B 訂貨系統,解決傳統 Excel/LINE 下單混亂、價格不透明的問題。採用「雙入口」設計,嚴格區分買家與賣家的操作環境,並實作等級綁定價格機制。
+Vsale-lite 是一個專為批發業務設計的輕量級 B2B 訂貨系統，解決傳統 Excel/LINE 下單混亂、價格不透明的問題。採用「雙入口」設計，嚴格區分買家與賣家的操作環境，並實作等級綁定價格機制。
 
 **核心特色**:
-- 🎯 雙入口設計: 客戶使用手機號碼登入,管理員使用 Email 登入
+- 🎯 雙入口設計: 客戶使用手機號碼登入，管理員使用 Email 登入
 - 💰 等級綁定價格: 不同會員等級看到不同價格
-- 📱 行動優先: 客戶端優化單手操作,管理端優化桌面批量操作
+- 📱 行動優先: 客戶端優化單手操作，管理端優化桌面批量操作
 - 🎨 Neo-Brutalism 設計風格: 強烈的品牌識別
 
 ---
 
 ## 技術棧
 
-<!-- BEGIN TECH_STACK -->
 ### 核心框架
 - **語言**: TypeScript 5.7+
 - **執行環境**: Node.js v22.x LTS (Iron)
@@ -69,7 +68,6 @@ Vsale-lite 是一個專為批發業務設計的輕量級 B2B 訂貨系統,解決
 - **區域**: sin1 (Singapore - 最接近台灣)
 - **自動部署**: GitHub Actions (push to master)
 - **備份系統**: Supabase 原生備份 + Google Cloud Storage
-<!-- END TECH_STACK -->
 
 ---
 
@@ -140,7 +138,7 @@ vsale/
 - 不檢查 `Stock > 0`
 - 庫存可為負數 (欠貨/預購)
 
-### VII. 響應式設計規範 (005-responsive-ui)
+### VII. 響應式設計規範
 - **必須** 遵循 Mobile-First 策略 (手機 → 平板 → 桌面)
 - **必須** 使用設計 Token 系統 (`lib/design-tokens.ts`)
 - **必須** 確保觸控目標 >= 44px × 44px (WCAG 2.1 AA 標準)
@@ -150,7 +148,7 @@ vsale/
 - 後台表格: 手機卡片視圖 / 桌面完整表格
 - 設計 Token 優先於硬編碼樣式
 
-### VIII. 統一對話框系統 (013-unified-dialog)
+### VIII. 統一對話框系統
 - **必須** 使用統一對話框 Hook 替代原生瀏覽器對話框
 - **絕對禁止** 使用 `window.alert()`、`window.confirm()`、`window.prompt()`
 - ESLint 規則已配置，違反將導致錯誤
@@ -192,434 +190,28 @@ const value = await prompt({
 
 ---
 
-## 當前開發狀態
-
-### ✅ 已完成功能（已合併到 master）
-
-#### 1. **001-user-tier-management**: 會員等級與客戶管理 ✅
-- 雙入口登入、快速開戶、客戶列表、等級 CRUD
-- RLS 權限控制與 RBAC
-
-#### 2. **002-product-management**: 商品與分類管理 ✅
-- 分類 CRUD、商品 CRUD、圖片上傳、前台商品瀏覽
-
-#### 3. **003-series-and-pricing**: 系列與等級價格管理 ✅
-- 三層階層架構（分類 > 系列 > 產品）
-- 等級綁定價格機制（tier_prices 表）
-- 批次價格設定功能
-
-#### 4. **004-cart-and-orders**: 購物車與訂單管理系統 ✅ **NEW!**
-**狀態**: Phase 1-7 已完成 (2026-01-03)
-
-**核心功能**:
-1. ✅ 購物車功能（Zustand 狀態管理、持久化儲存）
-2. ✅ 訂單建立（訂單編號產生、價格快照）
-3. ✅ 管理員訂單處理（確認、狀態更新、取消）
-4. ✅ 客戶訂單查詢（RLS 權限控制）
-5. ✅ 訂單操作歷史追蹤（完整稽核軌跡）
-
-**資料庫實體**:
-- `orders`: 訂單主表（訂單編號、總金額、狀態、備註）
-- `order_items`: 訂單明細（商品快照、成交價格）
-- `order_timelines`: 訂單操作歷史（操作類型、操作者、狀態變更）
-
-**Server Actions**:
-- `createOrder()`: 建立訂單（含訂單編號產生與價格快照）
-- `getOrders()`: 查詢訂單列表（支援狀態篩選與搜尋）
-- `getOrderById()`: 查詢訂單詳情（含明細與操作歷史）
-- `confirmOrder()`: 確認訂單並扣減庫存（原子性操作）
-- `updateOrderStatus()`: 更新訂單狀態（confirmed → shipping → completed）
-- `cancelOrder()`: 取消訂單並回補庫存（原子性操作）
-- `validateCartItem()`: 驗證購物車商品（價格設定檢查）
-- `validateCartBeforeCheckout()`: 下單前購物車驗證
-
-**PostgreSQL Functions**:
-- `generate_order_number()`: 產生唯一訂單編號（ORD-YYYYMMDD-XXXX）
-- `confirm_order_and_deduct_stock()`: 訂單確認與庫存扣減（原子性）
-- `cancel_order_and_restore_stock()`: 訂單取消與庫存回補（原子性）
-- `update_order_status()`: 更新訂單狀態並記錄歷史
-
-**Zustand Store**:
-- `stores/cart.ts`: 購物車狀態管理（含 persist middleware）
-
-**UI 元件**:
-- 客戶端：購物車頁面、訂單確認頁面、訂單列表、訂單詳情
-- 管理端：訂單列表（含篩選搜尋）、訂單詳情、狀態更新器、取消訂單按鈕、操作歷史時間軸
-
-**文件位置**:
-- 規格: `specs/004-cart-and-orders/spec.md`
-- 實作計畫: `specs/004-cart-and-orders/plan.md`
-- 資料模型: `specs/004-cart-and-orders/data-model.md`
-- API 合約: `specs/004-cart-and-orders/contracts/`
-- 快速上手: `specs/004-cart-and-orders/quickstart.md`
-- 研究紀錄: `specs/004-cart-and-orders/research.md`
-- 測試資料: `specs/004-cart-and-orders/seed-test-data.sql`
-
-**進度**: 53/63 任務完成 (84%)
-- Phase 1-7: ✅ 全部完成（MVP 核心功能）
-- Phase 8: ⏳ 進行中（Polish & 品質保證）
-
-#### 5. **008-system-admin**: 後台系統管理功能 ✅ **NEW!**
-**狀態**: Phase 1-5, Phase 6 後端, Phase 8 核心 已完成 (2026-01-04)
-
-**核心功能**:
-1. ✅ 管理員帳號管理（建立、編輯、刪除、重設密碼）
-2. ✅ 管理員登入系統（username 模式，無需 email）
-3. ✅ 操作日誌系統（完整稽核軌跡，五種操作類型）
-4. ✅ 系統設定 API（設定查詢、更新、Logo 上傳）
-
-**資料庫實體**:
-- `admin_users`: 管理員帳號表（username、密碼、暱稱）
-- `audit_logs`: 操作日誌表（操作類型、目標、變更內容、操作者快照）
-- `system_settings`: 系統設定表（key-value 儲存，支援多種型別）
-
-**Server Actions**:
-- 管理員管理: `createAdmin()`, `getAdmins()`, `updateAdmin()`, `resetPassword()`, `deleteAdmin()`
-- 操作日誌: `logAudit()`, `getAuditLogs()`, `getAuditLogsByTarget()`, `getAuditLogStats()`
-- 系統設定: `getSettings()`, `getPublicSettings()`, `updateSetting()`, `uploadLogo()`, `deleteLogo()`
-
-**UI 元件**:
-- 管理端：成員列表、成員表單、操作日誌列表、操作日誌篩選器、操作類型 Badge
-
-**文件位置**:
-- 規格: `specs/008-system-admin/spec.md`
-- 實作計畫: `specs/008-system-admin/plan.md`
-- 任務清單: `specs/008-system-admin/tasks.md`
-- API 合約: `specs/008-system-admin/contracts/`
-- 實作指引: `specs/008-system-admin/IMPLEMENTATION_GUIDE.md`
-- 測試報告: `specs/008-system-admin/TESTING_REPORT.md`
-
-**進度**: 69/86 任務完成 (80%)
-- Phase 1-5: ✅ 完整（成員管理 + 操作日誌）
-- Phase 6: 🔄 後端完成（系統設定 Server Actions）
-- Phase 7: 📋 UI 可選（操作歷史時間軸）
-- Phase 8: ✅ 核心完成（TypeScript 型別檢查通過）
-
-#### 6. **系列與商品管理 Excel 匯入匯出功能** ✅ **NEW!**
-**狀態**: Phase 1-5 完成 (2026-01-05)
-
-**核心功能**:
-1. ✅ 資料庫 Migration（系列與商品名稱唯一性約束）
-2. ✅ 系列管理匯入匯出（範本下載、匯出、雙階段匯入）
-3. ✅ 商品管理匯入匯出（範本下載、匯出、雙階段匯入）
-4. ✅ 批次查詢優化（避免 N+1 查詢問題）
-5. ✅ 完整錯誤處理（唯一性約束違反、Trigger 失敗、試算驗證）
-
-**資料庫變更**:
-- `series.name`: 新增 UNIQUE 約束與索引
-- `products.name`: 新增 UNIQUE 約束與索引
-- Migration: `20260116_add_unique_name_constraints.sql`
-
-**Server Actions** (`lib/actions/series.ts`, `lib/actions/products.ts`):
-- `exportSeries()` / `exportProducts()`: 匯出為 Excel（含篩選支援）
-- `importSeries()` / `importProducts()`: 批次匯入（試算模式 + 正式匯入）
-- `downloadSeriesTemplate()` / `downloadProductTemplate()`: 下載匯入範本
-
-**UI 元件** (`components/admin/series/`, `components/admin/products/`):
-- `ExcelExport`: 匯出按鈕（白色、Neo-Brutalism 風格）
-- `ExcelImport`: 匯入區塊（可收合、即時結果顯示、錯誤明細）
-- `ExcelTemplateDownload`: 範本下載按鈕（藍色）
-
-**頁面整合**:
-- `/admin/series`: 系列管理頁面（新增三個按鈕 + 匯入區塊）
-- `/admin/products`: 商品管理頁面（新增三個按鈕 + 匯入區塊）
-
-**特色**:
-- ✅ 名稱重複檢查：匯入時禁止名稱重複
-- ✅ 商品編號自動產生：由 PostgreSQL Trigger 自動產生
-- ✅ 系列狀態檢查：僅允許匯入到 active 系列
-- ✅ 批次查詢優化：使用 Set/Map 避免 N+1 查詢
-- ✅ 雙階段匯入：試算驗證 → 正式匯入
-- ✅ 匯入成功提示：提醒管理員設定等級價格
-
-**實作檔案**:
-| 類型 | 檔案數量 | 位置 |
-|------|---------|------|
-| Migration | 1 | `supabase/migrations/20260116_add_unique_name_constraints.sql` |
-| Zod Schema | 1 | `lib/validations/excel.schema.ts` |
-| Server Actions | 6 函式 | `lib/actions/series.ts`, `lib/actions/products.ts` |
-| UI 元件 | 6 | `components/admin/series/`, `components/admin/products/` |
-| 頁面整合 | 2 | `app/(admin)/admin/series/page.tsx`, `app/(admin)/admin/products/page.tsx` |
-
-#### 7. **009-coupon-system**: 優惠券系統 ✅ **NEW!**
-**狀態**: Phase 1-8 核心功能完成 (2026-01-06)
-
-**核心功能**:
-1. ✅ 客戶領取與使用優惠券（輸入口令、購物車應用、訂單折扣）
-2. ✅ 管理員建立與管理優惠券（代碼、折扣方式、使用限制、生效時間）
-3. ✅ 優惠券使用限制與驗證（等級限制、最低金額、系列限制）
-4. ✅ 訂單優惠券快照（永久保留，即使優惠券被刪除）
-5. ✅ 優惠券代碼唯一性與大小寫處理（自動轉大寫、重複檢查）
-6. ✅ 購物車商品變更時自動重新驗證優惠券
-
-**資料庫實體**:
-- `coupons`: 優惠券主表（代碼、折扣方式、折扣值、使用限制、生效時間）
-- `coupon_tier_restrictions`: 優惠券等級限制表（多對多關聯）
-- `coupon_series_restrictions`: 優惠券系列限制表（多對多關聯）
-- `user_coupons`: 客戶優惠券領取記錄表（領取時間、使用狀態）
-- `order_coupons`: 訂單優惠券快照表（代碼、折扣方式、折扣金額）
-- `active_coupons`: 有效優惠券 View（自動過濾過期與已刪除）
-
-**Server Actions** (`lib/actions/coupons.ts`):
-- 管理員: `createCoupon()`, `updateCoupon()`, `deleteCoupon()`, `getCoupons()`, `getCouponById()`, `getCouponStats()`
-- 客戶: `claimCoupon()`, `getUserCoupons()`, `validateCoupon()`
-- 工具函式: `calculateCouponDiscount()`, `validateCouponConditions()` (`lib/utils/coupon-helpers.ts`)
-
-**UI 元件**:
-- 前台：`CouponCard` (Coupang 風格)、`CouponCodeInput` (Foodpanda 風格)、`CouponSelector`
-- 後台：`CouponForm`、`CouponList`、`CouponFilters`
-
-**Zustand Store 擴充** (`stores/cart.ts`):
-- 新增優惠券狀態：`appliedCoupon`, `couponDiscount`, `couponValidationCallback`
-- 新增方法：`applyCoupon()`, `removeCoupon()`, `setCouponValidationCallback()`, `triggerCouponRevalidation()`
-- 購物車商品變更時自動重新驗證優惠券並移除不符合條件的優惠券
-
-**文件位置**:
-- 規格: `specs/009-coupon-system/spec.md`
-- 技術研究: `specs/009-coupon-system/research.md`
-- 資料模型: `specs/009-coupon-system/data-model.md`
-- API 合約: `specs/009-coupon-system/contracts/coupons.ts`
-- 任務清單: `specs/009-coupon-system/tasks.md`
-- 快速上手: `specs/009-coupon-system/quickstart.md`
-- 測試資料: `specs/009-coupon-system/seed-test-data.sql`
-
-**進度**: 49/55 任務完成 (89%)
-- Phase 1-2 (Setup & Foundational): ✅ 完整
-- Phase 3-4 (US1-US2 - MVP): ✅ 完整（客戶領取使用 + 管理員 CRUD）
-- Phase 5 (US3 - 使用限制驗證): ✅ 完整
-- Phase 6 (US4 - 視覺化設計): 🔄 基礎完成（可選優化）
-- Phase 7 (US5 - 訂單快照): ✅ 完整
-- Phase 8 (US6 - 代碼唯一性): ✅ 完整
-- Phase 9 (US7 - 刪除清理): 🔄 基礎完成（可選優化）
-- Phase 10 (Polish): 🔄 進行中（統計功能可選）
-
-**特色亮點**:
-- ✅ 優惠券代碼大小寫不敏感（使用 Generated Column `code_normalized`）
-- ✅ 購物車商品變更時自動重新驗證優惠券
-- ✅ 訂單優惠券快照永久保留（不使用 FK，保留歷史記錄）
-- ✅ 支援現金折扣與百分比折扣
-- ✅ 支援等級限制、最低金額限制、系列限制
-- ✅ RLS Policy 確保客戶僅能查看有效優惠券
-- ✅ Coupang 風格優惠券卡片 + Foodpanda 風格輸入口令
-
-
-#### 8. **011-shipping-and-order-edit**: 運費設定與訂單修改系統 ✅ **NEW!**
-**狀態**: Phase 1-6 核心功能完成 (2026-01-06)
-
-**核心功能**:
-1. ✅ 會員等級運費設定（基本運費、滿額免運門檻）
-2. ✅ 訂單建立時自動計算運費（RPC 函數、購物車預覽）
-3. ✅ 訂單狀態流程簡化（移除 confirmed 狀態，pending → shipping → completed）
-4. ✅ 庫存扣減時機調整（從確認訂單移至標記出貨階段）
-5. ✅ 訂單修改核心功能（商品單價、數量、運費、自訂費用）
-6. ✅ 批次修改原子性保證（PostgreSQL Transaction）
-
-**資料庫實體**:
-- `tiers`: 擴展運費欄位（shipping_fee, free_shipping_threshold）
-- `orders`: 擴展運費欄位（shipping_fee）
-- `order_custom_fees`: 訂單自訂費用表（手續費、包裝費、總額調整）
-- `order_timelines`: 擴展修改歷程欄位（modifications JSONB）
-
-**PostgreSQL Functions**:
-- `calculate_shipping_fee()`: 計算運費（依會員等級與訂單金額）
-- `mark_order_as_shipping()`: 標記出貨並扣減庫存（原子性操作）
-- `update_order_with_modifications()`: 批次修改訂單（商品、費用、運費）
-
-**Server Actions** (`lib/actions/orders.ts`, `lib/actions/tiers.ts`):
-- 訂單管理: `markAsShipping()`, `updateOrderDetails()`, `updateOrderStatus()` (更新)
-- 等級管理: `updateTier()` (擴展運費欄位)
-
-**UI 元件**:
-- 前台：`CartSummary` (運費預覽)、`ShippingFeeDisplay`
-- 後台：`TierForm` (運費設定)、`OrderEditor` (訂單編輯器)、`OrderActions` (標記出貨按鈕)
-
-**文件位置**:
-- 規格: `specs/011-shipping-and-order-edit/spec.md`
-- 實作計畫: `specs/011-shipping-and-order-edit/plan.md`
-- 資料模型: `specs/011-shipping-and-order-edit/data-model.md`
-- API 合約: `specs/011-shipping-and-order-edit/contracts/`
-- 任務清單: `specs/011-shipping-and-order-edit/tasks.md`
-- 快速上手: `specs/011-shipping-and-order-edit/quickstart.md`
-- 測試資料: `specs/011-shipping-and-order-edit/seed-test-data.sql`
-
-**進度**: 63/101 任務完成 (62%)
-- Phase 1 (Setup): ✅ 完整
-- Phase 2 (Foundational): ✅ 完整（資料庫 Migration、型別定義）
-- Phase 3 (US1 - 運費設定): ✅ 完整
-- Phase 4 (US2 - 運費計算): ✅ 完整
-- Phase 5 (US6 - 狀態流程調整): ✅ 完整
-- Phase 6 (US3 - 訂單修改核心): ✅ 完整
-- Phase 7 (US4 - 修改歷程顯示): 📋 可選（P2 優先級）
-- Phase 8 (US5 - 優惠券互動): 📋 可選（P2 優先級）
-- Phase 9 (Polish): ✅ 完整（程式碼品質檢查、TypeScript 型別檢查、權限驗證、RLS Policy、錯誤訊息規範）
-- Phase 10 (Deployment): 📋 待部署
-
-**特色亮點**:
-- ✅ 運費自動化計算（依會員等級與訂單金額）
-- ✅ 滿額免運機制（支援不同等級設定不同門檻）
-- ✅ 訂單狀態流程簡化（pending → shipping → completed）
-- ✅ 庫存扣減時機優化（從確認訂單移至出貨階段）
-- ✅ 訂單修改原子性保證（PostgreSQL Transaction 確保資料一致性）
-- ✅ 支援負庫存（預購/欠貨場景）
-- ✅ 自訂費用支援（手續費、包裝費、額外運費、總額調整）
-- ✅ 批次修改功能（商品單價、數量、運費一次性提交）
-
-#### 9. **013-unified-dialog**: 統一對話框系統 ✅ **NEW!**
-**狀態**: Phase 1-7 核心功能完成 (2026-01-08)
-
-**核心功能**:
-1. ✅ 統一對話框 Hook API（useAlert、useConfirm、usePrompt）
-2. ✅ 替換所有原生瀏覽器對話框（18 個檔案、72 個對話框）
-3. ✅ Neo-Brutalism 設計規範（3px 邊框、硬邊陰影、點擊效果）
-4. ✅ ESLint 規則預防未來引入原生對話框
-5. ✅ 對話框佇列機制（連續呼叫自動排隊）
-6. ✅ 背景滾動鎖定與 ESC 鍵關閉支援
-
-**核心元件**:
-- `DialogProvider`: React Context 提供統一對話框狀態管理
-- `AlertDialog`: 通知型對話框（success / error / warning / info）
-- `ConfirmDialog`: 確認型對話框（含取消按鈕、danger 變體）
-- `PromptDialog`: 輸入型對話框（含驗證規則）
-
-**Hook API** (`lib/contexts/dialog-context.tsx`):
-- `useAlert()`: 顯示通知訊息（返回 Promise<void>）
-- `useConfirm()`: 顯示確認對話框（返回 Promise<boolean>）
-- `usePrompt()`: 顯示輸入對話框（返回 Promise<string | null>）
-
-**ESLint 配置** (`.eslintrc.json`):
-- 禁止使用 `window.alert()`、`window.confirm()`、`window.prompt()`
-- 提供自訂錯誤訊息引導使用 Hook
-- 測試檔案與型別定義檔案自動排除
-- Git pre-commit hook 自動檢查
-
-**已遷移檔案** (18 個):
-- **P0 高頻**: 會員等級、優惠券、訂單、商品、分類管理（5 個檔案）
-- **P1 中頻**: 公告、Logo、系列、標籤、成員、密碼、價格（10 個檔案）
-- **P2 低頻**: 訂單編輯器、前台導覽列、圖片上傳（3 個檔案）
-
-**文件位置**:
-- 規格: `specs/013-unified-dialog/spec.md`
-- 技術研究: `specs/013-unified-dialog/research.md`
-- 快速上手: `specs/013-unified-dialog/quickstart.md`
-- API 合約: `specs/013-unified-dialog/contracts/`
-- 任務清單: `specs/013-unified-dialog/tasks.md`
-
-**進度**: 52/63 任務完成 (83%)
-- Phase 1-2 (Setup & Foundational): ✅ 完整（13/13）
-- Phase 3 (US1 - Hook API): ✅ 完整（7/7）
-- Phase 4 (US2 - 遷移 72 個對話框): ✅ 完整（23/23）
-- Phase 5 (US3 - 驗證): 🔄 進行中（3/6 - TypeScript/ESLint 通過）
-- Phase 6 (US4 - ESLint 規則): ✅ 完整（6/6）
-- Phase 7 (Polish): 🔄 進行中（文件撰寫）
-
-**特色亮點**:
-- ✅ Promise-based API（與原生對話框使用方式一致）
-- ✅ Neo-Brutalism 設計（3px 黑邊框、8px 硬陰影）
-- ✅ 五種變體配色（success、error、warning、info、danger）
-- ✅ ESLint 規則自動阻止原生對話框引入
-- ✅ 對話框佇列機制（連續呼叫不會互相覆蓋）
-- ✅ 無障礙支援（ARIA 標籤、鍵盤導航、焦點管理）
-- ✅ 響應式設計（手機 2px / 桌面 3px 邊框）
-
-#### 10. **017-health-check**: 專案健康檢查系統 ✅ **NEW!**
-**狀態**: Phase 0-10 核心功能完成 (2026-01-14)
-
-**核心功能**:
-1. ✅ 架構健康度檢查（路由結構、Server Actions 模式、模組依賴）
-2. ✅ API 整合度檢查（Server Actions 品質、錯誤處理、權限驗證）
-3. ✅ 使用者體驗檢查（前台/後台操作流程測試清單）
-4. ✅ 設計系統一致性檢查（Neo-Brutalism 風格、響應式設計）
-5. ✅ 效能檢查（Lighthouse CI、Web Vitals、資料庫查詢）
-6. ✅ Bug 檢查（邊界條件、資料一致性、並發操作測試）
-7. ✅ 資料庫安全檢查（RLS Policies、Migration 品質、備份系統）
-8. ✅ 綜合報告產生（Markdown + JSON 雙格式、問題清單、修復建議）
-9. ✅ 並行執行系統（7 個領域同時檢查，12 秒完成）
-
-**檢查腳本**:
-- `scripts/health-check/run-health-check.ts` - 主執行腳本（並行執行所有檢查）
-- `scripts/health-check/check-architecture.ts` - 架構檢查（ts-morph AST 分析）
-- `scripts/health-check/check-api.ts` - API 檢查（Server Actions 品質）
-- `scripts/health-check/check-ux.ts` - UX 檢查（操作流程測試清單產生）
-- `scripts/health-check/check-design.ts` - 設計檢查（正規表示式樣式檢查）
-- `scripts/health-check/check-performance.ts` - 效能檢查（Lighthouse CI 整合）
-- `scripts/health-check/check-bugs.ts` - Bug 檢查（測試案例產生）
-- `scripts/health-check/check-security.ts` - 安全檢查（RLS 與 Migration 分析）
-- `scripts/health-check/generate-report.ts` - 報告產生器（Markdown + JSON）
-
-**執行方式**:
-```bash
-# 執行完整健康檢查
-pnpm health-check
-
-# 執行特定領域檢查
-pnpm health-check:architecture  # 架構檢查
-pnpm health-check:api           # API 檢查
-pnpm health-check:security      # 安全檢查
-```
-
-**報告輸出**:
-- `specs/017-health-check/reports/summary.md` - 綜合報告（Markdown）
-- `specs/017-health-check/reports/summary.json` - 綜合報告（JSON）
-- `specs/017-health-check/reports/architecture.json` - 架構檢查詳細報告
-- `specs/017-health-check/reports/api.json` - API 檢查詳細報告
-- `specs/017-health-check/reports/security.json` - 安全檢查詳細報告
-- `specs/017-health-check/reports/issues/` - 問題清單（依嚴重程度分類）
-
-**檢查結果範例** (2026-01-14):
-```
-✅ 健康檢查完成
-⏱️  執行時間: 12.4秒
-📊 整體評分: 30/100
-🔍 總問題數: 75
-  - 🔴 Critical: 0
-  - 🟡 High: 9
-  - 🔵 Medium: 41
-  - ⚪ Low: 25
-```
-
-**各領域評分**:
-- 架構健康度: 64/100 (43 個問題)
-- API 整合度: 0/100 (7 個問題)
-- 使用者體驗: 85/100 (0 個問題)
-- 設計系統一致性: 75/100 (25 個問題)
-- 效能表現: 待實作
-- Bug 檢查: 待實作
-- 安全性: 待實作
-
-**文件位置**:
-- 規格: `specs/017-health-check/spec.md`
-- 實作計畫: `specs/017-health-check/plan.md`
-- 資料模型: `specs/017-health-check/data-model.md`
-- 技術研究: `specs/017-health-check/research.md`
-- 任務清單: `specs/017-health-check/tasks.md`
-- 快速上手: `specs/017-health-check/quickstart.md`
-- API 合約: `specs/017-health-check/contracts/`
-
-**進度**: 94/118 任務完成 (80%)
-- Phase 0-1 (Setup + Foundational): ✅ 完整
-- Phase 2-3 (US1-US2 - 架構與 API 檢查): ✅ 完整
-- Phase 4-8 (US3-US7 - UX、設計、效能、Bug、安全檢查): ✅ 完整
-- Phase 9-10 (報告產生 + 主執行腳本): ✅ 完整
-- Phase 11 (Polish & Testing): 📋 可選（測試與文件）
-
-**特色亮點**:
-- ✅ 七大領域全面檢查（架構、API、UX、設計、效能、Bug、安全）
-- ✅ 自動化與手動測試混合（自動檢查 + 手動測試清單）
-- ✅ Markdown + JSON 雙格式報告（人類易讀 + 機器可解析）
-- ✅ 並行執行機制（7 個領域同時檢查，12 秒完成）
-- ✅ 問題追蹤與修復建議（每個問題包含具體修復步驟）
-- ✅ TypeScript AST 分析（ts-morph 靜態分析 Server Actions）
-- ✅ 可重複性與版本控制（所有報告儲存為檔案）
-
----
-
-### 🚀 待開發功能
-目前所有核心功能已完成，以下是可能的擴充方向：
-- 📊 **報表與分析**: 銷售報表、庫存分析、優惠券使用統計
-- 🎨 **視覺化優化**: 優惠券卡片鋸齒狀切口、領取動畫效果
-- 🔔 **通知系統**: 訂單狀態通知、庫存警示、優惠券過期提醒
-- 💳 **付款整合**: 金流串接
-- 🚚 **物流整合**: 出貨與追蹤
+## 已完成核心功能
+
+### 功能模組清單
+1. ✅ **會員等級與客戶管理** - 雙入口登入、快速開戶、等級 CRUD、RLS 權限控制
+2. ✅ **商品與分類管理** - 分類/商品 CRUD、圖片上傳、前台商品瀏覽
+3. ✅ **系列與等級價格管理** - 三層階層架構、等級綁定價格、批次價格設定
+4. ✅ **購物車與訂單系統** - Zustand 狀態管理、訂單建立、訂單處理、操作歷史追蹤
+5. ✅ **後台系統管理** - 管理員帳號管理、操作日誌系統、系統設定 API
+6. ✅ **Excel 匯入匯出** - 系列與商品批次匯入匯出、範本下載、雙階段匯入驗證
+7. ✅ **優惠券系統** - 客戶領取使用、管理員 CRUD、使用限制驗證、訂單快照
+8. ✅ **運費與訂單修改** - 運費自動計算、滿額免運、訂單狀態流程、訂單修改功能
+9. ✅ **統一對話框系統** - 替換原生對話框、Neo-Brutalism 設計、ESLint 規則
+10. ✅ **專案健康檢查系統** - 七大領域檢查、並行執行、報告產生
+
+### 核心資料模型
+- **認證與會員**: `tiers`, `profiles`
+- **商品目錄**: `categories`, `series`, `products`, `tier_prices`
+- **訂單系統**: `orders`, `order_items`, `order_timelines`, `order_custom_fees`
+- **優惠券**: `coupons`, `user_coupons`, `coupon_tier_restrictions`, `coupon_series_restrictions`, `order_coupons`
+- **系統管理**: `admin_users`, `audit_logs`, `system_settings`
+
+詳細資料模型請參考：`supabase/migrations/README.md`
 
 ---
 
@@ -642,13 +234,11 @@ pnpm health-check:security      # 安全檢查
 
 ---
 
-## 重要提醒
-
-### 🚀 Migration 工作流程（生產環境）⭐
+## Migration 工作流程（生產環境）⭐
 
 **⚠️ 重要：本專案使用線上 Supabase 生產資料庫，所有操作必須謹慎執行**
 
-#### ✅ 標準 Migration 流程（生產環境）
+### 標準 Migration 流程
 
 ```bash
 # 1. 建立新 Migration
@@ -663,210 +253,46 @@ pnpm db:migrate
 supabase db push
 ```
 
-**🛡️ 生產環境操作注意事項**:
+### 生產環境操作注意事項
 - ⚠️ **每次 Migration 都會直接影響線上資料庫**
 - ✅ **執行前必須備份**（使用雲端備份系統）
 - ✅ **必須先在測試分支驗證**
 - ✅ **增量式更新**（避免破壞性變更）
 - ❌ **絕對禁止**使用 `supabase db reset` 或 `pnpm db:reset`
 
-#### 📚 完整文件
+### 完整文件參考
+- 📖 **安全 Migration 指南**: [`docs/SAFE_MIGRATION_GUIDE.md`](docs/SAFE_MIGRATION_GUIDE.md)
+- 🚀 **快速參考**: [`docs/BACKUP_RESTORE_CHEATSHEET.md`](docs/BACKUP_RESTORE_CHEATSHEET.md)
+- ⚡ **安全協議**: [`docs/DATABASE_SAFETY_PROTOCOL.md`](docs/DATABASE_SAFETY_PROTOCOL.md)
 
-- 📖 **安全 Migration 指南**: [`docs/SAFE_MIGRATION_GUIDE.md`](docs/SAFE_MIGRATION_GUIDE.md) - 生產環境操作規範
-- 🚀 **快速參考**: [`docs/BACKUP_RESTORE_CHEATSHEET.md`](docs/BACKUP_RESTORE_CHEATSHEET.md) - 備份與回滾指令
-- ⚡ **安全協議**: [`docs/DATABASE_SAFETY_PROTOCOL.md`](docs/DATABASE_SAFETY_PROTOCOL.md) - 資料庫安全最高指導原則
-
----
-
-### ⚠️ 資料庫安全最高指導原則（生產環境）
-
-**🛡️ 專案使用線上 Supabase 生產資料庫，所有操作必須極度謹慎**
-
-**絕對禁止的操作**:
-- ❌ **嚴格禁止**: `supabase db reset`（會清空所有生產資料）
-- ❌ **嚴格禁止**: `pnpm db:reset`（會清空所有生產資料）
-- ❌ **嚴格禁止**: 任何包含 `DROP TABLE`、`TRUNCATE` 的 Migration
-
-**標準開發流程（生產環境 SOP）**:
-1. **建立 Migration**: 執行 `supabase migration new <描述性名稱>`
-2. **編輯 SQL**: 編輯生成的 Migration 檔案
-   - ✅ 優先使用 `ADD COLUMN`、`CREATE TABLE`、`CREATE INDEX`
-   - ⚠️ 避免 `DROP COLUMN`、`DROP TABLE`（先重新命名，保留 30 天）
-   - 🔍 檢查是否有意外的破壞性變更
-3. **執行前備份**: 使用雲端備份系統手動備份（後台系統設定頁面）
-4. **推送到生產**: 使用 `pnpm db:migrate` 或 `supabase db push`
-5. **驗證結果**: 確認 Migration 成功且資料完整
-
-**指令管控（生產環境）**:
-- ✅ **允許使用**:
-  - `pnpm db:migrate` - 推送 Migration 到生產環境 ⭐
-  - `supabase db push` - 推送 Migration 到生產環境
-  - `supabase migration new <name>` - 建立新 Migration
-  - `supabase migration list` - 查看 Migration 狀態
-- ❌ **絕對禁止**:
-  - `pnpm db:reset` - 會清空所有生產資料
-  - `supabase db reset` - 會清空所有生產資料
-
-**三層安全防護**:
-1. **預防層**: 使用增量式 Migration + 避免破壞性變更
-2. **備份層**: 雲端自動備份（每日 02:00）+ 手動備份
-3. **回滾層**: 完整備份檔案（保留最近 10 個）
-
-📖 **完整安全指南**: [docs/SAFE_MIGRATION_GUIDE.md](docs/SAFE_MIGRATION_GUIDE.md)
-🚀 **快速參考**: [docs/BACKUP_RESTORE_CHEATSHEET.md](docs/BACKUP_RESTORE_CHEATSHEET.md)
-⚡ **安全協議**: [docs/DATABASE_SAFETY_PROTOCOL.md](docs/DATABASE_SAFETY_PROTOCOL.md)
-
----
-
-### 設計風格
-採用 **Neo-Brutalism** 風格,所有 UI 元件必須符合:
-- 2-3px 實心黑邊框
-- 硬邊陰影: `shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
-- 點擊效果: `translate-x-[2px] translate-y-[2px] shadow-none`
-
-### 安全性
-- Server Actions 必須包含權限檢查
-- 所有輸入使用 Zod 驗證
-- 敏感操作記錄於 `order_timelines` 或日誌
-
-### 效能目標
-- 頁面首次載入 < 2s (Mobile 4G)
-- 登入驗證響應 < 500ms
-- 客戶搜尋即時響應 < 300ms
-- 資料庫查詢 < 100ms (p95)
-
----
-
----
-
-## 常用開發指令
-
-### 開發與建置
-```bash
-pnpm dev              # 啟動開發伺服器 (http://localhost:3000)
-pnpm build            # 建置生產環境
-pnpm start            # 啟動生產伺服器
-pnpm type-check       # TypeScript 型別檢查 (建置前必須執行)
-pnpm lint             # ESLint 檢查
-```
-
-### 測試
-```bash
-pnpm test             # 執行所有測試 (Vitest)
-pnpm test:ui          # 啟動 Vitest UI 介面
-```
-
-### Supabase 生產環境管理
-
-**⚠️ 重要：本專案使用線上 Supabase 生產資料庫**
-
-專案配置為**線上 Supabase 生產環境**，所有操作會直接影響生產資料。
-
----
-
-#### 生產環境資訊
-
-**Supabase 專案**:
-- Dashboard: https://supabase.com/dashboard/project/qwovavytryvgchcowjof
-- API URL: https://qwovavytryvgchcowjof.supabase.co
-- 區域: AWS ap-southeast-1 (新加坡)
-- 專案 ID: `qwovavytryvgchcowjof`
-
-**環境變數** (`.env.local`):
-- `NEXT_PUBLIC_SUPABASE_URL`: 生產環境 API URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 公開金鑰
-- `SUPABASE_SERVICE_ROLE_KEY`: 服務金鑰（Admin 權限）
-
----
-
-#### Migration 管理（生產環境）
-
-**⚠️ 生產環境 Migration 安全提醒**:
-- **每次 Migration 都會直接影響生產資料**
-- 新增 Migration 前**必須**參考 [安全 Migration 指南](docs/SAFE_MIGRATION_GUIDE.md)
-- 使用 [Migration 範本](supabase/migrations/_TEMPLATE_safe_migration.sql) 確保正確格式
-- 執行前使用 [檢查清單](supabase/migrations/_CHECKLIST.md) 逐項驗證
-- **絕對禁止**執行 `supabase db reset` 或 `pnpm db:reset`
-
-```bash
-# 建立新 Migration
-supabase migration new <name>
-
-# 推送到生產環境（謹慎執行）
-pnpm db:migrate
-# 或
-supabase db push
-
-# 查看 Migration 狀態
-supabase migration list
-
-# 查看資料庫差異（執行前檢查）
-pnpm db:diff
-# 或
-supabase db diff
-```
-
-**執行前檢查清單**:
-- [ ] 已手動備份資料庫（後台系統設定 > 資料庫備份）
-- [ ] 已確認 Migration SQL 無破壞性變更
-- [ ] 已使用 `pnpm db:diff` 檢查差異
-- [ ] 已在測試分支驗證
-
-**Migration 檔案架構** (2026-01-07 整合後):
-
-專案已將 27 個零散的 Migration 檔案整合為 8 個功能模組化檔案，減少 70% 檔案數量：
-
-| 模組 | 檔案名稱 | 功能說明 | 包含內容 |
-|------|---------|----------|----------|
-| **M1** | `20260107100000_core_auth_and_tiers.sql` | 核心認證與會員等級 | tiers, profiles 表 + RLS |
-| **M2** | `20260107110000_product_catalog_system.sql` | 商品目錄系統 | categories, series, products 表 + 索引 |
-| **M3** | `20260107120000_orders_and_workflow.sql` | 訂單與工作流程 | orders, order_items, order_timelines 表 + 5 函數 |
-| **M4** | `20260107130000_shipping_and_custom_fees.sql` | 運費與自訂費用 | order_custom_fees 表 + 運費計算函數 |
-| **M5** | `20260107140000_coupon_system.sql` | 優惠券系統 | coupons, user_coupons 等 5 表 + View |
-| **M6** | `20260107150000_system_admin_and_audit.sql` | 系統管理與稽核 | admin_users, audit_logs, system_settings 表 |
-| **M7** | `20260107160000_indexes_and_performance.sql` | 索引與效能優化 | 50+ 個索引（含效能優化索引） |
-| **M8** | `20260107170000_rls_policies.sql` | RLS 策略 | 18 個表的 60+ 個 Policy |
-
-**整合優勢**:
-- ✅ **可讀性提升**: 新開發者 10 分鐘內理解資料庫架構（原 30+ 分鐘）
-- ✅ **維護性提升**: 按功能模組組織，快速找到需要修改的位置
-- ✅ **完整註解**: 每個表、欄位、函數都有 COMMENT 說明
-- ✅ **集中管理**: M7 集中管理所有索引，M8 集中管理所有 RLS
-
-**舊檔案封存**:
-- 📁 **位置**: `supabase/migrations/.archive/`（27 個舊檔案已備份）
-- 📋 **對應表**: `.archive/MAPPING.md`（舊檔案與新模組的對應關係）
-- 📖 **還原指引**: `.archive/README.md`
-
-**雲端備份系統** (015-cloud-backup):
-- ✅ **自動備份**: 每日凌晨 2:00 自動執行（Vercel Cron）
-- ✅ **手動備份**: 管理員可在後台系統設定頁面手動觸發
-- ✅ **雲端儲存**: Google Cloud Storage（主）+ Vercel Blob（備）
-- ✅ **滾動刪除**: 自動保留最近 10 個備份
-- 📖 **完整指南**: `specs/015-cloud-backup/E2E-TESTING-GUIDE.md`
-
-**快速參考**:
-- 📚 **Migration 索引**: `supabase/migrations/README.md`
-- 🚀 **快速開始**: `specs/012-migration-consolidation/quickstart.md`
-- 📊 **整合報告**: `specs/012-migration-consolidation/INTEGRATION_REPORT.md`
-
-**⚠️ Migration 安全原則** - **必讀！**
-
-在建立 Migration 前，請務必參考以下文件：
-- 📖 **完整指南**: [`docs/SAFE_MIGRATION_GUIDE.md`](docs/SAFE_MIGRATION_GUIDE.md) - 詳細說明安全與危險操作
-- 🚀 **快速參考**: [`docs/BACKUP_RESTORE_CHEATSHEET.md`](docs/BACKUP_RESTORE_CHEATSHEET.md) - 部署檢查清單與指令
-
-**黃金守則（按優先級排序）**:
-0. **🛡️ 資料庫安全至上**: 絕對禁止在遠端/生產環境執行 `supabase db reset`（見 [資料庫安全協議](docs/DATABASE_SAFETY_PROTOCOL.md)）
+### Migration 黃金守則
+0. **🛡️ 資料庫安全至上**: 絕對禁止在生產環境執行 `supabase db reset`
 1. ✅ **優先使用新增操作**（ADD COLUMN, CREATE TABLE, CREATE INDEX）
 2. ⚠️ **避免刪除操作**（DROP COLUMN, DROP TABLE）- 先重新命名，保留 30 天
-3. 🛡️ **部署前必須備份**（使用 `pnpm deploy:db` 或手動 `pg_dump`）
+3. 🛡️ **部署前必須備份**（使用雲端備份系統手動備份）
 4. 🔄 **複雜變更分階段執行**（新增 → 遷移 → 清理）
 5. 📊 **準備回滾計畫**（備份檔案或反向 Migration）
 
-**Migration 範本位置**:
+### Migration 範本位置
 - `supabase/migrations/_TEMPLATE_safe_migration.sql` - 安全新增功能範本
 - `supabase/migrations/_CHECKLIST.md` - 部署前檢查清單
+
+### Migration 檔案架構
+
+專案已將 Migration 整合為 8 個功能模組化檔案：
+
+| 模組 | 檔案名稱 | 功能說明 |
+|------|---------|----------|
+| **M1** | `20260107100000_core_auth_and_tiers.sql` | 核心認證與會員等級 |
+| **M2** | `20260107110000_product_catalog_system.sql` | 商品目錄系統 |
+| **M3** | `20260107120000_orders_and_workflow.sql` | 訂單與工作流程 |
+| **M4** | `20260107130000_shipping_and_custom_fees.sql` | 運費與自訂費用 |
+| **M5** | `20260107140000_coupon_system.sql` | 優惠券系統 |
+| **M6** | `20260107150000_system_admin_and_audit.sql` | 系統管理與稽核 |
+| **M7** | `20260107160000_indexes_and_performance.sql` | 索引與效能優化 |
+| **M8** | `20260107170000_rls_policies.sql` | RLS 策略 |
+
+詳見：`supabase/migrations/README.md`
 
 ---
 
@@ -924,13 +350,6 @@ Middleware (middleware.ts) 自動檢查：
 - **級聯刪除**: 使用 `ON DELETE CASCADE`（如 tiers → tier_prices）
 - **軟刪除**: 使用 `status` 欄位（active/inactive），不實際刪除記錄
 
-### 圖片上傳流程
-1. 使用 `uploadProductImage(product_id, file)` Server Action
-2. 檔案驗證：格式（JPG/PNG/WebP）、大小（5MB）
-3. 上傳至 Supabase Storage: `products/{product_id}/main.{ext}`
-4. 覆寫模式（`upsert: true`）
-5. 更新 `products.image_url` 欄位
-
 ### RLS (Row Level Security) 策略
 所有資料表都啟用 RLS，策略如下：
 - **客戶**: 僅能讀取 `status = 'active'` 的資料
@@ -957,8 +376,8 @@ Middleware (middleware.ts) 自動檢查：
 - `Client`: 客戶（含等級資訊）
 - `Category`: 商品分類
 - `Product`: 商品
-- `Series`: 系列（003 新增）
-- `TierPrice`: 等級價格（003 新增）
+- `Series`: 系列
+- `TierPrice`: 等級價格
 
 ### Zod Schema 位置
 所有驗證 Schema 位於 `lib/validations/`：
@@ -966,31 +385,6 @@ Middleware (middleware.ts) 自動檢查：
 - `tier.schema.ts`: 會員等級
 - `category.schema.ts`: 分類
 - `product.schema.ts`: 商品
-
----
-
-## 當前開發狀態
-
-### 已完成功能（已合併到 master）
-1. ✅ **001-user-tier-management**: 會員等級與客戶管理
-   - 雙入口登入、快速開戶、客戶列表、等級 CRUD
-2. ✅ **002-product-management**: 商品與分類管理
-   - 分類 CRUD、商品 CRUD、圖片上傳、前台商品瀏覽
-3. ✅ **003-series-and-pricing**: 系列與等級價格管理（2026-01-03 完成）
-   - 三層階層架構（分類 > 系列 > 產品）
-   - 等級綁定價格機制（tier_prices 表）
-   - 系列管理（CRUD、系列代碼）
-   - 批次價格設定功能
-   - 商品原價與庫存狀態
-   - 前台根據用戶等級顯示對應價格
-
-### 待開發功能
-目前所有核心功能已完成，以下是可能的擴充方向：
-- 📦 **購物車與訂單系統**: 完整的下單流程
-- 📊 **報表與分析**: 銷售報表、庫存分析
-- 🔔 **通知系統**: 訂單狀態通知、庫存警示
-- 💳 **付款整合**: 金流串接
-- 🚚 **物流整合**: 出貨與追蹤
 
 ---
 
@@ -1004,7 +398,7 @@ Middleware (middleware.ts) 自動檢查：
   - `stock === 0`: 顯示「缺貨中」（黃色）
   - `stock < 0`: 顯示「欠貨: X（可預購）」（紅色）
 
-### 價格機制（003 已實作）
+### 價格機制
 - 商品有「原價」（retail_price）用於顯示折扣力度
 - 每個商品 × 每個等級 = 一個價格（tier_prices 表）
 - 前台顯示：「原價 $60  您的價格 $30（批發）」
@@ -1039,6 +433,71 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
 
 ---
 
-**最後更新**: 2026-01-03
-**憲章版本**: 1.0.0
+## 常用開發指令
+
+### 開發與建置
+```bash
+pnpm dev              # 啟動開發伺服器 (http://localhost:3000)
+pnpm build            # 建置生產環境
+pnpm start            # 啟動生產伺服器
+pnpm type-check       # TypeScript 型別檢查 (建置前必須執行)
+pnpm lint             # ESLint 檢查
+```
+
+### 測試
+```bash
+pnpm test             # 執行所有測試 (Vitest)
+pnpm test:ui          # 啟動 Vitest UI 介面
+```
+
+### Supabase 生產環境管理
+
+```bash
+# 建立新 Migration
+supabase migration new <name>
+
+# 推送到生產環境（謹慎執行）
+pnpm db:migrate
+# 或
+supabase db push
+
+# 查看 Migration 狀態
+supabase migration list
+
+# 查看資料庫差異（執行前檢查）
+pnpm db:diff
+# 或
+supabase db diff
+```
+
+### 健康檢查
+```bash
+# 執行完整健康檢查
+pnpm health-check
+
+# 執行特定領域檢查
+pnpm health-check:architecture  # 架構檢查
+pnpm health-check:api           # API 檢查
+pnpm health-check:security      # 安全檢查
+```
+
+---
+
+## 生產環境資訊
+
+**Supabase 專案**:
+- Dashboard: https://supabase.com/dashboard/project/qwovavytryvgchcowjof
+- API URL: https://qwovavytryvgchcowjof.supabase.co
+- 區域: AWS ap-southeast-1 (新加坡)
+- 專案 ID: `qwovavytryvgchcowjof`
+
+**環境變數** (`.env.local`):
+- `NEXT_PUBLIC_SUPABASE_URL`: 生產環境 API URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 公開金鑰
+- `SUPABASE_SERVICE_ROLE_KEY`: 服務金鑰（Admin 權限）
+
+---
+
+**最後更新**: 2026-01-14
+**憲章版本**: 1.1.0
 **當前分支**: master
