@@ -100,7 +100,7 @@ export function ClientFilter({
               type="button"
               variant="secondary"
               onClick={clearFilters}
-              className="border-3 border-black bg-red-500 text-white hover:bg-red-600"
+              className="border-2 md:border-3 border-black bg-red-500 text-white hover:bg-red-600"
             >
               <X className="mr-2 h-4 w-4" />
               清除篩選
@@ -149,7 +149,7 @@ export function ClientFilter({
                 key={tier.id}
                 onClick={() => toggleTier(tier.id)}
                 className={`
-                  rounded-none border-3 border-black px-4 py-2 text-sm font-bold
+                  rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold
                   transition-all duration-150
                   ${
                     isSelected

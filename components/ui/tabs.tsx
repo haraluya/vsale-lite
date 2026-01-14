@@ -23,7 +23,7 @@ export function Tabs({ tabs, defaultTab, children, className = '' }: TabsProps) 
   return (
     <div className={className}>
       {/* Tab 按鈕列 */}
-      <div className="flex flex-wrap gap-2 border-b-3 border-black pb-4 mb-6">
+      <div className="flex flex-wrap gap-2 border-b-2 md:border-b-3 border-black pb-4 mb-6">
         {tabs.map((tab) => {
           const Icon = tab.icon
           return (

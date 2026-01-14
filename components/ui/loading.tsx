@@ -9,7 +9,7 @@ interface LoadingProps {
 export function Loading({ message = '載入中...', size = 'md', className }: LoadingProps) {
   const sizeClasses = {
     sm: 'h-8 w-8 border-2',
-    md: 'h-12 w-12 border-3',
+    md: 'h-12 w-12 border-2 md:border-3',
     lg: 'h-16 w-16 border-4',
   }
 

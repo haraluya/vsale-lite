@@ -439,7 +439,7 @@ export function ProductTableWithTags({
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b-3 border-black">
+              <tr className="border-b-2 md:border-b-3 border-black">
                 {/* 勾選框 */}
                 <th className="px-4 py-3">
                   <input

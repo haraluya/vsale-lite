@@ -90,7 +90,7 @@ export function CouponFilters() {
     status !== 'all' || discountType !== 'all' || search.trim() !== ''
 
   return (
-    <div className="border-3 border-black bg-white p-4 shadow-neo md:p-6">
+    <div className="border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo md:p-6">
       <div className="mb-4 flex items-center gap-2">
         <Filter className="h-5 w-5" />
         <h2 className="font-black text-lg">篩選條件</h2>

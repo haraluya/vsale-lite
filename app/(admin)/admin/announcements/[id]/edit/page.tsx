@@ -42,7 +42,7 @@ export default async function EditAnnouncementPage({ params }: EditAnnouncementP
       <div className="flex items-center gap-4">
         <Link
           href="/admin/announcements"
-          className="rounded-none border-2 border-black bg-white p-2 shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="rounded-none border-2 border-black bg-white p-2 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
@@ -53,7 +53,7 @@ export default async function EditAnnouncementPage({ params }: EditAnnouncementP
       </div>
 
       {/* Form */}
-      <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <AnnouncementForm announcement={announcement} series={series} />
       </div>
     </div>

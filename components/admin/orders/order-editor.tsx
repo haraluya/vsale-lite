@@ -382,7 +382,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
   }
 
   return (
-    <div className="border-3 border-black bg-white p-6 space-y-6 shadow-neo">
+    <div className="border-2 md:border-3 border-black bg-white p-6 space-y-6 shadow-neo">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-xl">📝 編輯訂單</h3>
         <Button
@@ -607,7 +607,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
       </div>
 
       {/* 總額摘要 */}
-      <div className="border-t-3 border-black pt-4 space-y-2">
+      <div className="border-t-2 md:border-t-3 border-black pt-4 space-y-2">
         <h4 className="font-bold text-lg">💰 訂單摘要</h4>
 
         <div className="space-y-1 text-sm">
@@ -669,7 +669,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
         <Button
           onClick={() => handleSave()}
           disabled={loading}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 border-2 border-black shadow-neo active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          className="flex-1 bg-blue-600 hover:bg-blue-700 border-2 border-black shadow-neo-sm md:shadow-neo active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         >
           {loading ? (
             <>

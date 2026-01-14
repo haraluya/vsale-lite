@@ -224,7 +224,7 @@ export function StoreSearch({ categories, availableTags, onActiveChange }: Store
       {isActive && (
         <div>
           {products.length === 0 ? (
-            <div className="rounded-none border-3 border-black bg-white p-12 text-center shadow-neo">
+            <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
               <p className="text-lg text-gray-500">
                 找不到符合條件的商品
               </p>

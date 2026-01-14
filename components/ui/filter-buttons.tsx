@@ -40,7 +40,7 @@ export function FilterButtons({
             onClick={() => onToggle(option.id)}
             className={cn(
               'px-4 py-2 text-sm font-bold',
-              'border-3 border-black rounded-none',
+              'border-2 md:border-3 border-black rounded-none',
               'transition-all duration-150',
               'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
               isSelected
@@ -87,7 +87,7 @@ export function ClearFiltersButton({
       disabled={disabled}
       className={cn(
         'px-4 py-2 text-sm font-bold',
-        'border-3 border-black rounded-none',
+        'border-2 md:border-3 border-black rounded-none',
         'transition-all duration-150',
         disabled
           ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -123,7 +123,7 @@ export function FilterResultCount({
     <div
       className={cn(
         'px-3 py-1 text-sm',
-        'border-3 border-black rounded-none bg-yellow-100',
+        'border-2 md:border-3 border-black rounded-none bg-yellow-100',
         className
       )}
       aria-live="polite"

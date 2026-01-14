@@ -190,7 +190,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
       )}
 
       {/* 基本資訊 */}
-      <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <h2 className="mb-4 text-xl font-bold">基本資訊</h2>
 
         <div className="space-y-4">
@@ -305,7 +305,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
       </div>
 
       {/* 系列圖片 */}
-      <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <h2 className="mb-4 text-xl font-bold">系列圖片</h2>
 
         <div className="space-y-4">
@@ -325,7 +325,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               <button
                 type="button"
                 onClick={handleRemoveImage}
-                className="absolute right-2 top-2 rounded-none border-2 border-black bg-red-500 p-2 font-bold text-white shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                className="absolute right-2 top-2 rounded-none border-2 border-black bg-red-500 p-2 font-bold text-white shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
                 title="移除圖片"
               >
                 <X className="h-4 w-4" />
@@ -347,7 +347,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
           <div>
             <label
               htmlFor="image"
-              className="inline-flex cursor-pointer items-center gap-2 rounded-none border-2 border-black bg-yellow-300 px-4 py-2 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-none border-2 border-black bg-yellow-300 px-4 py-2 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
             >
               <Upload className="h-5 w-5" />
               {imagePreview ? '更換圖片' : '選擇圖片'}

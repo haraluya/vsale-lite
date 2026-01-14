@@ -77,7 +77,7 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
       {announcements.map((announcement) => (
         <div
           key={announcement.id}
-          className="rounded-none border-3 border-black bg-white p-4 shadow-neo"
+          className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo"
         >
           {/* 圖片預覽 */}
           <div className="relative mb-4 aspect-video overflow-hidden rounded-none border-2 border-black bg-gray-100">

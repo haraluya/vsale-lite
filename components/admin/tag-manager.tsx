@@ -172,12 +172,12 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
               onFocus={() => setShowSuggestions(inputValue.length > 0)}
               placeholder="輸入標籤名稱 (2-8 字元)..."
               disabled={isLoading}
-              className="w-full rounded-none border-2 border-black px-4 py-2 shadow-neo focus:outline-none focus:ring-2 focus:ring-black disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-none border-2 border-black px-4 py-2 shadow-neo-sm md:shadow-neo focus:outline-none focus:ring-2 focus:ring-black disabled:cursor-not-allowed disabled:opacity-50"
             />
             <button
               onClick={() => handleAddTag(inputValue)}
               disabled={isLoading || !inputValue.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-none border-2 border-black bg-green-400 p-2 shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-none border-2 border-black bg-green-400 p-2 shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
             >
               <Plus className="h-4 w-4" />
             </button>

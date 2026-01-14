@@ -185,7 +185,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       )}
 
       {/* 基本資訊 */}
-      <div className="border-3 border-black bg-white p-6 shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <h2 className="mb-4 text-xl font-black">基本資訊</h2>
 
         {/* 優惠券代碼 */}
@@ -352,7 +352,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       </div>
 
       {/* 生效時間 */}
-      <div className="border-3 border-black bg-white p-6 shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <h2 className="mb-4 text-xl font-black">生效時間</h2>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -408,7 +408,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       </div>
 
       {/* 等級限制 */}
-      <div className="border-3 border-black bg-white p-6 shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <h2 className="mb-4 text-xl font-black">等級限制（選填）</h2>
         <p className="mb-4 text-sm text-gray-600">
           不選擇任何等級表示所有等級均可使用此優惠券
@@ -446,7 +446,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       </div>
 
       {/* 系列限制 */}
-      <div className="border-3 border-black bg-white p-6 shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <h2 className="mb-4 text-xl font-black">系列限制（選填）</h2>
         <p className="mb-4 text-sm text-gray-600">
           不選擇任何系列表示所有系列商品均可計入優惠券條件
@@ -487,7 +487,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
 
       {/* 狀態設定（僅編輯模式） */}
       {mode === 'edit' && (
-        <div className="border-3 border-black bg-white p-6 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
           <h2 className="mb-4 text-xl font-black">狀態設定</h2>
 
           <div className="flex gap-4">
@@ -522,7 +522,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="border-3 border-black bg-green-400 px-8 py-4 font-black text-black shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50"
+          className="border-2 md:border-3 border-black bg-green-400 px-8 py-4 font-black text-black shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50"
         >
           {loading ? '處理中...' : mode === 'create' ? '建立優惠券' : '更新優惠券'}
         </Button>
@@ -531,7 +531,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
           type="button"
           onClick={() => router.back()}
           disabled={loading}
-          className="border-3 border-black bg-white px-8 py-4 font-black text-black shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="border-2 md:border-3 border-black bg-white px-8 py-4 font-black text-black shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
         >
           取消
         </Button>

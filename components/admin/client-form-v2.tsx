@@ -139,7 +139,7 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
       </div>
 
       {error && (
-        <div className="rounded-none border-3 border-red-500 bg-red-50 p-4">
+        <div className="rounded-none border-2 md:border-3 border-red-500 bg-red-50 p-4">
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}

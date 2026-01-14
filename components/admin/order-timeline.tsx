@@ -178,7 +178,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
               <div className={`max-w-md ${isAdminComment ? 'ml-auto' : 'mr-auto'}`}>
                 {/* 氣泡式留言框 */}
                 <div
-                  className={`rounded-none border-3 border-black p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
+                  className={`rounded-none border-2 md:border-3 border-black p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
                              ${isAdminComment ? 'bg-blue-100' : 'bg-gray-100'}`}
                 >
                   {/* 留言內容 */}

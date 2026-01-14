@@ -38,7 +38,7 @@ export default async function AuditLogsPage({
 
   if (!result.success || !result.data) {
     return (
-      <div className="rounded-none border-3 border-red-500 bg-red-50 p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-red-500 bg-red-50 p-6 shadow-neo">
         <p className="text-sm font-bold text-red-800">
           {result.message || '載入操作日誌失敗'}
         </p>

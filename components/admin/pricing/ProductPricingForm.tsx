@@ -121,7 +121,7 @@ export function ProductPricingForm() {
   return (
     <div className="space-y-6">
       {/* 商品選擇器 */}
-      <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <label className="mb-3 block font-bold">選擇商品（依分類排序）</label>
         <select
           value={selectedProductId}
@@ -151,14 +151,14 @@ export function ProductPricingForm() {
 
       {/* 載入中 */}
       {isLoading && (
-        <div className="rounded-none border-3 border-black bg-white p-12 text-center shadow-neo">
+        <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
           <p className="text-lg text-gray-500">載入中...</p>
         </div>
       )}
 
       {/* 價格矩陣表格 */}
       {!isLoading && productData && (
-        <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+        <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
           {/* 商品資訊 */}
           <div className="mb-6 rounded-none border-2 border-black bg-blue-50 p-4">
             <h3 className="font-bold">
@@ -222,7 +222,7 @@ export function ProductPricingForm() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="rounded-none border-3 border-black bg-green-400 px-8 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-none border-2 md:border-3 border-black bg-green-400 px-8 py-3 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSaving ? '儲存中...' : '儲存價格'}
             </button>
@@ -232,7 +232,7 @@ export function ProductPricingForm() {
 
       {/* 提示訊息 */}
       {!isLoading && !productData && (
-        <div className="rounded-none border-3 border-black bg-green-50 p-8 text-center shadow-neo">
+        <div className="rounded-none border-2 md:border-3 border-black bg-green-50 p-8 text-center shadow-neo">
           <p className="text-lg font-bold">請選擇商品</p>
           <p className="mt-4 text-sm text-gray-600">
             選擇商品後,可設定該商品在各會員等級的價格

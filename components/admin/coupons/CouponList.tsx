@@ -134,7 +134,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
 
   if (filteredCoupons.length === 0) {
     return (
-      <div className="border-3 border-black bg-white p-12 text-center shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
         <p className="text-gray-500">
           {showArchived ? '目前沒有已刪除或已過期的優惠券' : '目前沒有有效的優惠券'}
         </p>
@@ -145,10 +145,10 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
   return (
     <>
       {/* 桌面版表格 */}
-      <div className="hidden md:block overflow-x-auto border-3 border-black shadow-neo">
+      <div className="hidden md:block overflow-x-auto border-2 md:border-3 border-black shadow-neo">
         <table className="w-full">
           <thead>
-            <tr className="border-b-3 border-black bg-yellow-300">
+            <tr className="border-b-2 md:border-b-3 border-black bg-yellow-300">
               <th className={cn('px-6 py-4 text-left font-black', designTokens.typography.body.base)}>
                 優惠券代碼
               </th>
@@ -174,7 +174,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
           </thead>
           <tbody>
             {filteredCoupons.map((coupon) => (
-              <tr key={coupon.id} className="border-b-3 border-black last:border-b-0 bg-white">
+              <tr key={coupon.id} className="border-b-2 md:border-b-3 border-black last:border-b-0 bg-white">
                 <td className={cn('px-6 py-4 font-mono font-bold', designTokens.typography.body.base)}>
                   {coupon.code_normalized}
                 </td>
@@ -238,7 +238,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
         {filteredCoupons.map((coupon) => (
           <div
             key={coupon.id}
-            className="border-3 border-black bg-white p-4 shadow-neo"
+            className="border-2 md:border-3 border-black bg-white p-4 shadow-neo"
           >
             {/* 優惠券代碼與狀態 */}
             <div className="mb-3 flex items-center justify-between">

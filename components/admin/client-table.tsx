@@ -113,7 +113,7 @@ export function ClientTable({
       )}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="border-b-3 border-black bg-gray-50">
+            <thead className="border-b-2 md:border-b-3 border-black bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-bold">
                   手機號碼
@@ -189,7 +189,7 @@ export function ClientTable({
                             size="sm"
                             variant="secondary"
                             onClick={() => handleCopyLoginInfo(client)}
-                            className="border-3 border-black bg-green-100 hover:bg-green-200"
+                            className="border-2 md:border-3 border-black bg-green-100 hover:bg-green-200"
                             title="複製登入資訊（不含密碼）"
                           >
                             {copiedClientId === client.id ? (
@@ -221,7 +221,7 @@ export function ClientTable({
                             variant="secondary"
                             onClick={() => handleDeleteClick(client)}
                             disabled={isDeleting}
-                            className="border-3 border-black bg-red-500 text-white hover:bg-red-600"
+                            className="border-2 md:border-3 border-black bg-red-500 text-white hover:bg-red-600"
                           >
                             <Trash2 className="h-3 w-3 mr-1" />
                             刪除

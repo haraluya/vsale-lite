@@ -115,7 +115,7 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
         designTokens.neoBrutalism.shadow.full
       )}>
         {/* 標題列 */}
-        <div className="grid grid-cols-6 gap-4 border-b-3 border-black bg-gray-100 p-4 font-bold">
+        <div className="grid grid-cols-6 gap-4 border-b-2 md:border-b-3 border-black bg-gray-100 p-4 font-bold">
           <div>訂單編號</div>
           <div>客戶</div>
           <div>等級</div>

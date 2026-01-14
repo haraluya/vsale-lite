@@ -77,7 +77,7 @@ export function BlockTypeChoice({ onSelect, onCancel }: BlockTypeChoiceProps) {
                 text-left
               `}
             >
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white border-3 border-black">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white border-2 md:border-3 border-black">
                 <Icon className="w-8 h-8" />
               </div>
               <div className="w-full text-center">

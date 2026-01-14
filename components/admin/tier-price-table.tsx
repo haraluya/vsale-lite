@@ -94,7 +94,7 @@ export function TierPriceTable({ product, tiersWithPrices }: TierPriceTableProps
       )}
 
       {/* 商品資訊 */}
-      <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo">
         <h3 className="text-lg font-bold">{product.name}</h3>
         <p className="text-sm text-gray-600">商品編號: {product.code}</p>
         {product.retail_price !== null && (
@@ -106,7 +106,7 @@ export function TierPriceTable({ product, tiersWithPrices }: TierPriceTableProps
 
       {/* 等級價格表格 */}
       <form onSubmit={handleSubmit}>
-        <div className="overflow-hidden rounded-none border-3 border-black bg-white shadow-neo">
+        <div className="overflow-hidden rounded-none border-2 md:border-3 border-black bg-white shadow-neo">
           <table className="w-full">
             <thead className="bg-gray-100">
               <tr>

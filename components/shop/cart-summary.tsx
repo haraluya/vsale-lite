@@ -111,7 +111,7 @@ export function CartSummary({
   const finalAmount = totalAmount - couponDiscount + (shippingFee ?? 0)
 
   return (
-    <div className="sticky top-24 rounded-none border-3 border-black bg-white p-6 shadow-neo">
+    <div className="sticky top-24 rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
       <h2 className="mb-6 text-2xl font-bold">購物車摘要</h2>
 
       <div className="space-y-4">
@@ -192,14 +192,14 @@ export function CartSummary({
         {isEmpty ? (
           <button
             disabled
-            className="w-full cursor-not-allowed rounded-none border-3 border-black bg-gray-200 px-6 py-4 text-lg font-bold text-gray-500 opacity-50"
+            className="w-full cursor-not-allowed rounded-none border-2 md:border-3 border-black bg-gray-200 px-6 py-4 text-lg font-bold text-gray-500 opacity-50"
           >
             購物車是空的
           </button>
         ) : (
           <Link
             href="/store/checkout"
-            className="flex w-full items-center justify-center gap-2 rounded-none border-3 border-black bg-green-400 px-6 py-4 text-lg font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+            className="flex w-full items-center justify-center gap-2 rounded-none border-2 md:border-3 border-black bg-green-400 px-6 py-4 text-lg font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
           >
             <ShoppingCart className="h-6 w-6" />
             前往結帳
@@ -209,7 +209,7 @@ export function CartSummary({
         {/* 繼續購物按鈕 */}
         <Link
           href="/store"
-          className="block w-full rounded-none border-3 border-black bg-white px-6 py-3 text-center font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="block w-full rounded-none border-2 md:border-3 border-black bg-white px-6 py-3 text-center font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
         >
           繼續購物
         </Link>

@@ -56,7 +56,7 @@ export function CommentInput({
           maxLength={maxLength}
           rows={3}
           disabled={disabled || isSubmitting}
-          className="resize-none rounded-none border-3 border-black bg-white p-3
+          className="resize-none rounded-none border-2 md:border-3 border-black bg-white p-3
                      focus:outline-none focus:ring-2 focus:ring-black
                      disabled:opacity-50 disabled:cursor-not-allowed"
         />
@@ -72,7 +72,7 @@ export function CommentInput({
         <Button
           type="submit"
           disabled={!isValid || disabled || isSubmitting}
-          className="rounded-none border-3 border-black bg-yellow-400 px-6 py-2
+          className="rounded-none border-2 md:border-3 border-black bg-yellow-400 px-6 py-2
                      font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
                      hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
                      active:translate-x-[4px] active:translate-y-[4px] active:shadow-none

@@ -65,7 +65,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
             </div>
             <Link
               href="/admin/announcements/new"
-              className="inline-flex items-center gap-2 rounded-none border-3 border-black bg-green-400 px-6 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              className="inline-flex items-center gap-2 rounded-none border-2 md:border-3 border-black bg-green-400 px-6 py-3 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
             >
               <Plus className="h-5 w-5" />
               新增廣告
@@ -74,7 +74,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
 
           {/* Announcements List */}
           {announcements.length === 0 ? (
-            <div className="rounded-none border-3 border-black bg-white p-12 text-center shadow-neo">
+            <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
               <p className="text-lg text-gray-500">目前沒有任何廣告</p>
               <Link
                 href="/admin/announcements/new"

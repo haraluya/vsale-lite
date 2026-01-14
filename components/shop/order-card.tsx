@@ -32,7 +32,7 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
       href={showCustomerInfo ? `/admin/orders/${order.id}` : `/store/orders/${order.id}`}
       className="block"
     >
-      <div className="group rounded-none border-3 border-black bg-white p-6 shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+      <div className="group rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
         {/* 訂單編號與狀態 */}
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>

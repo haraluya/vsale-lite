@@ -54,7 +54,7 @@ export default async function NewMemberPage() {
       </Link>
 
       {/* 頁面標題 */}
-      <div className="rounded-none border-3 border-black bg-yellow-400 p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-yellow-400 p-6 shadow-neo">
         <h1 className="text-3xl font-black">新增成員</h1>
         <p className="mt-2 text-sm font-bold text-gray-800">
           建立新的工作人員帳號
@@ -62,7 +62,7 @@ export default async function NewMemberPage() {
       </div>
 
       {/* 表單卡片 */}
-      <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <MemberForm onSubmit={handleSubmit} submitLabel="建立帳號" />
       </div>
 

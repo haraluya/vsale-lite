@@ -67,7 +67,7 @@ export default async function EditAdminPage({
       </Link>
 
       {/* 頁面標題 */}
-      <div className="rounded-none border-3 border-black bg-blue-400 p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-blue-400 p-6 shadow-neo">
         <h1 className="text-3xl font-black">編輯成員</h1>
         <p className="mt-2 text-sm font-bold text-gray-800">
           修改「{admin.username}」的資料
@@ -75,7 +75,7 @@ export default async function EditAdminPage({
       </div>
 
       {/* 表單卡片 */}
-      <div className="rounded-none border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <MemberForm admin={admin} onSubmit={handleSubmit} submitLabel="儲存變更" />
       </div>
 

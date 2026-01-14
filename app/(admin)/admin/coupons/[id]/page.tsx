@@ -94,7 +94,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
 
       {/* 統計資訊卡片 */}
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="border-3 border-black bg-blue-100 p-4 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-blue-100 p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
             <Users className="h-5 w-5 text-blue-600" />
             <p className="text-sm font-bold text-blue-600">發放張數</p>
@@ -105,7 +105,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
           </p>
         </div>
 
-        <div className="border-3 border-black bg-green-100 p-4 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-green-100 p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="h-5 w-5 text-green-600" />
             <p className="text-sm font-bold text-green-600">使用張數</p>
@@ -116,7 +116,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
           </p>
         </div>
 
-        <div className="border-3 border-black bg-orange-100 p-4 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-orange-100 p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="h-5 w-5 text-orange-600" />
             <p className="text-sm font-bold text-orange-600">總折扣金額</p>
@@ -126,14 +126,14 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
       </div>
 
       {/* 優惠券表單 */}
-      <div className="border-3 border-black bg-white p-6 shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <h2 className="text-2xl font-black mb-4">編輯優惠券</h2>
         <CouponForm mode="edit" coupon={coupon} />
       </div>
 
       {/* 領取用戶列表 */}
-      <div className="border-3 border-black bg-white shadow-neo">
-        <div className="border-b-3 border-black bg-yellow-300 p-4">
+      <div className="border-2 md:border-3 border-black bg-white shadow-neo">
+        <div className="border-b-2 md:border-b-3 border-black bg-yellow-300 p-4">
           <h2 className="text-2xl font-black flex items-center gap-2">
             <Users className="h-6 w-6" />
             領取用戶名單 ({total} 位用戶)
@@ -188,7 +188,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
 
             {/* 分頁控制 */}
             {totalPages > 1 && (
-              <div className="border-t-3 border-black p-4 flex items-center justify-between">
+              <div className="border-t-2 md:border-t-3 border-black p-4 flex items-center justify-between">
                 <div className="text-sm text-gray-600">
                   共 {totalPages} 頁
                 </div>

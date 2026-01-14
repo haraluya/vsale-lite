@@ -52,7 +52,7 @@ function SortableCategoryRow({
   }
 
   return (
-    <tr ref={setNodeRef} style={style} className="border-b-3 border-black last:border-b-0 bg-white">
+    <tr ref={setNodeRef} style={style} className="border-b-2 md:border-b-3 border-black last:border-b-0 bg-white">
       <td className="px-4 py-3 md:px-6 md:py-4">
         <button
           {...attributes}
@@ -291,7 +291,7 @@ export function CategoryTable({ categories: initialCategories }: { categories: C
         {/* 桌面版: 完整表格 */}
         <div className="hidden lg:block card-neo overflow-hidden p-0">
           <table className="w-full">
-            <thead className="border-b-3 border-black bg-gray-100">
+            <thead className="border-b-2 md:border-b-3 border-black bg-gray-100">
               <tr>
                 <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)} style={{ width: '60px' }}>排序</th>
                 <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>分類名稱</th>

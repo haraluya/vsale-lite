@@ -110,7 +110,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl rounded-none border-3 border-black bg-white p-8 shadow-neo">
+    <div className="mx-auto max-w-2xl rounded-none border-2 md:border-3 border-black bg-white p-8 shadow-neo">
       <form
         action={mode === 'edit' || productNames.length === 1 ? formAction : undefined}
         onSubmit={mode === 'create' && productNames.length > 1 ? handleBatchCreate : undefined}
@@ -216,7 +216,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             name="series_id"
             value={formData.series_id}
             onChange={(e) => setFormData({ ...formData, series_id: e.target.value })}
-            className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+            className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">請選擇系列</option>
             {series.map((s) => (
@@ -240,7 +240,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             placeholder="輸入商品描述..."
             rows={4}
-            className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+            className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
           />
           <ErrorInline message={state?.errors?.description?.[0]} />
         </div>
@@ -299,7 +299,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                   stock_status: e.target.value as 'sufficient' | 'low' | 'out_of_stock',
                 })
               }
-              className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="sufficient">充足</option>
               <option value="low">緊張</option>
@@ -334,7 +334,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
               name="status"
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
-              className="w-full rounded-none border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="active">啟用</option>
               <option value="inactive">停用</option>
@@ -363,14 +363,14 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
 
         {/* 錯誤訊息 */}
         {(state?.message && !state.success) || submitError ? (
-          <div className="rounded-none border-3 border-red-600 bg-red-50 p-4">
+          <div className="rounded-none border-2 md:border-3 border-red-600 bg-red-50 p-4">
             <p className="font-bold text-red-800">{submitError || state?.message}</p>
           </div>
         ) : null}
 
         {/* 成功訊息 */}
         {(state?.success || submitSuccess) && (
-          <div className="rounded-none border-3 border-green-600 bg-green-50 p-4">
+          <div className="rounded-none border-2 md:border-3 border-green-600 bg-green-50 p-4">
             <p className="font-bold text-green-800">
               {submitSuccess ? '商品批次建立成功!' : state?.message}
             </p>
@@ -401,7 +401,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             type="button"
             onClick={handleCancel}
             disabled={isPending}
-            className="flex-1 rounded-none border-3 border-black bg-gray-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-none border-2 md:border-3 border-black bg-gray-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="mr-2 inline-block h-5 w-5" />
             取消

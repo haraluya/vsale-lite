@@ -172,7 +172,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         <select
           value={formData.seriesId}
           onChange={(e) => setFormData({ ...formData, seriesId: e.target.value })}
-          className="w-full rounded-none border-3 border-black bg-white px-4 py-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full rounded-none border-2 md:border-3 border-black bg-white px-4 py-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-black"
         >
           <option value="">請選擇系列（不選則不跳轉）</option>
           {categoryList.map((categoryName) => {
@@ -259,7 +259,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 rounded-none border-3 border-black bg-green-400 px-6 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 rounded-none border-2 md:border-3 border-black bg-green-400 px-6 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? '處理中...' : isEdit ? '更新廣告' : '建立廣告'}
         </button>
@@ -267,7 +267,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex-1 rounded-none border-3 border-black bg-gray-200 px-6 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="flex-1 rounded-none border-2 md:border-3 border-black bg-gray-200 px-6 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
         >
           取消
         </button>

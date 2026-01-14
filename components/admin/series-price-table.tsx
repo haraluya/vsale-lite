@@ -154,7 +154,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
       )}
 
       {/* 系列資訊 */}
-      <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo">
         <h3 className="text-lg font-bold">{series.name}</h3>
         {series.description && (
           <p className="mt-1 text-sm text-gray-600">{series.description}</p>
@@ -166,7 +166,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
 
       {/* 價格表格 */}
       <form onSubmit={handleSubmit}>
-        <div className="overflow-x-auto rounded-none border-3 border-black bg-white shadow-neo">
+        <div className="overflow-x-auto rounded-none border-2 md:border-3 border-black bg-white shadow-neo">
           <table className="w-full">
             <thead className="bg-gray-100">
               <tr>

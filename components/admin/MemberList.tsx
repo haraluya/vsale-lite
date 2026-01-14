@@ -21,7 +21,7 @@ export function MemberList({
 }: MemberListProps) {
   if (admins.length === 0) {
     return (
-      <div className="rounded-none border-3 border-gray-300 bg-gray-50 p-12 text-center">
+      <div className="rounded-none border-2 md:border-3 border-gray-300 bg-gray-50 p-12 text-center">
         <p className="text-lg font-bold text-gray-500">尚無成員帳號</p>
       </div>
     )
@@ -31,8 +31,8 @@ export function MemberList({
     <div className="space-y-4">
       {/* 桌面版表格 */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full rounded-none border-3 border-black bg-white shadow-neo">
-          <thead className="border-b-3 border-black bg-yellow-400">
+        <table className="w-full rounded-none border-2 md:border-3 border-black bg-white shadow-neo">
+          <thead className="border-b-2 md:border-b-3 border-black bg-yellow-400">
             <tr>
               <th className="px-6 py-4 text-left text-sm font-black uppercase tracking-wider">
                 帳號
@@ -117,7 +117,7 @@ export function MemberList({
         {admins.map((admin) => (
           <div
             key={admin.id}
-            className="rounded-none border-3 border-black bg-white p-4 shadow-neo"
+            className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo"
           >
             <div className="mb-4">
               <div className="flex items-center justify-between mb-2">

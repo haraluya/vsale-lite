@@ -45,7 +45,7 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
   }
 
   return (
-    <tr ref={setNodeRef} style={style} className="border-b-3 border-black last:border-b-0 bg-white">
+    <tr ref={setNodeRef} style={style} className="border-b-2 md:border-b-3 border-black last:border-b-0 bg-white">
       <td className={cn("px-3 py-3 md:px-4 md:py-4")}>
         <button
           {...attributes}
@@ -189,7 +189,7 @@ export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
           onDragEnd={handleDragEnd}
         >
           <table className="w-full">
-            <thead className="border-b-3 border-black bg-gray-100">
+            <thead className="border-b-2 md:border-b-3 border-black bg-gray-100">
               <tr>
                 <th className={cn("px-3 py-3 text-left font-bold w-16 md:px-4 md:py-4", designTokens.typography.body.base)}>拖曳</th>
                 <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>等級名稱</th>

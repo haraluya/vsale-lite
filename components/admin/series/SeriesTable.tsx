@@ -123,7 +123,7 @@ export function SeriesTable({
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b-3 border-black">
+              <tr className="border-b-2 md:border-b-3 border-black">
                 <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>縮圖</th>
                 <th className={cn('px-4 py-3 text-left', designTokens.typography.body.base)}>
                   <SortableHeader label="系列代碼" sortKey="code" />

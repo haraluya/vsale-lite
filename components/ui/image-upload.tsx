@@ -110,7 +110,7 @@ export function ImageUpload({
       {/* 圖片預覽或上傳區域 */}
       {imageUrl ? (
         <div className="relative">
-          <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-none border-3 border-black shadow-neo">
+          <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-none border-2 md:border-3 border-black shadow-neo">
             <Image
               src={imageUrl}
               alt="商品圖片"
@@ -146,7 +146,7 @@ export function ImageUpload({
               type="button"
               onClick={handleDelete}
               disabled={uploading}
-              className="rounded-none border-3 border-black bg-red-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-none border-2 md:border-3 border-black bg-red-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <X className="h-4 w-4" />
             </button>
@@ -155,7 +155,7 @@ export function ImageUpload({
       ) : (
         <div
           onClick={uploading ? undefined : triggerFileInput}
-          className={`flex aspect-square w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-none border-3 border-dashed border-black bg-gray-50 p-8 shadow-neo transition-colors hover:bg-gray-100 ${
+          className={`flex aspect-square w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-none border-2 md:border-3 border-dashed border-black bg-gray-50 p-8 shadow-neo transition-colors hover:bg-gray-100 ${
             uploading ? 'cursor-not-allowed opacity-50' : ''
           }`}
         >
@@ -176,7 +176,7 @@ export function ImageUpload({
 
       {/* 錯誤訊息 */}
       {error && (
-        <div className="rounded-none border-3 border-red-600 bg-red-50 p-4">
+        <div className="rounded-none border-2 md:border-3 border-red-600 bg-red-50 p-4">
           <p className="text-sm font-bold text-red-800">{error}</p>
         </div>
       )}

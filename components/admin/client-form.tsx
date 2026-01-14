@@ -96,7 +96,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
 
     return (
       <div className="space-y-6">
-        <div className="rounded-none border-3 border-green-500 bg-green-50 p-6">
+        <div className="rounded-none border-2 md:border-3 border-green-500 bg-green-50 p-6">
           <h3 className="text-lg font-bold text-green-700 mb-4">
             ✅ 客戶建立成功!
           </h3>

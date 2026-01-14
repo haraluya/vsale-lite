@@ -25,7 +25,7 @@ export function ProductSelector({ products, selectedProductId }: ProductSelector
   }
 
   return (
-    <div className="mb-6 rounded-none border-3 border-black bg-white p-6 shadow-neo">
+    <div className="mb-6 rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
       <h2 className="mb-4 text-xl font-bold">選擇商品</h2>
 
       <select

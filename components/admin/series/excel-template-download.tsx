@@ -65,9 +65,9 @@ export function ExcelTemplateDownload({
       disabled={isDownloading}
       className={`
         inline-flex items-center gap-2 px-4 py-2
-        rounded-none border-3 border-black
+        rounded-none border-2 md:border-3 border-black
         bg-blue-300 hover:bg-blue-400
-        shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+        shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
         transition-all duration-150
         disabled:opacity-50 disabled:cursor-not-allowed
         ${className}

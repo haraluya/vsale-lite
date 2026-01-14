@@ -18,7 +18,7 @@ export function Error({
   return (
     <div
       className={cn(
-        'rounded-none border-3 border-red-500 bg-red-50 p-6 shadow-neo',
+        'rounded-none border-2 md:border-3 border-red-500 bg-red-50 p-6 shadow-neo',
         className
       )}
     >

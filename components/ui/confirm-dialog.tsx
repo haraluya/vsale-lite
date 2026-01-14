@@ -83,14 +83,14 @@ export function ConfirmDialog({
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-md border-3 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+        className="w-full max-w-md border-2 md:border-3 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
         role="dialog"
         aria-modal="true"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
       >
         {/* Header */}
-        <div className={`border-b-3 border-black bg-gray-100 p-4 ${colors.border}`}>
+        <div className={`border-b-2 md:border-b-3 border-black bg-gray-100 p-4 ${colors.border}`}>
           <div className="flex items-start justify-between">
             <h2 id="dialog-title" className="text-xl font-bold">
               {title}
@@ -113,10 +113,10 @@ export function ConfirmDialog({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 border-t-3 border-black bg-gray-50 p-4">
+        <div className="flex gap-3 border-t-2 md:border-t-3 border-black bg-gray-50 p-4">
           <button
             onClick={onClose}
-            className="flex-1 border-3 border-black bg-white px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            className="flex-1 border-2 md:border-3 border-black bg-white px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
           >
             {cancelText}
           </button>
@@ -125,7 +125,7 @@ export function ConfirmDialog({
               onConfirm()
               onClose()
             }}
-            className={`flex-1 border-3 border-black px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${colors.button}`}
+            className={`flex-1 border-2 md:border-3 border-black px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${colors.button}`}
           >
             {confirmText}
           </button>

@@ -59,19 +59,19 @@ async function CouponsContent({ searchParams }: PageProps) {
     <>
       {/* 統計資訊 */}
       <div className="mb-6 grid gap-4 md:grid-cols-4">
-        <div className="border-3 border-black bg-white p-4 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-white p-4 shadow-neo">
           <p className="text-sm text-gray-600">總優惠券數</p>
           <p className="text-3xl font-black">{allCoupons.length}</p>
         </div>
-        <div className="border-3 border-black bg-green-100 p-4 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-green-100 p-4 shadow-neo">
           <p className="text-sm text-gray-600">有效中</p>
           <p className="text-3xl font-black">{activeCoupons.length}</p>
         </div>
-        <div className="border-3 border-black bg-orange-100 p-4 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-orange-100 p-4 shadow-neo">
           <p className="text-sm text-gray-600">已過期</p>
           <p className="text-3xl font-black">{expiredCoupons.length}</p>
         </div>
-        <div className="border-3 border-black bg-red-100 p-4 shadow-neo">
+        <div className="border-2 md:border-3 border-black bg-red-100 p-4 shadow-neo">
           <p className="text-sm text-gray-600">已刪除</p>
           <p className="text-3xl font-black">{deletedCoupons.length}</p>
         </div>
@@ -142,7 +142,7 @@ export default function CouponsPage({ searchParams }: PageProps) {
       {/* 優惠券內容（使用 Suspense） */}
       <Suspense
         fallback={
-          <div className="border-3 border-black bg-white p-12 text-center shadow-neo">
+          <div className="border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
             <p className="text-gray-500">載入中...</p>
           </div>
         }

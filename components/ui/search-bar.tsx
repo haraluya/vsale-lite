@@ -75,9 +75,9 @@ export function SearchBar({
         placeholder={placeholder}
         className="
           w-full pl-10 pr-10 py-3
-          border-3 border-black rounded-none
+          border-2 md:border-3 border-black rounded-none
           bg-white
-          shadow-neo
+          shadow-neo-sm md:shadow-neo 
           focus:outline-none focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none
           transition-all duration-150
           text-base

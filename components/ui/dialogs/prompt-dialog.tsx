@@ -144,7 +144,7 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
       <div
         className={cn(
           'w-full max-w-md',
-          'border-3 border-black bg-white',
+          'border-2 md:border-3 border-black bg-white',
           'shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]',
           'animate-in zoom-in-95 duration-200',
           'max-h-[90vh] overflow-y-auto'
@@ -152,7 +152,7 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* 標題欄 */}
-        <div className="flex items-center gap-3 border-b-3 border-black bg-blue-400 p-4 text-white">
+        <div className="flex items-center gap-3 border-b-2 md:border-b-3 border-black bg-blue-400 p-4 text-white">
           <Info className="h-6 w-6 flex-shrink-0" />
           <h2 id="prompt-dialog-title" className="text-lg font-bold">
             {title}
@@ -187,7 +187,7 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
                     rows={4}
                     className={cn(
                       'w-full px-3 py-2',
-                      'border-3 border-black',
+                      'border-2 md:border-3 border-black',
                       'focus:outline-none focus:ring-2 focus:ring-blue-500',
                       'resize-none',
                       errors[field.name] && 'border-red-500'
@@ -207,7 +207,7 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
                     maxLength={field.maxLength}
                     className={cn(
                       'w-full px-3 py-2',
-                      'border-3 border-black',
+                      'border-2 md:border-3 border-black',
                       'focus:outline-none focus:ring-2 focus:ring-blue-500',
                       errors[field.name] && 'border-red-500'
                     )}
@@ -235,14 +235,14 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
           </div>
 
           {/* 按鈕 */}
-          <div className="border-t-3 border-black p-4 flex gap-3">
+          <div className="border-t-2 md:border-t-3 border-black p-4 flex gap-3">
             {/* 取消按鈕 */}
             <button
               type="button"
               onClick={handleCancel}
               className={cn(
                 'flex-1 px-4 py-2',
-                'border-3 border-black',
+                'border-2 md:border-3 border-black',
                 'bg-white hover:bg-gray-100',
                 'text-gray-800 font-bold text-sm uppercase',
                 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
@@ -260,7 +260,7 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
               disabled={!canSubmit}
               className={cn(
                 'flex-1 px-4 py-2',
-                'border-3 border-black',
+                'border-2 md:border-3 border-black',
                 'bg-blue-500 hover:bg-blue-600',
                 'text-white font-bold text-sm uppercase',
                 'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',

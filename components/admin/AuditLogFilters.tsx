@@ -21,7 +21,7 @@ export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
     : currentFilters.action_type
 
   return (
-    <form className="rounded-none border-3 border-black bg-white shadow-neo">
+    <form className="rounded-none border-2 md:border-3 border-black bg-white shadow-neo">
       {/* 標題區（手機可點擊展開） */}
       <button
         type="button"

@@ -156,7 +156,7 @@ export function ProductTable({
       <div className="hidden lg:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b-3 border-black">
+            <tr className="border-b-2 md:border-b-3 border-black">
               <th className="px-4 py-3 text-left font-bold">商品編號</th>
               <th className="px-4 py-3 text-left font-bold">商品名稱</th>
               <th className="px-4 py-3 text-left font-bold">分類</th>

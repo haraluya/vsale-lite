@@ -85,7 +85,7 @@ export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFor
         return (
           <div
             key={setting.key}
-            className={`rounded-none border-3 bg-white p-4 shadow-neo ${
+            className={`rounded-none border-2 md:border-3 bg-white p-4 shadow-neo-sm md:shadow-neo ${
               isChanged ? 'border-blue-500' : 'border-black'
             }`}
           >
@@ -158,7 +158,7 @@ export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFor
       })}
 
       {/* 儲存按鈕 */}
-      <div className="flex justify-end gap-4 pt-4 border-t-3 border-black">
+      <div className="flex justify-end gap-4 pt-4 border-t-2 md:border-t-3 border-black">
         <Button type="button" variant="outline" onClick={handleCancel} disabled={!hasChanges || loading}>
           取消變更
         </Button>

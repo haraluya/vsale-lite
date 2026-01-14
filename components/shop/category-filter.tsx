@@ -36,7 +36,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   }
 
   return (
-    <div className="rounded-none border-3 border-black bg-white p-4 shadow-neo">
+    <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo">
       <h3 className="mb-3 text-sm font-bold uppercase text-gray-600">商品分類</h3>
 
       <div className="flex flex-wrap gap-2">
