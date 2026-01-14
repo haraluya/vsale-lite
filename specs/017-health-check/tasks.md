@@ -118,16 +118,16 @@ wait
 
 ### Tasks
 
-- [ ] T015 [US1] 實作路由結構檢查函式 checkRouteStructure() 於 scripts/health-check/check-architecture.ts
-- [ ] T016 [US1] 實作 Middleware 權限檢查函式 checkMiddleware() 於 scripts/health-check/check-architecture.ts
-- [ ] T017 [US1] 實作 Server Actions 模式檢查函式 checkServerActionsPattern() 於 scripts/health-check/check-architecture.ts
-- [ ] T018 [US1] 實作 Supabase Client 使用檢查函式 checkSupabaseClientUsage() 於 scripts/health-check/check-architecture.ts
-- [ ] T019 [US1] 實作模組依賴檢查函式 checkModuleDependencies() 於 scripts/health-check/check-architecture.ts (含循環依賴檢測)
-- [ ] T020 [US1] 整合所有檢查函式為主函式 checkArchitecture() 於 scripts/health-check/check-architecture.ts
-- [ ] T021 [US1] 實作架構檢查報告產生器 generateArchitectureReport() 於 scripts/health-check/check-architecture.ts
-- [ ] T022 [US1] 產生架構檢查 JSON 報告檔案 architecture.json
+- [X] T015 [US1] 實作路由結構檢查函式 checkRouteStructure() 於 scripts/health-check/check-architecture.ts
+- [X] T016 [US1] 實作 Middleware 權限檢查函式 checkMiddleware() 於 scripts/health-check/check-architecture.ts
+- [X] T017 [US1] 實作 Server Actions 模式檢查函式 checkServerActionsPattern() 於 scripts/health-check/check-architecture.ts
+- [X] T018 [US1] 實作 Supabase Client 使用檢查函式 checkSupabaseClientUsage() 於 scripts/health-check/check-architecture.ts
+- [X] T019 [US1] 實作模組依賴檢查函式 checkModuleDependencies() 於 scripts/health-check/check-architecture.ts (含循環依賴檢測)
+- [X] T020 [US1] 整合所有檢查函式為主函式 checkArchitecture() 於 scripts/health-check/check-architecture.ts
+- [X] T021 [US1] 實作架構檢查報告產生器 generateArchitectureReport() 於 scripts/health-check/check-architecture.ts
+- [X] T022 [US1] 產生架構檢查 JSON 報告檔案 architecture.json
 - [ ] T023 [US1] 撰寫架構檢查整合測試 scripts/health-check/__tests__/check-architecture.test.ts
-- [ ] T024 [US1] 執行架構檢查驗證所有檢查項目運作正常
+- [X] T024 [US1] 執行架構檢查驗證所有檢查項目運作正常
 
 **驗證步驟**:
 - ✅ 腳本執行成功 (`tsx scripts/health-check/check-architecture.ts`)
@@ -153,7 +153,7 @@ wait
 - [X] T028 [US2] 實作 RLS Policies 檢查函式 checkRLSPolicies() 於 scripts/health-check/check-api.ts
 - [X] T029 [US2] 實作 Server Actions 統計函式 calculateServerActionsStats() 於 scripts/health-check/check-api.ts
 - [X] T030 [US2] 整合所有檢查函式為主函式 checkAPI() 於 scripts/health-check/check-api.ts
-- [ ] T031 [US2] 實作 API 檢查報告產生器 generateAPIReport() 於 scripts/health-check/check-api.ts
+- [X] T031 [US2] 實作 API 檢查報告產生器 generateAPIReport() 於 scripts/health-check/check-api.ts
 - [X] T032 [US2] 產生 API 檢查 JSON 報告檔案 api.json
 - [ ] T033 [US2] 撰寫 API 檢查整合測試 scripts/health-check/__tests__/check-api.test.ts
 - [X] T034 [US2] 執行 API 檢查驗證所有檢查項目運作正常
