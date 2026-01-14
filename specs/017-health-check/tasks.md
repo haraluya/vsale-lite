@@ -99,7 +99,7 @@ wait
 - [X] T011 [P] 實作 GitHub API 輔助函式 scripts/health-check/utils/github-api-helpers.ts (createIssue, ensureMilestone)
 - [X] T012 [P] 實作檔案系統工具函式 scripts/health-check/utils/fs-helpers.ts (ensureDir, createSymlink)
 - [ ] T013 撰寫工具函式單元測試 scripts/health-check/utils/__tests__/
-- [ ] T014 執行 TypeScript 型別檢查驗證型別定義正確
+- [X] T014 執行 TypeScript 型別檢查驗證型別定義正確
 
 **驗證步驟**:
 - ✅ TypeScript 型別檢查通過 (`pnpm type-check`)
@@ -147,16 +147,16 @@ wait
 
 ### Tasks
 
-- [ ] T025 [US2] 實作 Server Actions 品質檢查函式 checkServerActionsQuality() 於 scripts/health-check/check-api.ts
-- [ ] T026 [US2] 實作錯誤處理檢查函式 checkErrorHandling() 於 scripts/health-check/check-api.ts
-- [ ] T027 [US2] 實作權限驗證檢查函式 checkAuthorizationChecks() 於 scripts/health-check/check-api.ts
-- [ ] T028 [US2] 實作 RLS Policies 檢查函式 checkRLSPolicies() 於 scripts/health-check/check-api.ts
-- [ ] T029 [US2] 實作 Server Actions 統計函式 calculateServerActionsStats() 於 scripts/health-check/check-api.ts
-- [ ] T030 [US2] 整合所有檢查函式為主函式 checkAPI() 於 scripts/health-check/check-api.ts
+- [X] T025 [US2] 實作 Server Actions 品質檢查函式 checkServerActionsQuality() 於 scripts/health-check/check-api.ts
+- [X] T026 [US2] 實作錯誤處理檢查函式 checkErrorHandling() 於 scripts/health-check/check-api.ts
+- [X] T027 [US2] 實作權限驗證檢查函式 checkAuthorizationChecks() 於 scripts/health-check/check-api.ts
+- [X] T028 [US2] 實作 RLS Policies 檢查函式 checkRLSPolicies() 於 scripts/health-check/check-api.ts
+- [X] T029 [US2] 實作 Server Actions 統計函式 calculateServerActionsStats() 於 scripts/health-check/check-api.ts
+- [X] T030 [US2] 整合所有檢查函式為主函式 checkAPI() 於 scripts/health-check/check-api.ts
 - [ ] T031 [US2] 實作 API 檢查報告產生器 generateAPIReport() 於 scripts/health-check/check-api.ts
-- [ ] T032 [US2] 產生 API 檢查 JSON 報告檔案 api.json
+- [X] T032 [US2] 產生 API 檢查 JSON 報告檔案 api.json
 - [ ] T033 [US2] 撰寫 API 檢查整合測試 scripts/health-check/__tests__/check-api.test.ts
-- [ ] T034 [US2] 執行 API 檢查驗證所有檢查項目運作正常
+- [X] T034 [US2] 執行 API 檢查驗證所有檢查項目運作正常
 
 **驗證步驟**:
 - ✅ 腳本執行成功 (`tsx scripts/health-check/check-api.ts`)
@@ -178,13 +178,13 @@ wait
 
 - [ ] T035 [US3] 建立前台操作流程測試清單範本 specs/017-health-check/checklists/client-ux-checklist.md
 - [ ] T036 [US3] 建立後台操作流程測試清單範本 specs/017-health-check/checklists/admin-ux-checklist.md
-- [ ] T037 [US3] 實作 UX 檢查腳本 checkUX() 於 scripts/health-check/check-ux.ts（產生手動測試清單）
-- [ ] T038 [US3] 實作前台核心流程清單產生器 generateClientFlowChecklist() 於 scripts/health-check/check-ux.ts
-- [ ] T039 [US3] 實作後台核心流程清單產生器 generateAdminFlowChecklist() 於 scripts/health-check/check-ux.ts
+- [X] T037 [US3] 實作 UX 檢查腳本 checkUX() 於 scripts/health-check/check-ux.ts（產生手動測試清單）
+- [X] T038 [US3] 實作前台核心流程清單產生器 generateClientFlowChecklist() 於 scripts/health-check/check-ux.ts
+- [X] T039 [US3] 實作後台核心流程清單產生器 generateAdminFlowChecklist() 於 scripts/health-check/check-ux.ts
 - [ ] T040 [US3] 實作 UX 檢查報告產生器 generateUXReport() 於 scripts/health-check/check-ux.ts
-- [ ] T041 [US3] 產生 UX 檢查 JSON 報告檔案 ux.json
+- [X] T041 [US3] 產生 UX 檢查 JSON 報告檔案 ux.json
 - [ ] T042 [US3] 撰寫 UX 檢查整合測試 scripts/health-check/__tests__/check-ux.test.ts
-- [ ] T043 [US3] 執行 UX 檢查驗證手動測試清單格式正確
+- [X] T043 [US3] 執行 UX 檢查驗證手動測試清單格式正確
 
 **驗證步驟**:
 - ✅ 腳本執行成功 (`tsx scripts/health-check/check-ux.ts`)
@@ -204,16 +204,16 @@ wait
 
 ### Tasks
 
-- [ ] T044 [US4] 實作 Neo-Brutalism 風格檢查函式 checkNeoBrutalismStyle() 於 scripts/health-check/check-design.ts
-- [ ] T045 [US4] 實作響應式設計檢查函式 checkResponsiveDesign() 於 scripts/health-check/check-design.ts
-- [ ] T046 [US4] 實作設計 Token 使用檢查函式 checkDesignTokenUsage() 於 scripts/health-check/check-design.ts
-- [ ] T047 [US4] 實作對話框系統檢查函式 checkDialogSystemUsage() 於 scripts/health-check/check-design.ts
+- [X] T044 [US4] 實作 Neo-Brutalism 風格檢查函式 checkNeoBrutalismStyle() 於 scripts/health-check/check-design.ts
+- [X] T045 [US4] 實作響應式設計檢查函式 checkResponsiveDesign() 於 scripts/health-check/check-design.ts
+- [X] T046 [US4] 實作設計 Token 使用檢查函式 checkDesignTokenUsage() 於 scripts/health-check/check-design.ts
+- [X] T047 [US4] 實作對話框系統檢查函式 checkDialogSystemUsage() 於 scripts/health-check/check-design.ts
 - [ ] T048 [US4] 實作無障礙支援檢查函式 checkAccessibility() 於 scripts/health-check/check-design.ts
-- [ ] T049 [US4] 整合所有檢查函式為主函式 checkDesign() 於 scripts/health-check/check-design.ts
+- [X] T049 [US4] 整合所有檢查函式為主函式 checkDesign() 於 scripts/health-check/check-design.ts
 - [ ] T050 [US4] 實作設計檢查報告產生器 generateDesignReport() 於 scripts/health-check/check-design.ts
-- [ ] T051 [US4] 產生設計檢查 JSON 報告檔案 design.json
+- [X] T051 [US4] 產生設計檢查 JSON 報告檔案 design.json
 - [ ] T052 [US4] 撰寫設計檢查整合測試 scripts/health-check/__tests__/check-design.test.ts
-- [ ] T053 [US4] 執行設計檢查驗證所有檢查項目運作正常
+- [X] T053 [US4] 執行設計檢查驗證所有檢查項目運作正常
 
 **驗證步驟**:
 - ✅ 腳本執行成功 (`tsx scripts/health-check/check-design.ts`)
