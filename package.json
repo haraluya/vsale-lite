@@ -12,7 +12,16 @@
     "test:ui": "vitest --ui",
     "prepare": "husky",
     "db:migrate": "supabase db push",
-    "db:diff": "supabase db diff"
+    "db:diff": "supabase db diff",
+    "health-check": "tsx scripts/health-check/run-health-check.ts",
+    "health-check:architecture": "tsx scripts/health-check/check-architecture.ts",
+    "health-check:api": "tsx scripts/health-check/check-api.ts",
+    "health-check:ux": "tsx scripts/health-check/check-ux.ts",
+    "health-check:design": "tsx scripts/health-check/check-design.ts",
+    "health-check:performance": "lhci autorun && tsx scripts/health-check/check-performance.ts",
+    "health-check:bugs": "tsx scripts/health-check/check-bugs.ts",
+    "health-check:security": "tsx scripts/health-check/check-security.ts",
+    "health-check:ci": "pnpm health-check && pnpm health-check:performance"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -43,6 +52,8 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@lhci/cli": "^0.15.1",
+    "@octokit/rest": "^22.0.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@types/node": "^22.0.0",
@@ -54,10 +65,12 @@
     "dotenv": "^17.2.3",
     "eslint": "^9.0.0",
     "eslint-config-next": "^15.1.0",
+    "glob": "^13.0.0",
     "husky": "^9.1.7",
     "jsdom": "^27.4.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.19",
+    "ts-morph": "^27.0.2",
     "typescript": "^5.7.0",
     "vitest": "^4.0.16"
   }

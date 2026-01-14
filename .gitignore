@@ -129,6 +129,13 @@ __tests__/
 !CLAUDE.md
 !DEPLOYMENT.md
 
+# 但健康檢查規格需要追蹤
+!/specs/017-health-check/
+
+# Health Check Reports (排除時間戳目錄，保留 latest 符號連結)
+specs/017-health-check/reports/20*
+!specs/017-health-check/reports/latest
+
 # Supabase Local
 supabase/snippets/
 supabase/.temp/
@@ -152,6 +159,8 @@ backup-*.sql
 
 # Scripts (不需要部署)
 /scripts/
+# 但健康檢查腳本需要追蹤
+!/scripts/health-check/
 
 # Claude Code
 .claude/
