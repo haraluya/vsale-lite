@@ -1102,19 +1102,20 @@ export async function getActiveCategories(): Promise<ActionResult<{ id: string; 
 }
 
 /**
- * 取得所有使用中的標籤（用於篩選）
+ * 取得所有使用中的標籤（用於篩選）- 優化版
  * Feature: 006-ux-enhancement (US2)
+ *
+ * 優化：使用 PostgreSQL RPC 函數在資料庫層進行聚合和去重
+ * - 避免載入所有商品記錄到應用層（可能 1000+ 筆）
+ * - 減少網路傳輸量（從 MB 級降至 KB 級）
+ * - 資料庫層 DISTINCT 效能優於應用層 Set 去重
  */
 export async function getAvailableTags(): Promise<ActionResult<string[]>> {
   try {
     const supabase = await createClient()
 
-    // 查詢所有啟用商品的標籤，並去重
-    const { data, error } = await supabase
-      .from('products')
-      .select('tags')
-      .eq('status', 'active')
-      .not('tags', 'is', null)
+    // ✅ 呼叫 RPC 函數，在資料庫層完成去重和排序
+    const { data, error } = await supabase.rpc('get_active_tags')
 
     if (error) {
       console.error('getAvailableTags error:', error)
@@ -1124,17 +1125,12 @@ export async function getAvailableTags(): Promise<ActionResult<string[]>> {
       }
     }
 
-    // 將所有標籤展平並去重
-    const allTags = new Set<string>()
-    data?.forEach((item: any) => {
-      if (item.tags && Array.isArray(item.tags)) {
-        item.tags.forEach((tag: string) => allTags.add(tag))
-      }
-    })
+    // 提取標籤欄位（RPC 返回 { tag: string }[] 格式）
+    const tags = (data || []).map((row: { tag: string }) => row.tag)
 
     return {
       success: true,
-      data: Array.from(allTags).sort(),
+      data: tags,
     }
   } catch (error: unknown) {
     console.error('getAvailableTags error:', error)

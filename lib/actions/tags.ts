@@ -73,8 +73,8 @@ export async function updateProductTags(
     }
 
     // 5. 重新驗證快取
+    // ✅ 優化：只清除管理端快取，客戶端使用按需失效
     revalidatePath('/admin/products')
-    revalidatePath('/store')
 
     return {
       success: true,
@@ -178,8 +178,8 @@ export async function batchUpdateProductTags(
     }
 
     // 6. 重新驗證快取
+    // ✅ 優化：只清除管理端快取，客戶端使用按需失效
     revalidatePath('/admin/products')
-    revalidatePath('/store')
 
     // 7. 根據結果回傳適當訊息
     if (failureCount === 0) {
@@ -214,22 +214,21 @@ export async function batchUpdateProductTags(
 }
 
 /**
- * 取得所有使用中的標籤（用於自動完成）
+ * 取得所有使用中的標籤（用於自動完成）- 優化版
  * Feature: 006-ux-enhancement (US9 - T067)
  *
- * 注意: getAvailableTags 已經在 products.ts 中實作，此處保留以符合 API 合約
+ * 優化：使用 PostgreSQL RPC 函數在資料庫層進行聚合和去重
+ * - 避免載入所有商品記錄到應用層
+ * - 減少網路傳輸量
+ * - 資料庫層排序效能更好
  */
 export async function getAvailableTags(): Promise<ActionResult<string[]>> {
   try {
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
-    // 查詢所有啟用商品的標籤
-    const { data, error } = await adminClient
-      .from('products')
-      .select('tags')
-      .eq('status', 'active')
-      .not('tags', 'is', null)
+    // ✅ 呼叫 RPC 函數，在資料庫層完成去重和排序
+    const { data, error } = await adminClient.rpc('get_active_tags')
 
     if (error) {
       console.error('getAvailableTags error:', error)
@@ -239,20 +238,12 @@ export async function getAvailableTags(): Promise<ActionResult<string[]>> {
       }
     }
 
-    // 將所有標籤展平並去重
-    const allTags = new Set<string>()
-    data?.forEach((item: { tags?: string[] | null }) => {
-      if (item.tags && Array.isArray(item.tags)) {
-        item.tags.forEach((tag: string) => allTags.add(tag))
-      }
-    })
-
-    // 按字母順序排序
-    const sortedTags = Array.from(allTags).sort()
+    // 提取標籤欄位（RPC 返回 { tag: string }[] 格式）
+    const tags = (data || []).map((row: { tag: string }) => row.tag)
 
     return {
       success: true,
-      data: sortedTags,
+      data: tags,
     }
   } catch (error: unknown) {
     console.error('getAvailableTags error:', error)

@@ -206,28 +206,47 @@ export async function validateCartBeforeCheckout(
     const productIds = cartItems.map(item => item.productId)
     const invalidItems: string[] = []
 
-    // 逐一檢查每個商品
-    for (const productId of productIds) {
-      const { data: product } = await supabase
-        .from('products')
-        .select(`
-          id,
-          name,
-          status,
-          retail_price,
-          tier_prices!left(price)
-        `)
-        .eq('id', productId)
-        .eq('tier_prices.tier_id', tierId!)
-        .single()
+    // ✅ 優化：使用批次查詢避免 N+1 問題
+    const { data: products, error } = await supabase
+      .from('products')
+      .select(`
+        id,
+        name,
+        status,
+        retail_price,
+        series:series_id(status),
+        tier_prices!left(price, tier_id)
+      `)
+      .in('id', productIds)
 
+    if (error) {
+      console.error('批次查詢商品失敗:', error)
+      return {
+        success: false,
+        message: '查詢商品資料時發生錯誤',
+      }
+    }
+
+    // 在應用層進行驗證
+    for (const productId of productIds) {
+      const product = products?.find(p => p.id === productId)
+
+      // 驗證 1: 商品是否存在且狀態為 active
       if (!product || product.status !== 'active') {
         invalidItems.push(productId)
         continue
       }
 
-      // 若沒有等級價格，檢查是否有零售價格
-      const tierPrice = (product.tier_prices as any)?.[0]?.price
+      // 驗證 2: 系列狀態檢查
+      const series = product.series as any
+      if (series && series.status !== 'active') {
+        invalidItems.push(productId)
+        continue
+      }
+
+      // 驗證 3: 價格檢查（優先使用等級價格，其次使用零售價格）
+      const tierPrices = product.tier_prices as any[]
+      const tierPrice = tierPrices?.find(tp => tp.tier_id === tierId)?.price
       const finalPrice = tierPrice ?? product.retail_price
 
       if (finalPrice === null || finalPrice === undefined) {
