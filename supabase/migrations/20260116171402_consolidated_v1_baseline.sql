@@ -26,6 +26,8 @@
 -- ==================================================
 
 
+
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -59,9 +61,9 @@ DECLARE
   ];
   v_count INTEGER;
 BEGIN
-  -- ??芣??身摰??脫?嚗蝙?券?閮剖潘??芸???
+  -- 僅在未手動設定顏色時（使用預設值）自動分配
   IF NEW.color = '#94A3B8' OR NEW.color IS NULL THEN
-    -- 閮??暹?蝟餃??賊?嚗捱摰蝙?典????
+    -- 計算現有系列數量，決定使用哪個顏色
     SELECT COUNT(*) INTO v_count FROM series;
     NEW.color := v_colors[(v_count % array_length(v_colors, 1)) + 1];
   END IF;
@@ -74,7 +76,7 @@ $$;
 ALTER FUNCTION "public"."auto_assign_series_color"() OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."auto_assign_series_color"() IS '?芸???憿蝯行撱箇??頂??敺芰雿輻 15 蝔桅?閮剝??莎?';
+COMMENT ON FUNCTION "public"."auto_assign_series_color"() IS '自動分配顏色給新建立的系列（循環使用 15 種預設顏色）';
 
 
 
@@ -93,7 +95,7 @@ $$;
 ALTER FUNCTION "public"."auto_generate_product_code"() OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."auto_generate_product_code"() IS '閫貊?典?賂???撱箇??????楊??;
+COMMENT ON FUNCTION "public"."auto_generate_product_code"() IS '觸發器函數：商品建立時自動產生商品編號';
 
 
 
@@ -104,29 +106,29 @@ DECLARE
   v_shipping_fee DECIMAL(10,2);
   v_free_threshold DECIMAL(10,2);
 BEGIN
-  -- ?亥岷摰Ｘ蝑???鞎餉身摰??格活?亥岷 JOIN嚗?
+  -- 查詢客戶等級的運費設定（單次查詢 JOIN）
   SELECT t.shipping_fee, t.free_shipping_threshold
   INTO v_shipping_fee, v_free_threshold
   FROM profiles p
   JOIN tiers t ON t.id = p.tier_id
   WHERE p.id = p_user_id;
 
-  -- ?交?∪恥?嗆?蝑?嚗?閮凋??園?鞎?
+  -- 若查無客戶或等級，預設不收運費
   IF v_shipping_fee IS NULL THEN
     RETURN 0;
   END IF;
 
-  -- ?亙?祇?鞎餌 0嚗?亥???0
+  -- 若基本運費為 0，直接返回 0
   IF v_shipping_fee = 0 THEN
     RETURN 0;
   END IF;
 
-  -- ?亥身摰?皛輸????瑼颱???蝮賡???嚗???0
+  -- 若設定了滿額免運門檻且商品總額達標，返回 0
   IF v_free_threshold IS NOT NULL AND p_subtotal >= v_free_threshold THEN
     RETURN 0;
   END IF;
 
-  -- ?血?餈??箸?祥
+  -- 否則返回基本運費
   RETURN v_shipping_fee;
 END;
 $$;
@@ -135,7 +137,7 @@ $$;
 ALTER FUNCTION "public"."calculate_shipping_fee"("p_user_id" "uuid", "p_subtotal" numeric) OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."calculate_shipping_fee"("p_user_id" "uuid", "p_subtotal" numeric) IS '閮?閮?祥嚗?摰Ｘ蝑????蜇憿??舀皛輸???嚗?;
+COMMENT ON FUNCTION "public"."calculate_shipping_fee"("p_user_id" "uuid", "p_subtotal" numeric) IS '計算訂單運費（依客戶等級與商品總額，支援滿額免運）';
 
 
 
@@ -146,22 +148,25 @@ DECLARE
   v_order RECORD;
   v_item RECORD;
 BEGIN
-  -- 1. 撽?閮摮????  SELECT * INTO v_order FROM orders WHERE id = p_order_id;
+  -- 1. 驗證訂單存在與狀態
+  SELECT * INTO v_order FROM orders WHERE id = p_order_id;
 
   IF NOT FOUND THEN
     RETURN json_build_object('success', false, 'error', 'Order not found');
   END IF;
 
-  -- ?迂?? pending ??shipping ???閮
+  -- 允許取消 pending 或 shipping 狀態的訂單
   IF v_order.status NOT IN ('pending', 'shipping') THEN
     RETURN json_build_object('success', false, 'error', 'Cannot cancel order with status ' || v_order.status);
   END IF;
 
-  -- 2. ?湔閮???  UPDATE orders
+  -- 2. 更新訂單狀態
+  UPDATE orders
   SET status = 'cancelled', updated_at = NOW()
   WHERE id = p_order_id;
 
-  -- 3. ??摨怠?嚗??嗉??桀歇?箄疏??- 摨怠????撌脩宏??shipping ?挾嚗?  IF v_order.status = 'shipping' THEN
+  -- 3. 回補庫存（僅當訂單已出貨時 - 庫存扣減已移至 shipping 階段）
+  IF v_order.status = 'shipping' THEN
     FOR v_item IN
       SELECT * FROM order_items WHERE order_id = p_order_id
     LOOP
@@ -171,12 +176,12 @@ BEGIN
     END LOOP;
   END IF;
 
-  -- 4. ?? ???嚗?蝵?used_at ??order_id嚗?摰Ｘ?臬?甈∩蝙?剁?
+  -- 4. 🆕 退還優惠券（重置 used_at 與 order_id，讓客戶可再次使用）
   UPDATE user_coupons
   SET used_at = NULL, order_id = NULL
   WHERE order_id = p_order_id;
 
-  -- 5. 閮?閮??甇瑕
+  -- 5. 記錄訂單操作歷史
   INSERT INTO order_timelines (order_id, action_type, actor_id, actor_role, old_status, new_status, notes)
   VALUES (
     p_order_id,
@@ -186,15 +191,15 @@ BEGIN
     v_order.status,
     'cancelled',
     CASE
-      WHEN v_order.status = 'shipping' THEN '閮撌脣?瘨?摨怠?撌脣?鋆??芣??詨歇???
-      ELSE '閮撌脣?瘨??芣??詨歇???
+      WHEN v_order.status = 'shipping' THEN '訂單已取消，庫存已回補，優惠券已退還'
+      ELSE '訂單已取消，優惠券已退還'
     END
   );
 
   RETURN json_build_object(
     'success', true,
     'order_id', p_order_id,
-    'message', '閮撌脫???瘨?
+    'message', '訂單已成功取消'
   );
 
 EXCEPTION
@@ -210,7 +215,7 @@ $$;
 ALTER FUNCTION "public"."cancel_order_and_restore_stock"("p_order_id" "uuid", "p_actor_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."cancel_order_and_restore_stock"("p_order_id" "uuid", "p_actor_id" "uuid") IS '閮??銝血?鋆澈摮??芣???(???扳?雿? - ?舀 pending/shipping ??cancelled嚗??芸????;
+COMMENT ON FUNCTION "public"."cancel_order_and_restore_stock"("p_order_id" "uuid", "p_actor_id" "uuid") IS '訂單取消並回補庫存與優惠券 (原子性操作) - 支援 pending/shipping → cancelled，優惠券自動退還';
 
 
 
@@ -221,7 +226,7 @@ DECLARE
   v_order RECORD;
   v_item RECORD;
 BEGIN
-  -- 1. 撽?閮摮????
+  -- 1. 驗證訂單存在與狀態
   SELECT * INTO v_order FROM orders WHERE id = p_order_id;
 
   IF NOT FOUND THEN
@@ -232,12 +237,12 @@ BEGIN
     RETURN json_build_object('success', false, 'error', 'Order status must be pending');
   END IF;
 
-  -- 2. ?湔閮???
+  -- 2. 更新訂單狀態
   UPDATE orders
   SET status = 'confirmed', updated_at = NOW()
   WHERE id = p_order_id;
 
-  -- 3. ???摨怠? (?舀鞎澈摮?
+  -- 3. 扣減庫存 (支援負庫存)
   FOR v_item IN
     SELECT * FROM order_items WHERE order_id = p_order_id
   LOOP
@@ -246,7 +251,7 @@ BEGIN
     WHERE id = v_item.product_id;
   END LOOP;
 
-  -- 4. 閮???甇瑕 (雿輻 'confirmed' action_type)
+  -- 4. 記錄操作歷史 (使用 'confirmed' action_type)
   INSERT INTO order_timelines (
     order_id, action_type, actor_id, actor_role, old_status, new_status
   ) VALUES (
@@ -257,7 +262,7 @@ BEGIN
 
 EXCEPTION
   WHEN OTHERS THEN
-    -- ?芸??遝
+    -- 自動回滾
     RETURN json_build_object('success', false, 'error', SQLERRM);
 END;
 $$;
@@ -266,7 +271,7 @@ $$;
 ALTER FUNCTION "public"."confirm_order_and_deduct_stock"("p_order_id" "uuid", "p_actor_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."confirm_order_and_deduct_stock"("p_order_id" "uuid", "p_actor_id" "uuid") IS '閮蝣箄?銝行皜澈摮?(???扳?雿?';
+COMMENT ON FUNCTION "public"."confirm_order_and_deduct_stock"("p_order_id" "uuid", "p_actor_id" "uuid") IS '訂單確認並扣減庫存 (原子性操作)';
 
 
 
@@ -276,39 +281,40 @@ CREATE OR REPLACE FUNCTION "public"."delete_order_pending"("p_order_id" "uuid", 
 DECLARE
   v_order RECORD;
 BEGIN
-  -- 1. 撽?閮摮????  SELECT * INTO v_order FROM orders WHERE id = p_order_id;
+  -- 1. 驗證訂單存在與狀態
+  SELECT * INTO v_order FROM orders WHERE id = p_order_id;
 
   IF NOT FOUND THEN
     RETURN json_build_object('success', false, 'error', 'Order not found');
   END IF;
 
-  -- 2. ??閮勗??pending ???閮
+  -- 2. 僅允許刪除 pending 狀態的訂單
   IF v_order.status != 'pending' THEN
     RETURN json_build_object('success', false, 'error', 'Can only delete pending orders');
   END IF;
 
-  -- 3. ?? ???嚗?蝵?used_at ??order_id嚗?摰Ｘ?臬?甈∩蝙?剁?
+  -- 3. 🆕 退還優惠券（重置 used_at 與 order_id，讓客戶可再次使用）
   UPDATE user_coupons
   SET used_at = NULL, order_id = NULL
   WHERE order_id = p_order_id;
 
-  -- 4. 閮??芷????order_timelines (CASCADE ??歹?雿?閮?銝甈?
+  -- 4. 記錄刪除操作於 order_timelines (CASCADE 會刪除，但仍記錄一次)
   INSERT INTO order_timelines (order_id, action_type, actor_id, actor_role, notes)
   VALUES (
     p_order_id,
     'deleted',
     p_actor_id,
     'admin',
-    COALESCE(p_reason, '蝞∠??∪?方??殷??芣??詨歇???)
+    COALESCE(p_reason, '管理員刪除訂單，優惠券已退還')
   );
 
-  -- 5. ?芷閮 (CASCADE ????order_items ??order_timelines)
+  -- 5. 刪除訂單 (CASCADE 會自動刪除 order_items 與 order_timelines)
   DELETE FROM orders WHERE id = p_order_id;
 
   RETURN json_build_object(
     'success', true,
     'order_number', v_order.order_number,
-    'message', '閮撌脣?歹??芣??詨歇???
+    'message', '訂單已刪除，優惠券已退還'
   );
 
 EXCEPTION
@@ -324,7 +330,7 @@ $$;
 ALTER FUNCTION "public"."delete_order_pending"("p_order_id" "uuid", "p_actor_id" "uuid", "p_reason" "text") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."delete_order_pending"("p_order_id" "uuid", "p_actor_id" "uuid", "p_reason" "text") IS '?芷 pending ????桐蒂??? (???扳?雿?蝜? RLS)';
+COMMENT ON FUNCTION "public"."delete_order_pending"("p_order_id" "uuid", "p_actor_id" "uuid", "p_reason" "text") IS '刪除 pending 狀態訂單並退還優惠券 (原子性操作，繞過 RLS)';
 
 
 
@@ -339,7 +345,7 @@ DECLARE
 BEGIN
   today := TO_CHAR(NOW(), 'YYYYMMDD');
 
-  -- ?亥岷?嗆?憭扳?瘞渲?
+  -- 查詢當日最大流水號
   SELECT COALESCE(
     MAX(
       SUBSTRING(order_number FROM LENGTH('ORD-' || today || '-') + 1)::INTEGER
@@ -349,10 +355,10 @@ BEGIN
   FROM orders
   WHERE order_number LIKE 'ORD-' || today || '-%';
 
-  -- 瘙箏?瘚偌????(?撠?4 雿?頞? 9999 ?芸??游?)
+  -- 決定流水號位數 (最少 4 位，超過 9999 自動擴展)
   max_digits := GREATEST(4, LENGTH(seq_num::TEXT));
 
-  -- ?Ｙ?閮蝺刻?
+  -- 產生訂單編號
   order_num := 'ORD-' || today || '-' || LPAD(seq_num::TEXT, max_digits, '0');
 
   RETURN order_num;
@@ -363,7 +369,7 @@ $$;
 ALTER FUNCTION "public"."generate_order_number"() OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."generate_order_number"() IS '?Ｙ??臭?閮蝺刻? (ORD-YYYYMMDD-XXXX)';
+COMMENT ON FUNCTION "public"."generate_order_number"() IS '產生唯一訂單編號 (ORD-YYYYMMDD-XXXX)';
 
 
 
@@ -376,17 +382,17 @@ DECLARE
   v_max_number INTEGER;
   v_new_code VARCHAR(50);
 BEGIN
-  -- 1. ??蝟餃?隞?Ⅳ??憿誨蝣?
+  -- 1. 取得系列代碼與分類代碼
   SELECT c.code, s.code INTO v_category_code, v_series_code
   FROM series s
   INNER JOIN categories c ON s.category_id = c.id
   WHERE s.id = p_series_id;
 
   IF v_category_code IS NULL OR v_series_code IS NULL THEN
-    RAISE EXCEPTION '?⊥??曉蝟餃?撠???憿誨蝣潭?蝟餃?隞?Ⅳ';
+    RAISE EXCEPTION '無法找到系列對應的分類代碼或系列代碼';
   END IF;
 
-  -- 2. ?亥岷閰脩頂??撌脣??函??憭扳?瘞渲?
+  -- 2. 查詢該系列下已存在的最大流水號
   SELECT COALESCE(
     MAX(CAST(SUBSTRING(p.code FROM '(\d+)$') AS INTEGER)),
     0
@@ -395,7 +401,7 @@ BEGIN
   WHERE p.series_id = p_series_id
     AND p.code ~ ('^' || v_category_code || '-' || v_series_code || '-\d{2}$');
 
-  -- 3. ?Ｙ??啁楊???拐??豢?瘞渲?嚗?
+  -- 3. 產生新編號（兩位數流水號）
   v_new_code := v_category_code || '-' || v_series_code || '-' || LPAD((v_max_number + 1)::TEXT, 2, '0');
 
   RETURN v_new_code;
@@ -406,7 +412,7 @@ $_$;
 ALTER FUNCTION "public"."generate_product_code"("p_series_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."generate_product_code"("p_series_id" "uuid") IS '?芸??Ｙ???蝺刻?嚗??隞?Ⅳ]-[蝟餃?隞?Ⅳ]-[?拐?瘚偌?嚗? DRK-TEA-01嚗?;
+COMMENT ON FUNCTION "public"."generate_product_code"("p_series_id" "uuid") IS '自動產生商品編號：[分類代碼]-[系列代碼]-[兩位流水號]（如 DRK-TEA-01）';
 
 
 
@@ -428,7 +434,7 @@ $$;
 ALTER FUNCTION "public"."get_active_tags"() OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."get_active_tags"() IS '????暑頨???璅惜?”嚗??摨??踹?摰Ｘ蝡航???';
+COMMENT ON FUNCTION "public"."get_active_tags"() IS '取得所有活躍商品的標籤列表（去重排序，避免客戶端處理）';
 
 
 
@@ -467,7 +473,7 @@ $$;
 ALTER FUNCTION "public"."get_products_with_user_price"("p_series_id" "uuid", "p_tier_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."get_products_with_user_price"("p_series_id" "uuid", "p_tier_id" "uuid") IS '??蝟餃?銝????蝙?刻?蝝?潘??芸??亥岷嚗??N+1 ??嚗?;
+COMMENT ON FUNCTION "public"."get_products_with_user_price"("p_series_id" "uuid", "p_tier_id" "uuid") IS '取得系列下的商品與使用者等級價格（優化查詢，避免 N+1 問題）';
 
 
 
@@ -478,34 +484,34 @@ DECLARE
   v_current_status TEXT;
   v_item RECORD;
 BEGIN
-  -- 瑼Ｘ閮???
+  -- 檢查訂單狀態
   SELECT status INTO v_current_status FROM orders WHERE id = p_order_id FOR UPDATE;
 
   IF v_current_status IS NULL THEN
-    RETURN QUERY SELECT FALSE, '閮銝???;
+    RETURN QUERY SELECT FALSE, '訂單不存在';
     RETURN;
   END IF;
 
   IF v_current_status <> 'pending' THEN
-    RETURN QUERY SELECT FALSE, '??蝣箄?閮?舀?閮鞎?;
+    RETURN QUERY SELECT FALSE, '僅待確認訂單可標記出貨';
     RETURN;
   END IF;
 
-  -- ???摨怠?嚗?渲?摨怠?嚗?
+  -- 扣減庫存（支援負庫存）
   FOR v_item IN
     SELECT product_id, quantity FROM order_items WHERE order_id = p_order_id
   LOOP
     UPDATE products SET stock = stock - v_item.quantity WHERE id = v_item.product_id;
   END LOOP;
 
-  -- ?湔閮???
+  -- 更新訂單狀態
   UPDATE orders SET status = 'shipping', updated_at = NOW() WHERE id = p_order_id;
 
-  -- 閮???甇瑕
+  -- 記錄操作歷史
   INSERT INTO order_timelines (order_id, action_type, actor_id, actor_role, old_status, new_status)
   VALUES (p_order_id, 'status_updated', p_actor_id, 'admin', 'pending', 'shipping');
 
-  RETURN QUERY SELECT TRUE, '閮撌脫?閮?箄疏銝哨?摨怠?撌脫皜?;
+  RETURN QUERY SELECT TRUE, '訂單已標記為出貨中，庫存已扣減';
 END;
 $$;
 
@@ -513,7 +519,7 @@ $$;
 ALTER FUNCTION "public"."mark_order_as_shipping"("p_order_id" "uuid", "p_actor_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."mark_order_as_shipping"("p_order_id" "uuid", "p_actor_id" "uuid") IS '璅?閮?箏鞎其葉銝行皜澈摮????扳?雿?嚗?隞????confirm_order_and_deduct_stock';
+COMMENT ON FUNCTION "public"."mark_order_as_shipping"("p_order_id" "uuid", "p_actor_id" "uuid") IS '標記訂單為出貨中並扣減庫存（原子性操作），取代舊的 confirm_order_and_deduct_stock';
 
 
 
@@ -524,41 +530,41 @@ DECLARE
   v_old_status TEXT;
   v_item RECORD;
 BEGIN
-  -- 瑼Ｘ閮
+  -- 檢查訂單
   SELECT status INTO v_old_status FROM orders WHERE id = p_order_id FOR UPDATE;
 
   IF v_old_status IS NULL THEN
-    RETURN QUERY SELECT FALSE, '閮銝???;
+    RETURN QUERY SELECT FALSE, '訂單不存在';
     RETURN;
   END IF;
 
-  -- 撽????蝔?蝪∪?敺?閬?嚗?
+  -- 驗證狀態流程（簡化後的規則）
   IF v_old_status = 'shipping' AND p_new_status = 'completed' THEN
-    -- ?迂嚗hipping ??completed
+    -- 允許：shipping → completed
     NULL;
   ELSIF v_old_status = 'pending' AND p_new_status = 'cancelled' THEN
-    -- ?迂嚗ending ??cancelled嚗???摨怠?嚗?
+    -- 允許：pending → cancelled（無需回補庫存）
     NULL;
   ELSIF v_old_status = 'shipping' AND p_new_status = 'cancelled' THEN
-    -- ?迂嚗hipping ??cancelled嚗???摨怠?嚗?
+    -- 允許：shipping → cancelled（需回補庫存）
     FOR v_item IN
       SELECT product_id, quantity FROM order_items WHERE order_id = p_order_id
     LOOP
       UPDATE products SET stock = stock + v_item.quantity WHERE id = v_item.product_id;
     END LOOP;
   ELSE
-    RETURN QUERY SELECT FALSE, '銝?閮梁??????' || v_old_status || ' ??' || p_new_status;
+    RETURN QUERY SELECT FALSE, '不允許的狀態轉換：' || v_old_status || ' → ' || p_new_status;
     RETURN;
   END IF;
 
-  -- ?湔???
+  -- 更新狀態
   UPDATE orders SET status = p_new_status, updated_at = NOW() WHERE id = p_order_id;
 
-  -- 閮?甇瑕
+  -- 記錄歷史
   INSERT INTO order_timelines (order_id, action_type, actor_id, actor_role, old_status, new_status)
   VALUES (p_order_id, 'status_updated', p_actor_id, 'admin', v_old_status, p_new_status);
 
-  RETURN QUERY SELECT TRUE, '閮??歇?湔';
+  RETURN QUERY SELECT TRUE, '訂單狀態已更新';
 END;
 $$;
 
@@ -566,7 +572,7 @@ $$;
 ALTER FUNCTION "public"."update_order_status"("p_order_id" "uuid", "p_new_status" "text", "p_actor_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."update_order_status"("p_order_id" "uuid", "p_new_status" "text", "p_actor_id" "uuid") IS '?湔閮???蝪∪???蝘駁 confirmed ?????閮梁?頧?嚗hipping?ompleted, pending?ancelled, shipping?ancelled嚗?鋆澈摮?';
+COMMENT ON FUNCTION "public"."update_order_status"("p_order_id" "uuid", "p_new_status" "text", "p_actor_id" "uuid") IS '更新訂單狀態（簡化版，移除 confirmed 狀態）。允許的轉換：shipping→completed, pending→cancelled, shipping→cancelled（回補庫存）';
 
 
 
@@ -585,33 +591,33 @@ DECLARE
   v_actor_role TEXT;
   v_new_notes TEXT;
 BEGIN
-  -- ===== 1. ?亥岷 actor_role嚗??蝥閰Ｚ???NULL嚗?====
+  -- ===== 1. 查詢 actor_role（避免後續查詢返回 NULL）=====
   SELECT role INTO v_actor_role FROM profiles WHERE id = p_actor_id;
 
   IF v_actor_role IS NULL THEN
-    RETURN QUERY SELECT FALSE, '???澈隞賡?霅仃??, NULL::DECIMAL;
+    RETURN QUERY SELECT FALSE, '操作者身份驗證失敗', NULL::DECIMAL;
     RETURN;
   END IF;
 
-  -- ===== 2. 瑼Ｘ閮???=====
+  -- ===== 2. 檢查訂單狀態 =====
   SELECT status INTO v_current_status FROM orders WHERE id = p_order_id FOR UPDATE;
 
   IF v_current_status IS NULL THEN
-    RETURN QUERY SELECT FALSE, '閮銝???, NULL::DECIMAL;
+    RETURN QUERY SELECT FALSE, '訂單不存在', NULL::DECIMAL;
     RETURN;
   END IF;
 
   IF v_current_status NOT IN ('pending') THEN
-    RETURN QUERY SELECT FALSE, '??蝣箄?閮?臭耨?對?甇方??桃?? ' || v_current_status, NULL::DECIMAL;
+    RETURN QUERY SELECT FALSE, '僅待確認訂單可修改，此訂單狀態為 ' || v_current_status, NULL::DECIMAL;
     RETURN;
   END IF;
 
-  -- ===== 3. ????靽格 =====
+  -- ===== 3. 處理商品修改 =====
   IF p_modifications->'items' IS NOT NULL THEN
     FOR v_item IN SELECT * FROM jsonb_array_elements(p_modifications->'items')
     LOOP
       CASE v_item->>'type'
-        -- A. ?寞霈
+        -- A. 價格變更
         WHEN 'price_changed' THEN
           UPDATE order_items
           SET deal_price = (v_item->>'new_price')::DECIMAL,
@@ -619,11 +625,11 @@ BEGIN
           WHERE id = (v_item->>'item_id')::UUID AND order_id = p_order_id;
 
           IF NOT FOUND THEN
-            RETURN QUERY SELECT FALSE, '?曆??啣???ID: ' || (v_item->>'item_id'), NULL::DECIMAL;
+            RETURN QUERY SELECT FALSE, '找不到商品 ID: ' || (v_item->>'item_id'), NULL::DECIMAL;
             RETURN;
           END IF;
 
-        -- B. ?賊?霈
+        -- B. 數量變更
         WHEN 'quantity_changed' THEN
           UPDATE order_items
           SET quantity = (v_item->>'new_quantity')::INTEGER,
@@ -631,20 +637,20 @@ BEGIN
           WHERE id = (v_item->>'item_id')::UUID AND order_id = p_order_id;
 
           IF NOT FOUND THEN
-            RETURN QUERY SELECT FALSE, '?曆??啣???ID: ' || (v_item->>'item_id'), NULL::DECIMAL;
+            RETURN QUERY SELECT FALSE, '找不到商品 ID: ' || (v_item->>'item_id'), NULL::DECIMAL;
             RETURN;
           END IF;
 
-        -- C. 蝘駁??
+        -- C. 移除商品
         WHEN 'removed' THEN
           DELETE FROM order_items WHERE id = (v_item->>'item_id')::UUID AND order_id = p_order_id;
 
           IF NOT FOUND THEN
-            RETURN QUERY SELECT FALSE, '?曆??啣???ID: ' || (v_item->>'item_id'), NULL::DECIMAL;
+            RETURN QUERY SELECT FALSE, '找不到商品 ID: ' || (v_item->>'item_id'), NULL::DECIMAL;
             RETURN;
           END IF;
 
-        -- D. ?啣???
+        -- D. 新增商品
         WHEN 'added' THEN
           INSERT INTO order_items (order_id, product_id, product_name_snapshot, deal_price, quantity, subtotal)
           VALUES (
@@ -659,20 +665,20 @@ BEGIN
     END LOOP;
   END IF;
 
-  -- ===== 4. 瑼Ｘ?臬????嚗撠???????=====
+  -- ===== 4. 檢查是否還有商品（至少保留一個商品）=====
   IF (SELECT COUNT(*) FROM order_items WHERE order_id = p_order_id) = 0 THEN
-    RETURN QUERY SELECT FALSE, '閮?喳??靽?銝?????⊥??券蝘駁', NULL::DECIMAL;
+    RETURN QUERY SELECT FALSE, '訂單至少需保留一個商品，無法全部移除', NULL::DECIMAL;
     RETURN;
   END IF;
 
-  -- ===== 5. ??鞎餌靽格 =====
+  -- ===== 5. 處理費用修改 =====
   IF p_modifications->'fees' IS NOT NULL THEN
     FOR v_fee IN SELECT * FROM jsonb_array_elements(p_modifications->'fees')
     LOOP
       CASE v_fee->>'type'
-        -- A. ?啣?鞎餌
+        -- A. 新增費用
         WHEN 'added' THEN
-          -- ??靽格迤嚗蝙?冽迤蝣箇?甈???"amount" ?? "fee_amount"
+          -- ✅ 修正：使用正確的欄位名 "amount" 而非 "fee_amount"
           INSERT INTO order_custom_fees (order_id, fee_name, amount, created_by)
           VALUES (
             p_order_id,
@@ -681,7 +687,7 @@ BEGIN
             p_actor_id
           );
 
-        -- B. 蝘駁鞎餌
+        -- B. 移除費用
         WHEN 'removed' THEN
           DELETE FROM order_custom_fees
           WHERE order_id = p_order_id AND fee_name = v_fee->>'fee_name';
@@ -689,14 +695,14 @@ BEGIN
     END LOOP;
   END IF;
 
-  -- ===== 6. ???祥靽格 =====
+  -- ===== 6. 處理運費修改 =====
   IF p_modifications->'shipping' IS NOT NULL THEN
     UPDATE orders
     SET shipping_fee = (p_modifications->'shipping'->>'new_fee')::DECIMAL
     WHERE id = p_order_id;
   END IF;
 
-  -- ===== 7. ???酉靽格 =====
+  -- ===== 7. 處理備註修改 =====
   IF p_modifications->'notes' IS NOT NULL THEN
     v_new_notes := p_modifications->'notes'->>'new_notes';
     UPDATE orders
@@ -704,7 +710,7 @@ BEGIN
     WHERE id = p_order_id;
   END IF;
 
-  -- ===== 8. ???芣??貊宏??=====
+  -- ===== 8. 處理優惠券移除 =====
   IF p_modifications->'coupon' IS NOT NULL THEN
     IF p_modifications->'coupon'->>'action' = 'removed' THEN
       DELETE FROM order_coupons WHERE order_id = p_order_id;
@@ -714,7 +720,7 @@ BEGIN
     END IF;
   END IF;
 
-  -- ===== 9. ?閮?閮蝮賡?憿?=====
+  -- ===== 9. 重新計算訂單總金額 =====
   SELECT COALESCE(SUM(subtotal), 0) INTO v_items_subtotal
   FROM order_items WHERE order_id = p_order_id;
 
@@ -731,8 +737,8 @@ BEGIN
 
   UPDATE orders SET total_amount = v_new_total WHERE id = p_order_id;
 
-  -- ===== 10. 閮?靽格甇瑞? =====
-  -- ??靽格迤嚗蝙?冽迤蝣箇?甈???"action_type" ?? "action"
+  -- ===== 10. 記錄修改歷程 =====
+  -- ✅ 修正：使用正確的欄位名 "action_type" 而非 "action"
   INSERT INTO order_timelines (order_id, action_type, old_status, new_status, actor_id, actor_role, modifications)
   VALUES (
     p_order_id,
@@ -744,8 +750,8 @@ BEGIN
     p_modifications
   );
 
-  -- ===== 11. 餈???蝯? =====
-  RETURN QUERY SELECT TRUE, '閮靽格??', v_new_total;
+  -- ===== 11. 返回成功結果 =====
+  RETURN QUERY SELECT TRUE, '訂單修改成功', v_new_total;
 END;
 $$;
 
@@ -753,10 +759,11 @@ $$;
 ALTER FUNCTION "public"."update_order_with_modifications"("p_order_id" "uuid", "p_modifications" "jsonb", "p_actor_id" "uuid") OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."update_order_with_modifications"("p_order_id" "uuid", "p_modifications" "jsonb", "p_actor_id" "uuid") IS '?寞活靽格閮嚗??祥?具?鞎颯?閮颯?嚗蒂閮?靽格甇瑞???   靽格迤??歇?亙?憿?
-   - 雿輻 action_type ?? action
-   - 雿輻 amount ?? fee_amount
-   - 雿輻 NULLIF 甇?Ⅱ???酉?征??;
+COMMENT ON FUNCTION "public"."update_order_with_modifications"("p_order_id" "uuid", "p_modifications" "jsonb", "p_actor_id" "uuid") IS '批次修改訂單（商品、費用、運費、備註、優惠券）並記錄修改歷程。
+   修正所有已知問題：
+   - 使用 action_type 而非 action
+   - 使用 amount 而非 fee_amount
+   - 使用 NULLIF 正確處理備註的空值';
 
 
 
@@ -773,7 +780,7 @@ $$;
 ALTER FUNCTION "public"."update_updated_at_column"() OWNER TO "postgres";
 
 
-COMMENT ON FUNCTION "public"."update_updated_at_column"() IS '閫貊?典?賂??芸??湔銵函? updated_at 甈??箇????;
+COMMENT ON FUNCTION "public"."update_updated_at_column"() IS '觸發器函數：自動更新表的 updated_at 欄位為當前時間';
 
 
 SET default_tablespace = '';
@@ -811,51 +818,51 @@ CREATE TABLE IF NOT EXISTS "public"."coupons" (
 ALTER TABLE "public"."coupons" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."coupons" IS '?芣??訾蜓銵?- ?脣??芣??訾誨蝣潦???撘蝙?券??嗚?????;
+COMMENT ON TABLE "public"."coupons" IS '優惠券主表 - 儲存優惠券代碼、折扣方式、使用限制、生效時間';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."code" IS '?芣??訾誨蝣潘?蝞∠??∟撓?伐?4-20 摮?嚗??迂?望摮?';
+COMMENT ON COLUMN "public"."coupons"."code" IS '優惠券代碼（管理員輸入，4-20 字元，僅允許英數字）';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."code_normalized" IS '?芸?頧之撖怎??芣??訾誨蝣潘??冽?臭??扳炎?亥??亥岷嚗之撠神銝???';
+COMMENT ON COLUMN "public"."coupons"."code_normalized" IS '自動轉大寫的優惠券代碼（用於唯一性檢查與查詢，大小寫不敏感）';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."discount_type" IS '??孵?嚗ixed (?暸??) ??percentage (?曉?瘥???';
+COMMENT ON COLUMN "public"."coupons"."discount_type" IS '折扣方式：fixed (現金折扣) 或 percentage (百分比折扣)';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."discount_value" IS '??潘??暸??嚗摰?憿?NT$嚗???嚗?-100 隞?”??曉?瘥?';
+COMMENT ON COLUMN "public"."coupons"."discount_value" IS '折扣值（現金折扣：固定金額 NT$；百分比折扣：1-100 代表折扣百分比）';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."min_order_amount" IS '?雿??桅?憿??塚??詨‵嚗ULL 銵函內?⊿??塚?';
+COMMENT ON COLUMN "public"."coupons"."min_order_amount" IS '最低訂單金額限制（選填，NULL 表示無限制）';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."valid_from" IS '?芣??貊???憪???;
+COMMENT ON COLUMN "public"."coupons"."valid_from" IS '優惠券生效開始時間';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."valid_until" IS '?芣??貊???????;
+COMMENT ON COLUMN "public"."coupons"."valid_until" IS '優惠券生效結束時間';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."claim_limit" IS '瘥?摰Ｘ?舫??撐?訾????身 1 撘蛛??舀憭撐??嚗?;
+COMMENT ON COLUMN "public"."coupons"."claim_limit" IS '每位客戶可領取張數上限（預設 1 張，支援多張領取）';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."status" IS '?芣??貊???active (?), inactive (?), deleted (撌脣??';
+COMMENT ON COLUMN "public"."coupons"."status" IS '優惠券狀態：active (啟用), inactive (停用), deleted (已刪除)';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."deleted_at" IS '?芷??嚗??芷嚗?;
+COMMENT ON COLUMN "public"."coupons"."deleted_at" IS '刪除時間（軟刪除）';
 
 
 
-COMMENT ON COLUMN "public"."coupons"."total_limit" IS '蝮賢撐?訾?????恥?嗅?閮??撘菜嚗ULL 銵函內?⊿??潭嚗?;
+COMMENT ON COLUMN "public"."coupons"."total_limit" IS '總張數上限（所有客戶合計可領取張數，NULL 表示無限發放）';
 
 
 
@@ -881,7 +888,7 @@ CREATE OR REPLACE VIEW "public"."active_coupons" WITH ("security_invoker"='true'
 ALTER VIEW "public"."active_coupons" OWNER TO "postgres";
 
 
-COMMENT ON VIEW "public"."active_coupons" IS '???芣???View - ?芸??蕪???歇?芷?芣??賂?雿輻 SECURITY INVOKER 蝣箔? RLS 蝑甇?Ⅱ?';
+COMMENT ON VIEW "public"."active_coupons" IS '有效優惠券 View - 自動過濾過期與已刪除優惠券，使用 SECURITY INVOKER 確保 RLS 策略正確應用';
 
 
 
@@ -900,31 +907,31 @@ CREATE TABLE IF NOT EXISTS "public"."announcements" (
 ALTER TABLE "public"."announcements" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."announcements" IS '撱??頛芣銵?- ?冽擐?頛芣璈怠?';
+COMMENT ON TABLE "public"."announcements" IS '廣告輪播表 - 用於首頁輪播橫幅';
 
 
 
-COMMENT ON COLUMN "public"."announcements"."id" IS '撱?? ID (UUID)';
+COMMENT ON COLUMN "public"."announcements"."id" IS '廣告 ID (UUID)';
 
 
 
-COMMENT ON COLUMN "public"."announcements"."title" IS '撱??璅?';
+COMMENT ON COLUMN "public"."announcements"."title" IS '廣告標題';
 
 
 
-COMMENT ON COLUMN "public"."announcements"."image_url" IS '撱???? URL';
+COMMENT ON COLUMN "public"."announcements"."image_url" IS '廣告圖片 URL';
 
 
 
-COMMENT ON COLUMN "public"."announcements"."sort_order" IS '????嚗?潭??唾矽?湛?';
+COMMENT ON COLUMN "public"."announcements"."sort_order" IS '排序順序（用於拖曳調整）';
 
 
 
-COMMENT ON COLUMN "public"."announcements"."is_active" IS '?臬?';
+COMMENT ON COLUMN "public"."announcements"."is_active" IS '是否啟用';
 
 
 
-COMMENT ON COLUMN "public"."announcements"."series_id" IS '??頂??ID嚗??誨??頝唾??唾府蝟餃???????;
+COMMENT ON COLUMN "public"."announcements"."series_id" IS '關聯的系列 ID，點擊廣告時跳轉至該系列的商品頁面';
 
 
 
@@ -948,43 +955,43 @@ CREATE TABLE IF NOT EXISTS "public"."audit_logs" (
 ALTER TABLE "public"."audit_logs" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."audit_logs" IS '???亥?銵?- 蝔賣餈質馱嚗?????閬?雿?撱箇??耨?嫘?扎澈摮矽?氬?閮嚗?;
+COMMENT ON TABLE "public"."audit_logs" IS '操作日誌表 - 稽核追蹤，記錄所有重要操作（建立、修改、刪除、庫存調整、留言）';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."target_type" IS '?格?撖阡?憿?嚗roduct, client, order, tier, series, coupon, setting, etc.';
+COMMENT ON COLUMN "public"."audit_logs"."target_type" IS '目標實體類型：product, client, order, tier, series, coupon, setting, etc.';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."target_id" IS '?格?撖阡? ID (UUID 頧 TEXT ?脣?)';
+COMMENT ON COLUMN "public"."audit_logs"."target_id" IS '目標實體 ID (UUID 轉為 TEXT 儲存)';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."action_type" IS '??憿?嚗reated (撱箇?), updated (?湔), deleted (?芷), stock_adjusted (摨怠?隤踵), comment_added (?啣???)';
+COMMENT ON COLUMN "public"."audit_logs"."action_type" IS '操作類型：created (建立), updated (更新), deleted (刪除), stock_adjusted (庫存調整), comment_added (新增留言)';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."actor_id" IS '????ID (摰Ｘ?恣?)';
+COMMENT ON COLUMN "public"."audit_logs"."actor_id" IS '操作者 ID (客戶或管理員)';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."actor_role" IS '??????(client ??admin)';
+COMMENT ON COLUMN "public"."audit_logs"."actor_role" IS '操作者角色 (client 或 admin)';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."actor_display_name" IS '???蝔勗翰??(?踹??芷撣唾?敺＊蝷箝?乩蝙?刻?';
+COMMENT ON COLUMN "public"."audit_logs"."actor_display_name" IS '操作者暱稱快照 (避免刪除帳號後顯示「未知使用者」)';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."old_values" IS '霈????(JSONB ?澆?嚗? updated/deleted ????';
+COMMENT ON COLUMN "public"."audit_logs"."old_values" IS '變更前資料 (JSONB 格式，僅 updated/deleted 動作有值)';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."new_values" IS '霈敺???(JSONB ?澆?嚗? created/updated ????';
+COMMENT ON COLUMN "public"."audit_logs"."new_values" IS '變更後資料 (JSONB 格式，僅 created/updated 動作有值)';
 
 
 
-COMMENT ON COLUMN "public"."audit_logs"."notes" IS '???酉 (憿?隤芣?)';
+COMMENT ON COLUMN "public"."audit_logs"."notes" IS '操作備註 (額外說明)';
 
 
 
@@ -1012,63 +1019,63 @@ CREATE TABLE IF NOT EXISTS "public"."backup_jobs" (
 ALTER TABLE "public"."backup_jobs" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."backup_jobs" IS '?脩垢?遢閮?銵?;
+COMMENT ON TABLE "public"."backup_jobs" IS '雲端備份記錄表';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."id" IS '?臭?霅蝣?;
+COMMENT ON COLUMN "public"."backup_jobs"."id" IS '唯一識別碼';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."filename" IS '?遢瑼??迂嚗sale-backup-YYYYMMDD-HHMMSS.sql.gz嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."filename" IS '備份檔案名稱（vsale-backup-YYYYMMDD-HHMMSS.sql.gz）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."file_size" IS '憯葬敺?獢之撠?bytes嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."file_size" IS '壓縮後檔案大小（bytes）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."storage_provider" IS '?脣?雿蔭嚗cs ??vercel_blob嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."storage_provider" IS '儲存位置（gcs 或 vercel_blob）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."storage_url" IS '?脩垢瑼? URL嚗CS: gs://bucket/path, Vercel: https://...嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."storage_url" IS '雲端檔案 URL（GCS: gs://bucket/path, Vercel: https://...）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."backup_type" IS '?遢憿?嚗uto ??manual嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."backup_type" IS '備份類型（auto 或 manual）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."status" IS '?瑁????in_progress, success, failed嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."status" IS '執行狀態（in_progress, success, failed）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."metadata" IS '?遢???鞈?銵冽?????蝮桃?嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."metadata" IS '備份元數據（資料表數量、記錄數量、壓縮率）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."error_message" IS '憭望??隤方???;
+COMMENT ON COLUMN "public"."backup_jobs"."error_message" IS '失敗時錯誤訊息';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."created_by" IS '???遢?????芸??遢? NULL嚗?;
+COMMENT ON COLUMN "public"."backup_jobs"."created_by" IS '手動備份操作者（自動備份時為 NULL）';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."started_at" IS '?遢????';
+COMMENT ON COLUMN "public"."backup_jobs"."started_at" IS '備份開始時間';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."completed_at" IS '?遢摰???';
+COMMENT ON COLUMN "public"."backup_jobs"."completed_at" IS '備份完成時間';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."created_at" IS '閮?撱箇???';
+COMMENT ON COLUMN "public"."backup_jobs"."created_at" IS '記錄建立時間';
 
 
 
-COMMENT ON COLUMN "public"."backup_jobs"."includes_storage" IS '?臬? Supabase Storage ??';
+COMMENT ON COLUMN "public"."backup_jobs"."includes_storage" IS '是否包含 Supabase Storage 圖片';
 
 
 
@@ -1089,39 +1096,39 @@ CREATE TABLE IF NOT EXISTS "public"."categories" (
 ALTER TABLE "public"."categories" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."categories" IS '????銵剁?摰儔????撅文?憿?憒ㄡ?憌?典?嚗?;
+COMMENT ON TABLE "public"."categories" IS '商品分類表：定義商品的頂層分類（如飲料、零食、日用品）';
 
 
 
-COMMENT ON COLUMN "public"."categories"."id" IS '?? ID嚗UID嚗?;
+COMMENT ON COLUMN "public"."categories"."id" IS '分類 ID（UUID）';
 
 
 
-COMMENT ON COLUMN "public"."categories"."code" IS '??隞?Ⅳ嚗?-10 ?之撖怠?瘥?憒?DRK, SNK, DAI嚗?;
+COMMENT ON COLUMN "public"."categories"."code" IS '分類代碼（3-10 個大寫字母，如 DRK, SNK, DAI）';
 
 
 
-COMMENT ON COLUMN "public"."categories"."name" IS '???迂嚗??ㄡ?憌?';
+COMMENT ON COLUMN "public"."categories"."name" IS '分類名稱（如「飲料」、「零食」）';
 
 
 
-COMMENT ON COLUMN "public"."categories"."description" IS '???膩';
+COMMENT ON COLUMN "public"."categories"."description" IS '分類描述';
 
 
 
-COMMENT ON COLUMN "public"."categories"."status" IS '???active 憿舐內嚗nactive ?梯?';
+COMMENT ON COLUMN "public"."categories"."status" IS '狀態：active 顯示，inactive 隱藏';
 
 
 
-COMMENT ON COLUMN "public"."categories"."sort_order" IS '????嚗摮?撠??嚗?;
+COMMENT ON COLUMN "public"."categories"."sort_order" IS '排序順序（數字越小越前面）';
 
 
 
-COMMENT ON COLUMN "public"."categories"."created_at" IS '撱箇???';
+COMMENT ON COLUMN "public"."categories"."created_at" IS '建立時間';
 
 
 
-COMMENT ON COLUMN "public"."categories"."updated_at" IS '?敺?唳???;
+COMMENT ON COLUMN "public"."categories"."updated_at" IS '最後更新時間';
 
 
 
@@ -1136,15 +1143,15 @@ CREATE TABLE IF NOT EXISTS "public"."coupon_series_restrictions" (
 ALTER TABLE "public"."coupon_series_restrictions" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."coupon_series_restrictions" IS '?芣??貊頂???嗉” - 憭?憭??航”嚗??嗅??摰??頂?雿輻';
+COMMENT ON TABLE "public"."coupon_series_restrictions" IS '優惠券系列限制表 - 多對多關聯表，限制優惠券僅特定商品系列可使用';
 
 
 
-COMMENT ON COLUMN "public"."coupon_series_restrictions"."coupon_id" IS '?芣???ID';
+COMMENT ON COLUMN "public"."coupon_series_restrictions"."coupon_id" IS '優惠券 ID';
 
 
 
-COMMENT ON COLUMN "public"."coupon_series_restrictions"."series_id" IS '??蝟餃? ID';
+COMMENT ON COLUMN "public"."coupon_series_restrictions"."series_id" IS '商品系列 ID';
 
 
 
@@ -1159,15 +1166,15 @@ CREATE TABLE IF NOT EXISTS "public"."coupon_tier_restrictions" (
 ALTER TABLE "public"."coupon_tier_restrictions" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."coupon_tier_restrictions" IS '?芣??貊?蝝??嗉” - 憭?憭??航”嚗??嗅??摰??∠?蝝雿輻';
+COMMENT ON TABLE "public"."coupon_tier_restrictions" IS '優惠券等級限制表 - 多對多關聯表，限制優惠券僅特定會員等級可使用';
 
 
 
-COMMENT ON COLUMN "public"."coupon_tier_restrictions"."coupon_id" IS '?芣???ID';
+COMMENT ON COLUMN "public"."coupon_tier_restrictions"."coupon_id" IS '優惠券 ID';
 
 
 
-COMMENT ON COLUMN "public"."coupon_tier_restrictions"."tier_id" IS '?蝑? ID';
+COMMENT ON COLUMN "public"."coupon_tier_restrictions"."tier_id" IS '會員等級 ID';
 
 
 
@@ -1187,23 +1194,23 @@ CREATE TABLE IF NOT EXISTS "public"."home_page_blocks" (
 ALTER TABLE "public"."home_page_blocks" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."home_page_blocks" IS '擐?撱???憛”嚗?游??憚?准???蝷箝?摮?憛?';
+COMMENT ON TABLE "public"."home_page_blocks" IS '首頁廣告區塊表（支援圖片輪播、商品展示、文字區塊）';
 
 
 
-COMMENT ON COLUMN "public"."home_page_blocks"."block_type" IS '?憛???image_carousel嚗??憚?哨??roduct_display嚗???蝷綽??ext_block嚗?摮?憛?';
+COMMENT ON COLUMN "public"."home_page_blocks"."block_type" IS '區塊類型：image_carousel（圖片輪播）、product_display（商品展示）、text_block（文字區塊）';
 
 
 
-COMMENT ON COLUMN "public"."home_page_blocks"."config" IS '?憛?蝵殷?JSONB嚗?靘?block_type 銝?蝯?';
+COMMENT ON COLUMN "public"."home_page_blocks"."config" IS '區塊配置（JSONB）：依 block_type 不同結構';
 
 
 
-COMMENT ON COLUMN "public"."home_page_blocks"."sort_order" IS '????嚗摮?撠???嚗?;
+COMMENT ON COLUMN "public"."home_page_blocks"."sort_order" IS '排序順序（數字越小越靠前）';
 
 
 
-COMMENT ON COLUMN "public"."home_page_blocks"."is_active" IS '?臬?嚗????憛?憿舐內?典??堆?';
+COMMENT ON COLUMN "public"."home_page_blocks"."is_active" IS '是否啟用（僅啟用的區塊會顯示在前台）';
 
 
 
@@ -1221,27 +1228,27 @@ CREATE TABLE IF NOT EXISTS "public"."order_coupons" (
 ALTER TABLE "public"."order_coupons" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."order_coupons" IS '閮?芣??詨翰?扯” - 銝蝙??FK ??coupons嚗偶銋???鞈?嚗雿踹?鋡怠?歹?';
+COMMENT ON TABLE "public"."order_coupons" IS '訂單優惠券快照表 - 不使用 FK 到 coupons，永久保留優惠券資訊（即使優惠券被刪除）';
 
 
 
-COMMENT ON COLUMN "public"."order_coupons"."order_id" IS '閮 ID';
+COMMENT ON COLUMN "public"."order_coupons"."order_id" IS '訂單 ID';
 
 
 
-COMMENT ON COLUMN "public"."order_coupons"."coupon_code" IS '?芣??訾誨蝣澆翰?改?憭批神嚗?;
+COMMENT ON COLUMN "public"."order_coupons"."coupon_code" IS '優惠券代碼快照（大寫）';
 
 
 
-COMMENT ON COLUMN "public"."order_coupons"."discount_type" IS '??孵?敹怎嚗ixed (?暸??) ??percentage (?曉?瘥???';
+COMMENT ON COLUMN "public"."order_coupons"."discount_type" IS '折扣方式快照：fixed (現金折扣) 或 percentage (百分比折扣)';
 
 
 
-COMMENT ON COLUMN "public"."order_coupons"."discount_value" IS '??澆翰?改??暸??嚗摰?憿??曉?瘥????1-100嚗?;
+COMMENT ON COLUMN "public"."order_coupons"."discount_value" IS '折扣值快照（現金折扣：固定金額；百分比折扣：1-100）';
 
 
 
-COMMENT ON COLUMN "public"."order_coupons"."discount_amount" IS '撖阡????嚗??桃蜇憿?- ?敺?憿??桐?嚗T$嚗?;
+COMMENT ON COLUMN "public"."order_coupons"."discount_amount" IS '實際折扣金額（訂單總額 - 折扣後金額，單位：NT$）';
 
 
 
@@ -1260,31 +1267,31 @@ CREATE TABLE IF NOT EXISTS "public"."order_custom_fees" (
 ALTER TABLE "public"."order_custom_fees" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."order_custom_fees" IS '閮?芾?鞎餌?嚗???鞎颯?鋆祥??憭?鞎颯蜇憿矽?渡?嚗?;
+COMMENT ON TABLE "public"."order_custom_fees" IS '訂單自訂費用項目（如手續費、包裝費、額外運費、總額調整等）';
 
 
 
-COMMENT ON COLUMN "public"."order_custom_fees"."id" IS '?芾?鞎餌?臭?霅蝣?(UUID)';
+COMMENT ON COLUMN "public"."order_custom_fees"."id" IS '自訂費用唯一識別碼 (UUID)';
 
 
 
-COMMENT ON COLUMN "public"."order_custom_fees"."order_id" IS '?撅祈???(FK: orders.id嚗ASCADE ?芷)';
+COMMENT ON COLUMN "public"."order_custom_fees"."order_id" IS '所屬訂單 (FK: orders.id，CASCADE 刪除)';
 
 
 
-COMMENT ON COLUMN "public"."order_custom_fees"."fee_name" IS '鞎餌?迂嚗?憒? ??鞎颯?鋆祥??憭?鞎鳴??憭?50 摮?嚗?;
+COMMENT ON COLUMN "public"."order_custom_fees"."fee_name" IS '費用名稱（例如: 手續費、包裝費、額外運費，最多 50 字元）';
 
 
 
-COMMENT ON COLUMN "public"."order_custom_fees"."amount" IS '鞎餌??嚗迤???嗉祥????皜?嚗?憒? +50 = ??50 ??蝥祥嚗?100 = 皜? 100 ??';
+COMMENT ON COLUMN "public"."order_custom_fees"."amount" IS '費用金額（正數=收費、負數=減免，例如: +50 = 收 50 元手續費，-100 = 減免 100 元）';
 
 
 
-COMMENT ON COLUMN "public"."order_custom_fees"."created_at" IS '鞎餌撱箇???';
+COMMENT ON COLUMN "public"."order_custom_fees"."created_at" IS '費用建立時間';
 
 
 
-COMMENT ON COLUMN "public"."order_custom_fees"."created_by" IS '撱箇???(FK: auth.users.id嚗虜?箇恣?)';
+COMMENT ON COLUMN "public"."order_custom_fees"."created_by" IS '建立者 (FK: auth.users.id，通常為管理員)';
 
 
 
@@ -1307,43 +1314,43 @@ CREATE TABLE IF NOT EXISTS "public"."order_items" (
 ALTER TABLE "public"."order_items" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."order_items" IS '閮?敦銵?- 閮?瘥?閮??????漱?寞';
+COMMENT ON TABLE "public"."order_items" IS '訂單明細表 - 記錄每筆訂單包含的商品與成交價格';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."id" IS '閮?敦?臭?霅蝣?(UUID)';
+COMMENT ON COLUMN "public"."order_items"."id" IS '訂單明細唯一識別碼 (UUID)';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."order_id" IS '?撅祈???(FK: orders.id嚗ASCADE ?芷)';
+COMMENT ON COLUMN "public"."order_items"."order_id" IS '所屬訂單 (FK: orders.id，CASCADE 刪除)';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."product_id" IS '?? ID嚗??NULL嚗?文????芸?閮剔 NULL嚗??桐?靽????迂敹怎嚗?;
+COMMENT ON COLUMN "public"."order_items"."product_id" IS '商品 ID（可為 NULL，刪除商品時自動設為 NULL，訂單仍保留商品名稱快照）';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."product_name_snapshot" IS '???迂敹怎 (?踹????芷敺瘜＊蝷箸風?脰???';
+COMMENT ON COLUMN "public"."order_items"."product_name_snapshot" IS '商品名稱快照 (避免商品刪除後無法顯示歷史訂單)';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."deal_price" IS '?漱?寞 (銝?嗆???蝝?潘??冽閮?甇瑕)';
+COMMENT ON COLUMN "public"."order_items"."deal_price" IS '成交價格 (下單當時的等級價格，用於記錄歷史)';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."quantity" IS '閮頃?賊?';
+COMMENT ON COLUMN "public"."order_items"."quantity" IS '訂購數量';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."subtotal" IS '撠? = deal_price ? quantity (??甈?嚗??閰Ｘ???';
+COMMENT ON COLUMN "public"."order_items"."subtotal" IS '小計 = deal_price × quantity (冗餘欄位，提升查詢效能)';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."created_at" IS '?敦撱箇???';
+COMMENT ON COLUMN "public"."order_items"."created_at" IS '明細建立時間';
 
 
 
-COMMENT ON COLUMN "public"."order_items"."series_id_snapshot" IS '蝟餃? ID 敹怎嚗?澆?蝟餃??撽?嚗???斗?靽?嚗?;
+COMMENT ON COLUMN "public"."order_items"."series_id_snapshot" IS '系列 ID 快照（用於優惠券系列限制驗證，商品刪除時保留）';
 
 
 
@@ -1367,51 +1374,51 @@ CREATE TABLE IF NOT EXISTS "public"."order_timelines" (
 ALTER TABLE "public"."order_timelines" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."order_timelines" IS '閮??甇瑕銵?- 蝔賣餈質馱????桃??雿?;
+COMMENT ON TABLE "public"."order_timelines" IS '訂單操作歷史表 - 稽核追蹤所有訂單相關操作';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."id" IS '甇瑕閮??臭?霅蝣?(UUID)';
+COMMENT ON COLUMN "public"."order_timelines"."id" IS '歷史記錄唯一識別碼 (UUID)';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."order_id" IS '?撅祈???(FK: orders.id嚗ASCADE ?芷)';
+COMMENT ON COLUMN "public"."order_timelines"."order_id" IS '所屬訂單 (FK: orders.id，CASCADE 刪除)';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."action_type" IS '??憿?: created (閮撱箇?), confirmed (閮蝣箄?嚗歇璉), status_updated (?????, cancelled (閮??), comment (??), deleted (閮?芷), order_modified (閮靽格)';
+COMMENT ON COLUMN "public"."order_timelines"."action_type" IS '操作類型: created (訂單建立), confirmed (訂單確認，已棄用), status_updated (狀態變更), cancelled (訂單取消), comment (留言), deleted (訂單刪除), order_modified (訂單修改)';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."actor_id" IS '????(FK: auth.users.id嚗?箏恥?嗆?蝞∠???';
+COMMENT ON COLUMN "public"."order_timelines"."actor_id" IS '操作者 (FK: auth.users.id，可為客戶或管理員)';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."actor_role" IS '?????? client (摰Ｘ), admin (蝞∠???';
+COMMENT ON COLUMN "public"."order_timelines"."actor_role" IS '操作者角色: client (客戶), admin (管理員)';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."old_status" IS '????(??status_updated ?閬?閮?????游?????';
+COMMENT ON COLUMN "public"."order_timelines"."old_status" IS '舊狀態 (僅 status_updated 需要，記錄狀態變更前的狀態)';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."new_status" IS '?啁???(閮?????游?????';
+COMMENT ON COLUMN "public"."order_timelines"."new_status" IS '新狀態 (記錄狀態變更後的狀態)';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."notes" IS '蝟餌絞???酉嚗????桀歇蝣箄????桀歇????';
+COMMENT ON COLUMN "public"."order_timelines"."notes" IS '系統操作備註（如「訂單已確認」、「訂單已取消」）';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."created_at" IS '????';
+COMMENT ON COLUMN "public"."order_timelines"."created_at" IS '操作時間';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."modifications" IS '閮靽格閰單?嚗? action_type = ''order_modified'' ?蝙?剁?嚗摮耨?寧????祥?具?鞎颯?蝑?閮?JSONB ?澆?嚗?;
+COMMENT ON COLUMN "public"."order_timelines"."modifications" IS '訂單修改詳情（僅 action_type = ''order_modified'' 時使用），儲存修改的商品、費用、運費、優惠券等資訊（JSONB 格式）';
 
 
 
-COMMENT ON COLUMN "public"."order_timelines"."content" IS '???批捆嚗? action_type = ''comment'' ?蝙?剁?';
+COMMENT ON COLUMN "public"."order_timelines"."content" IS '留言內容（僅 action_type = ''comment'' 時使用）';
 
 
 
@@ -1434,47 +1441,47 @@ CREATE TABLE IF NOT EXISTS "public"."orders" (
 ALTER TABLE "public"."orders" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."orders" IS '閮銝餉” - 閮?????桃??箸鞈?????;
+COMMENT ON TABLE "public"."orders" IS '訂單主表 - 記錄所有訂單的基本資訊與狀態';
 
 
 
-COMMENT ON COLUMN "public"."orders"."id" IS '閮?臭?霅蝣?(UUID)';
+COMMENT ON COLUMN "public"."orders"."id" IS '訂單唯一識別碼 (UUID)';
 
 
 
-COMMENT ON COLUMN "public"."orders"."order_number" IS '閮蝺刻? (?澆?: ORD-YYYYMMDD-XXXX嚗 generate_order_number() ?Ｙ?)';
+COMMENT ON COLUMN "public"."orders"."order_number" IS '訂單編號 (格式: ORD-YYYYMMDD-XXXX，由 generate_order_number() 產生)';
 
 
 
-COMMENT ON COLUMN "public"."orders"."user_id" IS '摰Ｘ ID嚗?閮?NULL嚗?文恥?嗅?閮靽?雿瘜???恥?塚?';
+COMMENT ON COLUMN "public"."orders"."user_id" IS '客戶 ID（允許 NULL，刪除客戶後訂單保留但無法連結回客戶）';
 
 
 
-COMMENT ON COLUMN "public"."orders"."total_amount" IS '閮蝮賡?憿?(?啣撟???恍?鞎餉??芣??豢???';
+COMMENT ON COLUMN "public"."orders"."total_amount" IS '訂單總金額 (新台幣，含運費與優惠券折扣)';
 
 
 
-COMMENT ON COLUMN "public"."orders"."status" IS '閮??? pending (敺Ⅱ隤?, confirmed (撌脩Ⅱ隤?, shipping (?箄疏銝?, completed (撌脣???, cancelled (撌脣?瘨?';
+COMMENT ON COLUMN "public"."orders"."status" IS '訂單狀態: pending (待確認), confirmed (已確認), shipping (出貨中), completed (已完成), cancelled (已取消)';
 
 
 
-COMMENT ON COLUMN "public"."orders"."notes" IS '摰Ｘ?酉 (?憭?500 摮?靘?: ?????畾?瘙?';
+COMMENT ON COLUMN "public"."orders"."notes" IS '客戶備註 (最多 500 字，例如: 指定配送時間、特殊需求)';
 
 
 
-COMMENT ON COLUMN "public"."orders"."created_at" IS '閮撱箇???';
+COMMENT ON COLUMN "public"."orders"."created_at" IS '訂單建立時間';
 
 
 
-COMMENT ON COLUMN "public"."orders"."updated_at" IS '?敺?唳???(??Trigger ?芸??湔)';
+COMMENT ON COLUMN "public"."orders"."updated_at" IS '最後更新時間 (由 Trigger 自動更新)';
 
 
 
-COMMENT ON COLUMN "public"."orders"."shipping_fee" IS '閮?祥??嚗遣蝡?敹怎?脣?嚗?摰Ｘ蝑????桅?憿?蝞?';
+COMMENT ON COLUMN "public"."orders"."shipping_fee" IS '訂單運費金額（建立時快照儲存，依客戶等級與訂單金額計算）';
 
 
 
-COMMENT ON CONSTRAINT "orders_status_check" ON "public"."orders" IS '閮???蝔?蝪∪???: pending ??shipping ??completed (?臬?瘨? pending?ancelled, shipping?ancelled)';
+COMMENT ON CONSTRAINT "orders_status_check" ON "public"."orders" IS '訂單狀態流程（簡化版）: pending → shipping → completed (可取消: pending→cancelled, shipping→cancelled)';
 
 
 
@@ -1487,7 +1494,7 @@ CREATE TABLE IF NOT EXISTS "public"."products" (
     "retail_price" numeric(10,2) NOT NULL,
     "stock" integer DEFAULT 0 NOT NULL,
     "stock_status" "text" DEFAULT 'sufficient'::"text",
-    "unit" "text" DEFAULT '隞?::"text" NOT NULL,
+    "unit" "text" DEFAULT '件'::"text" NOT NULL,
     "image_url" "text",
     "tags" "text"[] DEFAULT '{}'::"text"[],
     "status" "text" DEFAULT 'active'::"text" NOT NULL,
@@ -1503,63 +1510,63 @@ CREATE TABLE IF NOT EXISTS "public"."products" (
 ALTER TABLE "public"."products" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."products" IS '??銵剁??脣??????閮???蝺刻???蝔晞澈摮?潛?嚗?;
+COMMENT ON TABLE "public"."products" IS '商品表：儲存所有商品資訊（商品編號、名稱、庫存、價格等）';
 
 
 
-COMMENT ON COLUMN "public"."products"."id" IS '?? ID嚗UID嚗?;
+COMMENT ON COLUMN "public"."products"."id" IS '商品 ID（UUID）';
 
 
 
-COMMENT ON COLUMN "public"."products"."code" IS '??蝺刻?嚗?????澆?嚗??隞?Ⅳ]-[蝟餃?隞?Ⅳ]-[01]嚗? DRK-TEA-01嚗?;
+COMMENT ON COLUMN "public"."products"."code" IS '商品編號（自動生成，格式：[分類代碼]-[系列代碼]-[01]，如 DRK-TEA-01）';
 
 
 
-COMMENT ON COLUMN "public"."products"."name" IS '???迂嚗??銝嚗?;
+COMMENT ON COLUMN "public"."products"."name" IS '商品名稱（必須唯一）';
 
 
 
-COMMENT ON COLUMN "public"."products"."series_id" IS '?撅祉頂??ID嚗?憛恬?';
+COMMENT ON COLUMN "public"."products"."series_id" IS '所屬系列 ID（必填）';
 
 
 
-COMMENT ON COLUMN "public"."products"."description" IS '???膩';
+COMMENT ON COLUMN "public"."products"."description" IS '商品描述';
 
 
 
-COMMENT ON COLUMN "public"."products"."retail_price" IS '?嗅?寞嚗?憛恬?- ?Ｗ??皞?潘????蝝?潔誑甇斤??;
+COMMENT ON COLUMN "public"."products"."retail_price" IS '零售價格（必填）- 產品的基準價格，所有等級價格以此為參考';
 
 
 
-COMMENT ON COLUMN "public"."products"."stock" IS '摨怠??賊?嚗?渲?摨怠?嚗?;
+COMMENT ON COLUMN "public"."products"."stock" IS '庫存數量（支援負庫存）';
 
 
 
-COMMENT ON COLUMN "public"."products"."stock_status" IS '摨怠????sufficient ?雲?ow 蝺撐?ut_of_stock 蝻箄疏嚗?撖阡?摨怠??賊??嚗?;
+COMMENT ON COLUMN "public"."products"."stock_status" IS '庫存狀態：sufficient 充足、low 緊張、out_of_stock 缺貨（與實際庫存數量分離）';
 
 
 
-COMMENT ON COLUMN "public"."products"."unit" IS '?桐?嚗??辣?拳???';
+COMMENT ON COLUMN "public"."products"."unit" IS '單位（如「件」、「箱」、「瓶」）';
 
 
 
-COMMENT ON COLUMN "public"."products"."image_url" IS '???? URL';
+COMMENT ON COLUMN "public"."products"."image_url" IS '商品圖片 URL';
 
 
 
-COMMENT ON COLUMN "public"."products"."tags" IS '??璅惜???嚗? {"?梢", "?啣?", "??"}嚗?憭?5 ??;
+COMMENT ON COLUMN "public"."products"."tags" IS '商品標籤陣列，如 {"熱銷", "新品", "限量"}，最多 5 個';
 
 
 
-COMMENT ON COLUMN "public"."products"."status" IS '???active 憿舐內嚗nactive ?梯?';
+COMMENT ON COLUMN "public"."products"."status" IS '狀態：active 顯示，inactive 隱藏';
 
 
 
-COMMENT ON COLUMN "public"."products"."created_at" IS '撱箇???';
+COMMENT ON COLUMN "public"."products"."created_at" IS '建立時間';
 
 
 
-COMMENT ON COLUMN "public"."products"."updated_at" IS '?敺?唳???;
+COMMENT ON COLUMN "public"."products"."updated_at" IS '最後更新時間';
 
 
 
@@ -1588,51 +1595,51 @@ CREATE TABLE IF NOT EXISTS "public"."profiles" (
 ALTER TABLE "public"."profiles" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."profiles" IS '雿輻?平???”嚗??auth.users嚗摮?璈?蝣潦??脯??∠?蝝?璆剖?鞈?';
+COMMENT ON TABLE "public"."profiles" IS '使用者業務資料表：擴充 auth.users，儲存手機號碼、角色、會員等級等業務資訊';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."id" IS '雿輻??ID嚗???auth.users.id嚗?;
+COMMENT ON COLUMN "public"."profiles"."id" IS '使用者 ID（關聯 auth.users.id）';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."phone" IS '???Ⅳ嚗恥?嗅?憛恬??冽?餃嚗?;
+COMMENT ON COLUMN "public"."profiles"."phone" IS '手機號碼（客戶必填，用於登入）';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."email" IS '?餃??萎辣嚗恣?敹‵嚗?潛?伐?';
+COMMENT ON COLUMN "public"."profiles"."email" IS '電子郵件（管理員必填，用於登入）';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."role" IS '閫憿?嚗lient: 摰Ｘ, admin: 蝞∠??∴?';
+COMMENT ON COLUMN "public"."profiles"."role" IS '角色類型（client: 客戶, admin: 管理員）';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."tier_id" IS '?蝑? ID嚗恥?嗅?憛恬?蝞∠??∪??NULL嚗?;
+COMMENT ON COLUMN "public"."profiles"."tier_id" IS '會員等級 ID（客戶必填，管理員可為 NULL）';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."created_at" IS '撱箇???';
+COMMENT ON COLUMN "public"."profiles"."created_at" IS '建立時間';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."display_name" IS '憿舐內?梁迂 (摰Ｘ???摮?憒???';
+COMMENT ON COLUMN "public"."profiles"."display_name" IS '顯示暱稱 (客戶看到的名字，如「小愛」)';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."notes" IS '?酉嚗恣??舐嚗?;
+COMMENT ON COLUMN "public"."profiles"."notes" IS '備註（管理員可用）';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."username" IS '蝞∠??∠?亙董??(?恣?雿輻嚗?-20 摮?嚗?撖怠?瘥??詨?+摨?)';
+COMMENT ON COLUMN "public"."profiles"."username" IS '管理員登入帳號 (僅管理員使用，3-20 字元，小寫字母+數字+底線)';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."address" IS '摰Ｘ撣貊?啣?嚗憛恬?';
+COMMENT ON COLUMN "public"."profiles"."address" IS '客戶常用地址（選填）';
 
 
 
-COMMENT ON COLUMN "public"."profiles"."admin_notes" IS '蝞∠??∪?閮鳴??恣??航?嚗?;
+COMMENT ON COLUMN "public"."profiles"."admin_notes" IS '管理員備註（僅管理員可見）';
 
 
 
@@ -1657,47 +1664,47 @@ CREATE TABLE IF NOT EXISTS "public"."series" (
 ALTER TABLE "public"."series" OWNER TO "postgres";
 
 
-COMMENT ON COLUMN "public"."series"."id" IS '蝟餃? ID嚗UID嚗?;
+COMMENT ON COLUMN "public"."series"."id" IS '系列 ID（UUID）';
 
 
 
-COMMENT ON COLUMN "public"."series"."category_id" IS '?撅砍?憿?ID嚗??NULL嚗??嚗?;
+COMMENT ON COLUMN "public"."series"."category_id" IS '所屬分類 ID，可為 NULL（未分類）';
 
 
 
-COMMENT ON COLUMN "public"."series"."code" IS '蝟餃?隞?Ⅳ嚗?-10 ?之撖怠?瘥?憒?TEA, JUC嚗?;
+COMMENT ON COLUMN "public"."series"."code" IS '系列代碼（3-10 個大寫字母，如 TEA, JUC）';
 
 
 
-COMMENT ON COLUMN "public"."series"."name" IS '蝟餃??迂嚗???蝎?蝟餃???';
+COMMENT ON COLUMN "public"."series"."name" IS '系列名稱（如「美粒果系列」）';
 
 
 
-COMMENT ON COLUMN "public"."series"."description" IS '蝟餃??膩';
+COMMENT ON COLUMN "public"."series"."description" IS '系列描述';
 
 
 
-COMMENT ON COLUMN "public"."series"."image_url" IS '蝟餃??? URL';
+COMMENT ON COLUMN "public"."series"."image_url" IS '系列圖片 URL';
 
 
 
-COMMENT ON COLUMN "public"."series"."status" IS '蝟餃????active 憿舐內嚗nactive ?梯?';
+COMMENT ON COLUMN "public"."series"."status" IS '系列狀態：active 顯示，inactive 隱藏';
 
 
 
-COMMENT ON COLUMN "public"."series"."sort_order" IS '????嚗摮?撠??嚗?;
+COMMENT ON COLUMN "public"."series"."sort_order" IS '排序順序（數字越小越前面）';
 
 
 
-COMMENT ON COLUMN "public"."series"."created_at" IS '撱箇???';
+COMMENT ON COLUMN "public"."series"."created_at" IS '建立時間';
 
 
 
-COMMENT ON COLUMN "public"."series"."updated_at" IS '?敺?唳???;
+COMMENT ON COLUMN "public"."series"."updated_at" IS '最後更新時間';
 
 
 
-COMMENT ON COLUMN "public"."series"."color" IS '蝟餃?憿隞?Ⅳ嚗ex ?澆?嚗? #FBBF24嚗??UI 憿舐內嚗?;
+COMMENT ON COLUMN "public"."series"."color" IS '系列顏色代碼（Hex 格式，如 #FBBF24，用於 UI 顯示）';
 
 
 
@@ -1720,35 +1727,35 @@ CREATE TABLE IF NOT EXISTS "public"."system_settings" (
 ALTER TABLE "public"."system_settings" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."system_settings" IS '蝟餌絞閮剖?銵?- Key-Value 璅∪??脣?嚗?游?蝔株?????;
+COMMENT ON TABLE "public"."system_settings" IS '系統設定表 - Key-Value 模式儲存，支援多種資料型別';
 
 
 
-COMMENT ON COLUMN "public"."system_settings"."key" IS '閮剖???(?臭?霅嚗? site_title)';
+COMMENT ON COLUMN "public"."system_settings"."key" IS '設定鍵 (唯一識別，如 site_title)';
 
 
 
-COMMENT ON COLUMN "public"."system_settings"."value" IS '閮剖???(TEXT 蝯曹??脣?嚗? value_type 閫??)';
+COMMENT ON COLUMN "public"."system_settings"."value" IS '設定值 (TEXT 統一儲存，依 value_type 解析)';
 
 
 
-COMMENT ON COLUMN "public"."system_settings"."value_type" IS '?潮???text (??), number (?詨?), boolean (撣?), json (JSON), image_url (?? URL)';
+COMMENT ON COLUMN "public"."system_settings"."value_type" IS '值類型：text (文字), number (數字), boolean (布林), json (JSON), image_url (圖片 URL)';
 
 
 
-COMMENT ON COLUMN "public"."system_settings"."category" IS '閮剖?憿嚗eneral (銝??, branding (??), carousel (頛芣), system (蝟餌絞), client_notifications (摰Ｘ?)';
+COMMENT ON COLUMN "public"."system_settings"."category" IS '設定類別：general (一般), branding (品牌), carousel (輪播), system (系統), client_notifications (客戶通知)';
 
 
 
-COMMENT ON COLUMN "public"."system_settings"."is_public" IS '?臬?祇? (true: 摰Ｘ?航??? false: ?恣??航???';
+COMMENT ON COLUMN "public"."system_settings"."is_public" IS '是否公開 (true: 客戶可讀取, false: 僅管理員可讀取)';
 
 
 
-COMMENT ON COLUMN "public"."system_settings"."description" IS '閮剖?隤芣?嚗＊蝷箸蝞∠?隞嚗?;
+COMMENT ON COLUMN "public"."system_settings"."description" IS '設定說明（顯示於管理介面）';
 
 
 
-COMMENT ON COLUMN "public"."system_settings"."updated_by" IS '?敺?啗?(蝞∠???ID)';
+COMMENT ON COLUMN "public"."system_settings"."updated_by" IS '最後更新者 (管理員 ID)';
 
 
 
@@ -1766,31 +1773,31 @@ CREATE TABLE IF NOT EXISTS "public"."tier_prices" (
 ALTER TABLE "public"."tier_prices" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."tier_prices" IS '蝑??寞銵剁??脣?瘥??瘥??∠?蝝?撠??寞';
+COMMENT ON TABLE "public"."tier_prices" IS '等級價格表：儲存每個商品在每個會員等級的對應價格';
 
 
 
-COMMENT ON COLUMN "public"."tier_prices"."id" IS '?寞閮? ID嚗UID嚗?;
+COMMENT ON COLUMN "public"."tier_prices"."id" IS '價格記錄 ID（UUID）';
 
 
 
-COMMENT ON COLUMN "public"."tier_prices"."tier_id" IS '?蝑? ID';
+COMMENT ON COLUMN "public"."tier_prices"."tier_id" IS '會員等級 ID';
 
 
 
-COMMENT ON COLUMN "public"."tier_prices"."product_id" IS '?? ID';
+COMMENT ON COLUMN "public"."tier_prices"."product_id" IS '商品 ID';
 
 
 
-COMMENT ON COLUMN "public"."tier_prices"."price" IS '閰脩?蝝????寞';
+COMMENT ON COLUMN "public"."tier_prices"."price" IS '該等級對應的價格';
 
 
 
-COMMENT ON COLUMN "public"."tier_prices"."created_at" IS '撱箇???';
+COMMENT ON COLUMN "public"."tier_prices"."created_at" IS '建立時間';
 
 
 
-COMMENT ON COLUMN "public"."tier_prices"."updated_at" IS '?敺?唳???;
+COMMENT ON COLUMN "public"."tier_prices"."updated_at" IS '最後更新時間';
 
 
 
@@ -1811,39 +1818,39 @@ CREATE TABLE IF NOT EXISTS "public"."tiers" (
 ALTER TABLE "public"."tiers" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."tiers" IS '?蝑?銵剁?摰儔?寧蝟餌絞?恥?嗥?蝝??嗅??潦??瑕?嚗??冽蝬?蝑??寞';
+COMMENT ON TABLE "public"."tiers" IS '會員等級表：定義批發系統的客戶等級（零售、批發、經銷商），用於綁定等級價格';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."id" IS '蝑? ID嚗UID嚗?;
+COMMENT ON COLUMN "public"."tiers"."id" IS '等級 ID（UUID）';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."name" IS '蝑??迂嚗???柴?潦??瑕???';
+COMMENT ON COLUMN "public"."tiers"."name" IS '等級名稱（如「零售」、「批發」、「經銷商」）';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."rank" IS '蝑???嚗摮?憭抒?蝝?擃?';
+COMMENT ON COLUMN "public"."tiers"."rank" IS '等級排序（數字越大等級越高）';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."created_at" IS '撱箇???';
+COMMENT ON COLUMN "public"."tiers"."created_at" IS '建立時間';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."updated_at" IS '?敺?唳???;
+COMMENT ON COLUMN "public"."tiers"."updated_at" IS '最後更新時間';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."is_protected" IS '?臬?箏?靽風蝑?嚗?殷?嚗rue 銵函內甇斤?蝝??寞銝雿 retail_price';
+COMMENT ON COLUMN "public"."tiers"."is_protected" IS '是否為受保護等級（零售）：true 表示此等級的價格不能低於 retail_price';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."shipping_fee" IS '?箸?祥??嚗? 銵函內銝?祥嚗?;
+COMMENT ON COLUMN "public"."tiers"."shipping_fee" IS '基本運費金額（0 表示不收運費）';
 
 
 
-COMMENT ON COLUMN "public"."tiers"."free_shipping_threshold" IS '皛輸????瑼鳴?NULL 銵函內銝?靘???靘?嚗遛 1000 ??嚗?;
+COMMENT ON COLUMN "public"."tiers"."free_shipping_threshold" IS '滿額免運門檻（NULL 表示不提供免運，例如：滿 1000 免運）';
 
 
 
@@ -1861,27 +1868,27 @@ CREATE TABLE IF NOT EXISTS "public"."user_coupons" (
 ALTER TABLE "public"."user_coupons" OWNER TO "postgres";
 
 
-COMMENT ON TABLE "public"."user_coupons" IS '摰Ｘ?芣??賊????” - 瘥活??撱箇?銝蝑????舀???芣??詨?甈⊿???;
+COMMENT ON TABLE "public"."user_coupons" IS '客戶優惠券領取記錄表 - 每次領取建立一筆記錄，支援同一優惠券多次領取';
 
 
 
-COMMENT ON COLUMN "public"."user_coupons"."user_id" IS '摰Ｘ ID';
+COMMENT ON COLUMN "public"."user_coupons"."user_id" IS '客戶 ID';
 
 
 
-COMMENT ON COLUMN "public"."user_coupons"."coupon_id" IS '?芣???ID';
+COMMENT ON COLUMN "public"."user_coupons"."coupon_id" IS '優惠券 ID';
 
 
 
-COMMENT ON COLUMN "public"."user_coupons"."claimed_at" IS '????';
+COMMENT ON COLUMN "public"."user_coupons"."claimed_at" IS '領取時間';
 
 
 
-COMMENT ON COLUMN "public"."user_coupons"."used_at" IS '雿輻??嚗ULL 銵函內?芯蝙?剁?';
+COMMENT ON COLUMN "public"."user_coupons"."used_at" IS '使用時間（NULL 表示未使用）';
 
 
 
-COMMENT ON COLUMN "public"."user_coupons"."order_id" IS '雿輻?澆???殷?NULL 銵函內?芯蝙?剁?';
+COMMENT ON COLUMN "public"."user_coupons"."order_id" IS '使用於哪個訂單（NULL 表示未使用）';
 
 
 
@@ -2000,7 +2007,7 @@ ALTER TABLE ONLY "public"."products"
 
 
 
-COMMENT ON CONSTRAINT "products_series_id_name_key" ON "public"."products" IS '???迂?典?蝟餃??批??銝嚗?閮曹??頂??????嚗?;
+COMMENT ON CONSTRAINT "products_series_id_name_key" ON "public"."products" IS '商品名稱在同系列內必須唯一（允許不同系列有同名商品）';
 
 
 
@@ -2222,7 +2229,7 @@ CREATE INDEX "idx_order_timelines_modifications" ON "public"."order_timelines" U
 
 
 
-COMMENT ON INDEX "public"."idx_order_timelines_modifications" IS '???桐耨?寡底???亥岷嚗SONB GIN 蝝Ｗ?嚗?;
+COMMENT ON INDEX "public"."idx_order_timelines_modifications" IS '加速訂單修改詳情的查詢（JSONB GIN 索引）';
 
 
 
@@ -2238,7 +2245,7 @@ CREATE INDEX "idx_orders_number_pattern" ON "public"."orders" USING "gin" ("orde
 
 
 
-COMMENT ON INDEX "public"."idx_orders_number_pattern" IS '???桃楊?芋蝟?撠?ILIKE ?亥岷嚗?;
+COMMENT ON INDEX "public"."idx_orders_number_pattern" IS '加速訂單編號模糊搜尋（ILIKE 查詢）';
 
 
 
@@ -2258,7 +2265,7 @@ CREATE INDEX "idx_orders_status_created" ON "public"."orders" USING "btree" ("st
 
 
 
-COMMENT ON INDEX "public"."idx_orders_status_created" IS '???桀?銵函祟?貉???嚗tatus + created_at 蝯?嚗?;
+COMMENT ON INDEX "public"."idx_orders_status_created" IS '加速訂單列表篩選與排序（status + created_at 組合）';
 
 
 
@@ -2278,7 +2285,7 @@ CREATE INDEX "idx_products_code" ON "public"."products" USING "btree" ("code");
 
 
 
-COMMENT ON INDEX "public"."idx_products_code" IS '??蝺刻?蝝Ｗ? - ?冽?典???';
+COMMENT ON INDEX "public"."idx_products_code" IS '商品編號索引 - 用於全域搜尋';
 
 
 
@@ -2286,7 +2293,7 @@ CREATE INDEX "idx_products_name" ON "public"."products" USING "btree" ("name");
 
 
 
-COMMENT ON INDEX "public"."idx_products_name" IS '???迂蝝Ｗ? - ?冽?典???';
+COMMENT ON INDEX "public"."idx_products_name" IS '商品名稱索引 - 用於全域搜尋';
 
 
 
@@ -2298,7 +2305,7 @@ CREATE INDEX "idx_products_series_id_name" ON "public"."products" USING "btree" 
 
 
 
-COMMENT ON INDEX "public"."idx_products_series_id_name" IS '銴?蝝Ｗ?嚗頂??+ ???迂嚗?銝?扳炎?亥??亥岷嚗?;
+COMMENT ON INDEX "public"."idx_products_series_id_name" IS '複合索引：系列 + 商品名稱（優化唯一性檢查與查詢）';
 
 
 
@@ -2310,7 +2317,7 @@ CREATE INDEX "idx_products_status" ON "public"."products" USING "btree" ("status
 
 
 
-COMMENT ON INDEX "public"."idx_products_status" IS '????揣撘?- ?冽蝭拚 active ??';
+COMMENT ON INDEX "public"."idx_products_status" IS '商品狀態索引 - 用於篩選 active 商品';
 
 
 
@@ -2318,7 +2325,7 @@ CREATE INDEX "idx_products_status_updated_at" ON "public"."products" USING "btre
 
 
 
-COMMENT ON INDEX "public"."idx_products_status_updated_at" IS '??????湔??蝯?蝝Ｗ? - ?冽????”??';
+COMMENT ON INDEX "public"."idx_products_status_updated_at" IS '商品狀態與更新時間組合索引 - 用於前台商品列表排序';
 
 
 
@@ -2330,7 +2337,7 @@ CREATE INDEX "idx_products_tags" ON "public"."products" USING "gin" ("tags");
 
 
 
-COMMENT ON INDEX "public"."idx_products_tags" IS '??璅惜 GIN 蝝Ｗ? - ?舀????亥岷';
+COMMENT ON INDEX "public"."idx_products_tags" IS '商品標籤 GIN 索引 - 支援陣列查詢';
 
 
 
@@ -2398,7 +2405,7 @@ CREATE INDEX "idx_tier_prices_product_tier" ON "public"."tier_prices" USING "btr
 
 
 
-COMMENT ON INDEX "public"."idx_tier_prices_product_tier" IS '??蝝?潭閰ｇ?product_id + tier_id 銴??亥岷嚗?;
+COMMENT ON INDEX "public"."idx_tier_prices_product_tier" IS '加速等級價格查詢（product_id + tier_id 複合查詢）';
 
 
 
@@ -2430,7 +2437,7 @@ CREATE OR REPLACE TRIGGER "trigger_auto_assign_series_color" BEFORE INSERT ON "p
 
 
 
-COMMENT ON TRIGGER "trigger_auto_assign_series_color" ON "public"."series" IS '?啁頂?遣蝡??芸???憿';
+COMMENT ON TRIGGER "trigger_auto_assign_series_color" ON "public"."series" IS '新系列建立時自動分配顏色';
 
 
 
@@ -2438,7 +2445,7 @@ CREATE OR REPLACE TRIGGER "trigger_auto_generate_product_code" BEFORE INSERT ON 
 
 
 
-COMMENT ON TRIGGER "trigger_auto_generate_product_code" ON "public"."products" IS '??撱箇??????楊??;
+COMMENT ON TRIGGER "trigger_auto_generate_product_code" ON "public"."products" IS '商品建立時自動產生商品編號';
 
 
 
@@ -2618,7 +2625,7 @@ CREATE POLICY "Admins can delete order custom fees" ON "public"."order_custom_fe
 
 
 
-COMMENT ON POLICY "Admins can delete order custom fees" ON "public"."order_custom_fees" IS '蝞∠??∪?芷閮?芾?鞎餌';
+COMMENT ON POLICY "Admins can delete order custom fees" ON "public"."order_custom_fees" IS '管理員可刪除訂單自訂費用';
 
 
 
@@ -2634,7 +2641,7 @@ CREATE POLICY "Admins can insert order custom fees" ON "public"."order_custom_fe
 
 
 
-COMMENT ON POLICY "Admins can insert order custom fees" ON "public"."order_custom_fees" IS '蝞∠??∪?啣?閮?芾?鞎餌';
+COMMENT ON POLICY "Admins can insert order custom fees" ON "public"."order_custom_fees" IS '管理員可新增訂單自訂費用';
 
 
 
@@ -2668,7 +2675,7 @@ CREATE POLICY "Admins can update all user coupons" ON "public"."user_coupons" FO
 
 
 
-COMMENT ON POLICY "Admins can update all user coupons" ON "public"."user_coupons" IS '蝞∠??∪?湔??恥?嗥??芣??貉????冽??閮???嚗?;
+COMMENT ON POLICY "Admins can update all user coupons" ON "public"."user_coupons" IS '管理員可更新所有客戶的優惠券記錄（用於取消訂單時退還優惠券）';
 
 
 
@@ -2678,7 +2685,7 @@ CREATE POLICY "Admins can update order custom fees" ON "public"."order_custom_fe
 
 
 
-COMMENT ON POLICY "Admins can update order custom fees" ON "public"."order_custom_fees" IS '蝞∠??∪靽格閮?芾?鞎餌';
+COMMENT ON POLICY "Admins can update order custom fees" ON "public"."order_custom_fees" IS '管理員可修改訂單自訂費用';
 
 
 
@@ -2688,7 +2695,7 @@ CREATE POLICY "Admins can update orders" ON "public"."orders" FOR UPDATE USING (
 
 
 
-COMMENT ON POLICY "Admins can update orders" ON "public"."orders" IS '蝞∠??∪?湔?????;
+COMMENT ON POLICY "Admins can update orders" ON "public"."orders" IS '管理員可更新所有訂單';
 
 
 
@@ -2722,7 +2729,7 @@ CREATE POLICY "Admins can view all order custom fees" ON "public"."order_custom_
 
 
 
-COMMENT ON POLICY "Admins can view all order custom fees" ON "public"."order_custom_fees" IS '蝞∠??∪?亦?????桃??芾?鞎餌';
+COMMENT ON POLICY "Admins can view all order custom fees" ON "public"."order_custom_fees" IS '管理員可查看所有訂單的自訂費用';
 
 
 
@@ -2732,7 +2739,7 @@ CREATE POLICY "Admins can view all order items" ON "public"."order_items" FOR SE
 
 
 
-COMMENT ON POLICY "Admins can view all order items" ON "public"."order_items" IS '蝞∠??∪?亦?????格?蝝?;
+COMMENT ON POLICY "Admins can view all order items" ON "public"."order_items" IS '管理員可查看所有訂單明細';
 
 
 
@@ -2742,7 +2749,7 @@ CREATE POLICY "Admins can view all order timelines" ON "public"."order_timelines
 
 
 
-COMMENT ON POLICY "Admins can view all order timelines" ON "public"."order_timelines" IS '蝞∠??∪?亦?????格?雿風??;
+COMMENT ON POLICY "Admins can view all order timelines" ON "public"."order_timelines" IS '管理員可查看所有訂單操作歷史';
 
 
 
@@ -2752,7 +2759,7 @@ CREATE POLICY "Admins can view all orders" ON "public"."orders" FOR SELECT USING
 
 
 
-COMMENT ON POLICY "Admins can view all orders" ON "public"."orders" IS '蝞∠??∪?亦??????;
+COMMENT ON POLICY "Admins can view all orders" ON "public"."orders" IS '管理員可查看所有訂單';
 
 
 
@@ -2780,7 +2787,7 @@ CREATE POLICY "Allow admin to manage categories" ON "public"."categories" TO "au
 
 
 
-COMMENT ON POLICY "Allow admin to manage categories" ON "public"."categories" IS '??閮梁恣??啣??耨?嫘?文?憿?;
+COMMENT ON POLICY "Allow admin to manage categories" ON "public"."categories" IS '僅允許管理員新增、修改、刪除分類';
 
 
 
@@ -2790,7 +2797,7 @@ CREATE POLICY "Allow admin to manage products" ON "public"."products" TO "authen
 
 
 
-COMMENT ON POLICY "Allow admin to manage products" ON "public"."products" IS '??閮梁恣??啣??耨?嫘?文???;
+COMMENT ON POLICY "Allow admin to manage products" ON "public"."products" IS '僅允許管理員新增、修改、刪除商品';
 
 
 
@@ -2798,7 +2805,7 @@ CREATE POLICY "Allow admin to manage profiles" ON "public"."profiles" TO "authen
 
 
 
-COMMENT ON POLICY "Allow admin to manage profiles" ON "public"."profiles" IS '??閮曹耨?寡撌梁?鞈?嚗恣???雿輻 Admin Client 蝜? RLS嚗?;
+COMMENT ON POLICY "Allow admin to manage profiles" ON "public"."profiles" IS '僅允許修改自己的資料（管理員操作使用 Admin Client 繞過 RLS）';
 
 
 
@@ -2808,7 +2815,7 @@ CREATE POLICY "Allow admin to manage series" ON "public"."series" TO "authentica
 
 
 
-COMMENT ON POLICY "Allow admin to manage series" ON "public"."series" IS '??閮梁恣??啣??耨?嫘?斤頂??;
+COMMENT ON POLICY "Allow admin to manage series" ON "public"."series" IS '僅允許管理員新增、修改、刪除系列';
 
 
 
@@ -2818,7 +2825,7 @@ CREATE POLICY "Allow admin to manage tier_prices" ON "public"."tier_prices" TO "
 
 
 
-COMMENT ON POLICY "Allow admin to manage tier_prices" ON "public"."tier_prices" IS '??閮梁恣??啣??耨?嫘?斤?蝝??;
+COMMENT ON POLICY "Allow admin to manage tier_prices" ON "public"."tier_prices" IS '僅允許管理員新增、修改、刪除等級價格';
 
 
 
@@ -2828,7 +2835,7 @@ CREATE POLICY "Allow admin to manage tiers" ON "public"."tiers" TO "authenticate
 
 
 
-COMMENT ON POLICY "Allow admin to manage tiers" ON "public"."tiers" IS '??閮梁恣??啣??耨?嫘?斗??∠?蝝?;
+COMMENT ON POLICY "Allow admin to manage tiers" ON "public"."tiers" IS '僅允許管理員新增、修改、刪除會員等級';
 
 
 
@@ -2836,7 +2843,7 @@ CREATE POLICY "Allow admin to read all profiles" ON "public"."profiles" FOR SELE
 
 
 
-COMMENT ON POLICY "Allow admin to read all profiles" ON "public"."profiles" IS '?迂??歇隤??冽霈??Profiles嚗LS 撅斤?撖祇?嚗?? Server Action ?批嚗?;
+COMMENT ON POLICY "Allow admin to read all profiles" ON "public"."profiles" IS '允許所有已認證用戶讀取 Profiles（RLS 層級寬鬆，權限由 Server Action 控制）';
 
 
 
@@ -2846,7 +2853,7 @@ CREATE POLICY "Allow authenticated users to read active series" ON "public"."ser
 
 
 
-COMMENT ON POLICY "Allow authenticated users to read active series" ON "public"."series" IS '?迂摰Ｘ霈?暑頨頂??蝞∠??∪霈???頂??;
+COMMENT ON POLICY "Allow authenticated users to read active series" ON "public"."series" IS '允許客戶讀取活躍系列，管理員可讀取所有系列';
 
 
 
@@ -2854,7 +2861,7 @@ CREATE POLICY "Allow authenticated users to read categories" ON "public"."catego
 
 
 
-COMMENT ON POLICY "Allow authenticated users to read categories" ON "public"."categories" IS '?迂??歇隤?雿輻????憿?;
+COMMENT ON POLICY "Allow authenticated users to read categories" ON "public"."categories" IS '允許所有已認證使用者讀取分類';
 
 
 
@@ -2862,7 +2869,7 @@ CREATE POLICY "Allow authenticated users to read tier_prices" ON "public"."tier_
 
 
 
-COMMENT ON POLICY "Allow authenticated users to read tier_prices" ON "public"."tier_prices" IS '?迂??歇隤?雿輻????蝝?潘?Server Action ??瞈橘?';
+COMMENT ON POLICY "Allow authenticated users to read tier_prices" ON "public"."tier_prices" IS '允許所有已認證使用者讀取等級價格（Server Action 會過濾）';
 
 
 
@@ -2870,7 +2877,7 @@ CREATE POLICY "Allow authenticated users to read tiers" ON "public"."tiers" FOR 
 
 
 
-COMMENT ON POLICY "Allow authenticated users to read tiers" ON "public"."tiers" IS '?迂??歇隤?雿輻?????∠?蝝??冽?憿舐內蝑??賊?嚗?;
+COMMENT ON POLICY "Allow authenticated users to read tiers" ON "public"."tiers" IS '允許所有已認證使用者讀取會員等級（用於前台顯示等級選項）';
 
 
 
@@ -2882,7 +2889,7 @@ CREATE POLICY "Allow users to read active products in active series" ON "public"
 
 
 
-COMMENT ON POLICY "Allow users to read active products in active series" ON "public"."products" IS '?迂摰Ｘ霈?暑頨頂?葉?暑頨???蝞∠??∪霈??????;
+COMMENT ON POLICY "Allow users to read active products in active series" ON "public"."products" IS '允許客戶讀取活躍系列中的活躍商品，管理員可讀取所有商品';
 
 
 
@@ -2890,7 +2897,7 @@ CREATE POLICY "Allow users to read own profile" ON "public"."profiles" FOR SELEC
 
 
 
-COMMENT ON POLICY "Allow users to read own profile" ON "public"."profiles" IS '?迂雿輻???撌梁? Profile 鞈?';
+COMMENT ON POLICY "Allow users to read own profile" ON "public"."profiles" IS '允許使用者讀取自己的 Profile 資料';
 
 
 
@@ -2902,7 +2909,7 @@ CREATE POLICY "Authenticated users can insert timeline records" ON "public"."ord
 
 
 
-COMMENT ON POLICY "Authenticated users can insert timeline records" ON "public"."order_timelines" IS '撌脰?霅蝙?刻撱箇?甇瑕閮? (靽桀儔 RLS INSERT ?餅???)';
+COMMENT ON POLICY "Authenticated users can insert timeline records" ON "public"."order_timelines" IS '已認證使用者可建立歷史記錄 (修復 RLS INSERT 阻擋問題)';
 
 
 
@@ -2922,7 +2929,7 @@ CREATE POLICY "Clients can create their own orders" ON "public"."orders" FOR INS
 
 
 
-COMMENT ON POLICY "Clients can create their own orders" ON "public"."orders" IS '摰Ｘ?撱箇??芸楛????;
+COMMENT ON POLICY "Clients can create their own orders" ON "public"."orders" IS '客戶僅能建立自己的訂單';
 
 
 
@@ -2932,7 +2939,7 @@ CREATE POLICY "Clients can insert items for their own orders" ON "public"."order
 
 
 
-COMMENT ON POLICY "Clients can insert items for their own orders" ON "public"."order_items" IS '摰Ｘ撱箇?閮??啣??敦 (靽桀儔 RLS INSERT ?餅???)';
+COMMENT ON POLICY "Clients can insert items for their own orders" ON "public"."order_items" IS '客戶建立訂單時可新增明細 (修復 RLS INSERT 阻擋問題)';
 
 
 
@@ -2946,7 +2953,7 @@ CREATE POLICY "Clients can mark their coupons as used" ON "public"."user_coupons
 
 
 
-COMMENT ON POLICY "Clients can mark their coupons as used" ON "public"."user_coupons" IS '摰Ｘ?舀?閮撌梁??芣??貊撌脖蝙?剁?閮撱箇????used_at ??order_id嚗?;
+COMMENT ON POLICY "Clients can mark their coupons as used" ON "public"."user_coupons" IS '客戶可標記自己的優惠券為已使用（訂單建立時更新 used_at 與 order_id）';
 
 
 
@@ -2966,7 +2973,7 @@ CREATE POLICY "Clients can view their order custom fees" ON "public"."order_cust
 
 
 
-COMMENT ON POLICY "Clients can view their order custom fees" ON "public"."order_custom_fees" IS '摰Ｘ??亦??芸楛閮?閮祥??;
+COMMENT ON POLICY "Clients can view their order custom fees" ON "public"."order_custom_fees" IS '客戶僅能查看自己訂單的自訂費用';
 
 
 
@@ -2976,7 +2983,7 @@ CREATE POLICY "Clients can view their order items" ON "public"."order_items" FOR
 
 
 
-COMMENT ON POLICY "Clients can view their order items" ON "public"."order_items" IS '摰Ｘ??亦??芸楛閮??蝝?;
+COMMENT ON POLICY "Clients can view their order items" ON "public"."order_items" IS '客戶僅能查看自己訂單的明細';
 
 
 
@@ -2986,7 +2993,7 @@ CREATE POLICY "Clients can view their order timelines" ON "public"."order_timeli
 
 
 
-COMMENT ON POLICY "Clients can view their order timelines" ON "public"."order_timelines" IS '摰Ｘ??亦??芸楛閮??雿風??;
+COMMENT ON POLICY "Clients can view their order timelines" ON "public"."order_timelines" IS '客戶僅能查看自己訂單的操作歷史';
 
 
 
@@ -2998,7 +3005,7 @@ CREATE POLICY "Clients can view their own orders" ON "public"."orders" FOR SELEC
 
 
 
-COMMENT ON POLICY "Clients can view their own orders" ON "public"."orders" IS '摰Ｘ??亦??芸楛????;
+COMMENT ON POLICY "Clients can view their own orders" ON "public"."orders" IS '客戶僅能查看自己的訂單';
 
 
 
