@@ -11,6 +11,10 @@ import { getSeries } from '@/lib/actions/series'
 import { getSeriesProductsForPricing } from '@/lib/actions/tier-prices'
 import { PricingPageClient } from '@/components/admin/pricing/PricingPageClient'
 
+// 禁用所有快取，確保每次都取得最新資料
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 interface PricingPageProps {
   searchParams: Promise<{ series_id?: string }>
 }

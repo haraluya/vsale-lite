@@ -369,7 +369,18 @@ export async function getSeriesProductsForPricing(
 
     if (tierPricesError) {
       console.error('getSeriesProductsForPricing 價格查詢錯誤:', tierPricesError)
+      console.error('  - 系列 ID:', series_id)
+      console.error('  - 商品數量:', products.length)
+      console.error('  - 商品 IDs:', productIds)
       return { success: false, message: '查詢價格失敗' }
+    }
+
+    // 3.1 如果沒有任何價格資料，記錄警告（可能是正常情況）
+    if (!tierPrices || tierPrices.length === 0) {
+      console.warn('⚠️ getSeriesProductsForPricing: 該系列商品尚無價格設定')
+      console.warn('  - 系列 ID:', series_id)
+      console.warn('  - 商品數量:', products.length)
+      // 繼續執行，返回空價格
     }
 
     // 4. 整合資料
