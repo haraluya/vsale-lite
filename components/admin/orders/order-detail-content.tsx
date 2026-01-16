@@ -20,12 +20,11 @@ interface OrderDetailContentProps {
   timelines: OrderTimelineWithActor[]
 }
 
-export function OrderDetailContent({ order: initialOrder, timelines }: OrderDetailContentProps) {
+export function OrderDetailContent({ order, timelines }: OrderDetailContentProps) {
   const router = useRouter()
   const confirm = useConfirm()
   const [isPending, startTransition] = useTransition()
   const [editMode, setEditMode] = useState(false)
-  const [order, setOrder] = useState(initialOrder)
   const [showClientDialog, setShowClientDialog] = useState(false)
 
   // 檢查訂單是否可編輯（僅 pending 狀態）
