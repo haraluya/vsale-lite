@@ -68,6 +68,21 @@ insert-test-*.sql
 # JS 測試檔案
 test-*.js
 
+# ========================================
+# Archive Directories (歸檔目錄)
+# ========================================
+# 排除歷史備份檔案
+backups/archive/
+
+# 排除資料庫工具腳本（敏感操作）
+scripts/db/*.sql
+
+# 排除已完成的計畫文件
+docs/archive/planning/
+
+# 排除過時的部署文件
+docs/archive/deployment/
+
 # 環境檢查檔案
 .env.*.check
 
