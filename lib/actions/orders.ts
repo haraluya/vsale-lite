@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import {
   createOrderSchema,
   addOrderCommentSchema,
@@ -350,6 +350,7 @@ export async function createOrder(
     // 12. 重新驗證相關頁面
     revalidatePath('/store/orders')
     revalidatePath('/admin/orders')
+    revalidateTag('orders')
 
     // 建立成功訊息
     let successMessage = `訂單建立成功!訂單編號: ${order.order_number}`
@@ -701,6 +702,7 @@ export async function markAsShipping(
     revalidatePath('/admin/orders')
     revalidatePath(`/admin/orders/${orderId}`)
     revalidatePath('/store/orders')
+    revalidateTag('orders')
 
     return {
       success: true,
@@ -767,6 +769,7 @@ export async function updateOrderStatus(
     revalidatePath(`/admin/orders/${orderId}`)
     revalidatePath('/store/orders')
     revalidatePath(`/store/orders/${orderId}`)
+    revalidateTag('orders')
 
     // 狀態標籤映射（移除 confirmed）
     const statusLabels: Record<string, string> = {
@@ -838,6 +841,7 @@ export async function cancelOrder(
     revalidatePath(`/admin/orders/${orderId}`)
     revalidatePath('/store/orders')
     revalidatePath(`/store/orders/${orderId}`)
+    revalidateTag('orders')
 
     return {
       success: true,
@@ -1082,6 +1086,7 @@ export async function deleteOrder(
     // 重新驗證相關頁面
     revalidatePath('/admin/orders')
     revalidatePath(`/admin/orders/${order_id}`)
+    revalidateTag('orders')
 
     return {
       success: true,
@@ -1272,6 +1277,7 @@ export async function updateOrderDetails(
     // 重新驗證相關頁面
     revalidatePath('/admin/orders')
     revalidatePath(`/admin/orders/${orderId}`)
+    revalidateTag('orders')
 
     return {
       success: true,

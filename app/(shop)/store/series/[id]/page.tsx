@@ -50,18 +50,17 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
     redirect('/login')
   }
 
-  // 查詢系列資訊
-  const seriesResult = await getSeriesById(id)
+  // ⚡ 並行化查詢 - 使用 Promise.all 同時執行系列與商品查詢
+  const [seriesResult, productsResult] = await Promise.all([
+    getSeriesById(id), // 查詢系列資訊
+    getSeriesProductsWithPrice(id), // 查詢系列下的所有商品與價格
+  ])
 
   if (!seriesResult.success || !seriesResult.data) {
     notFound()
   }
 
   const series = seriesResult.data
-
-  // 查詢系列下的所有商品與價格
-  const productsResult = await getSeriesProductsWithPrice(id)
-
   const products = productsResult.success ? productsResult.data : []
 
   const tierName = (profile.tiers as any).name

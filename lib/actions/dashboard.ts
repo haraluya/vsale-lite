@@ -57,83 +57,96 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
     const last7Days = new Date(now.getTime() - 6 * 24 * 60 * 60 * 1000) // 包含今天共 7 天
     last7Days.setHours(0, 0, 0, 0)
 
-    // T078 - 今日訂單數查詢
-    const { count: todayOrdersCount, error: todayOrdersError } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', todayStart.toISOString())
+    // ⚡ 並行化查詢 - 使用 Promise.all 同時執行所有獨立查詢
+    const [
+      todayOrdersResult,
+      todayRevenueResult,
+      monthOrdersResult,
+      monthRevenueResult,
+      lowStockResult,
+      pendingOrdersResult,
+      trendResult
+    ] = await Promise.all([
+      // T078 - 今日訂單數查詢
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', todayStart.toISOString()),
 
-    if (todayOrdersError) {
-      console.error('查詢今日訂單錯誤:', todayOrdersError)
+      // T079 - 今日營收查詢
+      supabase
+        .from('orders')
+        .select('total_amount')
+        .gte('created_at', todayStart.toISOString())
+        .neq('status', 'cancelled'),
+
+      // T078 - 本月訂單數查詢
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', monthStart.toISOString()),
+
+      // T079 - 本月營收查詢
+      supabase
+        .from('orders')
+        .select('total_amount')
+        .gte('created_at', monthStart.toISOString())
+        .neq('status', 'cancelled'),
+
+      // T080 - 庫存警示商品數查詢 (stock < 10)
+      supabase
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .lt('stock', 10)
+        .eq('status', 'active'),
+
+      // T081 - 待處理訂單數查詢 (status = 'pending')
+      supabase
+        .from('orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending'),
+
+      // T082 - 近 7 日訂單趨勢圖表
+      supabase
+        .from('orders')
+        .select('created_at, total_amount, status')
+        .gte('created_at', last7Days.toISOString())
+        .order('created_at', { ascending: true })
+    ])
+
+    // 檢查錯誤
+    if (todayOrdersResult.error) {
+      console.error('查詢今日訂單錯誤:', todayOrdersResult.error)
+    }
+    if (todayRevenueResult.error) {
+      console.error('查詢今日營收錯誤:', todayRevenueResult.error)
+    }
+    if (monthOrdersResult.error) {
+      console.error('查詢本月訂單錯誤:', monthOrdersResult.error)
+    }
+    if (monthRevenueResult.error) {
+      console.error('查詢本月營收錯誤:', monthRevenueResult.error)
+    }
+    if (lowStockResult.error) {
+      console.error('查詢庫存警示錯誤:', lowStockResult.error)
+    }
+    if (pendingOrdersResult.error) {
+      console.error('查詢待處理訂單錯誤:', pendingOrdersResult.error)
+    }
+    if (trendResult.error) {
+      console.error('查詢訂單趨勢錯誤:', trendResult.error)
     }
 
-    // T079 - 今日營收查詢
-    const { data: todayRevenueData, error: todayRevenueError } = await supabase
-      .from('orders')
-      .select('total_amount')
-      .gte('created_at', todayStart.toISOString())
-      .neq('status', 'cancelled') // 不計算已取消訂單
+    // 計算營收
+    const todayRevenue = todayRevenueResult.data?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
+    const monthRevenue = monthRevenueResult.data?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
 
-    if (todayRevenueError) {
-      console.error('查詢今日營收錯誤:', todayRevenueError)
-    }
-
-    const todayRevenue = todayRevenueData?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
-
-    // T078 - 本月訂單數查詢
-    const { count: monthOrdersCount, error: monthOrdersError } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', monthStart.toISOString())
-
-    if (monthOrdersError) {
-      console.error('查詢本月訂單錯誤:', monthOrdersError)
-    }
-
-    // T079 - 本月營收查詢
-    const { data: monthRevenueData, error: monthRevenueError } = await supabase
-      .from('orders')
-      .select('total_amount')
-      .gte('created_at', monthStart.toISOString())
-      .neq('status', 'cancelled') // 不計算已取消訂單
-
-    if (monthRevenueError) {
-      console.error('查詢本月營收錯誤:', monthRevenueError)
-    }
-
-    const monthRevenue = monthRevenueData?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0
-
-    // T080 - 庫存警示商品數查詢 (stock < 10)
-    const { count: lowStockCount, error: lowStockError } = await supabase
-      .from('products')
-      .select('id', { count: 'exact', head: true })
-      .lt('stock', 10)
-      .eq('status', 'active')
-
-    if (lowStockError) {
-      console.error('查詢庫存警示錯誤:', lowStockError)
-    }
-
-    // T081 - 待處理訂單數查詢 (status = 'pending')
-    const { count: pendingOrdersCount, error: pendingOrdersError } = await supabase
-      .from('orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'pending')
-
-    if (pendingOrdersError) {
-      console.error('查詢待處理訂單錯誤:', pendingOrdersError)
-    }
-
-    // T082 - 近 7 日訂單趨勢圖表
-    const { data: trendData, error: trendError } = await supabase
-      .from('orders')
-      .select('created_at, total_amount, status')
-      .gte('created_at', last7Days.toISOString())
-      .order('created_at', { ascending: true })
-
-    if (trendError) {
-      console.error('查詢訂單趨勢錯誤:', trendError)
-    }
+    // 取得計數
+    const todayOrdersCount = todayOrdersResult.count
+    const monthOrdersCount = monthOrdersResult.count
+    const lowStockCount = lowStockResult.count
+    const pendingOrdersCount = pendingOrdersResult.count
+    const trendData = trendResult.data
 
     // 處理趨勢資料 - 依日期分組
     const trendMap = new Map<string, { orders: number; revenue: number }>()

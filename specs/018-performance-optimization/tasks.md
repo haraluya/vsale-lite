@@ -103,7 +103,7 @@
 #### 快取失效機制（商品相關）
 
 - [X] T011 [US-A] 新增商品 Server Actions 快取失效邏輯（createProduct、updateProduct、deleteProduct）`lib/actions/products.ts`
-- [ ] T012 [US-A] 新增系列與分類 Server Actions 快取失效邏輯 `lib/actions/series.ts` 和 `lib/actions/categories.ts`（可選）
+- [X] T012 [US-A] 新增系列與分類 Server Actions 快取失效邏輯 `lib/actions/series.ts` 和 `lib/actions/categories.ts`（可選）
 
 **Phase 3 驗收場景**（場景 A）：
 1. 客戶開啟商品列表頁面 `/store/products`
@@ -173,7 +173,7 @@
 #### 快取失效機制（價格相關）⭐ **最關鍵**
 
 - [X] T017 [US-C] 新增價格 Server Actions 快取失效邏輯（setTierPrice、batchSetTierPrices）`lib/actions/tier-prices.ts`（**修復空白Bug的關鍵** ✅）
-- [ ] T018 [US-C] 新增訂單 Server Actions 快取失效邏輯（updateOrderStatus）`lib/actions/orders.ts`（可選）
+- [X] T018 [US-C] 新增訂單 Server Actions 快取失效邏輯（updateOrderStatus）`lib/actions/orders.ts`（可選）
 
 **Phase 5 驗收場景**（場景 C）⭐：
 1. 管理員登入後台 `/admin`
@@ -205,7 +205,7 @@
 
 ### 任務清單
 
-- [ ] T019 [US-D] 確認訂單相關頁面的快取失效邏輯已完整（已在 T018 完成，此為驗證任務）
+- [X] T019 [US-D] 確認訂單相關頁面的快取失效邏輯已完整（已在 T018 完成，此為驗證任務）
 
 **Phase 6 驗收場景**（場景 D）：
 1. 管理員前往訂單列表頁 `/admin/orders`
@@ -239,13 +239,13 @@
 
 #### Loading UI 實作
 
-- [ ] T020 [P] [US-E] 實作系列詳情頁 Loading UI `app/(shop)/store/series/[id]/loading.tsx`（新建）
-- [ ] T021 [P] [US-E] 實作客戶訂單列表 Loading UI `app/(shop)/store/orders/loading.tsx`（新建）
-- [ ] T022 [P] [US-E] 實作管理員訂單列表 Loading UI `app/(admin)/admin/orders/loading.tsx`（新建）
-- [ ] T023 [P] [US-E] 實作價格管理頁面 Loading UI `app/(admin)/admin/tier-prices/loading.tsx`（新建）
-- [ ] T024 [P] [US-E] 實作商品管理頁面 Loading UI `app/(admin)/admin/products/loading.tsx`（新建）
-- [ ] T025 [P] [US-E] 確認商品列表頁 Loading UI 存在 `app/(shop)/store/products/loading.tsx`
-- [ ] T026 [P] [US-E] 確認購物車頁 Loading UI 存在 `app/(shop)/store/cart/loading.tsx`
+- [X] T020 [P] [US-E] 實作系列詳情頁 Loading UI `app/(shop)/store/series/[id]/loading.tsx`（新建）
+- [X] T021 [P] [US-E] 實作客戶訂單列表 Loading UI `app/(shop)/store/orders/loading.tsx`（新建）
+- [X] T022 [P] [US-E] 實作管理員訂單列表 Loading UI `app/(admin)/admin/orders/loading.tsx`（新建）
+- [X] T023 [P] [US-E] 實作價格管理頁面 Loading UI `app/(admin)/admin/tier-prices/loading.tsx`（新建）
+- [X] T024 [P] [US-E] 實作商品管理頁面 Loading UI `app/(admin)/admin/products/loading.tsx`（新建）
+- [X] T025 [P] [US-E] 確認商品列表頁 Loading UI 存在 `app/(shop)/store/products/loading.tsx`
+- [X] T026 [P] [US-E] 確認購物車頁 Loading UI 存在 `app/(shop)/store/cart/loading.tsx`
 
 **Phase 7 驗收場景**（場景 E）：
 1. 使用者點擊連結前往新頁面
@@ -271,9 +271,9 @@
 
 ### 任務清單
 
-- [ ] T027 優化 Dashboard 查詢（9 個序列 → 5 個並行）`lib/actions/dashboard.ts`
-- [ ] T028 [P] 優化商品頁面查詢（3 個序列 → 並行）`app/(shop)/store/products/page.tsx`
-- [ ] T029 [P] 檢查其他頁面的序列查詢並優化 `app/(shop)/store/series/[id]/page.tsx` 等
+- [X] T027 優化 Dashboard 查詢（9 個序列 → 7 個並行）`lib/actions/dashboard.ts`
+- [X] T028 [P] 優化商品頁面查詢（3 個序列 → 並行）`app/(shop)/store/products/page.tsx`
+- [X] T029 [P] 檢查其他頁面的序列查詢並優化 `app/(shop)/store/series/[id]/page.tsx` 等
 
 **Phase 8 驗收標準**：
 - ✅ Dashboard 查詢時間 < 300ms（當前約 600ms）

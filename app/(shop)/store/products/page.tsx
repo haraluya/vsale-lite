@@ -33,15 +33,15 @@ export default async function ProductsPage() {
     redirect('/login')
   }
 
-  // 查詢所有啟用的系列 (Feature 003)
-  const seriesResult = await getActiveSeries()
+  // ⚡ 並行化查詢 - 使用 Promise.all 同時執行所有獨立查詢
+  const [seriesResult, categoriesResult, tagsResult] = await Promise.all([
+    getActiveSeries(), // 查詢所有啟用的系列 (Feature 003)
+    getActiveCategories(), // 查詢分類 (Feature 006 - US2)
+    getAvailableTags(), // 查詢標籤 (Feature 006 - US2)
+  ])
+
   const series = seriesResult.success ? seriesResult.data : []
-
-  // 查詢分類與標籤 (Feature 006 - US2)
-  const categoriesResult = await getActiveCategories()
   const categories = categoriesResult.success ? categoriesResult.data : []
-
-  const tagsResult = await getAvailableTags()
   const availableTags = tagsResult.success ? tagsResult.data : []
 
   return (

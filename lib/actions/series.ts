@@ -5,7 +5,7 @@
  * Feature: 003-series-and-pricing
  */
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
 import { createSeriesSchema, updateSeriesSchema } from '@/lib/validations/series.schema'
@@ -254,6 +254,8 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
     // 更新快取
     revalidatePath('/admin/series')
     revalidatePath('/store')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,
@@ -319,6 +321,9 @@ export async function updateSeries(
     revalidatePath('/admin/series')
     revalidatePath('/store')
     revalidatePath(`/store/series/${id}`)
+    revalidateTag('series')
+    revalidateTag('products')
+    revalidateTag('tier-prices')
 
     return {
       success: true,
@@ -385,6 +390,8 @@ export async function deleteSeries(id: string): Promise<ActionResult<void>> {
     // 更新快取
     revalidatePath('/admin/series')
     revalidatePath('/store')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,
@@ -500,6 +507,8 @@ export async function uploadSeriesImage(
     revalidatePath(`/admin/series/${series_id}`)
     revalidatePath('/admin/series')
     revalidatePath('/store')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,
@@ -561,6 +570,8 @@ export async function deleteSeriesImage(series_id: string): Promise<ActionResult
     revalidatePath(`/admin/series/${series_id}`)
     revalidatePath('/admin/series')
     revalidatePath('/store')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,
@@ -852,6 +863,9 @@ export async function importSeries(
 
     // 10. 更新快取
     revalidatePath('/admin/series')
+    revalidatePath('/store')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,

@@ -6,7 +6,7 @@
  */
 
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { checkAuth } from './helpers'
 import { createCategorySchema, updateCategorySchema } from '@/lib/validations/category.schema'
 import type { ActionResult, Category } from '@/types'
@@ -119,6 +119,10 @@ export async function createCategory(
 
     // 6. 重新驗證快取
     revalidatePath('/admin/categories')
+    revalidatePath('/store')
+    revalidateTag('categories')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,
@@ -239,6 +243,10 @@ export async function updateCategory(
 
     // 7. 重新驗證快取
     revalidatePath('/admin/categories')
+    revalidatePath('/store')
+    revalidateTag('categories')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,
@@ -298,6 +306,10 @@ export async function deleteCategory(id: string): Promise<ActionResult> {
 
     // 4. 重新驗證快取
     revalidatePath('/admin/categories')
+    revalidatePath('/store')
+    revalidateTag('categories')
+    revalidateTag('series')
+    revalidateTag('products')
 
     return {
       success: true,
@@ -379,6 +391,9 @@ export async function migrateCategoryProducts(
     // 5. 重新驗證快取
     revalidatePath('/admin/categories')
     revalidatePath('/admin/products')
+    revalidatePath('/store')
+    revalidateTag('categories')
+    revalidateTag('products')
 
     return {
       success: true,
