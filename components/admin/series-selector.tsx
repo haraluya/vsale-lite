@@ -7,7 +7,6 @@
 
 'use client'
 
-import { useRouter } from 'next/navigation'
 import type { Series } from '@/types'
 
 interface SeriesSelectorProps {
@@ -16,14 +15,13 @@ interface SeriesSelectorProps {
 }
 
 export function SeriesSelector({ series, selectedSeriesId }: SeriesSelectorProps) {
-  const router = useRouter()
-
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const seriesId = e.target.value
     if (seriesId) {
-      router.push(`/admin/pricing?series_id=${seriesId}`)
+      // 使用 window.location.href 強制完整頁面重載，確保 Server Component 資料完全刷新
+      window.location.href = `/admin/pricing?series_id=${seriesId}`
     } else {
-      router.push('/admin/pricing')
+      window.location.href = '/admin/pricing'
     }
   }
 

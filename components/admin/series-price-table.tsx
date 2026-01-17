@@ -30,7 +30,13 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
   const [error, setError] = useState<string | null>(null)
 
   // 初始化價格狀態 (key: "product_id_tier_id", value: price)
-  const [prices, setPrices] = useState<Record<string, number | null>>(() => {
+  const [prices, setPrices] = useState<Record<string, number | null>>({})
+
+  // 快速填入狀態 (key: tier_id, value: amount)
+  const [quickFillAmounts, setQuickFillAmounts] = useState<Record<string, string>>({})
+
+  // 當 products 變更時，同步更新價格狀態（修復系列切換後價格不顯示的問題）
+  useEffect(() => {
     const initialPrices: Record<string, number | null> = {}
     products.forEach((product) => {
       product.tier_prices.forEach((tierPrice) => {
@@ -38,11 +44,8 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
         initialPrices[key] = tierPrice.price
       })
     })
-    return initialPrices
-  })
-
-  // 快速填入狀態 (key: tier_id, value: amount)
-  const [quickFillAmounts, setQuickFillAmounts] = useState<Record<string, string>>({})
+    setPrices(initialPrices)
+  }, [products])
 
   // 當系列變更時，重置快速填入輸入框
   useEffect(() => {
