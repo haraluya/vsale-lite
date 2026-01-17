@@ -76,7 +76,7 @@ export function Navbar({ user }: NavbarProps) {
 
   return (
     <nav className={cn(
-      "sticky top-0 z-50 bg-white w-full max-w-full",
+      "fixed top-0 left-0 right-0 z-50 bg-white w-full",
       designTokens.neoBrutalism.border.mobile,
       "md:border-b-3",
       "border-b-black",
@@ -86,7 +86,7 @@ export function Navbar({ user }: NavbarProps) {
       <div className={cn(
         designTokens.container.default,
         "p-3 md:p-4",
-        "w-full"
+        "w-full mx-auto"
       )}>
         <div className="flex h-14 md:h-16 items-center justify-between flex-wrap gap-2">
           {/* Logo / 品牌 */}

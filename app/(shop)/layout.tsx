@@ -75,43 +75,47 @@ export default async function ShopLayout({
 
   return (
     <div className="min-h-screen bg-background">
+      {/* 固定導覽列 */}
       <Navbar user={currentUser} />
 
-      {/* 歡迎訊息與 SegmentControl */}
-      <div className={cn(
-        designTokens.spacing.page.padding,
-        designTokens.container.default
-      )}>
+      {/* 主要內容區域 - 添加頂部間距避免被導覽列遮擋 */}
+      <div className="pt-[72px] md:pt-[80px]">
+        {/* 歡迎訊息與 SegmentControl */}
         <div className={cn(
-          'rounded-none bg-white',
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
-          designTokens.spacing.card.padding,
-          designTokens.spacing.section.marginBottom
+          designTokens.spacing.page.padding,
+          designTokens.container.default
         )}>
-          {/* 歡迎訊息 */}
-          <div className="mb-4">
-            <p className={cn(
-              designTokens.typography.body.base,
-              'text-gray-600'
-            )}>
-              {userName} 您好！
-            </p>
-            <p className={cn(
-              designTokens.typography.caption,
-              'mt-1 text-gray-500'
-            )}>
-              會員等級: <span className="font-bold">{tierName}</span>
-            </p>
+          <div className={cn(
+            'rounded-none bg-white',
+            designTokens.neoBrutalism.border.full,
+            'border-black',
+            designTokens.neoBrutalism.shadow.full,
+            designTokens.spacing.card.padding,
+            designTokens.spacing.section.marginBottom
+          )}>
+            {/* 歡迎訊息 */}
+            <div className="mb-4">
+              <p className={cn(
+                designTokens.typography.body.base,
+                'text-gray-600'
+              )}>
+                {userName} 您好！
+              </p>
+              <p className={cn(
+                designTokens.typography.caption,
+                'mt-1 text-gray-500'
+              )}>
+                會員等級: <span className="font-bold">{tierName}</span>
+              </p>
+            </div>
+
+            {/* SegmentControl */}
+            <SegmentControl />
           </div>
-
-          {/* SegmentControl */}
-          <SegmentControl />
         </div>
-      </div>
 
-      <main>{children}</main>
+        <main>{children}</main>
+      </div>
     </div>
   )
 }
