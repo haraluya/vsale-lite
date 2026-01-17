@@ -19,6 +19,9 @@ import Link from 'next/link'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
+// ISR 快取策略：10 分鐘（商品詳情變動較少）
+export const revalidate = 600
+
 interface ProductDetailPageProps {
   params: Promise<{
     id: string

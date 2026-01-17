@@ -5,7 +5,7 @@
  * Feature: 003-series-and-pricing
  */
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
 import { setTierPriceSchema, batchSetTierPricesSchema } from '@/lib/validations/tier-price.schema'
@@ -146,8 +146,10 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
         return { success: false, message: '移除價格失敗' }
       }
 
-      // 更新快取
-      revalidatePath('/admin/pricing')
+      // 更新快取（修復空白Bug的關鍵）
+      revalidatePath('/admin/pricing')  // 立即刷新價格管理頁
+      revalidateTag('tier-prices')  // 失效價格標籤
+      revalidateTag('products')  // 失效商品標籤
       revalidatePath(`/store/series/*`) // 更新所有系列詳情頁
 
       return {
@@ -178,8 +180,10 @@ export async function setTierPrice(data: SetTierPriceInput): Promise<ActionResul
       return { success: false, message: '價格設定失敗' }
     }
 
-    // 更新快取
-    revalidatePath('/admin/pricing')
+    // 更新快取（修復空白Bug的關鍵）
+    revalidatePath('/admin/pricing')  // 立即刷新價格管理頁
+    revalidateTag('tier-prices')  // 失效價格標籤
+    revalidateTag('products')  // 失效商品標籤
     revalidatePath(`/store/series/*`) // 更新所有系列詳情頁
 
     return {
@@ -262,8 +266,10 @@ export async function batchSetTierPrices(
       }
     }
 
-    // 更新快取
-    revalidatePath('/admin/pricing')
+    // 更新快取（修復空白Bug的關鍵）
+    revalidatePath('/admin/pricing')  // 立即刷新價格管理頁
+    revalidateTag('tier-prices')  // 失效價格標籤
+    revalidateTag('products')  // 失效商品標籤
     revalidatePath('/store')
 
     return {

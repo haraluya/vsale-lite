@@ -7,7 +7,7 @@
  */
 
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { checkAuth } from './helpers'
 import { logAudit } from './audit'
 import { createProductSchema, updateProductSchema, batchUpdateProductsSchema } from '@/lib/validations/product.schema'
@@ -288,6 +288,7 @@ export async function createProduct(
     })
 
     // 8. 重新驗證快取
+    revalidateTag('products')
     revalidatePath('/admin/products')
     revalidatePath('/store')
 
@@ -407,8 +408,10 @@ export async function updateProduct(
     })
 
     // 8. 重新驗證快取
+    revalidateTag('products')
     revalidatePath('/admin/products')
     revalidatePath(`/admin/products/${id}`)
+    revalidatePath(`/store/${id}`)
 
     return {
       success: true,
@@ -488,7 +491,9 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
         notes: '商品已有訂單記錄,執行軟刪除',
       })
 
+      revalidateTag('products')
       revalidatePath('/admin/products')
+      revalidatePath('/store')
 
       return {
         success: true,
@@ -524,7 +529,9 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
         notes: '硬刪除商品',
       })
 
+      revalidateTag('products')
       revalidatePath('/admin/products')
+      revalidatePath('/store')
 
       return {
         success: true,

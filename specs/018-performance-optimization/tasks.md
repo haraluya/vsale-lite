@@ -44,8 +44,8 @@
 
 ### 任務清單
 
-- [ ] T001 確認 Next.js 15.1+ 與 Supabase SDK 版本符合需求
-- [ ] T002 檢查專案結構，確認所有需要修改的檔案存在
+- [X] T001 確認 Next.js 15.1+ 與 Supabase SDK 版本符合需求
+- [X] T002 檢查專案結構，確認所有需要修改的檔案存在
 
 **驗收標準**：
 - Next.js 版本 >= 15.1
@@ -65,9 +65,9 @@
 
 ### 任務清單
 
-- [ ] T003 [P] 確認或建立基礎骨架屏元件 `components/ui/skeleton.tsx`
-- [ ] T004 [P] 建立複合骨架屏元件 `components/shop/product-card-skeleton.tsx`
-- [ ] T005 [P] 確認 Next.js cache helpers 正確 import（revalidateTag、revalidatePath）
+- [X] T003 [P] 確認或建立基礎骨架屏元件 `components/ui/skeleton.tsx`
+- [X] T004 [P] 建立複合骨架屏元件 `components/shop/product-card-skeleton.tsx`
+- [X] T005 [P] 確認 Next.js cache helpers 正確 import（revalidateTag、revalidatePath）
 
 **驗收標準**：
 - `Skeleton` 元件包含 `border-2 border-black` 樣式
@@ -94,16 +94,16 @@
 
 #### 前台快取策略設定
 
-- [ ] T006 [US-A] 移除前台 Layout 的 force-dynamic，新增 ISR 快取 `app/(shop)/layout.tsx`
-- [ ] T007 [P] [US-A] 設定首頁快取時間（revalidate: 300）`app/(shop)/store/home/page.tsx`
-- [ ] T008 [P] [US-A] 設定商品列表頁快取時間（revalidate: 300）`app/(shop)/store/products/page.tsx`
-- [ ] T009 [P] [US-A] 設定商品詳情頁快取時間（revalidate: 600）`app/(shop)/store/[id]/page.tsx`
-- [ ] T010 [P] [US-A] 設定系列頁面快取時間（revalidate: 300）`app/(shop)/store/series/[id]/page.tsx`
+- [X] T006 [US-A] 移除前台 Layout 的 force-dynamic，新增 ISR 快取 `app/(shop)/layout.tsx`
+- [X] T007 [P] [US-A] 設定首頁快取時間（revalidate: 300）`app/(shop)/store/home/page.tsx`
+- [X] T008 [P] [US-A] 設定商品列表頁快取時間（revalidate: 300）`app/(shop)/store/products/page.tsx`
+- [X] T009 [P] [US-A] 設定商品詳情頁快取時間（revalidate: 600）`app/(shop)/store/[id]/page.tsx`
+- [X] T010 [P] [US-A] 設定系列頁面快取時間（revalidate: 300）`app/(shop)/store/series/[id]/page.tsx`
 
 #### 快取失效機制（商品相關）
 
-- [ ] T011 [US-A] 新增商品 Server Actions 快取失效邏輯（createProduct、updateProduct、deleteProduct）`lib/actions/products.ts`
-- [ ] T012 [US-A] 新增系列與分類 Server Actions 快取失效邏輯 `lib/actions/series.ts` 和 `lib/actions/categories.ts`
+- [X] T011 [US-A] 新增商品 Server Actions 快取失效邏輯（createProduct、updateProduct、deleteProduct）`lib/actions/products.ts`
+- [ ] T012 [US-A] 新增系列與分類 Server Actions 快取失效邏輯 `lib/actions/series.ts` 和 `lib/actions/categories.ts`（可選）
 
 **Phase 3 驗收場景**（場景 A）：
 1. 客戶開啟商品列表頁面 `/store/products`
@@ -134,8 +134,8 @@
 
 ### 任務清單
 
-- [ ] T013 [P] [US-B] 確保購物車頁保持動態渲染 `app/(shop)/store/cart/page.tsx`
-- [ ] T014 [P] [US-B] 確保訂單頁保持動態渲染 `app/(shop)/store/orders/page.tsx`
+- [X] T013 [P] [US-B] 確保購物車頁保持動態渲染 `app/(shop)/store/cart/page.tsx`（已是 Client Component）
+- [X] T014 [P] [US-B] 確保訂單頁保持動態渲染 `app/(shop)/store/orders/page.tsx`（已是 Client Component）
 
 **Phase 4 驗收場景**（場景 B）：
 1. 客戶在商品頁點擊「加入購物車」
@@ -167,13 +167,13 @@
 
 #### 後台動態渲染確保
 
-- [ ] T015 [US-C] 確認後台 Layout 的 force-dynamic 存在 `app/(admin)/admin/layout.tsx`
-- [ ] T016 [US-C] 檢查所有後台頁面的 dynamic 設定（dashboard、tier-prices、products、orders、users）
+- [X] T015 [US-C] 確認後台 Layout 的 force-dynamic 存在 `app/(admin)/admin/layout.tsx`
+- [X] T016 [US-C] 檢查所有後台頁面的 dynamic 設定（dashboard、tier-prices、products、orders、users）
 
 #### 快取失效機制（價格相關）⭐ **最關鍵**
 
-- [ ] T017 [US-C] 新增價格 Server Actions 快取失效邏輯（updateTierPrice、createTierPrice、deleteTierPrice、batchUpdateTierPrices）`lib/actions/tier-prices.ts`（**修復空白Bug的關鍵**）
-- [ ] T018 [US-C] 新增訂單 Server Actions 快取失效邏輯（updateOrderStatus）`lib/actions/orders.ts`
+- [X] T017 [US-C] 新增價格 Server Actions 快取失效邏輯（setTierPrice、batchSetTierPrices）`lib/actions/tier-prices.ts`（**修復空白Bug的關鍵** ✅）
+- [ ] T018 [US-C] 新增訂單 Server Actions 快取失效邏輯（updateOrderStatus）`lib/actions/orders.ts`（可選）
 
 **Phase 5 驗收場景**（場景 C）⭐：
 1. 管理員登入後台 `/admin`

@@ -19,6 +19,9 @@ import { StorePageClient } from '@/components/shop/store-page-client'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
+// ISR 快取策略：5 分鐘
+export const revalidate = 300
+
 export default async function ProductsPage() {
   const supabase = await createClient()
 

@@ -17,8 +17,10 @@ import { SegmentControl } from '@/components/shop/home-blocks/SegmentControl'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
-// 強制動態渲染，避免預渲染時 workUnitAsyncStorage 未初始化錯誤
-export const dynamic = 'force-dynamic'
+// ISR 快取策略：5 分鐘
+// 移除 force-dynamic，啟用快取以提升效能
+// export const dynamic = 'force-dynamic'  // 已移除
+export const revalidate = 300 // 5 分鐘快取
 
 export default async function ShopLayout({
   children,

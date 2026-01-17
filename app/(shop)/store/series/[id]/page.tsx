@@ -18,6 +18,9 @@ import { ArrowLeft } from 'lucide-react'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
+// ISR 快取策略：5 分鐘
+export const revalidate = 300
+
 interface SeriesDetailPageProps {
   params: Promise<{ id: string }>
 }
