@@ -5,7 +5,7 @@ import { getOrderTimeline, addOrderComment } from '@/lib/actions/orders'
 import { OrderTimeline } from '@/components/admin/order-timeline'
 import { CommentInput } from '@/components/orders/CommentInput'
 import type { OrderTimelineWithActor } from '@/types'
-import { toast } from 'sonner'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 /**
  * 訂單留言區塊（後台專用）
@@ -21,6 +21,7 @@ interface OrderCommentSectionProps {
 }
 
 export function OrderCommentSection({ orderId, initialTimelines }: OrderCommentSectionProps) {
+  const alert = useAlert()
   const [timelines, setTimelines] = useState<OrderTimelineWithActor[]>(initialTimelines)
 
   // 載入最新時間軸
@@ -36,10 +37,18 @@ export function OrderCommentSection({ orderId, initialTimelines }: OrderCommentS
     const result = await addOrderComment({ orderId, content })
 
     if (result.success) {
-      toast.success('留言已送出')
+      await alert({
+        title: '成功',
+        message: '留言已送出',
+        variant: 'success'
+      })
       await refreshTimelines()
     } else {
-      toast.error(result.message || '送出留言失敗')
+      await alert({
+        title: '送出失敗',
+        message: result.message || '送出留言失敗',
+        variant: 'error'
+      })
     }
   }
 

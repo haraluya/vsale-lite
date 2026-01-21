@@ -8,7 +8,7 @@ import { User, Phone, Award, MapPin, FileText, Edit, ExternalLink, Loader2 } fro
 import { cn } from '@/lib/utils'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { updateClientQuickInfo } from '@/lib/actions/clients'
-import { toast } from 'sonner'
+import { useAlert } from '@/lib/contexts/dialog-context'
 
 /**
  * 客戶快速檢視與編輯 Dialog
@@ -36,6 +36,7 @@ interface ClientQuickViewDialogProps {
 
 export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: ClientQuickViewDialogProps) {
   const router = useRouter()
+  const alert = useAlert()
   const [editMode, setEditMode] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [address, setAddress] = useState(client.address || '')
@@ -67,16 +68,28 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
       })
 
       if (result.success) {
-        toast.success('客戶資料已更新')
+        await alert({
+          title: '成功',
+          message: '客戶資料已更新',
+          variant: 'success'
+        })
         setEditMode(false)
         onUpdate?.()
         onOpenChange(false) // ✅ 儲存成功後關閉 Dialog
         router.refresh()
       } else {
-        toast.error(result.message || '更新失敗')
+        await alert({
+          title: '更新失敗',
+          message: result.message || '更新失敗，請稍後再試',
+          variant: 'error'
+        })
       }
     } catch (error) {
-      toast.error('更新時發生錯誤')
+      await alert({
+        title: '錯誤',
+        message: '更新時發生錯誤',
+        variant: 'error'
+      })
       console.error('Update client error:', error)
     } finally {
       setIsSaving(false)

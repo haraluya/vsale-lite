@@ -254,6 +254,21 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
 
     // 費用修改
     const feesModified: OrderModificationsInput['fees'] = []
+
+    // 檢查已刪除的費用
+    const editedFeeIds = new Set(editedFees.map(f => f.id))
+    originalFees.forEach((originalFee: any) => {
+      if (!editedFeeIds.has(originalFee.id)) {
+        // 原有費用被刪除
+        feesModified.push({
+          type: 'removed',
+          fee_id: originalFee.id,
+          fee_name: originalFee.fee_name,
+        })
+      }
+    })
+
+    // 檢查新增的費用
     editedFees.forEach((fee: EditedFee) => {
       if (fee.is_new) {
         feesModified.push({

@@ -334,6 +334,90 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
             </div>
           </div>
 
+          {/* 訂單修改歷史摘要 */}
+          {timelines.some(t => t.action_type === 'order_modified') && (
+            <div className={cn('rounded-none bg-purple-50', getNeoBrutalismClasses())}>
+              <h2
+                className={cn(
+                  designTokens.typography.h2,
+                  'border-b-2 md:border-b-3 border-black bg-purple-100 p-3 md:p-4'
+                )}
+              >
+                ✏️ 訂單修改記錄
+              </h2>
+              <div className="p-3 md:p-4 space-y-3">
+                {timelines
+                  .filter(t => t.action_type === 'order_modified')
+                  .reverse()
+                  .map((timeline, index) => {
+                    const modifications = timeline.modifications as any
+                    const formatDate = (dateString: string) => {
+                      const date = new Date(dateString)
+                      return date.toLocaleDateString('zh-TW', {
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })
+                    }
+
+                    return (
+                      <div
+                        key={timeline.id}
+                        className="rounded-none border-2 border-purple-400 bg-white p-3"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="font-bold text-sm">
+                            修改 #{timelines.filter(t => t.action_type === 'order_modified').length - index}
+                          </div>
+                          <div className="text-xs text-gray-600">
+                            {formatDate(timeline.created_at)} · {timeline.actor_name}
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-700 space-y-1">
+                          {modifications?.items?.map((item: any, i: number) => (
+                            <div key={i}>
+                              {item.type === 'price_changed' && (
+                                <div>• 商品「{item.product_name}」單價: NT${item.old_price} → NT${item.new_price}</div>
+                              )}
+                              {item.type === 'quantity_changed' && (
+                                <div>• 商品「{item.product_name}」數量: {item.old_quantity} → {item.new_quantity}</div>
+                              )}
+                              {item.type === 'removed' && (
+                                <div>• 移除商品「{item.product_name}」</div>
+                              )}
+                              {item.type === 'added' && (
+                                <div>• 新增商品「{item.product_name}」(單價 NT${item.new_price}, 數量 {item.new_quantity})</div>
+                              )}
+                            </div>
+                          ))}
+                          {modifications?.shipping && (
+                            <div>• 運費: NT${modifications.shipping.old_fee} → NT${modifications.shipping.new_fee}</div>
+                          )}
+                          {modifications?.fees?.map((fee: any, i: number) => (
+                            <div key={i}>
+                              {fee.type === 'added' && (
+                                <div>• 新增費用「{fee.fee_name}」: NT${fee.amount >= 0 ? '+' : ''}{fee.amount}</div>
+                              )}
+                              {fee.type === 'removed' && (
+                                <div>• 移除費用「{fee.fee_name}」</div>
+                              )}
+                            </div>
+                          ))}
+                          {modifications?.notes && (
+                            <div>• 客戶備註: 已修改</div>
+                          )}
+                          {modifications?.coupon?.action === 'removed' && (
+                            <div>• 移除優惠券「{modifications.coupon.coupon_code}」</div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          )}
+
           {/* 訂單操作 */}
           <OrderActions orderId={order.id} orderNumber={order.order_number} currentStatus={order.status} />
 
