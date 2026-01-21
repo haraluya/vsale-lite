@@ -134,16 +134,22 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
                 <div>
-                  <div className={cn(designTokens.typography.caption, 'text-gray-600')}>客戶姓名</div>
+                  <div className={cn(designTokens.typography.caption, 'text-gray-600 flex items-center gap-1')}>
+                    客戶姓名
+                    <span className="text-xs text-blue-600">(點擊編輯資料)</span>
+                  </div>
                   <button
                     onClick={() => setShowClientDialog(true)}
                     className={cn(
                       designTokens.typography.body.base,
                       'font-bold text-blue-600 hover:text-blue-800 hover:underline',
-                      'transition-colors cursor-pointer text-left'
+                      'transition-colors cursor-pointer text-left',
+                      'flex items-center gap-1 group'
                     )}
+                    title="點擊編輯客戶資料（地址、備註）"
                   >
                     {order.user.name}
+                    <Edit className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 </div>
               </div>
@@ -375,35 +381,33 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                           </div>
                         </div>
                         <div className="text-sm text-gray-700 space-y-1">
-                          {modifications?.items?.map((item: any, i: number) => (
-                            <div key={i}>
-                              {item.type === 'price_changed' && (
-                                <div>• 商品「{item.product_name}」單價: NT${item.old_price} → NT${item.new_price}</div>
-                              )}
-                              {item.type === 'quantity_changed' && (
-                                <div>• 商品「{item.product_name}」數量: {item.old_quantity} → {item.new_quantity}</div>
-                              )}
-                              {item.type === 'removed' && (
-                                <div>• 移除商品「{item.product_name}」</div>
-                              )}
-                              {item.type === 'added' && (
-                                <div>• 新增商品「{item.product_name}」(單價 NT${item.new_price}, 數量 {item.new_quantity})</div>
-                              )}
-                            </div>
-                          ))}
+                          {modifications?.items?.map((item: any, i: number) => {
+                            if (item.type === 'price_changed') {
+                              return <div key={`item-${i}`}>• 商品「{item.product_name}」單價: NT${item.old_price} → NT${item.new_price}</div>
+                            }
+                            if (item.type === 'quantity_changed') {
+                              return <div key={`item-${i}`}>• 商品「{item.product_name}」數量: {item.old_quantity} → {item.new_quantity}</div>
+                            }
+                            if (item.type === 'removed') {
+                              return <div key={`item-${i}`}>• 移除商品「{item.product_name}」</div>
+                            }
+                            if (item.type === 'added') {
+                              return <div key={`item-${i}`}>• 新增商品「{item.product_name}」(單價 NT${item.new_price}, 數量 {item.new_quantity})</div>
+                            }
+                            return null
+                          })}
                           {modifications?.shipping && (
                             <div>• 運費: NT${modifications.shipping.old_fee} → NT${modifications.shipping.new_fee}</div>
                           )}
-                          {modifications?.fees?.map((fee: any, i: number) => (
-                            <div key={i}>
-                              {fee.type === 'added' && (
-                                <div>• 新增費用「{fee.fee_name}」: NT${fee.amount >= 0 ? '+' : ''}{fee.amount}</div>
-                              )}
-                              {fee.type === 'removed' && (
-                                <div>• 移除費用「{fee.fee_name}」</div>
-                              )}
-                            </div>
-                          ))}
+                          {modifications?.fees?.map((fee: any, i: number) => {
+                            if (fee.type === 'added') {
+                              return <div key={`fee-${i}`}>• 新增費用「{fee.fee_name}」: NT${fee.amount >= 0 ? '+' : ''}{fee.amount}</div>
+                            }
+                            if (fee.type === 'removed') {
+                              return <div key={`fee-${i}`}>• 移除費用「{fee.fee_name}」</div>
+                            }
+                            return null
+                          })}
                           {modifications?.notes && (
                             <div>• 客戶備註: 已修改</div>
                           )}

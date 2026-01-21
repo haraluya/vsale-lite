@@ -68,15 +68,17 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
       })
 
       if (result.success) {
+        setEditMode(false)
+        onUpdate?.()
+        onOpenChange(false) // 先關閉 Dialog
+        router.refresh()
+
+        // 然後顯示成功訊息
         await alert({
           title: '成功',
           message: '客戶資料已更新',
           variant: 'success'
         })
-        setEditMode(false)
-        onUpdate?.()
-        onOpenChange(false) // ✅ 儲存成功後關閉 Dialog
-        router.refresh()
       } else {
         await alert({
           title: '更新失敗',
