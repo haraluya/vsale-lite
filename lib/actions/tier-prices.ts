@@ -27,15 +27,17 @@ export async function getAllTiersWithPrices(
 
     if (product_id) {
       // 查詢該商品的所有等級價格
+      // 🔴 修正：需要 SELECT product_id 並過濾對應的 tier_prices
       const { data, error } = await adminClient
         .from('tiers')
         .select(`
           id,
           name,
           rank,
-          tier_prices (
+          tier_prices!left (
             id,
-            price
+            price,
+            product_id
           )
         `)
         .order('rank', { ascending: true })
@@ -47,6 +49,7 @@ export async function getAllTiersWithPrices(
 
       // 整合資料
       const result: TierWithPrice[] = data.map((tier: any) => {
+        // 🔴 修正：從 tier_prices 陣列中過濾出該商品的價格
         const tierPrice = tier.tier_prices?.find((tp: any) => tp.product_id === product_id)
         return {
           tier_id: tier.id,
@@ -250,6 +253,10 @@ export async function batchSetTierPrices(
 
     // 2. 批量 DELETE 操作（處理價格為 null 的）
     if (toDelete.length > 0) {
+      // 🔴 改用批次刪除，避免 N+1 查詢問題
+      // 需要逐一刪除，因為 Supabase 不支援複合主鍵的 .in() 操作
+      const failedDeletions: Array<{ item: typeof toDelete[0]; error: any }> = []
+
       for (const item of toDelete) {
         const { error } = await adminClient
           .from('tier_prices')
@@ -258,10 +265,22 @@ export async function batchSetTierPrices(
           .eq('tier_id', item.tier_id)
 
         if (error) {
-          console.error('batchSetTierPrices DELETE 錯誤:', error)
-          // 不中斷，繼續刪除其他記錄
+          failedDeletions.push({ item, error })
         } else {
           deletedCount++
+        }
+      }
+
+      // 若有部分刪除失敗，回傳詳細錯誤訊息
+      if (failedDeletions.length > 0) {
+        return {
+          success: false,
+          message: `部分刪除失敗：${failedDeletions.length} 筆失敗，${deletedCount} 筆成功`,
+          errors: {
+            deletions: failedDeletions.map(f =>
+              `商品 ${f.item.product_id} - 等級 ${f.item.tier_id}: ${f.error.message || '未知錯誤'}`
+            ),
+          },
         }
       }
     }

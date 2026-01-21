@@ -97,7 +97,7 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName }: ImageModalP
             width={1200}
             height={1200}
             className="h-auto max-h-[80vh] w-auto max-w-[85vw] object-contain"
-            priority
+            priority={isOpen}
           />
         </div>
 

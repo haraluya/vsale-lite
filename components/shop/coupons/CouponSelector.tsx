@@ -7,12 +7,14 @@
  * @date 2026-01-07
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { getUserCoupons, validateCoupon } from '@/lib/actions/coupons'
 import { useCartStore } from '@/stores/cart'
 import type { UserCoupon, CartItem as BaseCartItem, CouponDiscountResult } from '@/types'
 import { toast } from 'sonner'
 import { X } from 'lucide-react'
+import { designTokens } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface CouponSelectorProps {
   cartItems: (BaseCartItem & { price: number; series_id?: string })[]
@@ -36,16 +38,9 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   const [applying, setApplying] = useState<string | null>(null)
 
   /**
-   * 載入客戶已領取的優惠券
-   */
-  useEffect(() => {
-    loadCoupons()
-  }, [])
-
-  /**
    * 載入優惠券並驗證
    */
-  const loadCoupons = async () => {
+  const loadCoupons = useCallback(async () => {
     setLoading(true)
 
     try {
@@ -63,12 +58,19 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [validateAllCoupons])
+
+  /**
+   * 載入客戶已領取的優惠券
+   */
+  useEffect(() => {
+    loadCoupons()
+  }, [loadCoupons])
 
   /**
    * 驗證所有優惠券
    */
-  const validateAllCoupons = async (coupons: UserCoupon[]) => {
+  const validateAllCoupons = useCallback(async (coupons: UserCoupon[]) => {
     const results: Record<string, CouponDiscountResult> = {}
 
     for (const userCoupon of coupons) {
@@ -90,7 +92,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
     }
 
     setValidationResults(results)
-  }
+  }, [cartItems])
 
   /**
    * 應用優惠券（追蹤特定領取記錄 ID）
@@ -135,7 +137,12 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
 
   if (loading) {
     return (
-      <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-white p-6">
+      <div className={cn(
+        "bg-white p-6",
+        designTokens.neoBrutalism.border.mobile,
+        "border-black",
+        designTokens.neoBrutalism.shadow.mobile
+      )}>
         <div className="text-center text-gray-600">載入中...</div>
       </div>
     )
@@ -143,14 +150,23 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
 
   if (availableCoupons.length === 0) {
     return (
-      <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-white p-6">
+      <div className={cn(
+        "bg-white p-6",
+        designTokens.neoBrutalism.border.mobile,
+        "border-black",
+        designTokens.neoBrutalism.shadow.mobile
+      )}>
         <div className="text-center">
           <p className="text-gray-600 mb-4">您目前沒有可用的優惠券</p>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-black text-white font-bold border-2 border-black
-                       shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px]
-                       hover:shadow-none transition-all"
+            className={cn(
+              "px-4 py-2 bg-black text-white font-bold transition-all",
+              designTokens.neoBrutalism.border.mobile,
+              "border-black",
+              designTokens.neoBrutalism.shadow.mobile,
+              "hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+            )}
           >
             關閉
           </button>

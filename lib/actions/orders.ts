@@ -130,10 +130,9 @@ export async function createOrder(
         series_id,
         status,
         retail_price,
-        tier_prices(price)
+        tier_prices(price, tier_id)
       `)
       .in('id', productIds)
-      .eq('tier_prices.tier_id', tierId!)
       .eq('status', 'active')
 
     if (productsError) {
@@ -172,7 +171,9 @@ export async function createOrder(
       }
 
       // 優先使用等級價格，若未設定則使用零售價格
-      const tierPrice = (product.tier_prices as any)[0]?.price
+      // 🔴 修正：從所有 tier_prices 中過濾出該等級的價格
+      const tierPriceData = (product.tier_prices as any)?.find((tp: any) => tp.tier_id === tierId)
+      const tierPrice = tierPriceData?.price
       const price = tierPrice !== null && tierPrice !== undefined ? tierPrice : product.retail_price
 
       // 檢查是否有有效價格
@@ -328,7 +329,13 @@ export async function createOrder(
         .eq('id', couponData.userCouponId)
 
       if (updateUserCouponError) {
-        // 不回滾，僅記錄錯誤（優惠券快照已建立，不影響訂單）
+        // 🔴 重要：若更新失敗，必須回滾整個訂單，避免優惠券雙重使用
+        // 回滾訂單（CASCADE 會自動刪除 order_items 和 order_coupons）
+        await supabase.from('orders').delete().eq('id', order.id)
+        return {
+          success: false,
+          message: '更新優惠券使用狀態失敗，訂單已取消',
+        }
       }
     }
 

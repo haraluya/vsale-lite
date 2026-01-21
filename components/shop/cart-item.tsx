@@ -10,7 +10,7 @@
  * - Neo-Brutalism 設計風格
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import type { CartItemWithProduct } from '@/types'
 import Image from 'next/image'
 import { Minus, Plus, Trash2 } from 'lucide-react'
@@ -23,7 +23,7 @@ interface CartItemProps {
   item: CartItemWithProduct
 }
 
-export function CartItem({ item }: CartItemProps) {
+export const CartItem = memo(function CartItem({ item }: CartItemProps) {
   const { updateQuantity, removeItem } = useCartStore()
   const [inputValue, setInputValue] = useState(item.quantity.toString())
 
@@ -152,7 +152,7 @@ export function CartItem({ item }: CartItemProps) {
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                   "p-1.5 md:p-2",
-                  "min-h-[40px] min-w-[40px]", // WCAG 2.1 AA
+                  "min-h-[44px] min-w-[44px]", // WCAG 2.1 AA (修正為 44px 標準)
                   "active:translate-x-[1px] active:translate-y-[1px]",
                   "disabled:cursor-not-allowed disabled:opacity-50"
                 )}
@@ -172,7 +172,7 @@ export function CartItem({ item }: CartItemProps) {
                   "w-16 md:w-20 text-center font-bold rounded-none",
                   "border-2 border-black",
                   "px-2 py-1.5 md:py-2",
-                  "min-h-[40px]", // WCAG 2.1 AA
+                  "min-h-[44px]", // WCAG 2.1 AA (修正為 44px 標準)
                   "focus:outline-none focus:ring-2 focus:ring-blue-500",
                   designTokens.typography.body.large
                 )}
@@ -186,7 +186,7 @@ export function CartItem({ item }: CartItemProps) {
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                   "p-1.5 md:p-2",
-                  "min-h-[40px] min-w-[40px]", // WCAG 2.1 AA
+                  "min-h-[44px] min-w-[44px]", // WCAG 2.1 AA (修正為 44px 標準)
                   "active:translate-x-[1px] active:translate-y-[1px]"
                 )}
                 aria-label="增加數量"
@@ -234,4 +234,4 @@ export function CartItem({ item }: CartItemProps) {
       </div>
     </div>
   )
-}
+})
