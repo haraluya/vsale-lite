@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { deleteTier } from '@/lib/actions/tiers'
 import { reorderTiers } from '@/lib/actions/reorder'
 import { useState } from 'react'
+import { formatDateTW } from '@/lib/date-utils'
 import { useConfirm } from '@/lib/contexts/dialog-context'
 import {
   DndContext,
@@ -57,7 +58,7 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
       </td>
       <td className={cn("px-4 py-3 font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>{tier.name}</td>
       <td className={cn("px-4 py-3 text-gray-600 md:px-6 md:py-4", designTokens.typography.caption)}>
-        {new Date(tier.created_at).toLocaleDateString('zh-TW')}
+        {formatDateTW(tier.created_at)}
       </td>
       <td className={cn("px-4 py-3 md:px-6 md:py-4")}>
         <div className="flex justify-end gap-2">

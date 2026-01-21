@@ -6,6 +6,7 @@ import { Search, Filter } from 'lucide-react'
 import { OrderStatusBadge } from '@/components/shop/order-status-badge'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { formatDateTW, formatAmount } from '@/lib/date-utils'
 import type { OrderStatus, OrderWithUser } from '@/types'
 
 /**
@@ -45,23 +46,6 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
 
     return matchesStatus && matchesSearch
   })
-
-  // 格式化金額
-  const formatAmount = (amount: number) => {
-    return `NT$ ${amount.toLocaleString()}`
-  }
-
-  // 格式化日期
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
 
   return (
     <div className={designTokens.spacing.page.gap}>
@@ -147,7 +131,7 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
                   <OrderStatusBadge status={order.status} size="sm" />
                 </div>
                 <div className="text-right font-bold">{formatAmount(order.total_amount)}</div>
-                <div className="text-sm text-gray-600">{formatDate(order.created_at)}</div>
+                <div className="text-sm text-gray-600">{formatDateTW(order.created_at)}</div>
               </Link>
             ))}
           </div>

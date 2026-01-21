@@ -11,6 +11,7 @@ import { deleteClient } from '@/lib/actions/clients'
 import { useHighlightKeyword } from './client-filter'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/date-utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
 
 type ClientTableProps = {
@@ -181,7 +182,7 @@ export function ClientTable({
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">
-                        {new Date(client.created_at).toLocaleDateString('zh-TW')}
+                        {formatDateTW(client.created_at)}
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2">
@@ -345,7 +346,7 @@ export function ClientTable({
 
                 {/* 註冊時間 */}
                 <div className={cn("text-gray-500 text-right", designTokens.typography.caption)}>
-                  {new Date(client.created_at).toLocaleDateString('zh-TW')}
+                  {formatDateTW(client.created_at)}
                 </div>
               </div>
             )

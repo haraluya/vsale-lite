@@ -19,6 +19,7 @@ import { OrderTimeline } from '@/components/admin/order-timeline'
 import { CommentInput } from '@/components/orders/CommentInput'
 import type { OrderDetail, OrderTimelineWithActor } from '@/types'
 import { formatCurrency, cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/date-utils'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { designTokens } from '@/lib/design-tokens'
@@ -134,14 +135,6 @@ export default function CustomerOrderDetailPage() {
     )
   }
 
-  const createdDate = new Date(order.created_at).toLocaleDateString('zh-TW', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-
   return (
     <div className={cn(
       "min-h-screen bg-gray-50",
@@ -195,7 +188,7 @@ export default function CustomerOrderDetailPage() {
             <p className={cn(
               designTokens.typography.body.base,
               "mt-2 text-gray-600"
-            )}>{createdDate}</p>
+            )}>{formatDateTW(order.created_at)}</p>
           </div>
           <OrderStatusBadge status={order.status} size="lg" />
         </div>
@@ -383,7 +376,7 @@ export default function CustomerOrderDetailPage() {
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
                 <dt className="font-bold">建立時間:</dt>
-                <dd className="text-gray-800">{createdDate}</dd>
+                <dd className="text-gray-800">{formatDateTW(order.created_at)}</dd>
               </div>
               <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
                 <dt className="font-bold">商品數量:</dt>

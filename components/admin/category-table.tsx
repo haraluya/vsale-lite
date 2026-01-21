@@ -8,6 +8,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { formatDateTW } from '@/lib/date-utils'
 import { useConfirm } from '@/lib/contexts/dialog-context'
 import {
   DndContext,
@@ -67,7 +68,7 @@ function SortableCategoryRow({
         {category.description || <span className="text-gray-400 italic">無描述</span>}
       </td>
       <td className={cn("px-4 py-3 text-gray-600 md:px-6 md:py-4", designTokens.typography.caption)}>
-        {new Date(category.created_at).toLocaleDateString('zh-TW')}
+        {formatDateTW(category.created_at)}
       </td>
       <td className={cn("px-4 py-3 md:px-6 md:py-4")}>
         <div className="flex justify-end gap-2">

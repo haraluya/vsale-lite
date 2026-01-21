@@ -2,6 +2,7 @@
 
 import { Clock, User } from 'lucide-react'
 import type { OrderTimelineWithActor as OrderTimelineType } from '@/types'
+import { formatDateTW } from '@/lib/date-utils'
 
 /**
  * 訂單操作歷史時間軸元件
@@ -67,16 +68,6 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 export function OrderTimeline({ timelines }: OrderTimelineProps) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
 
   const getTimelineMessage = (timeline: OrderTimelineType) => {
     switch (timeline.action_type) {
@@ -196,7 +187,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3" />
-                      {formatDate(timeline.created_at)}
+                      {formatDateTW(timeline.created_at)}
                     </div>
                   </div>
                 </div>
@@ -225,7 +216,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
                   <div className="font-bold">{getTimelineMessage(timeline)}</div>
                   <div className="flex items-center gap-1 text-sm text-gray-600">
                     <Clock className="h-4 w-4" />
-                    {formatDate(timeline.created_at)}
+                    {formatDateTW(timeline.created_at)}
                   </div>
                 </div>
 
