@@ -35,11 +35,22 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
     return `NT$ ${amount.toLocaleString()}`
   }
 
-  // 格式化日期
+  // 格式化日期（完整版）
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString('zh-TW', {
       year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  // 格式化日期（簡短版）
+  const formatDateShort = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('zh-TW', {
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
@@ -357,15 +368,6 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                   .reverse()
                   .map((timeline, index) => {
                     const modifications = timeline.modifications as any
-                    const formatDate = (dateString: string) => {
-                      const date = new Date(dateString)
-                      return date.toLocaleDateString('zh-TW', {
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })
-                    }
 
                     return (
                       <div
@@ -377,7 +379,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                             修改 #{timelines.filter(t => t.action_type === 'order_modified').length - index}
                           </div>
                           <div className="text-xs text-gray-600">
-                            {formatDate(timeline.created_at)} · {timeline.actor_name}
+                            {formatDateShort(timeline.created_at)} · {timeline.actor_name}
                           </div>
                         </div>
                         <div className="text-sm text-gray-700 space-y-1">
