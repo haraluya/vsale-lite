@@ -181,7 +181,7 @@ export function OrderTable({ initialOrders, initialTotal }: OrderTableProps) {
               {/* 金額與時間 */}
               <div className="flex items-center justify-between pt-2 border-t border-gray-200">
                 <div className={cn("text-gray-600", designTokens.typography.caption)}>
-                  {formatDate(order.created_at)}
+                  {formatDateTW(order.created_at)}
                 </div>
                 <div className={cn("font-bold", designTokens.typography.body.base)}>
                   {formatAmount(order.total_amount)}
