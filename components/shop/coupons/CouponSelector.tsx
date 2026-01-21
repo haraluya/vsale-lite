@@ -38,6 +38,33 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   const [applying, setApplying] = useState<string | null>(null)
 
   /**
+   * 驗證所有優惠券
+   */
+  const validateAllCoupons = useCallback(async (coupons: UserCoupon[]) => {
+    const results: Record<string, CouponDiscountResult> = {}
+
+    for (const userCoupon of coupons) {
+      if (!userCoupon.coupon) continue
+
+      const validationResult = await validateCoupon({
+        couponCode: userCoupon.coupon.code_normalized,
+        cartItems: cartItems.map(item => ({
+          product_id: item.productId,
+          series_id: item.series_id || '', // 確保 series_id 存在
+          price: item.price || 0,
+          quantity: item.quantity,
+        })),
+      })
+
+      if (validationResult.success && validationResult.data) {
+        results[userCoupon.coupon.id] = validationResult.data
+      }
+    }
+
+    setValidationResults(results)
+  }, [cartItems])
+
+  /**
    * 載入優惠券並驗證
    */
   const loadCoupons = useCallback(async () => {
@@ -66,33 +93,6 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   useEffect(() => {
     loadCoupons()
   }, [loadCoupons])
-
-  /**
-   * 驗證所有優惠券
-   */
-  const validateAllCoupons = useCallback(async (coupons: UserCoupon[]) => {
-    const results: Record<string, CouponDiscountResult> = {}
-
-    for (const userCoupon of coupons) {
-      if (!userCoupon.coupon) continue
-
-      const validationResult = await validateCoupon({
-        couponCode: userCoupon.coupon.code_normalized,
-        cartItems: cartItems.map(item => ({
-          product_id: item.productId,
-          series_id: item.series_id || '', // 確保 series_id 存在
-          price: item.price || 0,
-          quantity: item.quantity,
-        })),
-      })
-
-      if (validationResult.success && validationResult.data) {
-        results[userCoupon.coupon.id] = validationResult.data
-      }
-    }
-
-    setValidationResults(results)
-  }, [cartItems])
 
   /**
    * 應用優惠券（追蹤特定領取記錄 ID）
