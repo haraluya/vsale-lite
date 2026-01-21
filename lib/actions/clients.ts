@@ -1267,15 +1267,20 @@ export async function updateClientQuickInfo(
       .update({
         address: data.address,
         admin_notes: data.admin_notes,
-        updated_at: new Date().toISOString(),
       })
       .eq('id', id)
 
     if (error) {
       console.error('更新客戶快速資訊失敗:', error)
+      console.error('錯誤詳情:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      })
       return {
         success: false,
-        message: '更新失敗,請稍後再試',
+        message: `更新失敗: ${error.message}`,
       }
     }
 
