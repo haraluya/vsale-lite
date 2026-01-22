@@ -26,7 +26,8 @@
     "site2:migrate": "node scripts/migrate-to-site2-smart.js",
     "site2:create-admin": "node scripts/create-site2-admin.js",
     "site2:check-users": "node scripts/check-site2-users.js",
-    "site2:clean-orphans": "node scripts/clean-site2-orphan-users.js"
+    "site2:clean-orphans": "node scripts/clean-site2-orphan-users.js",
+    "site2:compare-storage": "node scripts/compare-storage.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
