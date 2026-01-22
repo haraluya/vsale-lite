@@ -159,18 +159,18 @@ wait
 
 ### Tasks
 
-- [ ] T028 [US2] 建立環境檢查腳本檔案於 scripts/check-environment.js
-- [ ] T029 [US2] 實作環境變數載入邏輯使用 dotenv 於 scripts/check-environment.js
-- [ ] T030 [US2] 定義必要環境變數清單（3 個）於 scripts/check-environment.js
-- [ ] T031 [US2] 定義可選環境變數清單（8 個）於 scripts/check-environment.js
-- [ ] T032 [US2] 實作必要變數存在性檢查於 scripts/check-environment.js
-- [ ] T033 [US2] 實作 Supabase URL 格式驗證（Regex）於 scripts/check-environment.js
-- [ ] T034 [US2] 實作繁體中文成功/失敗訊息於 scripts/check-environment.js
-- [ ] T035 [US2] 實作可選變數提示資訊於 scripts/check-environment.js
-- [ ] T036 [US2] 新增 check-env 指令於 package.json
-- [ ] T037 [US2] 測試缺少 .env.local 時顯示錯誤
-- [ ] T038 [US2] 測試不完整配置時列出缺少變數
-- [ ] T039 [US2] 測試完整配置時顯示成功訊息
+- [X] T028 [US2] 建立環境檢查腳本檔案於 scripts/check-environment.js
+- [X] T029 [US2] 實作環境變數載入邏輯使用 dotenv 於 scripts/check-environment.js
+- [X] T030 [US2] 定義必要環境變數清單（3 個）於 scripts/check-environment.js
+- [X] T031 [US2] 定義可選環境變數清單（8 個）於 scripts/check-environment.js
+- [X] T032 [US2] 實作必要變數存在性檢查於 scripts/check-environment.js
+- [X] T033 [US2] 實作 Supabase URL 格式驗證（Regex）於 scripts/check-environment.js
+- [X] T034 [US2] 實作繁體中文成功/失敗訊息於 scripts/check-environment.js
+- [X] T035 [US2] 實作可選變數提示資訊於 scripts/check-environment.js
+- [X] T036 [US2] 新增 check-env 指令於 package.json
+- [X] T037 [US2] 測試缺少 .env.local 時顯示錯誤
+- [X] T038 [US2] 測試不完整配置時列出缺少變數
+- [X] T039 [US2] 測試完整配置時顯示成功訊息
 
 **驗證步驟**:
 - ✅ `scripts/check-environment.js` 檔案存在
@@ -194,7 +194,7 @@ wait
 
 - [ ] T040 [P] [US3] 建立資料庫初始化腳本檔案於 scripts/init-database.js
 - [ ] T041 [P] [US3] 實作 readline 互動式輸入邏輯於 scripts/init-database.js
-- [ ] T042 [US3] 實作提示輸入管理員 Email 於 scripts/init-database.js
+- [ ] T042 [US3] 實作提示輸入管理員帳號 於 scripts/init-database.js（⚠️ 註記：管理員使用帳號 username，前台客戶使用手機號碼）
 - [ ] T043 [US3] 實作提示輸入密碼（最少 8 字元驗證）於 scripts/init-database.js
 - [ ] T044 [US3] 實作提示輸入顯示名稱（可選,預設「系統管理員」）於 scripts/init-database.js
 - [ ] T045 [US3] 實作使用 Supabase Admin API 建立使用者於 scripts/init-database.js
@@ -209,7 +209,7 @@ wait
 **驗證步驟**:
 - ✅ `scripts/init-database.js` 檔案存在
 - ✅ `pnpm init-db` 可執行
-- ✅ 提示輸入 Email、密碼、名稱
+- ✅ 提示輸入帳號、密碼、名稱
 - ✅ 成功建立管理員帳號
 - ✅ 可使用建立的帳號登入後台
 - ✅ 重複執行不會建立重複帳號

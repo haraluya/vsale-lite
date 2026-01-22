@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "prepare": "husky",
+    "check-env": "node scripts/check-environment.js",
     "db:migrate": "supabase db push",
     "db:diff": "supabase db diff",
     "health-check": "tsx scripts/health-check/run-health-check.ts",
