@@ -333,12 +333,14 @@ export type BackupProgress = {
  * @param backupType 備份類型（'auto' | 'manual'）
  * @param userId 執行者 ID（手動備份時提供）
  * @param onProgress 進度回調函數
+ * @param includeStorage 是否備份 Supabase Storage 圖片
  * @returns 備份任務 ID
  */
 export async function performSupabaseBackupWithProgress(
   backupType: 'auto' | 'manual',
   userId: string | undefined,
-  onProgress: (progress: BackupProgress) => void
+  onProgress: (progress: BackupProgress) => void,
+  includeStorage = false
 ): Promise<string> {
   const supabase = await createClient()
   const startTime = Date.now()
@@ -423,8 +425,21 @@ SET standard_conforming_strings = on;
 
     sqlContent += `-- Backup completed: ${BACKUP_TABLES.length} tables, ${totalRows} rows\n`
 
-    // 3. 壓縮備份檔案
-    onProgress({ stage: 'compressing', message: '正在壓縮備份檔案...', percentage: 50 })
+    // 3. 備份 Storage（如果需要）
+    let storageZipPath: string | null = null
+    if (includeStorage) {
+      onProgress({
+        stage: 'backing_up_storage',
+        message: '正在備份 Supabase Storage 圖片...',
+        percentage: 50,
+      })
+      console.log('Backing up Supabase Storage...')
+      const { backupStorage } = await import('./storage-backup')
+      storageZipPath = await backupStorage()
+    }
+
+    // 4. 壓縮備份檔案
+    onProgress({ stage: 'compressing', message: '正在壓縮資料庫備份檔案...', percentage: 60 })
     console.log('Compressing backup...')
     const compressedBuffer = await compressString(sqlContent)
     const compressedSize = compressedBuffer.length
@@ -432,12 +447,24 @@ SET standard_conforming_strings = on;
 
     console.log(`Compression: ${originalSize} -> ${compressedSize} (${((compressedSize / originalSize) * 100).toFixed(2)}%)`)
 
-    // 4. 上傳到雲端
-    onProgress({ stage: 'uploading', message: '正在上傳到雲端儲存...', percentage: 70 })
-    console.log('Uploading to cloud storage...')
+    // 5. 上傳資料庫備份到雲端
+    onProgress({ stage: 'uploading', message: '正在上傳資料庫備份到雲端儲存...', percentage: 70 })
+    console.log('Uploading database backup to cloud storage...')
     const uploadResult = await uploadBackup(filename, compressedBuffer)
 
-    // 5. 計算備份元數據
+    // 6. 上傳 Storage ZIP（如果有）
+    if (storageZipPath && includeStorage) {
+      onProgress({ stage: 'uploading', message: '正在上傳 Storage 圖片備份...', percentage: 80 })
+      console.log('Uploading storage backup to cloud storage...')
+      const storageFilename = filename.replace('.sql.gz', '-storage.zip')
+      const { readFileSync, unlinkSync } = await import('fs')
+      const storageBuffer = readFileSync(storageZipPath)
+      await uploadBackup(storageFilename, storageBuffer)
+      // 清理臨時 ZIP 檔案
+      unlinkSync(storageZipPath)
+    }
+
+    // 7. 計算備份元數據
     onProgress({ stage: 'calculating', message: '正在計算備份統計資訊...', percentage: 85 })
     const durationMs = Date.now() - startTime
     const metadata: BackupMetadata = {
@@ -450,8 +477,8 @@ SET standard_conforming_strings = on;
       table_stats: tableStats,
     }
 
-    // 6. 更新備份任務記錄（status = 'success'）
-    onProgress({ stage: 'updating', message: '正在更新備份記錄...', percentage: 95 })
+    // 8. 更新備份任務記錄（status = 'success'）
+    onProgress({ stage: 'updating', message: '正在更新備份記錄...', percentage: 90 })
     const { error: updateError } = await supabase
       .from('backup_jobs')
       .update({
@@ -461,6 +488,7 @@ SET standard_conforming_strings = on;
         status: 'success',
         metadata,
         error_message: uploadResult.error_message || null,
+        includes_storage: includeStorage,
         completed_at: new Date().toISOString(),
       })
       .eq('id', backupJobId)

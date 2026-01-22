@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
             // 發送進度更新
             const data = `data: ${JSON.stringify(progress)}\n\n`
             controller.enqueue(encoder.encode(data))
-          })
+          }, includeStorage)
 
           // 備份完成
           controller.close()
