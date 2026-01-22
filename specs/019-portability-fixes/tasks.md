@@ -260,24 +260,24 @@ wait
 
 ### Tasks
 
-- [ ] T065 [P] [US5] 建立新用戶部署指南文檔於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T066 [P] [US5] 建立環境變數檢查清單文檔於 docs/ENV_VARIABLES_CHECKLIST.md
-- [ ] T067 [US5] 撰寫步驟 1：Fork 專案於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T068 [US5] 撰寫步驟 2：建立 Supabase 專案於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T069 [US5] 撰寫步驟 3：環境變數設定於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T070 [US5] 撰寫步驟 4：初始化資料庫於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T071 [US5] 撰寫步驟 5：本機測試於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T072 [US5] 撰寫步驟 6：部署到 Vercel 於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T073 [US5] 撰寫步驟 7：驗證線上環境於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T074 [US5] 撰寫步驟 8：設定 GitHub Actions（可選）於 docs/NEW_DEPLOYMENT_GUIDE.md
-- [ ] T075 [US5] 新增常見問題章節於 docs/NEW_DEPLOYMENT_GUIDE.md，包含以下 4 個問題：1) 環境變數遺漏（缺少 SUPABASE_URL 或 ANON_KEY）、2) Migration 失敗（外鍵約束錯誤）、3) 連線錯誤（Supabase 專案 ID 不正確）、4) 部署失敗（Vercel 環境變數未設定）
-- [ ] T076 [US5] 列出 3 個必填變數於 docs/ENV_VARIABLES_CHECKLIST.md
-- [ ] T077 [US5] 列出 8 個可選變數於 docs/ENV_VARIABLES_CHECKLIST.md
-- [ ] T078 [US5] 新增環境差異對照表（本機 vs Vercel）於 docs/ENV_VARIABLES_CHECKLIST.md
-- [ ] T079 [US5] 更新 README.md 「快速開始」章節
-- [ ] T080 [US5] 新增連結到 NEW_DEPLOYMENT_GUIDE.md 於 README.md
-- [ ] T081 [US5] 移除 README.md 所有硬編碼的專案資訊
-- [ ] T082 [P] [US5] 更新 DEPLOYMENT.md 標記為舊版並指向新指南
+- [X] T065 [P] [US5] 建立新用戶部署指南文檔於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T066 [P] [US5] 建立環境變數檢查清單文檔於 docs/ENV_VARIABLES_CHECKLIST.md
+- [X] T067 [US5] 撰寫步驟 1：Fork 專案於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T068 [US5] 撰寫步驟 2：建立 Supabase 專案於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T069 [US5] 撰寫步驟 3：環境變數設定於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T070 [US5] 撰寫步驟 4：初始化資料庫於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T071 [US5] 撰寫步驟 5：本機測試於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T072 [US5] 撰寫步驟 6：部署到 Vercel 於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T073 [US5] 撰寫步驟 7：驗證線上環境於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T074 [US5] 撰寫步驟 8：設定 GitHub Actions（可選）於 docs/NEW_DEPLOYMENT_GUIDE.md
+- [X] T075 [US5] 新增常見問題章節於 docs/NEW_DEPLOYMENT_GUIDE.md，包含以下 4 個問題：1) 環境變數遺漏（缺少 SUPABASE_URL 或 ANON_KEY）、2) Migration 失敗（外鍵約束錯誤）、3) 連線錯誤（Supabase 專案 ID 不正確）、4) 部署失敗（Vercel 環境變數未設定）
+- [X] T076 [US5] 列出 3 個必填變數於 docs/ENV_VARIABLES_CHECKLIST.md
+- [X] T077 [US5] 列出 8 個可選變數於 docs/ENV_VARIABLES_CHECKLIST.md
+- [X] T078 [US5] 新增環境差異對照表（本機 vs Vercel）於 docs/ENV_VARIABLES_CHECKLIST.md
+- [X] T079 [US5] 更新 README.md 「快速開始」章節
+- [X] T080 [US5] 新增連結到 NEW_DEPLOYMENT_GUIDE.md 於 README.md
+- [X] T081 [US5] 移除 README.md 所有硬編碼的專案資訊
+- [X] T082 [P] [US5] 更新 DEPLOYMENT.md 標記為舊版並指向新指南
 
 **驗證步驟**:
 - ✅ `docs/NEW_DEPLOYMENT_GUIDE.md` 包含 8 個步驟
@@ -300,17 +300,17 @@ wait
 
 ### Tasks
 
-- [ ] T083 [P] [US6] 編輯 supabase/seed.sql 新增存在性檢查邏輯
-- [ ] T084 [P] [US6] 新增警告註解說明僅用於開發環境於 supabase/seed.sql
-- [ ] T085 [US6] 建立故障排除指南文檔於 docs/TROUBLESHOOTING.md
-- [ ] T086 [US6] 撰寫常見問題 1：環境變數遺漏（症狀、原因、解決步驟）於 docs/TROUBLESHOOTING.md
-- [ ] T087 [US6] 撰寫常見問題 2：Migration 失敗（外鍵約束錯誤、語法錯誤）於 docs/TROUBLESHOOTING.md
-- [ ] T088 [US6] 撰寫常見問題 3：連線錯誤（Supabase URL 格式、網路問題）於 docs/TROUBLESHOOTING.md
-- [ ] T089 [US6] 撰寫常見問題 4：部署失敗（Vercel 環境變數、建置錯誤）於 docs/TROUBLESHOOTING.md
-- [ ] T090 [US6] 撰寫常見問題 5：備份 Cron Job 失敗（GCS 憑證、權限問題）於 docs/TROUBLESHOOTING.md
-- [ ] T091 [US6] 執行 supabase db seed 兩次驗證冪等性
-- [ ] T092 [US6] 執行 git log -- .env.local .env.vercel 驗證無歷史記錄
-- [ ] T092A [US6] 執行 git log -- .env 驗證無歷史記錄（補充檢查）
+- [X] T083 [P] [US6] 編輯 supabase/seed.sql 新增存在性檢查邏輯
+- [X] T084 [P] [US6] 新增警告註解說明僅用於開發環境於 supabase/seed.sql
+- [X] T085 [US6] 建立故障排除指南文檔於 docs/TROUBLESHOOTING.md
+- [X] T086 [US6] 撰寫常見問題 1：環境變數遺漏（症狀、原因、解決步驟）於 docs/TROUBLESHOOTING.md
+- [X] T087 [US6] 撰寫常見問題 2：Migration 失敗（外鍵約束錯誤、語法錯誤）於 docs/TROUBLESHOOTING.md
+- [X] T088 [US6] 撰寫常見問題 3：連線錯誤（Supabase URL 格式、網路問題）於 docs/TROUBLESHOOTING.md
+- [X] T089 [US6] 撰寫常見問題 4：部署失敗（Vercel 環境變數、建置錯誤）於 docs/TROUBLESHOOTING.md
+- [X] T090 [US6] 撰寫常見問題 5：備份 Cron Job 失敗（GCS 憑證、權限問題）於 docs/TROUBLESHOOTING.md
+- [X] T091 [US6] 執行 supabase db seed 兩次驗證冪等性
+- [X] T092 [US6] 執行 git log -- .env.local .env.vercel 驗證無歷史記錄
+- [X] T092A [US6] 執行 git log -- .env 驗證無歷史記錄（補充檢查）
 
 **驗證步驟**:
 - ✅ `supabase/seed.sql` 包含存在性檢查
@@ -330,24 +330,24 @@ wait
 
 ### Tasks
 
-- [ ] T093 [P] 執行完整型別檢查（pnpm type-check）
-- [ ] T094 [P] 執行 ESLint 檢查（pnpm lint）
-- [ ] T095 [P] 執行環境檢查驗證工具正確運作（pnpm check-env）
-- [ ] T096 [P] 執行資料庫初始化驗證工具正確運作（pnpm init-db）
-- [ ] T097 執行本機開發測試（pnpm dev）驗證所有頁面正常
-- [ ] T098 測試前台登入功能
-- [ ] T099 測試商品瀏覽功能
-- [ ] T100 測試加入購物車功能
-- [ ] T101 測試建立訂單功能
-- [ ] T102 測試後台登入功能
-- [ ] T103 測試管理商品功能
-- [ ] T104 測試查看訂單功能
-- [ ] T105 執行建置驗證無錯誤（pnpm build）
-- [ ] T106 審查所有新建檔案使用繁體中文
-- [ ] T107 執行 git grep "qwovavytryvgchcowjof" 最終驗證（應僅在文檔中）
-- [ ] T108 執行 git grep "Devape-BM69" 最終驗證（應無結果）
-- [ ] T109 執行 git status 驗證無未預期的變更
-- [ ] T110 建立 Git commit 提交所有變更
+- [X] T093 [P] 執行完整型別檢查（pnpm type-check）
+- [X] T094 [P] 執行 ESLint 檢查（pnpm lint）
+- [X] T095 [P] 執行環境檢查驗證工具正確運作（pnpm check-env）
+- [X] T096 [P] 執行資料庫初始化驗證工具正確運作（pnpm init-db）
+- [X] T097 執行本機開發測試（pnpm dev）驗證所有頁面正常
+- [X] T098 測試前台登入功能
+- [X] T099 測試商品瀏覽功能
+- [X] T100 測試加入購物車功能
+- [X] T101 測試建立訂單功能
+- [X] T102 測試後台登入功能
+- [X] T103 測試管理商品功能
+- [X] T104 測試查看訂單功能
+- [X] T105 執行建置驗證無錯誤（pnpm build）
+- [X] T106 審查所有新建檔案使用繁體中文
+- [X] T107 執行 git grep "qwovavytryvgchcowjof" 最終驗證（應僅在文檔中）
+- [X] T108 執行 git grep "Devape-BM69" 最終驗證（應無結果）
+- [X] T109 執行 git status 驗證無未預期的變更
+- [X] T110 建立 Git commit 提交所有變更
 
 **驗證步驟**:
 - ✅ TypeScript 型別檢查 0 errors

@@ -14,7 +14,7 @@
 |------|------|---------|
 | **README.md** | 專案主要說明文件 | ✅ 持續維護 |
 | **CLAUDE.md** | Claude Code 專案上下文（開發必讀） | ✅ 持續維護 |
-| **DEPLOYMENT.md** | 生產環境部署指南 | ✅ 持續維護 |
+| **DEPLOYMENT.md** | 生產環境部署指南（舊版，請參考 docs/NEW_DEPLOYMENT_GUIDE.md） | ⚠️ 已歸檔 |
 | **package.json** | 專案依賴與腳本配置 | ✅ 持續維護 |
 | **tsconfig.json** | TypeScript 配置 | ✅ 穩定 |
 | **next.config.ts** | Next.js 配置 | ✅ 穩定 |
@@ -57,42 +57,58 @@
 
 ## 快速開始
 
-### 1. 安裝依賴
+**新用戶推薦**：如果您是第一次部署此專案，請參考完整的 **[新用戶部署指南](docs/NEW_DEPLOYMENT_GUIDE.md)**，可在 2 小時內完成從複製到部署的全流程。
+
+### 快速開發流程（已有環境）
+
+1. **安裝依賴**
+   ```bash
+   pnpm install
+   ```
+
+2. **設定環境變數**
+   ```bash
+   cp .env.local.example .env.local
+   # 編輯 .env.local 並填入您的 Supabase 憑證
+   ```
+
+   詳細環境變數說明請參考：[環境變數檢查清單](docs/ENV_VARIABLES_CHECKLIST.md)
+
+3. **驗證環境變數**
+   ```bash
+   pnpm check-env
+   ```
+
+4. **初始化資料庫**
+   ```bash
+   # 推送資料表結構到 Supabase
+   supabase db push
+
+   # 建立管理員帳號
+   pnpm init-db
+   ```
+
+5. **啟動開發伺服器**
+   ```bash
+   pnpm dev
+   ```
+
+   訪問 [http://localhost:3000](http://localhost:3000)
+
+### 自動化工具
+
+專案提供三個自動化工具簡化開發流程：
 
 ```bash
-pnpm install
+# 環境變數檢查（驗證配置是否正確）
+pnpm check-env
+
+# 資料庫初始化（建立管理員帳號）
+pnpm init-db
+
+# 部署驗證（測試線上環境）
+pnpm verify-deploy https://your-app.vercel.app
 ```
-
-### 2. 環境變數設定
-
-複製環境變數範本並填入 Supabase 憑證:
-
-```bash
-cp .env.local.example .env.local
-```
-
-編輯 `.env.local` 並填入:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### 3. 資料庫設定
-
-執行以下 SQL Migration 檔案 (在 Supabase SQL Editor 中):
-
-1. `supabase/migrations/20260101_initial_schema.sql` - 建立資料表結構 (會員等級與客戶)
-2. `supabase/migrations/20260101_seed_data.sql` - 插入預設會員等級與測試管理員
-3. `supabase/migrations/20260102_products_and_categories.sql` - 建立商品與分類表 (含 Storage Bucket)
-
-### 4. 啟動開發伺服器
-
-```bash
-pnpm dev
-```
-
-訪問 [http://localhost:3000](http://localhost:3000)
 
 ## 測試帳號
 
@@ -319,60 +335,54 @@ refactor: 重構會員等級查詢邏輯
 
 ## 部署
 
-### Vercel 自動部署 (推薦)
+### 完整部署指南
 
-專案已配置 Vercel 自動部署，每次推送到 GitHub master 分支時會自動部署。
+**推薦閱讀**：[新用戶部署指南](docs/NEW_DEPLOYMENT_GUIDE.md) - 完整的 Vercel 部署流程，包含環境變數設定、資料庫初始化與驗證步驟。
 
-#### 設定步驟
+### 快速部署摘要
 
 1. **在 Vercel 匯入專案**
    - 前往 [Vercel Dashboard](https://vercel.com/dashboard)
    - 點擊「Add New Project」
-   - 選擇「Import Git Repository」
-   - 連結 GitHub 帳號並選擇 `haraluya/vsale-lite` 倉庫
+   - 連結您的 GitHub 儲存庫
 
 2. **配置專案設定**
    - Framework Preset: `Next.js`
    - Build Command: `pnpm build`
-   - Output Directory: `.next`
    - Install Command: `pnpm install`
    - Node.js Version: `22.x`
 
 3. **設定環境變數**
 
-   在 Vercel 專案設定中新增以下環境變數：
+   在 Vercel 專案設定中新增以下 3 個必要變數（**所有環境都勾選**）：
 
    ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://qwovavytryvgchcowjof.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=你的_SUPABASE_ANON_KEY
+   NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
    ```
 
-4. **部署**
-   - 點擊「Deploy」開始首次部署
-   - 之後每次推送到 master 分支都會自動觸發部署
+   詳細說明請參考：[環境變數檢查清單](docs/ENV_VARIABLES_CHECKLIST.md)
 
-#### GitHub Actions (可選)
+4. **部署與驗證**
+   - 點擊「Deploy」開始部署
+   - 部署完成後執行驗證工具：
+     ```bash
+     pnpm verify-deploy https://your-app.vercel.app
+     ```
 
-專案支援 GitHub Actions 進行 CI/CD：
-- 自動執行 TypeScript 型別檢查
-- 自動執行 ESLint 檢查
-- 自動部署到 Vercel
+### GitHub Actions (可選)
 
-### 手動部署
+專案已配置 GitHub Actions CI/CD，會在每次推送時自動執行：
+- ✅ TypeScript 型別檢查
+- ✅ ESLint 程式碼檢查
+- ✅ 建置測試
 
-如需手動部署：
+### 疑難排解
 
-```bash
-# 建置
-pnpm build
-
-# 驗證
-pnpm start
-```
-
-環境變數設定:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+如遇到部署問題，請參考：
+- [故障排除指南](docs/TROUBLESHOOTING.md)
+- [環境變數檢查清單](docs/ENV_VARIABLES_CHECKLIST.md)
 
 ## 授權
 
