@@ -27,6 +27,93 @@
 
 ---
 
+## 🔄 站點資料遷移（多站點管理）
+
+**本專案支援多站點部署，使用智慧型 API 遷移方式避免 SQL 檔案過大問題**
+
+### 快速指令
+
+```bash
+# 1. 比較兩個站點的資料差異
+pnpm site2:compare
+
+# 2. 執行遷移（從主站複製到站點二）
+pnpm site2:migrate
+```
+
+### 為什麼需要這個功能？
+
+**問題**: 使用 `pg_dump` 產生的 SQL 備份檔案過大（>10MB），導致：
+- ❌ 觸發 Prompt 長度限制
+- ❌ 需要手動分割檔案
+- ❌ 處理複雜且容易出錯
+
+**解決方案**: 使用 Supabase JavaScript API 直接傳輸資料
+- ✅ 無需中間 SQL 檔案
+- ✅ 批次處理（每次 100 筆）
+- ✅ 自動處理外鍵依賴順序
+- ✅ 即時進度顯示
+- ✅ 失敗自動中斷
+
+### 遷移的資料表
+
+依外鍵依賴順序自動處理：
+1. `tiers` - 會員等級
+2. `categories` - 商品分類
+3. `series` - 商品系列
+4. `products` - 商品
+5. `tier_prices` - 等級價格
+6. `coupons` - 優惠券
+7. `coupon_tier_restrictions` - 優惠券等級限制
+8. `coupon_series_restrictions` - 優惠券系列限制
+9. `system_settings` - 系統設定
+
+### 不遷移的資料（站點獨立）
+
+- `profiles` - 使用者帳號
+- `admin_users` - 管理員帳號
+- `orders` - 訂單
+- `order_items` - 訂單明細
+- `user_coupons` - 使用者優惠券
+- `audit_logs` - 操作日誌
+
+### 環境變數設定
+
+在 `.env.local` 新增站點二配置：
+
+```env
+# 站點二 Supabase 配置（用於資料遷移）
+NEXT_PUBLIC_SUPABASE_URL_SITE2=https://rdyvmgomjdglflrcfijs.supabase.co
+SUPABASE_SERVICE_ROLE_KEY_SITE2=your-service-role-key
+```
+
+**重要**: 必須使用 `service_role` key（非 `anon` key）才有足夠權限。
+
+### 執行步驟
+
+```bash
+# 步驟 1: 確認站點二已完成 Migration
+supabase link --project-ref rdyvmgomjdglflrcfijs
+supabase db push
+
+# 步驟 2: 比較資料差異
+pnpm site2:compare
+
+# 步驟 3: 執行遷移（會清空站點二並複製主站資料）
+pnpm site2:migrate
+
+# 步驟 4: 驗證結果
+pnpm site2:compare  # 應該顯示所有資料表一致
+```
+
+### 詳細文件
+
+- [快速設定指南](docs/SITE2_QUICK_SETUP.md) - 5 分鐘完成設定
+- [完整遷移指南](docs/SITE2_MIGRATION_GUIDE.md) - 技術細節與疑難排解
+- [站點資訊](docs/SITE_CREDENTIALS.md) - 多站點連線資訊
+
+---
+
 ## 專案概述
 
 Vsale-lite 是一個專為批發業務設計的輕量級 B2B 訂貨系統，解決傳統 Excel/LINE 下單混亂、價格不透明的問題。採用「雙入口」設計，嚴格區分買家與賣家的操作環境，並實作等級綁定價格機制。
