@@ -187,10 +187,14 @@ async function main() {
 
   // 提供遷移建議
   if (site2Missing.length > 0 || mismatched.length > 0) {
+    // 動態提取專案 ID
+    const mainProjectId = MAIN_SITE.url?.split('.')[0]?.split('//')[1] || 'YOUR_PROJECT_REF';
+    const site2ProjectId = SITE_2.url?.split('.')[0]?.split('//')[1] || 'YOUR_SITE2_PROJECT_REF';
+
     console.log('\n💡 建議操作:\n');
     console.log('1. 手動遷移 Storage 檔案（從 Supabase Dashboard）');
-    console.log('   - 主站 Dashboard: https://supabase.com/dashboard/project/qwovavytryvgchcowjof/storage');
-    console.log('   - 站點二 Dashboard: https://supabase.com/dashboard/project/rdyvmgomjdglflrcfijs/storage');
+    console.log(`   - 主站 Dashboard: https://supabase.com/dashboard/project/${mainProjectId}/storage`);
+    console.log(`   - 站點二 Dashboard: https://supabase.com/dashboard/project/${site2ProjectId}/storage`);
     console.log('\n2. 或使用 Storage 遷移腳本（待建立）');
     console.log('   - pnpm site2:migrate-storage');
   }

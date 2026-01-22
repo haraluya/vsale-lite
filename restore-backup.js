@@ -16,6 +16,9 @@ if (!supabaseUrl || !supabaseServiceKey) {
   process.exit(1);
 }
 
+// 動態提取專案 ID
+const projectRef = supabaseUrl?.split('.')[0]?.split('//')[1];
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function restoreBackup() {
@@ -30,7 +33,7 @@ async function restoreBackup() {
   if (clearError) {
     console.error('❌ 清空資料失敗:', clearError.message);
     console.log('\n💡 請手動在 Supabase SQL Editor 執行：');
-    console.log('   1. 前往: https://supabase.com/dashboard/project/qwovavytryvgchcowjof/sql');
+    console.log(`   1. 前往: https://supabase.com/dashboard/project/${projectRef}/sql`);
     console.log('   2. 執行 clear-data-before-restore.sql');
     console.log('   3. 執行 vsale-backup-20260109-080442.sql');
     process.exit(1);
