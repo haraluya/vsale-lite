@@ -323,7 +323,7 @@ SET standard_conforming_strings = on;
  * 備份進度資訊
  */
 export type BackupProgress = {
-  stage: 'starting' | 'dumping' | 'compressing' | 'uploading' | 'calculating' | 'updating' | 'completed' | 'error'
+  stage: 'starting' | 'dumping' | 'compressing' | 'backing_up_storage' | 'uploading' | 'calculating' | 'updating' | 'completed' | 'error'
   message: string
   percentage: number
 }
