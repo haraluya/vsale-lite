@@ -147,6 +147,9 @@ __tests__/
 # 但健康檢查規格需要追蹤
 !/specs/017-health-check/
 
+# 可移植性修復規格需要追蹤
+!/specs/019-portability-fixes/
+
 # Health Check Reports (排除時間戳目錄，保留 latest 符號連結)
 specs/017-health-check/reports/20*
 !specs/017-health-check/reports/latest
