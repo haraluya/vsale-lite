@@ -13,6 +13,7 @@
     "prepare": "husky",
     "check-env": "node scripts/check-environment.js",
     "init-db": "node scripts/init-database.js",
+    "verify-deploy": "node scripts/verify-deployment.js",
     "db:migrate": "supabase db push",
     "db:diff": "supabase db diff",
     "health-check": "tsx scripts/health-check/run-health-check.ts",

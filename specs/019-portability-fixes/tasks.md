@@ -227,18 +227,18 @@ wait
 
 ### Tasks
 
-- [ ] T053 [P] [US4] 建立部署驗證腳本檔案於 scripts/verify-deployment.js
-- [ ] T054 [P] [US4] 實作接受部署 URL 參數邏輯於 scripts/verify-deployment.js
-- [ ] T055 [P] [US4] 實作 HTTP 請求函式使用 Node.js https 模組於 scripts/verify-deployment.js
-- [ ] T056 [US4] 實作測試前台登入頁面（/login）於 scripts/verify-deployment.js
-- [ ] T057 [US4] 實作測試後台登入頁面（/admin/login）於 scripts/verify-deployment.js
-- [ ] T058 [US4] 實作測試環境變數 API（/api/env-test）於 scripts/verify-deployment.js
-- [ ] T059 [US4] 實作測試資料庫連線 API（/api/check-connection）於 scripts/verify-deployment.js
-- [ ] T060 [US4] 實作驗證回應狀態碼和內容於 scripts/verify-deployment.js
-- [ ] T061 [US4] 實作顯示測試總結（通過/失敗數量）於 scripts/verify-deployment.js
-- [ ] T062 [US4] 實作失敗時提供除錯提示於 scripts/verify-deployment.js
-- [ ] T063 [US4] 新增 verify-deploy 指令於 package.json
-- [ ] T064 [US4] 執行 pnpm verify-deploy http://localhost:3000 測試本機環境
+- [X] T053 [P] [US4] 建立部署驗證腳本檔案於 scripts/verify-deployment.js
+- [X] T054 [P] [US4] 實作接受部署 URL 參數邏輯於 scripts/verify-deployment.js
+- [X] T055 [P] [US4] 實作 HTTP 請求函式使用 Node.js https 模組於 scripts/verify-deployment.js
+- [X] T056 [US4] 實作測試前台登入頁面（/login）於 scripts/verify-deployment.js
+- [X] T057 [US4] 實作測試後台登入頁面（/admin/login）於 scripts/verify-deployment.js
+- [X] T058 [US4] 實作測試環境變數 API（/api/env-test）於 scripts/verify-deployment.js
+- [X] T059 [US4] 實作測試資料庫連線 API（/api/check-connection）於 scripts/verify-deployment.js
+- [X] T060 [US4] 實作驗證回應狀態碼和內容於 scripts/verify-deployment.js
+- [X] T061 [US4] 實作顯示測試總結（通過/失敗數量）於 scripts/verify-deployment.js
+- [X] T062 [US4] 實作失敗時提供除錯提示於 scripts/verify-deployment.js
+- [X] T063 [US4] 新增 verify-deploy 指令於 package.json
+- [X] T064 [US4] 執行 pnpm verify-deploy http://localhost:3000 測試本機環境
 
 **驗證步驟**:
 - ✅ `scripts/verify-deployment.js` 檔案存在
