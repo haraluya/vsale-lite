@@ -125,20 +125,20 @@ wait
 
 ### Tasks
 
-- [ ] T014 [US1] 移除 vercel.json 的 env 區塊（第 7-10 行）於 vercel.json
-- [ ] T015 [US1] 保留 vercel.json 的其他配置（buildCommand, framework, regions, crons）於 vercel.json
-- [ ] T016 [US1] 重構站點偵測邏輯為動態提取 projectRef 於 app/api/env-test/route.ts
-- [ ] T017 [US1] 移除硬編碼的 isMainSite 和 isSite2 檢查於 app/api/env-test/route.ts
-- [ ] T018 [US1] 新增 hasMainSiteConfig 和 hasSite2Config 檢查於 app/api/env-test/route.ts
-- [ ] T019 [US1] 移除硬編碼專案 ID 檢查於 app/api/check-connection/route.ts
-- [ ] T020 [US1] 改為通用的專案 ID 提取邏輯於 app/api/check-connection/route.ts
-- [ ] T021 [US1] 修改 import-data.ps1 使用環境變數 DB_PASSWORD_SITE2 而非硬編碼密碼於 import-data.ps1
-- [ ] T022 [US1] 新增環境變數檢查與錯誤提示於 import-data.ps1
-- [ ] T023 [US1] 移除硬編碼專案 ID 改為動態提取於 restore-backup.js
-- [ ] T024 [US1] 執行本機測試驗證 API 端點顯示動態 projectRef
-- [ ] T025 [US1] 執行 git grep "qwovavytryvgchcowjof" 驗證僅在文檔中出現
-- [ ] T026 [US1] 執行 git grep "Devape-BM69" 驗證無硬編碼密碼
-- [ ] T027 [US1] 執行 git grep "4Og37Vy1GzQJFq6K" 驗證無硬編碼資料庫密碼
+- [X] T014 [US1] 移除 vercel.json 的 env 區塊（第 7-10 行）於 vercel.json
+- [X] T015 [US1] 保留 vercel.json 的其他配置（buildCommand, framework, regions, crons）於 vercel.json
+- [X] T016 [US1] 重構站點偵測邏輯為動態提取 projectRef 於 app/api/env-test/route.ts
+- [X] T017 [US1] 移除硬編碼的 isMainSite 和 isSite2 檢查於 app/api/env-test/route.ts
+- [X] T018 [US1] 新增 hasMainSiteConfig 和 hasSite2Config 檢查於 app/api/env-test/route.ts
+- [X] T019 [US1] 移除硬編碼專案 ID 檢查於 app/api/check-connection/route.ts
+- [X] T020 [US1] 改為通用的專案 ID 提取邏輯於 app/api/check-connection/route.ts
+- [X] T021 [US1] 修改 import-data.ps1 使用環境變數 DB_PASSWORD_SITE2 而非硬編碼密碼於 import-data.ps1
+- [X] T022 [US1] 新增環境變數檢查與錯誤提示於 import-data.ps1
+- [X] T023 [US1] 移除硬編碼專案 ID 改為動態提取於 restore-backup.js
+- [X] T024 [US1] 執行本機測試驗證 API 端點顯示動態 projectRef
+- [X] T025 [US1] 執行 git grep "qwovavytryvgchcowjof" 驗證僅在文檔中出現
+- [X] T026 [US1] 執行 git grep "Devape-BM69" 驗證無硬編碼密碼
+- [X] T027 [US1] 執行 git grep "4Og37Vy1GzQJFq6K" 驗證無硬編碼資料庫密碼
 
 **驗證步驟**:
 - ✅ `vercel.json` 無 `env` 區塊,保留其他配置

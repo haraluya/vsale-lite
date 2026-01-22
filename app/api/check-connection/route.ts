@@ -25,16 +25,14 @@ export async function GET() {
     // 3. 測試 Auth 連線
     const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    // 4. 判斷是主站還是站點二
-    const isMainSite = supabaseUrl?.includes('qwovavytryvgchcowjof')
-    const isSite2 = supabaseUrl?.includes('rdyvmgomjdglflrcfijs')
+    // 4. 提取專案 ID（通用邏輯）
+    const projectId = supabaseUrl?.split('.')[0]?.split('//')[1] || 'unknown'
 
     return NextResponse.json({
       success: true,
       connection: {
         supabaseUrl,
-        site: isMainSite ? '主站點' : isSite2 ? '站點二' : '未知',
-        projectId: supabaseUrl?.split('.')[0]?.split('//')[1],
+        projectId,
         hasAnonKey,
         hasServiceKey,
       },
