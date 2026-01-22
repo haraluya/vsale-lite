@@ -192,19 +192,19 @@ wait
 
 ### Tasks
 
-- [ ] T040 [P] [US3] 建立資料庫初始化腳本檔案於 scripts/init-database.js
-- [ ] T041 [P] [US3] 實作 readline 互動式輸入邏輯於 scripts/init-database.js
-- [ ] T042 [US3] 實作提示輸入管理員帳號 於 scripts/init-database.js（⚠️ 註記：管理員使用帳號 username，前台客戶使用手機號碼）
-- [ ] T043 [US3] 實作提示輸入密碼（最少 8 字元驗證）於 scripts/init-database.js
-- [ ] T044 [US3] 實作提示輸入顯示名稱（可選,預設「系統管理員」）於 scripts/init-database.js
-- [ ] T045 [US3] 實作使用 Supabase Admin API 建立使用者於 scripts/init-database.js
-- [ ] T046 [US3] 實作插入管理員到 profiles 表（role = 'admin'）於 scripts/init-database.js
-- [ ] T047 [US3] 實作顯示登入資訊於 scripts/init-database.js
-- [ ] T048 [US3] 實作重複執行檢查（避免建立重複帳號）於 scripts/init-database.js
-- [ ] T049 [US3] 新增 init-db 指令於 package.json
-- [ ] T050 [US3] 執行 pnpm init-db 並輸入管理員資訊
-- [ ] T051 [US3] 驗證可使用建立的帳號登入後台
-- [ ] T052 [US3] 重複執行驗證不會建立重複帳號
+- [X] T040 [P] [US3] 建立資料庫初始化腳本檔案於 scripts/init-database.js
+- [X] T041 [P] [US3] 實作 readline 互動式輸入邏輯於 scripts/init-database.js
+- [X] T042 [US3] 實作提示輸入管理員帳號 於 scripts/init-database.js（⚠️ 註記：管理員使用帳號 username，前台客戶使用手機號碼）
+- [X] T043 [US3] 實作提示輸入密碼（最少 8 字元驗證）於 scripts/init-database.js
+- [X] T044 [US3] 實作提示輸入顯示名稱（可選,預設「系統管理員」）於 scripts/init-database.js
+- [X] T045 [US3] 實作使用 Supabase Admin API 建立使用者於 scripts/init-database.js
+- [X] T046 [US3] 實作插入管理員到 profiles 表（role = 'admin'）於 scripts/init-database.js
+- [X] T047 [US3] 實作顯示登入資訊於 scripts/init-database.js
+- [X] T048 [US3] 實作重複執行檢查（避免建立重複帳號）於 scripts/init-database.js
+- [X] T049 [US3] 新增 init-db 指令於 package.json
+- [X] T050 [US3] 執行 pnpm init-db 並輸入管理員資訊
+- [X] T051 [US3] 驗證可使用建立的帳號登入後台
+- [X] T052 [US3] 重複執行驗證不會建立重複帳號
 
 **驗證步驟**:
 - ✅ `scripts/init-database.js` 檔案存在
