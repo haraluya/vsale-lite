@@ -182,3 +182,5 @@ backup-*.sql
 
 # GitHub Workflows (需手動透過 GitHub 網頁建立)
 .github/workflows/
+# 忽略包含敏感資訊的文件
+docs/SITE_CREDENTIALS.md
