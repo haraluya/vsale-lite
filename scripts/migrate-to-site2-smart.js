@@ -35,6 +35,11 @@ const MIGRATION_ORDER = [
 
 const BATCH_SIZE = 100; // 每批次處理數量
 
+// 需要排除的欄位（GENERATED 欄位或其他不應手動插入的欄位）
+const EXCLUDED_COLUMNS = {
+  coupons: ['code_normalized'] // code_normalized 是 GENERATED ALWAYS AS (UPPER(code)) STORED
+};
+
 async function migrateTable(mainClient, site2Client, config) {
   const { table, description } = config;
   console.log(`\n📦 遷移: ${description} (${table})`);
@@ -52,19 +57,7 @@ async function migrateTable(mainClient, site2Client, config) {
       return { table, success: true, count: 0 };
     }
 
-    // 2. 清空站點二的資料（謹慎操作）
-    console.log(`  🗑️  清空站點二的 ${table} 資料...`);
-    const { error: deleteError } = await site2Client
-      .from(table)
-      .delete()
-      .neq('id', '00000000-0000-0000-0000-000000000000'); // 刪除所有
-
-    if (deleteError) {
-      console.error(`  ❌ 清空失敗: ${deleteError.message}`);
-      return { table, success: false, error: deleteError.message };
-    }
-
-    // 3. 批次複製資料
+    // 2. 批次複製資料（資料表已在開始前清空）
     let copiedCount = 0;
     const batches = Math.ceil(totalCount / BATCH_SIZE);
 
@@ -90,10 +83,20 @@ async function migrateTable(mainClient, site2Client, config) {
         continue;
       }
 
+      // 移除需要排除的欄位
+      let cleanedData = batchData;
+      if (EXCLUDED_COLUMNS[table]) {
+        cleanedData = batchData.map(row => {
+          const newRow = { ...row };
+          EXCLUDED_COLUMNS[table].forEach(col => delete newRow[col]);
+          return newRow;
+        });
+      }
+
       // 插入到站點二
       const { error: insertError } = await site2Client
         .from(table)
-        .insert(batchData);
+        .insert(cleanedData);
 
       if (insertError) {
         console.error(`❌ 插入失敗: ${insertError.message}`);
@@ -111,6 +114,32 @@ async function migrateTable(mainClient, site2Client, config) {
     console.error(`  ❌ 遷移失敗: ${error.message}`);
     return { table, success: false, error: error.message };
   }
+}
+
+async function clearAllTables(site2Client) {
+  console.log('\n🗑️  清空站點二所有資料表（反向順序避免外鍵錯誤）...\n');
+
+  // 反向順序清空（從最後依賴的表開始）
+  const reversedOrder = [...MIGRATION_ORDER].reverse();
+
+  for (const config of reversedOrder) {
+    const { table, description } = config;
+    process.stdout.write(`  清空 ${description} (${table})... `);
+
+    const { error } = await site2Client
+      .from(table)
+      .delete()
+      .neq('id', '00000000-0000-0000-0000-000000000000');
+
+    if (error) {
+      console.log(`❌ 失敗: ${error.message}`);
+      // 繼續清空其他表，忽略錯誤（可能表是空的）
+    } else {
+      console.log(`✅`);
+    }
+  }
+
+  console.log('\n✅ 所有資料表已清空\n');
 }
 
 async function main() {
@@ -139,7 +168,12 @@ async function main() {
   const mainClient = createClient(MAIN_SITE.url, MAIN_SITE.key);
   const site2Client = createClient(SITE_2.url, SITE_2.key);
 
-  // 逐表遷移
+  // 先清空所有表（反向順序）
+  await clearAllTables(site2Client);
+
+  console.log('='.repeat(60));
+
+  // 逐表遷移（正向順序）
   const results = [];
   for (const config of MIGRATION_ORDER) {
     const result = await migrateTable(mainClient, site2Client, config);
