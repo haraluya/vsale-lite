@@ -33,6 +33,9 @@ yarn-error.log*
 # GCS Service Account 金鑰（絕對不要上傳到 Git！）
 service-account-key.json
 *-service-account-key.json
+temp_gcs_key.txt
+*gcs*.json
+*gcs*.txt
 
 # vercel
 .vercel
@@ -157,6 +160,8 @@ specs/017-health-check/reports/20*
 # Supabase Local
 supabase/snippets/
 supabase/.temp/
+supabaseconfig.toml.temp
+*.toml.temp
 
 # Database Backups (敏感資料，不應 commit)
 backups/*.sql
@@ -174,6 +179,8 @@ vsale-backup-*.sql.gz
 vsale-backup-*.zip
 backup-*.sql
 *.sql.backup
+psql.zip
+*.zip
 
 # Scripts (不需要部署)
 /scripts/
