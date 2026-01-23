@@ -522,10 +522,46 @@ psql -h $DB_HOST -p 5432 -U $DB_USER -d postgres -f "backup\site2-before-import\
 
 ---
 
+## 🔐 遷移後重要步驟：設定 GCS 雲端備份
+
+**⚠️ 重要**: 完成資料遷移後，**強烈建議**為站點二設定 GCS 雲端備份功能。
+
+### 為什麼需要設定備份？
+
+Supabase 免費版**沒有自動備份功能**，資料遺失無法復原。設定 GCS 備份可提供：
+
+- ✅ 自動化每日備份（凌晨 2:00）
+- ✅ 異地容災保護
+- ✅ 與主站同等級的資料安全
+- ✅ 共用 GCS 儲存桶（成本約 $1/月）
+
+### 快速設定（10 分鐘）
+
+請參考 **[站點二 GCS 備份同步指南](SYNC_GCS_TO_SITE2.md)** 完成以下步驟：
+
+1. 從主站複製 4 個 GCS 環境變數
+2. 新增到站點二 Vercel 環境變數
+3. 觸發重新部署
+4. 測試備份功能
+
+**需要的環境變數**:
+- `GCS_SERVICE_ACCOUNT_KEY` - Google Cloud 服務帳號金鑰
+- `GCS_BUCKET_NAME` - GCS 儲存桶名稱
+- `GCS_PROJECT_ID` - Google Cloud 專案 ID
+- `CRON_SECRET` - Cron Job 安全驗證
+
+---
+
 ## 📚 相關文件
 
-- [BACKUP_ANALYSIS_REPORT.md](BACKUP_ANALYSIS_REPORT.md) - 備份系統完整性分析
+### 資料遷移相關
+- [SITE2_QUICK_SETUP.md](SITE2_QUICK_SETUP.md) - 5 分鐘快速設定
+- [SITE2_MIGRATION_SUMMARY.md](SITE2_MIGRATION_SUMMARY.md) - 遷移快速總結
 - [SITE_CREDENTIALS.md](SITE_CREDENTIALS.md) - 站點連線資訊
+
+### 備份系統相關 ⭐
+- [SYNC_GCS_TO_SITE2.md](SYNC_GCS_TO_SITE2.md) - **站點二 GCS 備份同步指南**
+- [BACKUP_ANALYSIS_REPORT.md](BACKUP_ANALYSIS_REPORT.md) - 備份系統完整性分析
 - [BACKUP_RESTORE_CHEATSHEET.md](BACKUP_RESTORE_CHEATSHEET.md) - 備份還原快速參考
 - [DATABASE_SAFETY_PROTOCOL.md](DATABASE_SAFETY_PROTOCOL.md) - 資料庫安全協議
 
@@ -554,6 +590,7 @@ psql -h $DB_HOST -p 5432 -U $DB_USER -d postgres -f "backup\site2-before-import\
 - [ ] 建立站點二管理員帳號
 - [ ] 建立測試客戶帳號
 - [ ] 測試前台完整流程
+- [ ] **⭐ 設定 GCS 雲端備份**（強烈建議，參考 [SYNC_GCS_TO_SITE2.md](SYNC_GCS_TO_SITE2.md)）
 
 ---
 
