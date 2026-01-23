@@ -116,7 +116,7 @@ export function ClientNotificationSettings({
         <div className="bg-white border-2 border-gray-400 p-4 font-mono text-sm whitespace-pre-wrap break-words">
           {template
             .replace(/\{客戶名稱\}/g, '王小明')
-            .replace(/\{前台網址\}/g, 'https://example.com/login')
+            .replace(/\{前台網址\}/g, 'https://example.com')
             .replace(/\{登入電話\}/g, '0912345678')
             .replace(/\{登入密碼\}/g, 'ABC123')}
         </div>

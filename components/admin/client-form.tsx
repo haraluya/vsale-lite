@@ -66,7 +66,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
 
   // 如果剛建立成功,顯示密碼複製介面
   if (state?.success && state.data?.password) {
-    const loginUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login'
+    const loginUrl = typeof window !== 'undefined' ? window.location.origin : '/'
     const phone = state.data.phone || ''
     const password = state.data.password
     const displayName = state.data.display_name || '客戶'
