@@ -113,42 +113,62 @@ async function createAdmin(emailArg = null, passwordArg = null) {
     console.log(`   User ID: ${authUser.user.id}`);
     console.log(`   Email: ${authUser.user.email}`);
 
-    // 3. 在 admin_users 表建立管理員記錄
-    console.log('\n步驟 2/3: 建立管理員記錄...');
+    // 3. 詢問 username 和 display_name
+    let username, displayName;
 
-    const { error: adminError } = await supabase
-      .from('admin_users')
+    if (emailArg && passwordArg) {
+      // 從 email 自動產生 username（去掉 @domain）
+      username = email.split('@')[0];
+      displayName = null;
+    } else {
+      username = await question('帳號 (username): ');
+      if (!username || username.trim() === '') {
+        console.error('❌ 錯誤: 帳號不可為空');
+        rl.close();
+        process.exit(1);
+      }
+
+      displayName = await question('暱稱 (display_name，可選): ');
+    }
+
+    // 4. 在 profiles 表建立管理員記錄
+    console.log('\n步驟 2/3: 建立使用者資料 (profiles)...');
+
+    const { error: profileError } = await supabase
+      .from('profiles')
       .insert({
         id: authUser.user.id,
         email: email,
-        role: 'admin',
-        status: 'active'
+        username: username,
+        display_name: displayName || null,
+        role: 'admin'
       });
 
-    if (adminError) {
-      console.error(`❌ 建立管理員記錄失敗: ${adminError.message}`);
-      console.log('\n⚠️  Auth 使用者已建立，但管理員記錄建立失敗');
-      console.log('請手動在 Supabase Dashboard 的 admin_users 表新增記錄：');
-      console.log(`   id: ${authUser.user.id}`);
-      console.log(`   email: ${email}`);
-      console.log(`   role: admin`);
-      console.log(`   status: active`);
+    if (profileError) {
+      console.error(`❌ 建立使用者資料失敗: ${profileError.message}`);
+      console.log('\n⚠️  Auth 使用者已建立，但使用者資料建立失敗');
+      console.log('正在回滾 Auth 使用者...');
+
+      // 回滾：刪除已建立的 Auth User
+      await supabase.auth.admin.deleteUser(authUser.user.id);
+      console.log('✅ 已回滾');
+
       rl.close();
       process.exit(1);
     }
 
-    console.log(`✅ 管理員記錄已建立`);
+    console.log(`✅ 使用者資料已建立`);
 
-    // 4. 驗證建立結果
+    // 5. 驗證建立結果
     console.log('\n步驟 3/3: 驗證建立結果...');
 
-    const { data: verifyAdmin, error: verifyError } = await supabase
-      .from('admin_users')
+    const { data: verifyProfile, error: verifyError } = await supabase
+      .from('profiles')
       .select('*')
       .eq('id', authUser.user.id)
       .single();
 
-    if (verifyError || !verifyAdmin) {
+    if (verifyError || !verifyProfile) {
       console.error(`❌ 驗證失敗`);
       rl.close();
       process.exit(1);
