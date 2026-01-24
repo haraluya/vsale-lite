@@ -10,6 +10,11 @@
 import { getSeries } from '@/lib/actions/series'
 import { getSeriesProductsForPricing } from '@/lib/actions/tier-prices'
 import { PricingPageClient } from '@/components/admin/pricing/PricingPageClient'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('批次價格設定', '批量設定商品價格')
+}
 
 // 禁用所有快取，確保每次都取得最新資料
 export const dynamic = 'force-dynamic'

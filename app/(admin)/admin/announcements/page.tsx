@@ -14,6 +14,11 @@ import { TabSwitcher } from '@/components/admin/announcements/TabSwitcher'
 import { HomeBlockList } from '@/components/admin/home-blocks/HomeBlockList'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('廣告管理', '管理前台廣告內容')
+}
 
 // 強制動態渲染，避免預渲染時 workUnitAsyncStorage 未初始化錯誤
 export const dynamic = 'force-dynamic'

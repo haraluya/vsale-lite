@@ -8,6 +8,11 @@ import { getSeries } from '@/lib/actions/series'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { redirect } from 'next/navigation'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('新增廣告', '建立新的輪播廣告')
+}
 
 export default async function NewAnnouncementPage() {
   // 查詢所有系列（含分類資訊）

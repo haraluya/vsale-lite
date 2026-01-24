@@ -1,6 +1,11 @@
 import { TierForm } from '@/components/admin/tier-form'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('新增會員等級', '建立新的會員等級分類')
+}
 
 export default function NewTierPage() {
   return (

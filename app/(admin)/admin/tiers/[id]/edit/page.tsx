@@ -4,6 +4,31 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Tier } from '@/types'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const supabase = await createClient()
+
+  const { data: tier } = await supabase
+    .from('tiers')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (!tier) {
+    return generatePageMetadata('編輯會員等級', '修改會員等級資訊')
+  }
+
+  return generatePageMetadata(
+    `編輯會員等級：${tier.name}`,
+    `修改會員等級 ${tier.name} 的資訊`
+  )
+}
 
 export default async function EditTierPage({
   params,

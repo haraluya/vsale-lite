@@ -4,6 +4,11 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('會員等級管理', '管理客戶的會員等級分類')
+}
 
 export default async function TiersPage() {
   const tiersResult = await getTiers()

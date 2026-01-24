@@ -4,6 +4,11 @@ import { OrderTrendChart } from '@/components/admin/order-trend-chart'
 import { TrendingUp, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('儀表板', '歡迎使用管理後台')
+}
 
 /**
  * 管理員儀表板頁面

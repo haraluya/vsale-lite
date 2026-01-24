@@ -9,9 +9,27 @@ import { AnnouncementForm } from '@/components/admin/announcements/AnnouncementF
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
+import { generatePageMetadata } from '@/lib/metadata'
 
 interface EditAnnouncementPageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: EditAnnouncementPageProps) {
+  const { id } = await params
+  const result = await getAllAnnouncements()
+  const announcement = result.success
+    ? result.data?.find((a) => a.id === id)
+    : null
+
+  if (!announcement) {
+    return generatePageMetadata('編輯廣告', '修改廣告資訊')
+  }
+
+  return generatePageMetadata(
+    `編輯廣告：${announcement.title}`,
+    `修改廣告 ${announcement.title} 的資訊`
+  )
 }
 
 export default async function EditAnnouncementPage({ params }: EditAnnouncementPageProps) {
