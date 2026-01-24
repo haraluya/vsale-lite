@@ -15,6 +15,18 @@ import { uploadProductImage, deleteProductImage } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/lib/contexts/dialog-context'
 
+/**
+ * 為 Promise 添加超時保護
+ */
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('操作超時，請檢查網路連線後重試')), timeoutMs)
+    ),
+  ])
+}
+
 interface ImageUploadProps {
   productId: string
   currentImageUrl?: string | null
@@ -42,7 +54,11 @@ export function ImageUpload({
     setUploading(true)
 
     try {
-      const result = await uploadProductImage(productId, file)
+      // 添加 60 秒前端超時保護（後端已有 30 秒超時 + 重試機制）
+      const result = await withTimeout(
+        uploadProductImage(productId, file),
+        60000  // 60 秒（考慮 3 次重試，每次 30 秒）
+      )
 
       if (result.success && result.data?.url) {
         setImageUrl(result.data.url)
@@ -51,11 +67,16 @@ export function ImageUpload({
         setError(result.message || '上傳失敗')
       }
     } catch (err) {
-      setError('上傳失敗,請稍後再試')
+      // 區分超時錯誤與其他錯誤
+      if (err instanceof Error && err.message.includes('超時')) {
+        setError(err.message)
+      } else {
+        setError('上傳失敗，請稍後再試')
+      }
       console.error('Image upload error:', err)
     } finally {
       setUploading(false)
-      // 清除檔案輸入,允許重複上傳同檔案
+      // 清除檔案輸入，允許重複上傳同檔案
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }

@@ -12,6 +12,7 @@ import { checkAuth } from './helpers'
 import { logAudit } from './audit'
 import { createProductSchema, updateProductSchema, batchUpdateProductsSchema } from '@/lib/validations/product.schema'
 import type { ActionResult, Product } from '@/types'
+import { uploadWithRetry, formatUploadError } from '@/lib/utils/upload-helpers'
 
 /**
  * 查詢商品列表 (含搜尋、篩選、分頁)
@@ -684,36 +685,47 @@ export async function uploadProductImage(
     }
 
     // 5. 上傳前先刪除所有可能的舊圖片（避免不同副檔名的孤兒檔案）
-    await adminClient.storage.from('products').remove([
+    const { error: removeError } = await adminClient.storage.from('products').remove([
       `${productId}/main.jpg`,
       `${productId}/main.png`,
       `${productId}/main.webp`,
     ])
-    // 註: 即使檔案不存在也不會報錯
 
-    // 6. 上傳新圖片到 Storage
+    // 6. 取得檔案副檔名
     const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `${productId}/main.${ext}`
 
-    const { error: uploadError } = await adminClient.storage
-      .from('products')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false, // 已刪除舊檔案，不需要 upsert
-      })
+    // 如果刪除失敗，使用 upsert 模式覆寫；否則使用 upsert: false
+    // 註: 即使檔案不存在，刪除操作也不會報錯
+    const shouldUpsert = !!removeError
 
-    if (uploadError) {
-      console.error('uploadProductImage storage error:', uploadError)
+    if (removeError) {
+      console.warn('刪除舊圖片失敗，將使用覆寫模式上傳:', removeError)
+    }
+
+    // 7. 使用帶重試機制的上傳函式
+    const uploadResult = await uploadWithRetry(
+      () =>
+        adminClient.storage.from('products').upload(filePath, file, {
+          upsert: shouldUpsert, // 刪除失敗時允許覆寫
+          contentType: file.type,
+        }),
+      3,      // 最多重試 3 次
+      30000   // 單次上傳超時 30 秒
+    )
+
+    if (uploadResult.error) {
+      console.error('上傳圖片錯誤:', uploadResult.error, `(嘗試 ${uploadResult.attempts} 次)`)
       return {
         success: false,
-        message: '圖片上傳失敗',
+        message: formatUploadError(uploadResult.error, uploadResult.attempts),
       }
     }
 
-    // 7. 取得公開 URL
+    // 8. 取得公開 URL
     const { data: urlData } = adminClient.storage.from('products').getPublicUrl(filePath)
 
-    // 8. 更新商品的 image_url
+    // 9. 更新商品的 image_url
     const { error: updateError } = await adminClient
       .from('products')
       .update({ image_url: urlData.publicUrl })
@@ -727,7 +739,7 @@ export async function uploadProductImage(
       }
     }
 
-    // 9. 重新驗證快取
+    // 10. 重新驗證快取
     revalidatePath('/admin/products')
     revalidatePath(`/admin/products/${productId}`)
 
