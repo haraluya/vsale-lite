@@ -53,10 +53,10 @@ export function ProductThumbnail({
     setUploading(true)
 
     try {
-      // 添加 60 秒前端超時保護（後端已有 30 秒超時 + 重試機制）
+      // 添加 120 秒前端超時保護（後端重試總時間：30s × 3 + 延遲 7s = 97s）
       const result = await withTimeout(
         uploadProductImage(productId, file),
-        60000  // 60 秒（考慮 3 次重試，每次 30 秒）
+        120000  // 120 秒（足夠完成 3 次重試）
       )
 
       if (result.success && result.data) {

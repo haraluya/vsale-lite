@@ -83,10 +83,13 @@ export async function uploadWithRetry<T = unknown>(
   let lastError: StorageError | null = null
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    // 宣告計時器 ID（需要在 try-catch 外，以便在 catch 中清除）
+    let timeoutId: NodeJS.Timeout | undefined
+
     try {
-      // 建立超時 Promise
+      // 建立可取消的超時 Promise
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           const timeoutError = new Error(
             `上傳超時（超過 ${timeoutMs / 1000} 秒）`
           ) as StorageError
@@ -97,6 +100,9 @@ export async function uploadWithRetry<T = unknown>(
 
       // 競速執行上傳與超時
       const result = await Promise.race([uploadFn(), timeoutPromise])
+
+      // 清除超時計時器（上傳成功或失敗時）
+      if (timeoutId) clearTimeout(timeoutId)
 
       // 上傳成功
       if (!result.error) {
@@ -128,6 +134,9 @@ export async function uploadWithRetry<T = unknown>(
         attempts: attempt,
       }
     } catch (error) {
+      // 清除超時計時器（發生異常時）
+      if (timeoutId) clearTimeout(timeoutId)
+
       // 捕獲超時錯誤或其他異常
       lastError = error as StorageError
 
