@@ -80,7 +80,7 @@ function ImageCarouselComponent({ config }: ImageCarouselProps) {
       {/* 圖片容器 */}
       <div
         className={cn(
-          'relative w-full aspect-[10/3] rounded-none bg-gray-100 overflow-hidden',
+          'relative w-full aspect-[16/9] rounded-none bg-gray-100 overflow-hidden',
           designTokens.neoBrutalism.border.full,
           'border-black',
           designTokens.neoBrutalism.shadow.full,

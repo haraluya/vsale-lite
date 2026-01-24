@@ -89,9 +89,9 @@ export const designTokens = {
    * 廣告圖片規格
    */
   adImage: {
-    aspectRatio: 'aspect-[10/3]',          // 10:3 比例
-    standardSize: '1280 × 384',            // 標準尺寸 (px)
-    highQualitySize: '1920 × 576',         // 高畫質尺寸 (px)
+    aspectRatio: 'aspect-[16/9]',          // 16:9 比例
+    standardSize: '1280 × 720',            // 標準尺寸 (px)
+    highQualitySize: '1920 × 1080',        // 高畫質尺寸 (px)
     safeZone: '中央 80% 區域',              // 安全區域提示
   },
 } as const

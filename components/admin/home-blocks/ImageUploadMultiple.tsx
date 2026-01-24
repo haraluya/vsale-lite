@@ -270,7 +270,7 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
 
       <div className="space-y-1">
         <p className="text-xs text-gray-600">
-          <strong>建議尺寸：</strong>1280 × 384 像素（10:3 比例）
+          <strong>建議尺寸：</strong>1280 × 720 像素（16:9 比例）
         </p>
         <p className="text-xs text-gray-600">
           支援 JPG、PNG、WebP 格式，單張圖片最大 5MB，最多上傳 5 張圖片
