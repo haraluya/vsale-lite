@@ -3,6 +3,28 @@ import { getAdminClientProfile } from '@/lib/actions/clients'
 import { ClientFormV2 } from '@/components/admin/client-form-v2'
 import { notFound } from 'next/navigation'
 import type { Client } from '@/types'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const result = await getAdminClientProfile(id)
+
+  if (!result.success || !result.data) {
+    return generatePageMetadata('編輯客戶', '修改客戶資訊')
+  }
+
+  const client = result.data
+  const clientName = client.display_name || client.phone || '未知客戶'
+
+  return generatePageMetadata(
+    `編輯客戶：${clientName}`,
+    `修改客戶 ${clientName} 的資訊`
+  )
+}
 
 export default async function EditClientPage({
   params,

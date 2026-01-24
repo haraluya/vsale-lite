@@ -4,6 +4,11 @@ import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Category } from '@/types'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('編輯商品分類', '修改商品分類資訊')
+}
 
 export default async function EditCategoryPage({
   params,

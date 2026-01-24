@@ -1,5 +1,10 @@
 import { getTiers } from '@/lib/actions/tiers'
 import { ClientForm } from '@/components/admin/client-form'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('快速開戶', '建立新客戶帳號')
+}
 
 export default async function NewClientPage() {
   const tiersResult = await getTiers()

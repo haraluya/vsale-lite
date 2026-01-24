@@ -8,6 +8,11 @@ import { SeriesFilterTags } from '@/components/admin/products/series-filter-tags
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('商品管理', '管理所有商品')
+}
 
 export default async function ProductsPage({
   searchParams,

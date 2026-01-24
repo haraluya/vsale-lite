@@ -6,6 +6,7 @@
  */
 
 import { CouponForm } from '@/components/admin/coupons/CouponForm'
+import { generatePageMetadata } from '@/lib/metadata'
 
 export default function NewCouponPage() {
   return (
@@ -24,7 +25,6 @@ export default function NewCouponPage() {
   )
 }
 
-export const metadata = {
-  title: '新增優惠券 | Vsale 管理後台',
-  description: '建立新的優惠券',
+export async function generateMetadata() {
+  return generatePageMetadata('新增優惠券', '建立新的優惠券')
 }

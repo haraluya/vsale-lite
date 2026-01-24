@@ -17,6 +17,11 @@ import { Button } from '@/components/ui/button'
 import { SeriesTable } from '@/components/admin/series/SeriesTable'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('商品系列管理', '管理商品系列')
+}
 
 export default async function SeriesPage({
   searchParams,

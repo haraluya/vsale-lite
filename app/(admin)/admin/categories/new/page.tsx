@@ -1,6 +1,11 @@
 import { CategoryForm } from '@/components/admin/category-form'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('新增商品分類', '建立新的商品分類')
+}
 
 export default function NewCategoryPage() {
   return (

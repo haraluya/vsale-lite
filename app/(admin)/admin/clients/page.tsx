@@ -10,6 +10,11 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses } from '@/lib/design-tokens'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('客戶管理', '管理所有客戶')
+}
 
 type SearchParams = {
   search?: string

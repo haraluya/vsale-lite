@@ -7,6 +7,11 @@
 
 import { getCategories } from '@/lib/actions/categories'
 import { SeriesForm } from '@/components/admin/series-form'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('新增商品系列', '建立新的商品系列')
+}
 
 export default async function NewSeriesPage() {
   const categories = await getCategories()

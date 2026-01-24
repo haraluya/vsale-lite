@@ -16,6 +16,7 @@ import { CouponList } from '@/components/admin/coupons/CouponList'
 import { CouponFilters } from '@/components/admin/coupons/CouponFilters'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { generatePageMetadata } from '@/lib/metadata'
 
 interface PageProps {
   searchParams: Promise<{
@@ -153,7 +154,6 @@ export default function CouponsPage({ searchParams }: PageProps) {
   )
 }
 
-export const metadata = {
-  title: '優惠券管理 | Vsale 管理後台',
-  description: '建立與管理優惠券',
+export async function generateMetadata() {
+  return generatePageMetadata('優惠券管理', '建立與管理優惠券')
 }

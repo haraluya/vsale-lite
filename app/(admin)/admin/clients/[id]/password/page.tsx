@@ -3,6 +3,28 @@ import { UpdatePasswordForm } from '@/components/admin/update-password-form'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const result = await getAdminClientProfile(id)
+
+  if (!result.success || !result.data) {
+    return generatePageMetadata('修改客戶密碼', '重設客戶密碼')
+  }
+
+  const client = result.data
+  const clientName = client.display_name || client.phone || '未知客戶'
+
+  return generatePageMetadata(
+    `修改密碼：${clientName}`,
+    `重設客戶 ${clientName} 的密碼`
+  )
+}
 
 export default async function UpdateClientPasswordPage({
   params,

@@ -3,6 +3,11 @@ import { getProduct } from '@/lib/actions/products'
 import { getSeries } from '@/lib/actions/series'
 import { ProductForm } from '@/components/admin/product-form'
 import { TagManager } from '@/components/admin/tag-manager'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('編輯商品', '修改商品資訊')
+}
 
 export default async function EditProductPage({
   params,

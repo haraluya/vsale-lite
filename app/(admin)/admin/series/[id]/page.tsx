@@ -9,9 +9,24 @@ import { notFound } from 'next/navigation'
 import { getSeriesById } from '@/lib/actions/series'
 import { getCategories } from '@/lib/actions/categories'
 import { SeriesForm } from '@/components/admin/series-form'
+import { generatePageMetadata } from '@/lib/metadata'
 
 interface EditSeriesPageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: EditSeriesPageProps) {
+  const { id } = await params
+  const result = await getSeriesById(id)
+
+  if (!result.success || !result.data) {
+    return generatePageMetadata('編輯系列', '修改系列資訊')
+  }
+
+  return generatePageMetadata(
+    `編輯系列：${result.data.name}`,
+    `修改系列 ${result.data.name} 的資訊`
+  )
 }
 
 export default async function EditSeriesPage({ params }: EditSeriesPageProps) {

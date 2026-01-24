@@ -12,6 +12,7 @@ import { getCouponById, getCouponUsers, getCouponStats } from '@/lib/actions/cou
 import { CouponForm } from '@/components/admin/coupons/CouponForm'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { generatePageMetadata } from '@/lib/metadata'
 
 interface PageProps {
   params: Promise<{
@@ -20,6 +21,20 @@ interface PageProps {
   searchParams: Promise<{
     page?: string
   }>
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { id } = await params
+  const result = await getCouponById(id)
+
+  if (!result.success || !result.data) {
+    return generatePageMetadata('優惠券詳情', '查看優惠券詳情與使用統計')
+  }
+
+  return generatePageMetadata(
+    `優惠券：${result.data.code_normalized}`,
+    `查看優惠券 ${result.data.code_normalized} 的詳情與使用統計`
+  )
 }
 
 export default async function CouponDetailPage({ params, searchParams }: PageProps) {
@@ -230,9 +245,4 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
       </div>
     </div>
   )
-}
-
-export const metadata = {
-  title: '優惠券詳情 | Vsale 管理後台',
-  description: '查看優惠券詳情與使用統計',
 }
