@@ -21,12 +21,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface ProductDisplayProps {
   config: ProductDisplayConfig
+  initialProducts?: ProductWithPrice[] | null // ⭐ 新增：預載商品資料（優化批次查詢）
+  initialTierName?: string | null // ⭐ 新增：預載等級名稱
 }
 
-export function ProductDisplay({ config }: ProductDisplayProps) {
-  const [products, setProducts] = useState<ProductWithPrice[]>([])
-  const [tierName, setTierName] = useState<string>('訪客')
-  const [isLoading, setIsLoading] = useState(true)
+export function ProductDisplay({ config, initialProducts, initialTierName }: ProductDisplayProps) {
+  const [products, setProducts] = useState<ProductWithPrice[]>(initialProducts || [])
+  const [tierName, setTierName] = useState<string>(initialTierName || '訪客')
+  const [isLoading, setIsLoading] = useState(!initialProducts) // ⭐ 有預載資料則不需載入
   const [error, setError] = useState<string | null>(null)
 
   // 滾動容器與箭頭顯示狀態
@@ -35,6 +37,11 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
   const [showRightArrow, setShowRightArrow] = useState(false)
 
   useEffect(() => {
+    // ⭐ 優化：若已有預載資料，則跳過查詢
+    if (initialProducts) {
+      return
+    }
+
     async function fetchProducts() {
       try {
         setIsLoading(true)
@@ -70,7 +77,7 @@ export function ProductDisplay({ config }: ProductDisplayProps) {
     }
 
     fetchProducts()
-  }, [config])
+  }, [config, initialProducts])
 
   // 檢查是否需要顯示箭頭
   const checkArrows = () => {

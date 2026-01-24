@@ -136,6 +136,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
               "group-hover:scale-105"
             )}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading="lazy" // ⭐ 優化：商品圖片延遲載入
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-gray-300">

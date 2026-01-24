@@ -52,6 +52,128 @@ export async function getActiveHomeBlocks(): Promise<ActionResult<HomePageBlock[
   }
 }
 
+/**
+ * 取得所有啟用的首頁廣告區塊（前台）+ 批次預載商品資料
+ * ⭐ 優化：減少 N+1 查詢問題，單次批次查詢所有商品+等級價格
+ *
+ * @returns 首頁區塊陣列，ProductDisplay 區塊包含預載的 products 欄位
+ */
+export async function getHomeBlocksWithProducts(): Promise<ActionResult<any[]>> {
+  try {
+    const supabase = await createClient()
+    const auth = await checkAuth() // 取得當前用戶與 tier_id
+
+    // 1️⃣ 取得所有啟用區塊
+    const blocksResult = await getActiveHomeBlocks()
+    if (!blocksResult.success) return blocksResult
+
+    const blocks = blocksResult.data!
+
+    // 2️⃣ 收集所有 ProductDisplay 的系列 ID 與標籤
+    const productDisplayBlocks = blocks.filter(b => b.block_type === 'product_display')
+    const seriesIds = new Set<string>()
+    const tags = new Set<string>()
+
+    productDisplayBlocks.forEach(block => {
+      const config = block.config as ProductDisplayConfig
+      config.series_ids?.forEach(id => seriesIds.add(id))
+      config.tag_ids?.forEach(tag => tags.add(tag))
+    })
+
+    // 3️⃣ 若沒有 ProductDisplay 區塊，直接返回
+    if (productDisplayBlocks.length === 0 || (seriesIds.size === 0 && tags.size === 0)) {
+      return {
+        success: true,
+        data: blocks,
+      }
+    }
+
+    // 4️⃣ 批次查詢所有需要的商品（含等級價格）
+    let query = supabase
+      .from('products')
+      .select(`
+        *,
+        series:series_id(name, color),
+        tier_prices!left (
+          price
+        )
+      `)
+      .eq('status', 'active')
+      .eq('tier_prices.tier_id', auth.tierId || '')
+
+    // 建構 OR 查詢條件
+    const orConditions: string[] = []
+    if (seriesIds.size > 0) {
+      orConditions.push(`series_id.in.(${Array.from(seriesIds).join(',')})`)
+    }
+    if (tags.size > 0) {
+      // overlaps 語法：tags.ov.{tag1,tag2}
+      orConditions.push(`tags.ov.{${Array.from(tags).join(',')}}`)
+    }
+
+    if (orConditions.length > 0) {
+      query = query.or(orConditions.join(','))
+    }
+
+    const { data: products, error: productsError } = await query
+
+    if (productsError) {
+      console.error('批次查詢商品失敗:', productsError)
+      // 降級：返回無商品的區塊
+      return {
+        success: true,
+        data: blocks,
+      }
+    }
+
+    // 5️⃣ 整合商品資料到 ProductDisplay 區塊
+    const enhancedBlocks = blocks.map(block => {
+      if (block.block_type !== 'product_display') {
+        return block
+      }
+
+      const config = block.config as ProductDisplayConfig
+
+      // 過濾符合當前區塊條件的商品
+      const blockProducts = (products || [])
+        .filter((p: any) => {
+          const matchesSeries =
+            !config.series_ids || config.series_ids.length === 0 || config.series_ids.includes(p.series_id)
+          const matchesTags =
+            !config.tag_ids || config.tag_ids.length === 0 || config.tag_ids.some(tag => p.tags?.includes(tag))
+          return matchesSeries && matchesTags
+        })
+        .map((product: any) => {
+          const tierPrice = product.tier_prices?.[0]
+          return {
+            ...product,
+            user_price: tierPrice?.price ?? product.retail_price ?? null,
+            series_name: product.series?.name || null,
+            series_color: product.series?.color || null,
+            tier_prices: undefined, // 移除 JOIN 資料
+          }
+        })
+        .slice(0, config.max_items || 50)
+
+      return {
+        ...block,
+        products: blockProducts,
+      }
+    })
+
+    return {
+      success: true,
+      data: enhancedBlocks,
+    }
+  } catch (error) {
+    console.error('取得首頁廣告區塊（含商品）失敗:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '取得首頁廣告區塊失敗',
+    }
+  }
+}
+
 // ===================================
 // 後台管理 Server Actions
 // ===================================

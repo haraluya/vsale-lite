@@ -6,7 +6,7 @@ import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 interface BlockRendererProps {
-  block: HomePageBlock
+  block: HomePageBlock & { products?: any[], tierName?: string } // ⭐ 支援預載商品資料
 }
 
 /**
@@ -38,7 +38,11 @@ export function BlockRenderer({ block }: BlockRendererProps) {
           designTokens.container.default,
           'px-4 md:px-6 lg:px-8'
         )}>
-          <ProductDisplay config={block.config as ProductDisplayConfig} />
+          <ProductDisplay
+            config={block.config as ProductDisplayConfig}
+            initialProducts={block.products || null} // ⭐ 傳遞預載商品
+            initialTierName={block.tierName || null} // ⭐ 傳遞等級名稱
+          />
         </div>
       )
 

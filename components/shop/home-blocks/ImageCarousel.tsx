@@ -106,6 +106,7 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
             className="object-cover"
             sizes="100vw"
             priority={currentIndex === 0} // 第一張圖片優先載入
+            loading={currentIndex === 0 ? 'eager' : 'lazy'} // ⭐ 優化：只預載第一張，其他延遲載入
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-gray-300">
