@@ -5,6 +5,7 @@ import { OrderTable } from '@/components/admin/order-table'
 import { Package } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { generatePageMetadata } from '@/lib/metadata'
 
 /**
  * 管理員訂單列表頁面
@@ -18,6 +19,10 @@ import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@
 
 // 🔧 修復：強制動態渲染，避免快取問題（刪除訂單後需要立即顯示最新資料）
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata() {
+  return generatePageMetadata('訂單管理', '查看所有訂單')
+}
 
 export default async function AdminOrdersPage() {
   // 驗證管理員權限

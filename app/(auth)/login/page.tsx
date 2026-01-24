@@ -3,6 +3,11 @@ import { LogoutButton } from '@/components/auth/logout-button'
 import { createClient } from '@/lib/supabase/server'
 import { Logo } from '@/components/ui/logo'
 import { ShoppingBag, Smartphone, Shield } from 'lucide-react'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('客戶登入', '使用手機號碼登入')
+}
 
 export default async function LoginPage() {
   const supabase = await createClient()

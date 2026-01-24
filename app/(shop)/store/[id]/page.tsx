@@ -18,6 +18,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { generatePageMetadata } from '@/lib/metadata'
 
 // ISR 快取策略：10 分鐘（商品詳情變動較少）
 export const revalidate = 600
@@ -26,6 +27,20 @@ interface ProductDetailPageProps {
   params: Promise<{
     id: string
   }>
+}
+
+export async function generateMetadata({ params }: ProductDetailPageProps) {
+  const { id } = await params
+  const product = await getProduct(id)
+
+  if (!product) {
+    return generatePageMetadata('商品詳情', '查看商品詳細資訊')
+  }
+
+  return generatePageMetadata(
+    product.name,
+    `查看 ${product.name} 的詳細資訊`
+  )
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {

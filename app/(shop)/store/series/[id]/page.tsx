@@ -17,12 +17,27 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { generatePageMetadata } from '@/lib/metadata'
 
 // ISR 快取策略：5 分鐘
 export const revalidate = 300
 
 interface SeriesDetailPageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: SeriesDetailPageProps) {
+  const { id } = await params
+  const result = await getSeriesById(id)
+
+  if (!result.success || !result.data) {
+    return generatePageMetadata('系列商品', '瀏覽系列商品')
+  }
+
+  return generatePageMetadata(
+    result.data.name,
+    `查看 ${result.data.name} 系列的所有商品`
+  )
 }
 
 export default async function SeriesDetailPage({ params }: SeriesDetailPageProps) {

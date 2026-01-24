@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getOrderById, getOrderTimeline } from '@/lib/actions/orders'
 import { OrderDetailContent } from '@/components/admin/orders/order-detail-content'
+import { generatePageMetadata } from '@/lib/metadata'
 
 /**
  * 管理員訂單詳情頁面
@@ -24,6 +25,20 @@ export const dynamic = 'force-dynamic'
 
 interface AdminOrderDetailPageProps {
   params: Promise<{ id: string }>
+}
+
+export async function generateMetadata({ params }: AdminOrderDetailPageProps) {
+  const { id } = await params
+  const result = await getOrderById(id)
+
+  if (!result.success || !result.data) {
+    return generatePageMetadata('訂單詳情', '訂單詳情與編輯')
+  }
+
+  return generatePageMetadata(
+    `訂單 #${result.data.order_number}`,
+    `查看訂單 ${result.data.order_number} 的詳細資訊`
+  )
 }
 
 export default async function AdminOrderDetailPage({ params }: AdminOrderDetailPageProps) {

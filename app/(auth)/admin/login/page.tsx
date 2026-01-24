@@ -3,6 +3,11 @@ import { LogoutButton } from '@/components/auth/logout-button'
 import { createClient } from '@/lib/supabase/server'
 import { Logo } from '@/components/ui/logo'
 import { Shield, Settings, FileText, Users2, ShoppingBag } from 'lucide-react'
+import { generatePageMetadata } from '@/lib/metadata'
+
+export async function generateMetadata() {
+  return generatePageMetadata('管理員登入', '使用 Email 登入')
+}
 
 export default async function AdminLoginPage() {
   const supabase = await createClient()

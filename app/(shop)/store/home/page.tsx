@@ -14,9 +14,14 @@ import { getActiveHomeBlocks } from '@/lib/actions/home-blocks'
 import { BlockRenderer } from '@/components/shop/home-blocks/BlockRenderer'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { generatePageMetadata } from '@/lib/metadata'
 
 // ISR 快取策略：5 分鐘
 export const revalidate = 300
+
+export async function generateMetadata() {
+  return generatePageMetadata('首頁', '首頁廣告與商品展示')
+}
 
 export default async function HomePage() {
   const supabase = await createClient()
