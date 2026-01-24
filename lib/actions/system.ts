@@ -435,6 +435,41 @@ export async function deleteLogo(
 }
 
 /**
+ * 查詢單一系統設定值
+ * Feature: 統一登入資訊範本
+ */
+export async function getSetting(key: string): Promise<ActionResult<string>> {
+  try {
+    const adminClient = createAdminClient()
+
+    const { data: setting, error } = await adminClient
+      .from('system_settings')
+      .select('value')
+      .eq('key', key)
+      .single()
+
+    if (error || !setting) {
+      console.error('[getSetting] Setting not found:', key)
+      return {
+        success: false,
+        message: `設定 ${key} 不存在`,
+      }
+    }
+
+    return {
+      success: true,
+      data: setting.value,
+    }
+  } catch (error) {
+    console.error('[getSetting] Error:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢失敗',
+    }
+  }
+}
+
+/**
  * 查詢客戶登入資訊範本
  * Feature: 系統設定頁面重構
  */
@@ -452,7 +487,7 @@ export async function getClientLoginTemplate(): Promise<ActionResult<string>> {
       // 回傳預設範本
       return {
         success: true,
-        data: `【快速下單系統 - 登入資訊】
+        data: `【{公司名稱} - 登入資訊】
 
 客戶名稱: {客戶名稱}
 前台網址: {前台網址}

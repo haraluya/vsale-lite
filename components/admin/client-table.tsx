@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Edit, Trash2, Key, Copy, Check } from 'lucide-react'
 import { deleteClient } from '@/lib/actions/clients'
+import { getSetting, getClientLoginTemplate } from '@/lib/actions/system'
+import { removeWwwFromUrl, replaceTemplateVariables } from '@/lib/utils/template-helpers'
 import { useHighlightKeyword } from './client-filter'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
@@ -85,21 +87,41 @@ export function ClientTable({
     }
   }
 
-  const handleCopyLoginInfo = (client: Client) => {
-    const loginUrl = typeof window !== 'undefined' ? `${window.location.origin}/login` : '/login'
-    const phone = client.phone
+  const handleCopyLoginInfo = async (client: Client) => {
+    // 1. 讀取公司名稱設定
+    const companyNameResult = await getSetting('company_name')
+    const companyName = companyNameResult.success ? companyNameResult.data : '您的公司名稱'
+
+    // 2. 產生前台網址並去除 www
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
+    const loginUrl = removeWwwFromUrl(`${baseUrl}/login`)
+
+    // 3. 讀取系統設定範本
+    const templateResult = await getClientLoginTemplate()
+    const template = templateResult.success && templateResult.data ? templateResult.data : ''
+
     const displayName = client.display_name || ''
+    const phone = client.phone
 
-    // 與快速開戶相同的格式，但密碼顯示為「請向管理員索取」
-    const fullGuide = `【Vsale 訂貨系統 - 登入資訊】
+    // 4. 替換範本變數（密碼固定為「請向管理員索取」）
+    const fullGuide = template
+      ? replaceTemplateVariables(template, {
+          客戶名稱: displayName,
+          前台網址: loginUrl,
+          登入電話: phone,
+          登入密碼: '(請向管理員索取)',
+          公司名稱: companyName,
+        })
+      : `【${companyName} - 登入資訊】
 
-客戶名稱: ${displayName || '未設定'}
+客戶名稱: ${displayName}
 前台網址: ${loginUrl}
 登入電話: ${phone}
 登入密碼: (請向管理員索取)
 
 請使用以上資訊登入系統進行下單。`
 
+    // 5. 複製到剪貼簿
     navigator.clipboard.writeText(fullGuide)
     setCopiedClientId(client.id)
     setTimeout(() => setCopiedClientId(null), 2000)

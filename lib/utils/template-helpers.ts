@@ -8,6 +8,14 @@ type TemplateVariables = {
   前台網址: string
   登入電話: string
   登入密碼: string
+  公司名稱?: string  // 新增可選變數
+}
+
+/**
+ * 自動去除網址中的 www
+ */
+export function removeWwwFromUrl(url: string): string {
+  return url.replace(/\/\/www\./g, '//')
 }
 
 /**
@@ -28,6 +36,7 @@ export function replaceTemplateVariables(
 
 /**
  * 驗證範本是否包含必要變數
+ * 注意：「公司名稱」為可選變數，不在必填清單中
  */
 export function validateTemplate(template: string): {
   valid: boolean

@@ -2,8 +2,8 @@
 
 import { useActionState, useState, useEffect } from 'react'
 import { createClient, updateClient } from '@/lib/actions/clients'
-import { getClientLoginTemplate } from '@/lib/actions/system'
-import { replaceTemplateVariables } from '@/lib/utils/template-helpers'
+import { getClientLoginTemplate, getSetting } from '@/lib/actions/system'
+import { replaceTemplateVariables, removeWwwFromUrl } from '@/lib/utils/template-helpers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,21 +26,29 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   const isEdit = mode === 'edit'
   const [copied, setCopied] = useState(false)
   const [template, setTemplate] = useState('')
+  const [companyName, setCompanyName] = useState('您的公司名稱')
 
   const [state, formAction, pending] = useActionState<
     ActionResult<{ id: string; password?: string; phone?: string; display_name?: string }> | null,
     FormData
   >(isEdit && client ? updateClient.bind(null, client.id) : createClient, null)
 
-  // 載入範本
+  // 載入範本與公司名稱
   useEffect(() => {
-    const loadTemplate = async () => {
-      const result = await getClientLoginTemplate()
-      if (result.success && result.data) {
-        setTemplate(result.data)
+    const loadSettings = async () => {
+      // 載入範本
+      const templateResult = await getClientLoginTemplate()
+      if (templateResult.success && templateResult.data) {
+        setTemplate(templateResult.data)
+      }
+
+      // 載入公司名稱
+      const companyNameResult = await getSetting('company_name')
+      if (companyNameResult.success && companyNameResult.data) {
+        setCompanyName(companyNameResult.data)
       }
     }
-    loadTemplate()
+    loadSettings()
   }, [])
 
   useEffect(() => {
@@ -66,7 +74,8 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
 
   // 如果剛建立成功,顯示密碼複製介面
   if (state?.success && state.data?.password) {
-    const loginUrl = typeof window !== 'undefined' ? window.location.origin : '/'
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : '/'
+    const loginUrl = removeWwwFromUrl(`${baseUrl}/login`)
     const phone = state.data.phone || ''
     const password = state.data.password
     const displayName = state.data.display_name || '客戶'
@@ -78,8 +87,9 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
           前台網址: loginUrl,
           登入電話: phone,
           登入密碼: password,
+          公司名稱: companyName,
         })
-      : `【快速下單系統 - 登入資訊】
+      : `【${companyName} - 登入資訊】
 
 客戶名稱: ${displayName}
 前台網址: ${loginUrl}
