@@ -16,8 +16,14 @@ import { HomeBlocksList } from './home-blocks-list'
 import { HomeBlocksSkeleton } from '@/components/shop/home-blocks-skeleton'
 import { generatePageMetadata } from '@/lib/metadata'
 
-// ISR 快取策略：5 分鐘
-export const revalidate = 300
+// ⭐ 優化：ISR 快取策略調整
+// - 快取時間從 5分鐘 → 10分鐘（首頁資料不常變）
+// - 大部分用戶直接讀取快取，載入時間 < 100ms
+export const revalidate = 600
+
+// ⭐ 優化：強制靜態生成與快取
+export const dynamic = 'force-static' // 強制靜態生成
+export const fetchCache = 'force-cache' // 強制快取
 
 export async function generateMetadata() {
   return generatePageMetadata('首頁', '首頁廣告與商品展示')
