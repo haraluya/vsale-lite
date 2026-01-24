@@ -19,6 +19,7 @@ import Link from 'next/link'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { generatePageMetadata } from '@/lib/metadata'
+import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 // ISR 快取策略：10 分鐘（商品詳情變動較少）
 export const revalidate = 600
@@ -63,6 +64,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   if (!product) {
     notFound()
   }
+
+  // 🔧 修復：加上時間戳記避免圖片快取問題
+  const imageUrl = addImageCacheBusting(product.image_url, product.updated_at)
 
   return (
     <div className={cn(
@@ -109,9 +113,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               designTokens.neoBrutalism.border.mobile,
               "border-black"
             )}>
-              {product.image_url ? (
+              {imageUrl ? (
                 <Image
-                  src={product.image_url}
+                  src={imageUrl}
                   alt={product.name}
                   width={600}
                   height={600}

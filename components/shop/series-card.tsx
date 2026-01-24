@@ -15,12 +15,16 @@ import Image from 'next/image'
 import type { Series } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 interface SeriesCardProps {
   series: Series
 }
 
 export function SeriesCard({ series }: SeriesCardProps) {
+  // 🔧 修復：加上時間戳記避免圖片快取問題
+  const imageUrl = addImageCacheBusting(series.image_url, series.updated_at)
+
   return (
     <Link href={`/store/series/${series.id}`}>
       <div className={cn(
@@ -37,9 +41,9 @@ export function SeriesCard({ series }: SeriesCardProps) {
           "md:border-b-3",
           "border-b-black"
         )}>
-          {series.image_url ? (
+          {imageUrl ? (
             <Image
-              src={series.image_url}
+              src={imageUrl}
               alt={series.name}
               fill
               className="object-cover transition-transform group-hover:scale-105"

@@ -26,6 +26,7 @@ import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { ImageModal } from '@/components/ui/image-modal'
+import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 interface ProductWithPriceCardProps {
   product: ProductWithPrice
@@ -38,6 +39,9 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
   const alert = useAlert()
   const [isAdding, setIsAdding] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // 🔧 修復：加上時間戳記避免圖片快取問題
+  const imageUrl = addImageCacheBusting(product.image_url, product.updated_at)
 
   // 使用 mounted 狀態避免 hydration 不一致
   const [mounted, setMounted] = useState(false)
@@ -89,11 +93,11 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
   // 商品圖片點擊處理
   const handleImageClick = () => {
-    if (!product.image_url) return
+    if (!imageUrl) return
 
     // 如果有 onImageClick callback（系列頁Hero圖切換），優先使用
     if (onImageClick) {
-      onImageClick(product.image_url, product.name)
+      onImageClick(imageUrl, product.name)
     } else {
       // 否則開啟彈窗
       setIsModalOpen(true)
@@ -114,16 +118,16 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
           designTokens.neoBrutalism.border.mobile,
           "border-black",
-          product.image_url && "cursor-pointer",
-          !product.image_url && "opacity-50"
+          imageUrl && "cursor-pointer",
+          !imageUrl && "opacity-50"
         )}
         onClick={handleImageClick}
-        role={product.image_url ? 'button' : undefined}
-        aria-label={product.image_url ? `查看 ${product.name} 大圖` : undefined}
+        role={imageUrl ? 'button' : undefined}
+        aria-label={imageUrl ? `查看 ${product.name} 大圖` : undefined}
       >
-        {product.image_url ? (
+        {imageUrl ? (
           <Image
-            src={product.image_url}
+            src={imageUrl}
             alt={product.name}
             width={300}
             height={300}
@@ -245,11 +249,11 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       </div>
 
       {/* 圖片彈窗 */}
-      {product.image_url && !onImageClick && (
+      {imageUrl && !onImageClick && (
         <ImageModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          imageUrl={product.image_url}
+          imageUrl={imageUrl}
           imageName={product.name}
         />
       )}

@@ -18,15 +18,23 @@ import { useRouter } from 'next/navigation'
 import type { ImageCarouselConfig } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 interface ImageCarouselProps {
   config: ImageCarouselConfig
+  blockUpdatedAt?: string | Date | null // 🔧 新增：區塊更新時間
 }
 
-function ImageCarouselComponent({ config }: ImageCarouselProps) {
+function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) {
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
   const { images, auto_play, interval_ms } = config
+
+  // 🔧 修復：為所有圖片加上快取破壞參數
+  const imagesWithCacheBusting = images.map(img => ({
+    ...img,
+    url: addImageCacheBusting(img.url, blockUpdatedAt)
+  }))
 
   // 切換到指定索引
   const goToSlide = useCallback((index: number) => {
@@ -35,18 +43,18 @@ function ImageCarouselComponent({ config }: ImageCarouselProps) {
 
   // 自動播放邏輯
   useEffect(() => {
-    if (!auto_play || images.length <= 1) return
+    if (!auto_play || imagesWithCacheBusting.length <= 1) return
 
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length)
+      setCurrentIndex((prev) => (prev + 1) % imagesWithCacheBusting.length)
     }, interval_ms)
 
     return () => clearInterval(timer)
-  }, [auto_play, interval_ms, images.length])
+  }, [auto_play, interval_ms, imagesWithCacheBusting.length])
 
   // 處理圖片點擊
   const handleImageClick = () => {
-    const currentImage = images[currentIndex]
+    const currentImage = imagesWithCacheBusting[currentIndex]
     if (currentImage?.series_id) {
       router.push(`/store/products/series/${currentImage.series_id}`)
     }
@@ -57,7 +65,7 @@ function ImageCarouselComponent({ config }: ImageCarouselProps) {
     goToSlide(index)
   }
 
-  if (images.length === 0) {
+  if (imagesWithCacheBusting.length === 0) {
     return (
       <div
         className={cn(
@@ -73,7 +81,7 @@ function ImageCarouselComponent({ config }: ImageCarouselProps) {
     )
   }
 
-  const currentImage = images[currentIndex]
+  const currentImage = imagesWithCacheBusting[currentIndex]
 
   return (
     <div className="relative w-full">
@@ -106,9 +114,9 @@ function ImageCarouselComponent({ config }: ImageCarouselProps) {
         )}
 
         {/* 指示器點（在圖片內部底部中央，僅多張圖片時顯示） */}
-        {images.length > 1 && (
+        {imagesWithCacheBusting.length > 1 && (
           <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center justify-center gap-2 z-10">
-            {images.map((_, index) => (
+            {imagesWithCacheBusting.map((_, index) => (
               <button
                 key={index}
                 onClick={(e) => {

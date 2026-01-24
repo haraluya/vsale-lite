@@ -25,7 +25,10 @@ export function BlockRenderer({ block }: BlockRendererProps) {
           designTokens.container.default,
           'px-4 md:px-6 lg:px-8'
         )}>
-          <ImageCarousel config={block.config as ImageCarouselConfig} />
+          <ImageCarousel
+            config={block.config as ImageCarouselConfig}
+            blockUpdatedAt={block.updated_at} // 🔧 修復：傳入更新時間避免快取問題
+          />
         </div>
       )
 
