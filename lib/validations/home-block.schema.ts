@@ -13,7 +13,7 @@ export const ImageCarouselConfigSchema = z.object({
         series_id: z.string().uuid('系列 ID 格式不正確').nullable().optional(),
       })
     )
-    .min(1, '至少需要 1 張圖片')
+    .min(0, '圖片陣列不可為 undefined') // 允許空陣列（新建區塊時）
     .max(5, '最多只能上傳 5 張圖片'),
   auto_play: z.boolean().default(true),
   interval_ms: z.number().int().min(1000, '輪播間隔最少 1000 毫秒（1 秒）').default(5000),
