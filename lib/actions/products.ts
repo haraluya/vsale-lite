@@ -12,7 +12,7 @@ import { checkAuth } from './helpers'
 import { logAudit } from './audit'
 import { createProductSchema, updateProductSchema, batchUpdateProductsSchema } from '@/lib/validations/product.schema'
 import type { ActionResult, Product } from '@/types'
-import { uploadWithRetry, formatUploadError } from '@/lib/utils/upload-helpers'
+// import { uploadWithRetry, formatUploadError } from '@/lib/utils/upload-helpers'  // 暫時註解測試
 
 /**
  * 查詢商品列表 (含搜尋、篩選、分頁)
@@ -685,40 +685,31 @@ export async function uploadProductImage(
     }
 
     // 5. 上傳前先刪除所有可能的舊圖片（避免不同副檔名的孤兒檔案）
-    const { error: removeError } = await adminClient.storage.from('products').remove([
-      `${productId}/main.jpg`,
-      `${productId}/main.png`,
-      `${productId}/main.webp`,
-    ])
+    const extensions = ['jpg', 'png', 'webp']
+    const deletePromises = extensions.map((ext) =>
+      adminClient.storage.from('products').remove([`${productId}/main.${ext}`])
+    )
 
-    // 6. 取得檔案副檔名
+    // 執行所有刪除操作（不關心是否成功，因為檔案可能不存在）
+    await Promise.allSettled(deletePromises)
+
+    // 6. 取得檔案副檔名並上傳
     const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
     const filePath = `${productId}/main.${ext}`
 
-    // 如果刪除失敗，使用 upsert 模式覆寫；否則使用 upsert: false
-    // 註: 即使檔案不存在，刪除操作也不會報錯
-    const shouldUpsert = !!removeError
+    // 7. 上傳圖片（固定使用 upsert: true 覆寫模式）
+    const { error: uploadError } = await adminClient.storage
+      .from('products')
+      .upload(filePath, file, {
+        upsert: true,  // 固定覆寫模式（與廣告海報一致）
+        contentType: file.type,
+      })
 
-    if (removeError) {
-      console.warn('刪除舊圖片失敗，將使用覆寫模式上傳:', removeError)
-    }
-
-    // 7. 使用帶重試機制的上傳函式
-    const uploadResult = await uploadWithRetry(
-      () =>
-        adminClient.storage.from('products').upload(filePath, file, {
-          upsert: shouldUpsert, // 刪除失敗時允許覆寫
-          contentType: file.type,
-        }),
-      3,      // 最多重試 3 次
-      30000   // 單次上傳超時 30 秒
-    )
-
-    if (uploadResult.error) {
-      console.error('上傳圖片錯誤:', uploadResult.error, `(嘗試 ${uploadResult.attempts} 次)`)
+    if (uploadError) {
+      console.error('上傳圖片錯誤:', uploadError)
       return {
         success: false,
-        message: formatUploadError(uploadResult.error, uploadResult.attempts),
+        message: `上傳失敗: ${uploadError.message}`,
       }
     }
 
