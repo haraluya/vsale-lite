@@ -649,9 +649,18 @@ export async function uploadProductImage(
     // 1. 驗證權限
     await checkAuth('admin')
 
+    // 記錄上傳資訊（用於診斷）
+    console.log('📸 開始上傳商品圖片:', {
+      productId,
+      fileName: file.name,
+      fileSize: `${(file.size / 1024).toFixed(2)} KB`,
+      mimeType: file.type,
+    })
+
     // 2. 驗證檔案格式
     const validFormats = ['image/jpeg', 'image/png', 'image/webp']
     if (!validFormats.includes(file.type)) {
+      console.error('❌ 檔案格式不支援:', file.type)
       return {
         success: false,
         message: '僅支援 JPG, PNG, WebP 格式',
@@ -661,6 +670,7 @@ export async function uploadProductImage(
     // 3. 驗證檔案大小 (5MB)
     const maxSize = 5 * 1024 * 1024
     if (file.size > maxSize) {
+      console.error('❌ 檔案過大:', file.size)
       return {
         success: false,
         message: '檔案大小不可超過 5MB',
@@ -694,10 +704,23 @@ export async function uploadProductImage(
     await Promise.allSettled(deletePromises)
 
     // 6. 取得檔案副檔名並上傳
-    const ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
+    // 優先從檔案名稱取得副檔名（更可靠），備用方案才使用 MIME type
+    let ext = file.name.split('.').pop()?.toLowerCase()
+
+    // 如果從檔案名稱無法取得副檔名，或副檔名不合法，則使用 MIME type
+    if (!ext || !['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+      ext = file.type.split('/')[1] === 'jpeg' ? 'jpg' : file.type.split('/')[1]
+    }
+
+    // 正規化副檔名（jpeg → jpg）
+    if (ext === 'jpeg') ext = 'jpg'
+
     const filePath = `${productId}/main.${ext}`
 
     // 7. 上傳圖片（固定使用 upsert: true 覆寫模式）
+    console.log('📤 開始上傳到 Storage:', filePath)
+    const uploadStartTime = Date.now()
+
     const { error: uploadError } = await adminClient.storage
       .from('products')
       .upload(filePath, file, {
@@ -705,13 +728,17 @@ export async function uploadProductImage(
         contentType: file.type,
       })
 
+    const uploadTime = Date.now() - uploadStartTime
+
     if (uploadError) {
-      console.error('上傳圖片錯誤:', uploadError)
+      console.error('❌ 上傳圖片錯誤 (耗時:', uploadTime, 'ms):', uploadError)
       return {
         success: false,
         message: `上傳失敗: ${uploadError.message}`,
       }
     }
+
+    console.log('✅ 上傳成功 (耗時:', uploadTime, 'ms)')
 
     // 8. 取得公開 URL
     const { data: urlData } = adminClient.storage.from('products').getPublicUrl(filePath)
