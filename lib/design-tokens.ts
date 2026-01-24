@@ -84,6 +84,16 @@ export const designTokens = {
   input: {
     base: 'px-3 py-2 text-sm md:px-4 md:py-2.5 md:text-base',
   },
+
+  /**
+   * 廣告圖片規格
+   */
+  adImage: {
+    aspectRatio: 'aspect-[10/3]',          // 10:3 比例
+    standardSize: '1280 × 384',            // 標準尺寸 (px)
+    highQualitySize: '1920 × 576',         // 高畫質尺寸 (px)
+    safeZone: '中央 80% 區域',              // 安全區域提示
+  },
 } as const
 
 /**

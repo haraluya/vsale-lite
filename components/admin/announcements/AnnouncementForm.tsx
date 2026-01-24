@@ -221,10 +221,10 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         </label>
         <div className="mb-2 rounded-none border-2 border-blue-500 bg-blue-50 p-3">
           <p className="text-sm font-bold text-blue-900">
-            📐 建議尺寸：1200 × 400 像素（16:9 或 3:1 比例）
+            📐 建議尺寸：1280 × 384 像素（10:3 比例）
           </p>
           <p className="mt-1 text-xs text-blue-700">
-            適合桌面與行動裝置顯示的輪播廣告尺寸
+            統一廣告圖片規格，適合桌面與行動裝置。重要內容請置中，邊緣可能被裁切。
           </p>
         </div>
 
