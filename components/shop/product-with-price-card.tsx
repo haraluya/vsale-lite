@@ -180,27 +180,39 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             "border-black",
             "p-2 md:p-3"
           )}>
-            {/* 價格顯示（右邊對齊，同一行） */}
-            <div className="flex items-baseline gap-1.5 justify-end flex-wrap">
-              {/* 售價（刪除線） - 只有當會員價低於售價時顯示 */}
-              {product.user_price &&
-               product.retail_price &&
-               product.user_price < product.retail_price && (
+            {/* 判斷是否有價格差異 */}
+            {product.user_price && product.retail_price && product.user_price < product.retail_price ? (
+              // 情況：會員價 < 售價 → 靠右對齊，顯示刪除線售價 + 會員價
+              <div className="flex items-baseline gap-1.5 justify-end flex-wrap">
+                {/* 售價（刪除線） */}
                 <span className="text-xs text-gray-400 line-through">
                   ${product.retail_price}
                 </span>
-              )}
 
-              {/* 會員價格 */}
-              <span className="text-lg md:text-2xl font-bold text-blue-600">
-                ${displayPrice}
-              </span>
+                {/* 會員價格 */}
+                <span className="text-lg md:text-2xl font-bold text-blue-600">
+                  ${displayPrice}
+                </span>
 
-              {/* 價格標籤 */}
-              <span className="text-xs text-gray-600">
-                ({priceLabel})
-              </span>
-            </div>
+                {/* 價格標籤 */}
+                <span className="text-xs text-gray-600">
+                  ({priceLabel})
+                </span>
+              </div>
+            ) : (
+              // 情況：只有售價 或 會員價 = 售價 → 靠左對齊，原本樣式
+              <div className="flex items-baseline gap-1.5">
+                {/* 價格 */}
+                <span className="text-lg md:text-2xl font-bold text-blue-600">
+                  ${displayPrice}
+                </span>
+
+                {/* 價格標籤 */}
+                <span className="text-xs text-gray-600">
+                  ({priceLabel})
+                </span>
+              </div>
+            )}
           </div>
         ) : (
           // 沒有任何價格：顯示「價格未設定」

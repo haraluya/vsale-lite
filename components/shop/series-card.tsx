@@ -54,6 +54,21 @@ export function SeriesCard({ series }: SeriesCardProps) {
               <span className="text-4xl md:text-6xl">📦</span>
             </div>
           )}
+
+          {/* 查看商品按鈕（右下角） */}
+          <div className="absolute right-2 bottom-2 z-10">
+            <span className={cn(
+              "inline-block rounded-none bg-yellow-300 font-bold transition-all group-hover:bg-yellow-400",
+              designTokens.neoBrutalism.border.mobile,
+              "border-black",
+              "shadow-neo-sm",
+              "px-2 py-1.5 md:px-3 md:py-2",
+              "text-xs md:text-sm",
+              "pointer-events-none"  // 不阻擋 Link 點擊
+            )}>
+              查看商品 →
+            </span>
+          </div>
         </div>
 
         {/* 系列資訊 */}
@@ -66,19 +81,6 @@ export function SeriesCard({ series }: SeriesCardProps) {
               {series.description}
             </p>
           )}
-
-          {/* 查看詳情按鈕 */}
-          <div className="mt-2 md:mt-4">
-            <span className={cn(
-              "inline-block rounded-none bg-yellow-300 font-bold transition-all group-hover:bg-yellow-400",
-              designTokens.neoBrutalism.border.mobile,
-              "border-black",
-              "px-2 py-1.5 md:px-4 md:py-2",
-              "text-xs md:text-sm"
-            )}>
-              查看商品 →
-            </span>
-          </div>
         </div>
       </div>
     </Link>
