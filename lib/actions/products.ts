@@ -23,6 +23,7 @@ export async function getProducts(params?: {
   search?: string
   series_id?: string  // 🔄 Feature 003: 改為系列篩選 (取代 category_id)
   series_ids?: string[]  // 🆕 Feature 016: 多系列篩選（陣列）
+  tag_ids?: string[]  // 🆕 標籤篩選（陣列）
   status?: 'active' | 'inactive' | 'all'
   sort?: 'code' | 'series_name' | 'retail_price'  // 🆕 Feature 016: 排序欄位（庫存不可排序）
   order?: 'asc' | 'desc'  // 🆕 Feature 016: 排序方向
@@ -39,6 +40,7 @@ export async function getProducts(params?: {
       search = '',
       series_id,
       series_ids,
+      tag_ids,
       status = 'active',
       sort = 'code',
       order = 'asc',
@@ -66,6 +68,11 @@ export async function getProducts(params?: {
     // 多系列篩選 (Feature 016)
     if (series_ids && series_ids.length > 0) {
       query = query.in('series_id', series_ids)
+    }
+
+    // 標籤篩選 - 商品標籤陣列需包含所選標籤中的任一個
+    if (tag_ids && tag_ids.length > 0) {
+      query = query.overlaps('tags', tag_ids)
     }
 
     // 狀態篩選
