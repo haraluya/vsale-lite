@@ -321,3 +321,45 @@ export async function globalSearch(
 }
 
 // 移除重複的 logout 函數，統一使用 lib/actions/auth.ts 中的 logout
+
+/**
+ * 查詢客戶未使用的優惠券數量
+ * Feature: 客戶端導覽列優惠券數量顯示
+ *
+ * @param userId - 使用者 ID（可選，不提供則使用當前登入用戶）
+ * @returns ActionResult<number> - 未使用優惠券數量
+ */
+export async function getUnusedCouponCount(userId?: string): Promise<ActionResult<number>> {
+  try {
+    const supabase = await createClient()
+
+    // 如果沒有提供 userId，使用當前登入用戶
+    let targetUserId = userId
+    if (!targetUserId) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        return { success: false, message: '未登入' }
+      }
+      targetUserId = user.id
+    }
+
+    // 查詢未使用的優惠券數量（僅計算 active 狀態的優惠券）
+    // 使用 count: 'exact', head: true 僅查詢數量，不返回資料，提升效能
+    const { count, error } = await supabase
+      .from('user_coupons')
+      .select('id, coupon:coupons!inner(status)', { count: 'exact', head: true })
+      .eq('user_id', targetUserId)
+      .is('used_at', null)
+      .eq('coupon.status', 'active')
+
+    if (error) {
+      console.error('查詢優惠券數量失敗:', error)
+      return { success: false, message: '查詢失敗' }
+    }
+
+    return { success: true, data: count || 0 }
+  } catch (error) {
+    console.error('查詢優惠券數量錯誤:', error)
+    return { success: false, message: '查詢錯誤' }
+  }
+}

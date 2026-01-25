@@ -13,9 +13,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/shop/navbar'
-import { SegmentControl } from '@/components/shop/home-blocks/SegmentControl'
-import { designTokens } from '@/lib/design-tokens'
-import { cn } from '@/lib/utils'
+import { SecondaryNav } from '@/components/shop/secondary-nav'
+import { getUnusedCouponCount } from '@/lib/actions/shop'
 
 // ISR 快取策略：5 分鐘
 // 移除 force-dynamic，啟用快取以提升效能
@@ -38,27 +37,32 @@ export default async function ShopLayout({
     redirect('/login')
   }
 
-  // 查詢用戶資料（含 display_name）
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select(`
-      id,
-      phone,
-      email,
-      role,
-      tier_id,
-      display_name,
-      created_at,
-      tiers (
-        name
-      )
-    `)
-    .eq('id', user.id)
-    .single()
+  // 並行查詢用戶資料與優惠券數量
+  const [{ data: profile }, couponCountResult] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select(`
+        id,
+        phone,
+        email,
+        role,
+        tier_id,
+        display_name,
+        created_at,
+        tiers (
+          name
+        )
+      `)
+      .eq('id', user.id)
+      .single(),
+    getUnusedCouponCount(user.id),
+  ])
 
   if (!profile) {
     redirect('/login')
   }
+
+  const unusedCouponCount = couponCountResult.success ? (couponCountResult.data ?? 0) : 0
 
   const currentUser = {
     id: profile.id,
@@ -80,40 +84,15 @@ export default async function ShopLayout({
 
       {/* 主要內容區域 - 添加頂部間距避免被導覽列遮擋 */}
       <div className="pt-[72px] md:pt-[80px]">
-        {/* 歡迎訊息與 SegmentControl */}
-        <div className={cn(
-          designTokens.spacing.page.padding,
-          designTokens.container.default
-        )}>
-          <div className={cn(
-            'rounded-none bg-white',
-            designTokens.neoBrutalism.border.full,
-            'border-black',
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.spacing.card.padding,
-            designTokens.spacing.section.marginBottom
-          )}>
-            {/* 歡迎訊息 */}
-            <div className="mb-4">
-              <p className={cn(
-                designTokens.typography.body.base,
-                'text-gray-600'
-              )}>
-                {userName} 您好！
-              </p>
-              <p className={cn(
-                designTokens.typography.caption,
-                'mt-1 text-gray-500'
-              )}>
-                會員等級: <span className="font-bold">{tierName}</span>
-              </p>
-            </div>
+        {/* 次導覽列 */}
+        <SecondaryNav
+          userPhone={currentUser.phone || currentUser.email || ''}
+          userName={userName}
+          tierName={tierName}
+          unusedCouponCount={unusedCouponCount}
+        />
 
-            {/* SegmentControl */}
-            <SegmentControl />
-          </div>
-        </div>
-
+        {/* 主要內容 */}
         <main>{children}</main>
       </div>
     </div>

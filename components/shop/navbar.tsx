@@ -95,27 +95,8 @@ export function Navbar({ user }: NavbarProps) {
             <Logo variant="icon" href="/store" className="block sm:hidden" />
           </div>
 
-          {/* 用戶資訊與登出 */}
+          {/* 功能按鈕區域 */}
           <div className="flex items-center gap-2 md:gap-4">
-            {/* 用戶資訊 (統一,使用響應式顯示) */}
-            <div className={cn(
-              "flex items-center gap-2 rounded-none bg-blue-50",
-              designTokens.neoBrutalism.border.full,
-              "border-black",
-              "px-3 py-2 md:px-4"
-            )}>
-              <User className="h-4 w-4 md:h-5 md:w-5" />
-              <div className="text-xs md:text-sm">
-                <p className="font-bold">{user.phone || user.email}</p>
-                {user.tier_name && (
-                  <p className="text-gray-600">
-                    <span className="hidden md:inline">會員等級: </span>
-                    <span className="font-bold">{user.tier_name}</span>
-                  </p>
-                )}
-              </div>
-            </div>
-
             {/* 我的訂單按鈕 */}
             <Link
               href="/store/orders"
