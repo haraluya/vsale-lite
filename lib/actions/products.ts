@@ -434,6 +434,70 @@ export async function updateProduct(
 }
 
 /**
+ * 快速更新商品狀態 (僅管理員)
+ * @param id 商品 ID
+ * @param status 新狀態 ('active' | 'inactive')
+ */
+export async function updateProductStatus(
+  id: string,
+  status: 'active' | 'inactive'
+): Promise<ActionResult<Product>> {
+  try {
+    await checkAuth('admin') // 僅管理員可執行
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    // 檢查商品是否存在
+    const { data: existing } = await adminClient
+      .from('products')
+      .select('id, status')
+      .eq('id', id)
+      .single()
+
+    if (!existing) {
+      return { success: false, message: '商品不存在' }
+    }
+
+    // 更新狀態
+    const { data: updated, error } = await adminClient
+      .from('products')
+      .update({ status })
+      .eq('id', id)
+      .select('*, series(name, color)')
+      .single()
+
+    if (error) {
+      console.error('updateProductStatus 錯誤:', error)
+      return { success: false, message: '狀態更新失敗' }
+    }
+
+    // 記錄操作日誌
+    await logAudit({
+      target_type: 'product',
+      target_id: id,
+      action_type: 'updated',
+      old_values: { status: existing.status },
+      new_values: { status },
+    })
+
+    // 更新快取
+    revalidatePath('/admin/products')
+    revalidatePath('/store')
+    revalidateTag('products')
+
+    return {
+      success: true,
+      data: updated as Product,
+      message: `商品已${status === 'active' ? '啟用' : '停用'}`,
+    }
+  } catch (error) {
+    console.error('updateProductStatus 異常:', error)
+    return { success: false, message: error instanceof Error ? error.message : '狀態更新失敗' }
+  }
+}
+
+/**
  * 刪除商品 (混合策略: 有訂單軟刪除,無訂單硬刪除)
  */
 export async function deleteProduct(id: string): Promise<ActionResult> {
