@@ -1,14 +1,15 @@
 import { getOrders } from '@/lib/actions/orders'
-import { OrderTable } from '@/components/admin/order-table'
+import { SmartOrderList } from '@/components/admin/orders/smart-order-list'
 import { cn } from '@/lib/utils'
 import { designTokens } from '@/lib/design-tokens'
 import type { OrderStatus } from '@/types'
 
 /**
  * Order List Server Component
- * Feature: Performance Optimization - Order List Streaming
+ * Feature: Performance Optimization - Order List Streaming + Virtual Scroll (Phase 3.1)
  *
  * 獨立的 Server Component，透過 Suspense 邊界支援 Streaming
+ * - 訂單數量 > 100：自動啟用虛擬滾動
  */
 
 interface OrderListProps {
@@ -48,5 +49,12 @@ export async function OrderList({ status, search, page, limit }: OrderListProps)
 
   const { orders, total } = result.data
 
-  return <OrderTable orders={orders} total={total} currentPage={page} pageSize={limit} />
+  return (
+    <SmartOrderList
+      orders={orders}
+      total={total}
+      currentPage={page}
+      pageSize={limit}
+    />
+  )
 }

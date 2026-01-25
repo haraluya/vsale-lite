@@ -3,8 +3,10 @@
 /**
  * Categories Management Server Actions
  * Feature: 002-product-management
+ * Feature: Performance Optimization - Phase 3.5 (Time-based Cache)
  */
 
+import { unstable_cache } from 'next/cache'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { checkAuth } from './helpers'
@@ -13,10 +15,25 @@ import type { ActionResult, Category } from '@/types'
 
 /**
  * 查詢所有商品分類（依 sort_order 排序）
+ * 🚀 Phase 3.5: 使用 time-based cache (5 分鐘)
  */
 export async function getCategories(): Promise<Category[]> {
   try {
-    // 使用 Admin Client 繞過 RLS
+    return await getCategoriesCached()
+  } catch (error) {
+    console.error('getCategories error:', error)
+    return []
+  }
+}
+
+/**
+ * Cached 分類查詢（內部函數）
+ * - 快取時間: 300 秒 (5 分鐘)
+ * - 快取標籤: 'categories'
+ * - 失效機制: time-based + tag-based
+ */
+const getCategoriesCached = unstable_cache(
+  async () => {
     const adminClient = createAdminClient()
 
     const { data, error } = await adminClient
@@ -26,16 +43,18 @@ export async function getCategories(): Promise<Category[]> {
       .order('created_at', { ascending: true })
 
     if (error) {
-      console.error('getCategories error:', error)
+      console.error('getCategoriesCached error:', error)
       return []
     }
 
     return data as Category[]
-  } catch (error) {
-    console.error('getCategories error:', error)
-    return []
+  },
+  ['categories-all'], // 快取 key
+  {
+    revalidate: 300, // 5 分鐘
+    tags: ['categories'], // 標籤用於手動失效
   }
-}
+)
 
 /**
  * 建立新商品分類

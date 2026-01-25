@@ -1,25 +1,24 @@
 'use server'
 
+/**
+ * Tiers Management Server Actions
+ * Feature: Performance Optimization - Phase 3.5 (Time-based Cache)
+ */
+
+import { unstable_cache } from 'next/cache'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { createTierSchema, updateTierSchema } from '@/lib/validations/tier.schema'
 import type { ActionResult, Tier } from '@/types'
 import { checkAuth } from './helpers'
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 /**
  * 查詢所有會員等級 (依 rank 排序)
+ * 🚀 Phase 3.5: 使用 time-based cache (10 分鐘)
  */
 export async function getTiers(): Promise<ActionResult<Tier[]>> {
   try {
-    // 使用 Admin Client 繞過 RLS
-    const adminClient = createAdminClient()
-
-    const { data, error } = await adminClient
-      .from('tiers')
-      .select('*')
-      .order('rank', { ascending: true })
-
-    if (error) throw error
+    const data = await getTiersCached()
 
     return {
       success: true,
@@ -33,6 +32,35 @@ export async function getTiers(): Promise<ActionResult<Tier[]>> {
     }
   }
 }
+
+/**
+ * Cached 等級查詢（內部函數）
+ * - 快取時間: 600 秒 (10 分鐘)
+ * - 快取標籤: 'tiers'
+ * - 失效機制: time-based + tag-based
+ */
+const getTiersCached = unstable_cache(
+  async () => {
+    const adminClient = createAdminClient()
+
+    const { data, error } = await adminClient
+      .from('tiers')
+      .select('*')
+      .order('rank', { ascending: true })
+
+    if (error) {
+      console.error('getTiersCached error:', error)
+      return []
+    }
+
+    return data as Tier[]
+  },
+  ['tiers-all'], // 快取 key
+  {
+    revalidate: 600, // 10 分鐘
+    tags: ['tiers'], // 標籤用於手動失效
+  }
+)
 
 /**
  * 建立新會員等級

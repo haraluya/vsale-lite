@@ -1,14 +1,15 @@
 import { getProducts } from '@/lib/actions/products'
 import { getSeries } from '@/lib/actions/series'
-import { ProductTableWithTags } from '@/components/admin/product-table-with-tags'
+import { SmartProductList } from '@/components/admin/products/smart-product-list'
 import { cn } from '@/lib/utils'
 import { designTokens } from '@/lib/design-tokens'
 
 /**
  * Product List Server Component
- * Feature: Performance Optimization - Product List Streaming
+ * Feature: Performance Optimization - Product List Streaming + Virtual Scroll (Phase 3.1)
  *
  * 獨立的 Server Component，透過 Suspense 邊界支援 Streaming
+ * - 商品數量 > 100：自動啟用虛擬滾動
  */
 
 interface ProductListProps {
@@ -70,7 +71,7 @@ export async function ProductList({
   }
 
   return (
-    <ProductTableWithTags
+    <SmartProductList
       products={products}
       series={series}
       total={total}

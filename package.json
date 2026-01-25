@@ -41,6 +41,7 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
+    "@tanstack/react-virtual": "^3.13.18",
     "@types/archiver": "^7.0.0",
     "@types/pg": "^8.16.0",
     "@types/xlsx": "^0.0.36",

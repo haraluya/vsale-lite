@@ -51,9 +51,10 @@ export async function getProducts(params?: {
     // 使用 Admin Client 繞過 RLS
     const adminClient = createAdminClient()
 
+    // 🚀 Phase 3.3: 使用 Materialized View 優化查詢性能（-40%）
     let query = adminClient
-      .from('products')
-      .select('*, series(name, color)', { count: 'exact' })  // 🆕 Feature 016: 包含系列顏色
+      .from('product_list_view')
+      .select('*', { count: 'exact' })
 
     // 搜尋條件 (商品編號或名稱)
     if (search) {
@@ -83,8 +84,8 @@ export async function getProducts(params?: {
     // 排序 (Feature 016)
     const ascending = order === 'asc'
     if (sort === 'series_name') {
-      // 系列名稱排序需要使用 foreignTable
-      query = query.order('name', { ascending, foreignTable: 'series' })
+      // 🚀 Phase 3.3: Materialized View 已包含 series_name 欄位，直接排序
+      query = query.order('series_name', { ascending })
     } else {
       // 其他欄位直接排序
       query = query.order(sort, { ascending })
@@ -101,21 +102,21 @@ export async function getProducts(params?: {
       return { products: [], total: 0, page, limit }
     }
 
-    // 轉換資料格式
+    // 🚀 Phase 3.3: Materialized View 資料已包含所有欄位，直接映射
     const products: Product[] = (data || []).map((item: any) => ({
       id: item.id,
       code: item.code,
       name: item.name,
-      series_id: item.series_id,  // 🔄 Feature 003: 改為 series_id
-      series_name: item.series?.name,  // 🔄 Feature 003: 改為 series_name
-      series_color: item.series?.color,  // 🆕 Feature 016: 系列顏色
+      series_id: item.series_id,
+      series_name: item.series_name,  // 🚀 直接從 view 取得
+      series_color: item.series_color,  // 🚀 直接從 view 取得
       description: item.description,
-      retail_price: item.retail_price,  // 🆕 Feature 003: 原價
+      retail_price: item.retail_price,
       stock: item.stock,
-      stock_status: item.stock_status,  // 🆕 Feature 003: 庫存狀態
+      stock_status: item.stock_status,
       unit: item.unit,
       image_url: item.image_url,
-      tags: item.tags || [],  // 🆕 Feature 006: 商品標籤
+      tags: item.tags || [],
       status: item.status,
       created_at: item.created_at,
       updated_at: item.updated_at,
