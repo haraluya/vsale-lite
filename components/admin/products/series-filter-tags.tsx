@@ -43,8 +43,8 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // Tab 切換狀態：'series' 或 'tags'
-  const [activeTab, setActiveTab] = useState<'series' | 'tags'>('series')
+  // Tab 切換狀態：'series' 或 'tags' 或 null（收起）
+  const [activeTab, setActiveTab] = useState<'series' | 'tags' | null>(null)
 
   // 標籤列表
   const [availableTags, setAvailableTags] = useState<string[]>([])
@@ -215,7 +215,7 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
       {/* Tab 切換按鈕 */}
       <div className="flex gap-2">
         <button
-          onClick={() => setActiveTab('series')}
+          onClick={() => setActiveTab(activeTab === 'series' ? null : 'series')}
           className={`
             rounded-none border-2 border-black px-4 py-2 font-bold text-sm
             transition-all shadow-neo-sm
@@ -228,7 +228,7 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
           系列篩選
         </button>
         <button
-          onClick={() => setActiveTab('tags')}
+          onClick={() => setActiveTab(activeTab === 'tags' ? null : 'tags')}
           className={`
             rounded-none border-2 border-black px-4 py-2 font-bold text-sm
             transition-all shadow-neo-sm
