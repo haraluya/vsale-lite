@@ -39,6 +39,12 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+-- ==================================================
+-- Required Extensions
+-- ==================================================
+
+-- PostgreSQL trigram extension for fuzzy text search (required for gin_trgm_ops)
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE SCHEMA IF NOT EXISTS "public";
 
