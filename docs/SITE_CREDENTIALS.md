@@ -236,6 +236,45 @@ psql -h aws-0-ap-south-1.pooler.supabase.com -p 6543 -d postgres -U postgres.dew
 
 ---
 
+## CLI Access Tokens
+
+### 站點 2 & 3 帳號 Access Token
+
+**用途**: Supabase CLI 多帳號切換（用於站點 2 和站點 3）
+
+```
+sbp_501d50c8ca940f93b0a3a60179ea552b8704999f
+```
+
+**使用方式**:
+```powershell
+# 設定環境變數
+$env:SUPABASE_ACCESS_TOKEN = "sbp_501d50c8ca940f93b0a3a60179ea552b8704999f"
+
+# 連結站點 2
+supabase link --project-ref rdyvmgomjdglflrcfijs
+
+# 連結站點 3
+supabase link --project-ref dewhcpfzrzewgknaqzwy
+```
+
+**或使用切換腳本**:
+```powershell
+# 切換到站點 2
+.\scripts\switch-to-site23.ps1 site2
+
+# 切換到站點 3
+.\scripts\switch-to-site23.ps1 site3
+```
+
+**注意事項**:
+- ⚠️ 此 Token 具有站點 2 & 3 完整管理權限
+- ⚠️ 請勿分享或提交到 Git
+- 🔄 建議每 3-6 個月輪換一次
+- 📅 Token 生成日期: 2026-01-25
+
+---
+
 ## 快速參考
 
 ### Supabase Dashboard URLs

@@ -1,5 +1,9 @@
 # 文檔目錄
 
+**最後更新**: 2026-01-25
+
+---
+
 ## 🛡️ 資料庫安全與 Migration（⚠️ 最高優先級 - 必讀！）
 
 | 文件 | 用途 | 閱讀時機 |
@@ -7,204 +11,124 @@
 | **[資料庫管理與遷移協議](DATABASE_SAFETY_PROTOCOL.md)** | ⚡ 最高指導原則（簡潔版） | **執行任何資料庫操作前必讀** |
 | **[SAFE_MIGRATION_GUIDE.md](SAFE_MIGRATION_GUIDE.md)** | 完整安全指南（7 種操作類型） | 建立 Migration 前參考 |
 | **[BACKUP_RESTORE_CHEATSHEET.md](BACKUP_RESTORE_CHEATSHEET.md)** | 快速參考與部署檢查清單 | 部署到生產環境前使用 |
-| **[Migration 檢查清單](../supabase/migrations/_CHECKLIST.md)** | 6 Phase 完整驗證流程 | 部署過程中逐項勾選 |
-| **[Migration 範本](../supabase/migrations/_TEMPLATE_safe_migration.sql)** | 可直接複製的安全範本 | 建立新 Migration 時使用 |
+| **[MIGRATION_WORKFLOW.md](MIGRATION_WORKFLOW.md)** | Migration 工作流程 | 理解 Migration 基礎概念 |
+| **[MIGRATION_DECISION_TREE.md](MIGRATION_DECISION_TREE.md)** | Migration 決策樹 | 選擇正確的 Migration 策略 |
 
 **🚨 緊急提醒**: 如果你看到「衝突需要 reset」的提示，**立即停止**並參考協議文件，絕不自動執行重置！
 
----
-
-## PostgreSQL 最佳實踐研究
-
-### 日期範圍查詢優化 (2026-01-03 新增)
-
-此系列文檔提供 PostgreSQL 中高效處理日期範圍查詢的完整指南，專為 Vsale-lite 訂單報表系統設計。
-
-#### 核心文檔
-
-1. **RESEARCH-SUMMARY.md** (本文件導覽)
-   - 快速概覽所有研究成果
-   - 核心發現與建議摘要
-   - Phase 8 實施計畫
-   - 每個文檔的快速查找指南
-
-2. **postgresql-date-range-optimization.md** (詳細研究，~800 行)
-   - **第 1 部分**: PostgreSQL 日期函數分析 (`NOW()`, `INTERVAL`, `date_trunc()` 對比)
-   - **第 2 部分**: 索引策略 (B-tree vs BRIN，複合索引，部分索引)
-   - **第 3 部分**: 快取策略 (Redis，Next.js cache，物化檢視表)
-   - **第 4 部分**: SQL 查詢範例 (7 類場景，26 個具體查詢)
-   - **第 5 部分**: Vsale-lite 實施建議 (Phase 8 任務分解)
-   - **附錄 A-B**: SQL 範本庫與參考資源
-
-3. **report-queries-reference.sql** (可直接運行的 SQL，~400 行)
-   - 8 類查詢範例 (基礎、日報表、週報表、月報表、分層分析、庫存分析、時間序列、效能測試)
-   - 每個查詢包含預期執行時間
-   - 可複製到 Supabase Studio SQL Editor 直接執行
-   - 包含快速參考與使用指南
-
-#### 實施指南
-
-**specs/004-cart-and-orders/performance-optimization.md** (實施步驟，~300 行)
-- **Task 1**: 新增複合索引 (15 分鐘)
-- **Task 2**: 建立報表 Server Actions (45 分鐘)
-- **Task 3**: PostgreSQL 報表函數 (30 分鐘)
-- **Task 4**: 報表 UI 頁面 (60 分鐘)
-- 效能基準與快取策略
-- 監控與完成檢查清單
+**相關資源**:
+- [Migration 檢查清單](../supabase/migrations/_CHECKLIST.md)
+- [Migration 範本](../supabase/migrations/_TEMPLATE_safe_migration.sql)
 
 ---
 
-## 快速開始
+## 🌐 多站點管理
 
-### 1. 理解研究成果 (5 分鐘)
-閱讀 `RESEARCH-SUMMARY.md` 的「核心發現與建議」部分
+本專案支援多站點部署（目前管理 3 個站點）。
 
-### 2. 學習最佳實踐 (30 分鐘)
-參考 `postgresql-date-range-optimization.md`:
-- 第 1 部分：日期函數選擇
-- 第 2 部分：索引設計
-- 第 3 部分：快取策略
+| 文件 | 用途 | 適用時機 |
+|------|------|---------|
+| **[MULTI_SITE_README.md](MULTI_SITE_README.md)** | 多站點管理總覽 | 了解多站點架構 |
+| **[SITE_CREDENTIALS.md](SITE_CREDENTIALS.md)** | 站點連線資訊（敏感） | 需要連線站點時 |
+| **[SITE2_MIGRATION_GUIDE.md](SITE2_MIGRATION_GUIDE.md)** | 站點 2 遷移指南（API 版本） | 遷移資料到站點 2 |
+| **[SITE2_FIX_RLS_GUIDE.md](SITE2_FIX_RLS_GUIDE.md)** | RLS 問題修復經驗 | 遇到 RLS 權限問題 |
+| **[SITE3_MIGRATION_GUIDE.md](SITE3_MIGRATION_GUIDE.md)** | 站點 3 遷移指南 | 遷移資料到站點 3 |
+| **[NEW_SITE_SETUP_GUIDE.md](NEW_SITE_SETUP_GUIDE.md)** | 新站點完整設置指南 | 建立新站點時 |
+| **[STORAGE_MIGRATION_CLI.md](STORAGE_MIGRATION_CLI.md)** | Storage 遷移工具 | 遷移 Supabase Storage 檔案 |
 
-### 3. 運行查詢範例 (15 分鐘)
-1. 開啟 Supabase Studio (http://127.0.0.1:54323)
-2. 進入 SQL Editor
-3. 複製 `report-queries-reference.sql` 中的查詢
-4. 修改時間參數並執行
-
-### 4. 實施 Phase 8 (3-4 小時)
-按 `specs/004-cart-and-orders/performance-optimization.md` 的 Task 1-7 依序實施
-
----
-
-## 核心建議速查
-
-### 日期函數
-```sql
--- ✅ 使用 INTERVAL（最快）
-WHERE created_at >= NOW() - INTERVAL '7 days'
-
--- ✅ 時間分組使用 date_trunc()
-GROUP BY date_trunc('day', created_at)
-
--- ✅ 時區轉換
-SELECT created_at AT TIME ZONE 'Asia/Taipei'
-```
-
-### 索引
-```sql
--- 已存在
-CREATE INDEX idx_orders_created_at ON orders(created_at DESC);
-CREATE INDEX idx_orders_user_status ON orders(user_id, status);
-
--- 推薦新增 (Phase 8)
-CREATE INDEX idx_orders_user_id_created_at ON orders(user_id, created_at DESC);
-CREATE INDEX idx_orders_status_created_at ON orders(status, created_at DESC);
-```
-
-### 快取
-```typescript
-// 應用層快取：5-15 分鐘 TTL
-const stats = await cacheGet('reports:daily:2026-01-03')
-if (!stats) {
-  stats = await getDailyReport()
-  await cacheSet('reports:daily:2026-01-03', stats, 600)
-}
-
-// 訂單變更時失效快取
-await invalidateReportCaches()
-```
-
-### 效能預期
-| 查詢類型 | 現況 | 優化後 | 目標 |
-|---------|------|--------|------|
-| 客戶 7 天訂單 | 30-50ms | 20-30ms | < 50ms ✓ |
-| 30 天統計 | 150-200ms | 80-100ms | < 100ms ✓ |
-| 月報表 | 200-300ms | 150-200ms | < 300ms ✓ |
-| 帶快取 | - | 5-50ms | < 50ms ✓ |
+**站點概覽**:
+- **站點 1 (主站)**: `qwovavytryvgchcowjof` - 生產環境主要站點（新加坡）
+- **站點 2**: `rdyvmgomjdglflrcfijs` - 第二營運站點（新加坡）
+- **站點 3**: `dewhcpfzrzewgknaqzwy` - 第三營運站點（孟買）
 
 ---
 
-## 文檔結構圖
+## 🎨 設計系統與 UI
 
-```
-docs/
-├── README.md (本文件)
-├── RESEARCH-SUMMARY.md (總結 & 快速參考)
-├── postgresql-date-range-optimization.md (詳細研究)
-└── report-queries-reference.sql (可運行的 SQL)
+| 文件 | 用途 | 適用時機 |
+|------|------|---------|
+| **[design-tokens.md](design-tokens.md)** | 設計 Token 系統 | 設計新元件時參考 |
+| **[responsive-ui-design.md](responsive-ui-design.md)** | 響應式 UI 設計詳解 | 理解響應式設計原則 |
+| **[responsive-guide.md](responsive-guide.md)** | 響應式開發指南 | 實作響應式元件 |
+| **[component-responsive-checklist.md](component-responsive-checklist.md)** | 元件響應式檢查清單 | 驗證元件響應式支援 |
 
-specs/004-cart-and-orders/
-└── performance-optimization.md (Phase 8 實施指南)
-```
+**核心原則**:
+- Mobile-First 策略
+- Neo-Brutalism 設計風格
+- 觸控目標 >= 44px × 44px (WCAG 2.1 AA)
+- 響應式斷點: `md: 768px` (平板) / `lg: 1024px` (桌面)
 
 ---
 
-## 使用提示
+## 📚 參考文檔
 
-### 搜尋特定主題
-
-| 主題 | 位置 |
+| 文件 | 用途 |
 |------|------|
-| 日期函數對比表 | postgresql-date-range-optimization.md § 1.1 |
-| INTERVAL vs date_trunc() | postgresql-date-range-optimization.md § 1.2-1.3 |
-| 索引推薦方案 | postgresql-date-range-optimization.md § 2.3 |
-| 快取層架構 | performance-optimization.md 或 postgresql-date-range-optimization.md § 3.1 |
-| 週報表 SQL | report-queries-reference.sql § 3 |
-| 實施 Task 清單 | performance-optimization.md § Phase 8 實施計畫 |
-
-### 文件大小參考
-- `RESEARCH-SUMMARY.md`: ~400 行 (快速概覽)
-- `postgresql-date-range-optimization.md`: ~800 行 (詳細參考)
-- `report-queries-reference.sql`: ~400 行 (可運行範例)
-- `performance-optimization.md`: ~300 行 (實施指南)
-- **總計**: ~1,900 行研究文檔
-
-### 編輯與維護
-所有文檔使用 Markdown 或 SQL 格式，便於版本控制。
-建議在以下時點重新審視：
-- Phase 9 開始時
-- 訂單數據量超過 100,000 筆時
-- 報表查詢時間超過效能目標時
+| **[QUICK-REFERENCE.md](QUICK-REFERENCE.md)** | 快速參考指南 |
+| **[supabase-quick-reference.md](supabase-quick-reference.md)** | Supabase 快速參考 |
+| **[supabase-docker-setup.md](supabase-docker-setup.md)** | Supabase Docker 設置 |
 
 ---
 
-## 相關檔案與指令
+## 📝 專案管理
 
-### 本地 Supabase
-```bash
-# 啟動本地 Supabase (Docker)
-supabase start
-
-# 重置資料庫並執行 Migrations
-supabase db reset
-
-# SQL 查詢
-psql -h 127.0.0.1 -p 54322 -U postgres -d postgres
-```
-
-### 效能測試
-```sql
--- 執行 EXPLAIN ANALYZE 查看執行計畫
-EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
-SELECT * FROM orders
-WHERE user_id = 'xxx'
-  AND created_at >= NOW() - INTERVAL '30 days'
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-### Git 提交本研究
-```bash
-git add docs/ specs/
-git commit -m "docs: 新增 PostgreSQL 日期範圍查詢最佳實踐研究"
-```
+| 文件 | 用途 |
+|------|------|
+| **[FILE_CLEANUP_PLAN.md](FILE_CLEANUP_PLAN.md)** | 檔案清理計畫 |
+| **[CLEANUP_SUMMARY.md](CLEANUP_SUMMARY.md)** | 清理摘要 |
+| **[LESSONS_LEARNED.md](LESSONS_LEARNED.md)** | 經驗教訓 |
+| **[CI_CD_MIGRATION_AUTOMATION_PLAN(未完成).md](CI_CD_MIGRATION_AUTOMATION_PLAN(未完成).md)** | CI/CD 自動化計畫（待實施） |
 
 ---
 
-**文檔完成日期**: 2026-01-03
-**適用版本**: Vsale-lite Phase 8+
+## 📦 Archive 資料夾
+
+已移至 Archive 的文檔（仍可查閱）：
+
+```
+docs/archive/
+├── deployment/      部署與環境變數指南
+├── backup/          備份與還原教學
+├── performance/     性能優化研究（PostgreSQL 日期範圍查詢最佳實踐）
+├── troubleshooting/ 故障排除指南
+├── migration/       Migration 快速指南
+├── fixes/           已修復的問題
+├── research/        已整合的研究
+├── debugging/       已解決的除錯
+├── decisions/       已整合的決策
+├── planning/        已完成的計畫
+└── firebase-research/ 已棄用的技術研究
+```
+
+詳見 [Archive README](archive/ARCHIVE_README.md)
+
+---
+
+## 🔍 快速搜尋
+
+### 我想...
+
+- **執行 Migration** → 閱讀 [DATABASE_SAFETY_PROTOCOL.md](DATABASE_SAFETY_PROTOCOL.md)
+- **設置新站點** → 閱讀 [NEW_SITE_SETUP_GUIDE.md](NEW_SITE_SETUP_GUIDE.md)
+- **遷移站點資料** → 閱讀對應站點的 Migration Guide
+- **設計響應式元件** → 閱讀 [responsive-guide.md](responsive-guide.md) + [design-tokens.md](design-tokens.md)
+- **查詢 Supabase 用法** → 閱讀 [supabase-quick-reference.md](supabase-quick-reference.md)
+- **查看過時文檔** → 瀏覽 `archive/` 資料夾
+
+---
+
+## 📊 文檔統計
+
+- **主目錄文件**: 24 個（核心參考）
+- **Archive 文件**: ~56 個（歷史參考）
+- **總計**: ~80 個文檔
+
+**最近更新**:
+- 2026-01-25: 完成文檔整理，將 35 個文件移至 Archive
+- 2026-01-25: 新增 PHASE3_MANUAL_SYNC_GUIDE（已移至 Archive）
+- 2026-01-24: 首頁優化完成（已移至 Archive）
+
+---
+
 **維護者**: Claude Code
-
----
-
-有任何問題或需要補充，請查閱各份文檔的相應章節。
+**專案**: Vsale-lite B2B 批發訂貨系統
