@@ -56,7 +56,7 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
   const handleImageClick = () => {
     const currentImage = imagesWithCacheBusting[currentIndex]
     if (currentImage?.series_id) {
-      router.push(`/store/products/series/${currentImage.series_id}`)
+      router.push(`/store/series/${currentImage.series_id}`)
     }
   }
 
