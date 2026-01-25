@@ -21,9 +21,10 @@ import { generatePageMetadata } from '@/lib/metadata'
 // - 大部分用戶直接讀取快取，載入時間 < 100ms
 export const revalidate = 600
 
-// ⭐ 優化：強制靜態生成與快取
-export const dynamic = 'force-static' // 強制靜態生成
-export const fetchCache = 'force-cache' // 強制快取
+// ⭐ 修正：移除 force-static（與使用者認證衝突）
+// - 首頁需要使用者認證資訊來顯示等級價格
+// - 使用動態渲染確保每位使用者看到正確的價格
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata() {
   return generatePageMetadata('首頁', '首頁廣告與商品展示')
