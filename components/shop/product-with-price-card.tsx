@@ -61,7 +61,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
   // 計算實際顯示的價格（等級價格優先，沒有則使用零售價）
   const displayPrice = product.user_price ?? product.retail_price
-  const priceLabel = product.user_price ? tierName : '零售價'
+  const priceLabel = product.user_price ? tierName : '售價'
 
   // 計算折扣百分比（僅當有等級價格且低於零售價時）
   const discountPercent =
@@ -165,24 +165,19 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             "border-black",
             "p-2 md:p-3"
           )}>
-            {/* 折扣提示（僅當有等級價格且有折扣時顯示） */}
-            {discountPercent > 0 && (
-              <div className="mb-1 flex items-center gap-1.5 flex-wrap">
-                <span className="text-xs text-gray-500">零售價</span>
-                <span className="text-xs text-gray-400 line-through">
+            {/* 只有當會員價低於售價時，才顯示售價（刪除線） */}
+            {product.user_price &&
+             product.retail_price &&
+             product.user_price < product.retail_price && (
+              <div className="mb-1">
+                <span className="text-xs text-gray-500">售價</span>
+                <span className="ml-1.5 text-xs text-gray-400 line-through">
                   ${product.retail_price}
-                </span>
-                <span className={cn(
-                  "rounded-none border border-red-600 bg-red-100",
-                  "px-1 py-0.5",
-                  "text-xs font-bold text-red-700"
-                )}>
-                  省{discountPercent}%
                 </span>
               </div>
             )}
 
-            {/* 顯示價格（等級價格或零售價） */}
+            {/* 顯示價格（等級價格或售價） */}
             <div className="flex items-baseline gap-1.5">
               <span className="text-lg md:text-2xl font-bold text-blue-600">
                 ${displayPrice}
@@ -204,11 +199,6 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             </p>
           </div>
         )}
-
-        {/* 單位 */}
-        <p className="text-xs text-gray-500">
-          單位: {product.unit}
-        </p>
 
         {/* 加入購物車按鈕 */}
         <button

@@ -62,6 +62,7 @@ export function ProductCard({ product }: ProductCardProps) {
       {/* 商品圖片 */}
       <div className={cn(
         "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
+        "relative",  // 新增：支援絕對定位
         designTokens.neoBrutalism.border.mobile,
         "border-black"
       )}>
@@ -79,6 +80,20 @@ export function ProductCard({ product }: ProductCardProps) {
             📦
           </div>
         )}
+
+        {/* 查看商品按鈕（右下角） */}
+        <div className="absolute right-2 bottom-2 z-10">
+          <span className={cn(
+            "inline-block rounded-none bg-white",
+            "border-2 border-black",
+            "shadow-neo-sm",
+            "px-2 py-1",
+            "text-xs font-bold",
+            "pointer-events-none"  // 不阻擋 Link 點擊
+          )}>
+            查看商品
+          </span>
+        </div>
       </div>
 
       {/* 商品資訊 */}
