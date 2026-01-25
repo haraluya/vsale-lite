@@ -139,20 +139,31 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             📦
           </div>
         )}
+
+        {/* 商品名稱標籤（左上角） */}
+        <div className="absolute left-2 top-2 z-10 max-w-[70%]">
+          <div className={cn(
+            "inline-block rounded-none bg-yellow-300",
+            designTokens.neoBrutalism.border.mobile,
+            "border-black",
+            "shadow-neo-sm",
+            "px-2 py-1.5 md:px-3 md:py-2",
+            "pointer-events-none"
+          )}>
+            <h3 className="line-clamp-2 font-bold text-xs md:text-sm leading-tight">
+              {product.name}
+            </h3>
+          </div>
+        </div>
+
+        {/* 庫存標籤（右上角） */}
+        <div className="absolute right-2 top-2 z-10">
+          <StockStatus status={product.stock_status} size="sm" />
+        </div>
       </div>
 
       {/* 商品資訊 */}
       <div className="space-y-1.5 md:space-y-3">
-        {/* 商品名稱與庫存狀況 */}
-        <div className="flex items-start gap-2">
-          <h3 className="flex-1 line-clamp-2 font-bold text-sm md:text-base leading-tight">
-            {product.name}
-          </h3>
-          <div className="flex-shrink-0">
-            <StockStatus status={product.stock_status} size="sm" />
-          </div>
-        </div>
-
         {/* 價格顯示 */}
         {displayPrice ? (
           <div className={cn(
@@ -233,8 +244,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             // SSR 時與首次渲染時統一顯示 Plus 圖示
             <span className="flex items-center justify-center gap-1.5">
               <Plus className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">加入購物車</span>
-              <span className="sm:hidden">加入</span>
+              <span>加入購物車</span>
             </span>
           ) : (
             // 客戶端 hydration 完成且購物車有商品時顯示 ShoppingCart 圖示

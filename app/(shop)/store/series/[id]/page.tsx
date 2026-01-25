@@ -89,26 +89,7 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
         designTokens.container.default,
         designTokens.spacing.page.gap
       )}>
-        {/* 返回按鈕 */}
-        <Link
-          href="/store/products"
-          className={cn(
-            "inline-flex items-center gap-2 rounded-none bg-white font-bold transition-all",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.mobile,
-            "md:shadow-neo",
-            designTokens.neoBrutalism.hover,
-            "px-3 py-2 md:px-4",
-            "min-h-[44px]",  // WCAG 2.1 AA
-            designTokens.spacing.section.marginBottom
-          )}
-        >
-          <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
-          <span className={designTokens.typography.body.base}>返回商品頁</span>
-        </Link>
-
-        {/* 系列標題 */}
+        {/* 系列標題與返回按鈕 */}
         <div className={cn(
           "rounded-none bg-white",
           designTokens.neoBrutalism.border.full,
@@ -117,16 +98,30 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
           designTokens.spacing.card.padding,
           designTokens.spacing.section.marginBottom
         )}>
-          <div className="flex items-baseline justify-between gap-4 mb-2">
+          <div className="flex items-center justify-between gap-4 mb-2">
+            {/* 返回按鈕 */}
+            <Link
+              href="/store/products"
+              className={cn(
+                "inline-flex items-center gap-2 rounded-none bg-gray-100 font-bold transition-all",
+                designTokens.neoBrutalism.border.full,
+                "border-black",
+                designTokens.neoBrutalism.shadow.mobile,
+                "md:shadow-neo",
+                designTokens.neoBrutalism.hover,
+                "px-3 py-2 md:px-4",
+                "min-h-[44px]"
+              )}
+            >
+              <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
+              <span className={cn(designTokens.typography.body.base, "hidden sm:inline")}>返回商品頁</span>
+            </Link>
+
+            {/* 系列名稱 */}
             <h1 className={cn(
-              designTokens.typography.h1
+              designTokens.typography.h1,
+              "text-right"
             )}>{series.name}</h1>
-            <p className={cn(
-              designTokens.typography.caption,
-              "text-gray-500 whitespace-nowrap"
-            )}>
-              會員等級: <span className="font-bold">{tierName}</span>
-            </p>
           </div>
           {series.description && (
             <p className={cn(
