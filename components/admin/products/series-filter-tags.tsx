@@ -111,6 +111,26 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
   const selectedSeries = series.filter((s) => selectedSeriesIds.includes(s.id))
   const unselectedSeries = series.filter((s) => !selectedSeriesIds.includes(s.id))
 
+  // 將所有系列按分類排序後平鋪顯示
+  const sortedAllSeries: Array<{ series: Series; color: string }> = []
+
+  // 先加入已排序的分類系列
+  sortedCategories.forEach(([categoryId, { series: categorySeries, color }]) => {
+    categorySeries.forEach((s) => {
+      sortedAllSeries.push({ series: s, color })
+    })
+  })
+
+  // 再加入未分類系列
+  uncategorizedSeries.forEach((s) => {
+    sortedAllSeries.push({ series: s, color: '#D1D5DB' })
+  })
+
+  // 分離已選中和未選中的系列（使用排序後的列表）
+  const sortedUnselectedSeries = sortedAllSeries.filter(
+    ({ series: s }) => !selectedSeriesIds.includes(s.id)
+  )
+
   return (
     <div className="flex flex-col gap-3">
       {/* 標題 */}
@@ -118,7 +138,32 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
         <h3 className="text-sm font-bold uppercase text-gray-600">系列篩選</h3>
       </div>
 
-      {/* 已選中的系列（獨立群組，置頂顯示） */}
+      {/* 所有系列標籤（未選中的，按分類排序平鋪） */}
+      <div className="flex flex-wrap gap-2">
+        {sortedUnselectedSeries.map(({ series: s, color }) => (
+          <button
+            key={s.id}
+            onClick={() => handleToggleSeries(s.id)}
+            className="
+              rounded-none border-2 border-black
+              px-3 py-1.5
+              text-sm font-bold
+              shadow-neo
+              transition-transform
+              hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+            "
+            style={{
+              backgroundColor: color,
+              color: '#000000',
+              opacity: 0.7,
+            }}
+          >
+            {s.name}
+          </button>
+        ))}
+      </div>
+
+      {/* 已選中的系列（獨立群組） */}
       {selectedSeries.length > 0 && (
         <div className="flex flex-col gap-2 rounded-none border-2 border-black bg-gray-50 p-3">
           <div className="flex items-center justify-between">
@@ -145,9 +190,10 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
           <div className="flex flex-wrap gap-2">
             {selectedSeries.map((s) => {
               // 找到該系列的分類顏色
-              const categoryColor = s.category_id && categoryMap.has(s.category_id)
-                ? categoryMap.get(s.category_id)!.color
-                : '#D1D5DB' // 未分類使用灰色
+              const categoryColor =
+                s.category_id && categoryMap.has(s.category_id)
+                  ? categoryMap.get(s.category_id)!.color
+                  : '#D1D5DB' // 未分類使用灰色
 
               return (
                 <button
@@ -176,80 +222,6 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
           </div>
         </div>
       )}
-
-      {/* 按分類分組顯示系列標籤 */}
-      <div className="flex flex-col gap-4">
-        {sortedCategories.map(([categoryId, { name: categoryName, series: categorySeries, color }]) => {
-          const unselectedInCategory = categorySeries.filter((s) => !selectedSeriesIds.includes(s.id))
-
-          // 只顯示有未選中系列的分類
-          if (unselectedInCategory.length === 0) return null
-
-          return (
-            <div key={categoryId} className="flex flex-col gap-2">
-              {/* 分類標題 */}
-              <h4 className="text-xs font-bold uppercase text-gray-600">{categoryName}</h4>
-
-              {/* 該分類下的系列標籤 */}
-              <div className="flex flex-wrap gap-2">
-                {unselectedInCategory.map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => handleToggleSeries(s.id)}
-                    className="
-                      rounded-none border-2 border-black
-                      px-3 py-1.5
-                      text-sm font-bold
-                      shadow-neo
-                      transition-transform
-                      hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
-                    "
-                    style={{
-                      backgroundColor: color,
-                      color: '#000000',
-                      opacity: 0.7,
-                    }}
-                  >
-                    {s.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )
-        })}
-
-        {/* 未分類系列 */}
-        {uncategorizedSeries.filter((s) => !selectedSeriesIds.includes(s.id)).length > 0 && (
-          <div className="flex flex-col gap-2">
-            <h4 className="text-xs font-bold uppercase text-gray-600">未分類</h4>
-            <div className="flex flex-wrap gap-2">
-              {uncategorizedSeries
-                .filter((s) => !selectedSeriesIds.includes(s.id))
-                .map((s) => (
-                  <button
-                    key={s.id}
-                    onClick={() => handleToggleSeries(s.id)}
-                    className="
-                      rounded-none border-2 border-black
-                      px-3 py-1.5
-                      text-sm font-bold
-                      shadow-neo
-                      transition-transform
-                      hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
-                    "
-                    style={{
-                      backgroundColor: '#D1D5DB', // 未分類使用灰色
-                      color: '#000000',
-                      opacity: 0.7,
-                    }}
-                  >
-                    {s.name}
-                  </button>
-                ))}
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   )
 }
