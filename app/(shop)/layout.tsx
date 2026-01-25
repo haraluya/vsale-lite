@@ -83,7 +83,7 @@ export default async function ShopLayout({
       <Navbar user={currentUser} />
 
       {/* 主要內容區域 - 添加頂部間距避免被導覽列遮擋 */}
-      <div className="pt-[72px] md:pt-[80px]">
+      <div className="pt-[84px] md:pt-[100px]">
         {/* 次導覽列 */}
         <SecondaryNav
           userPhone={currentUser.phone || currentUser.email || ''}
