@@ -121,6 +121,8 @@ export type Series = {
   categories?: {
     name: string
   } | null
+  // 🆕 最低售價（用於系列卡片顯示，前台查詢時包含）
+  min_retail_price?: number | null
 }
 
 // 商品

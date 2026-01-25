@@ -20,8 +20,8 @@ export async function getActiveSeries(category_id?: string): Promise<ActionResul
     const supabase = await createClient()
     await checkAuth() // 驗證登入
 
-    // JOIN categories 表以取得分類排序欄位
-    let query = supabase
+    // 先查詢系列資料（包含分類排序）
+    let seriesQuery = supabase
       .from('series')
       .select(`
         *,
@@ -34,21 +34,42 @@ export async function getActiveSeries(category_id?: string): Promise<ActionResul
 
     // 若提供 category_id,過濾分類
     if (category_id) {
-      query = query.eq('category_id', category_id)
+      seriesQuery = seriesQuery.eq('category_id', category_id)
     }
 
-    const { data, error } = await query
+    const { data: seriesData, error: seriesError } = await seriesQuery
 
-    if (error) {
-      console.error('getActiveSeries 錯誤:', error)
+    if (seriesError) {
+      console.error('getActiveSeries 錯誤:', seriesError)
       return { success: false, message: '查詢失敗' }
     }
 
-    // 手動排序：1. 分類排序 2. 系列編號
-    const sortedData = (data || [])
+    // 取得所有系列的 ID
+    const seriesIds = (seriesData || []).map((s: any) => s.id)
+
+    // 查詢每個系列的最低售價
+    const { data: minPricesData } = await supabase
+      .from('products')
+      .select('series_id, retail_price')
+      .in('series_id', seriesIds)
+      .eq('status', 'active')
+      .not('retail_price', 'is', null)
+
+    // 計算每個系列的最低售價
+    const minPricesBySeries = new Map<string, number>()
+    ;(minPricesData || []).forEach((product: any) => {
+      const currentMin = minPricesBySeries.get(product.series_id)
+      if (currentMin === undefined || product.retail_price < currentMin) {
+        minPricesBySeries.set(product.series_id, product.retail_price)
+      }
+    })
+
+    // 手動排序：1. 分類排序 2. 系列編號，並加入最低售價
+    const sortedData = (seriesData || [])
       .map((item: any) => ({
         ...item,
         category_sort_order: item.categories?.sort_order ?? 999,
+        min_retail_price: minPricesBySeries.get(item.id) ?? null,
       }))
       .sort((a, b) => {
         // 第一優先：分類排序

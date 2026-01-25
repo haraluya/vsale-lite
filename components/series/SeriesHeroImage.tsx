@@ -79,13 +79,6 @@ export function SeriesHeroImage({
           <X className="h-5 w-5" />
         </button>
       )}
-
-        {/* 圖片標籤 */}
-        <div className="absolute bottom-4 left-4 rounded-none border-2 border-black bg-white px-4 py-2 shadow-neo">
-          <p className="text-sm font-bold">
-            {isProductImage ? '商品圖片' : '系列圖片'}: {displayName}
-          </p>
-        </div>
       </div>
 
       {/* 圖片彈窗 */}

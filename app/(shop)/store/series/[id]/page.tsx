@@ -91,7 +91,7 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
       )}>
         {/* 返回按鈕 */}
         <Link
-          href="/store"
+          href="/store/products"
           className={cn(
             "inline-flex items-center gap-2 rounded-none bg-white font-bold transition-all",
             designTokens.neoBrutalism.border.full,
@@ -105,7 +105,7 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
           )}
         >
           <ArrowLeft className="h-4 w-4 md:h-5 md:w-5" />
-          <span className={designTokens.typography.body.base}>返回系列列表</span>
+          <span className={designTokens.typography.body.base}>返回商品頁</span>
         </Link>
 
         {/* 系列標題 */}
@@ -117,22 +117,23 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
           designTokens.spacing.card.padding,
           designTokens.spacing.section.marginBottom
         )}>
-          <h1 className={cn(
-            designTokens.typography.h1,
-            "mb-2"
-          )}>{series.name}</h1>
+          <div className="flex items-baseline justify-between gap-4 mb-2">
+            <h1 className={cn(
+              designTokens.typography.h1
+            )}>{series.name}</h1>
+            <p className={cn(
+              designTokens.typography.caption,
+              "text-gray-500 whitespace-nowrap"
+            )}>
+              會員等級: <span className="font-bold">{tierName}</span>
+            </p>
+          </div>
           {series.description && (
             <p className={cn(
               designTokens.typography.body.base,
               "text-gray-600"
             )}>{series.description}</p>
           )}
-          <p className={cn(
-            designTokens.typography.caption,
-            "mt-4 text-gray-500"
-          )}>
-            會員等級: <span className="font-bold">{tierName}</span>
-          </p>
         </div>
 
         {/* 商品列表與圖片切換功能 */}

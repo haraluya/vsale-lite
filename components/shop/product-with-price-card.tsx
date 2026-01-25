@@ -95,13 +95,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
   const handleImageClick = () => {
     if (!imageUrl) return
 
-    // 如果有 onImageClick callback（系列頁Hero圖切換），優先使用
-    if (onImageClick) {
-      onImageClick(imageUrl, product.name)
-    } else {
-      // 否則開啟彈窗
-      setIsModalOpen(true)
-    }
+    // 直接開啟彈窗預覽圖片
+    setIsModalOpen(true)
   }
 
   return (
@@ -144,20 +139,6 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             📦
           </div>
         )}
-
-        {/* 查看商品按鈕（右下角） */}
-        <div className="absolute right-2 bottom-2 z-10">
-          <span className={cn(
-            "inline-block rounded-none bg-white",
-            "border-2 border-black",
-            "shadow-neo-sm",
-            "px-2 py-1",
-            "text-xs font-bold",
-            "pointer-events-none"  // 不阻擋圖片點擊
-          )}>
-            查看商品
-          </span>
-        </div>
       </div>
 
       {/* 商品資訊 */}
@@ -267,7 +248,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       </div>
 
       {/* 圖片彈窗 */}
-      {imageUrl && !onImageClick && (
+      {imageUrl && (
         <ImageModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
