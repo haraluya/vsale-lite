@@ -87,13 +87,15 @@ export function TrendChartSkeleton() {
         <Skeleton className="h-4 w-48" />
       </div>
       <div className="h-64 flex items-end justify-around gap-2">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <Skeleton
-            key={i}
-            className="w-full"
-            style={{ height: `${Math.random() * 60 + 40}%` }}
-          />
-        ))}
+        {Array.from({ length: 7 }).map((_, i) => {
+          const heights = ['h-32', 'h-40', 'h-48', 'h-52', 'h-56', 'h-44', 'h-36']
+          return (
+            <Skeleton
+              key={i}
+              className={`w-full ${heights[i]}`}
+            />
+          )
+        })}
       </div>
     </div>
   )
