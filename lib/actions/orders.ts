@@ -416,7 +416,7 @@ export async function getOrders(
       query = query.eq('status', status)
     }
 
-    // 訂單編號搜尋
+    // 訂單編號搜尋（僅限管理員）
     if (search && role === 'admin') {
       query = query.ilike('order_number', `%${search}%`)
     }
@@ -455,7 +455,7 @@ export async function getOrders(
     )
 
     // 轉換資料格式
-    const formattedOrders: OrderWithUser[] = orders.map((order: any) => {
+    let formattedOrders: OrderWithUser[] = orders.map((order: any) => {
       const profile = profileMap.get(order.user_id)
       return {
         id: order.id,
@@ -472,6 +472,16 @@ export async function getOrders(
         tier_name: profile?.tiers?.name || '未設定',
       }
     })
+
+    // 🆕 Phase 2.2: 支援客戶名稱與手機號碼搜尋（Server 端篩選）
+    if (search && role === 'admin') {
+      const searchLower = search.toLowerCase()
+      formattedOrders = formattedOrders.filter(order =>
+        order.order_number.toLowerCase().includes(searchLower) ||
+        (order.user_name && order.user_name.toLowerCase().includes(searchLower)) ||
+        (order.user_phone && order.user_phone.includes(search))
+      )
+    }
 
     return {
       success: true,
