@@ -13,11 +13,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Edit, Trash2, Search } from 'lucide-react'
-import { deleteSeries } from '@/lib/actions/series'
+import { deleteSeries, updateSeriesStatus } from '@/lib/actions/series'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { CategoryBadge } from './CategoryBadge'
 import { SortableHeader } from './SortableHeader'
+import { SeriesThumbnail } from './SeriesThumbnail'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Series, Category } from '@/types'
@@ -70,6 +71,26 @@ export function SeriesTable({
       await alert({
         title: '刪除失敗',
         message: result.message || '刪除系列失敗',
+        variant: 'error',
+      })
+    }
+  }
+
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active'
+    const result = await updateSeriesStatus(id, newStatus)
+
+    if (result.success) {
+      await alert({
+        title: '狀態更新成功',
+        message: result.message || `系列已${newStatus === 'active' ? '啟用' : '停用'}`,
+        variant: 'success',
+      })
+      router.refresh()
+    } else {
+      await alert({
+        title: '狀態更新失敗',
+        message: result.message || '狀態更新失敗',
         variant: 'error',
       })
     }
@@ -149,21 +170,12 @@ export function SeriesTable({
                   <tr key={s.id} className="border-b border-gray-200 hover:bg-gray-50">
                     {/* 縮圖 */}
                     <td className="px-4 py-3">
-                      <div className="relative h-12 w-12 border-2 border-black bg-gray-100">
-                        {s.image_url ? (
-                          <Image
-                            src={s.image_url}
-                            alt={s.name}
-                            fill
-                            className="object-cover"
-                            sizes="48px"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-2xl">
-                            📦
-                          </div>
-                        )}
-                      </div>
+                      <SeriesThumbnail
+                        seriesId={s.id}
+                        imageUrl={s.image_url}
+                        seriesName={s.name}
+                        onUploadSuccess={() => router.refresh()}
+                      />
                     </td>
 
                     {/* 系列代碼 */}
@@ -171,27 +183,31 @@ export function SeriesTable({
                       {s.code}
                     </td>
 
-                    {/* 分類 / 系列名稱 */}
+                    {/* 分類 / 系列名稱（同行顯示） */}
                     <td className={cn('px-4 py-3', designTokens.typography.body.base)}>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
                         <CategoryBadge categoryName={s.categories?.name || '未分類'} size="sm" />
                         <div className="font-medium">{s.name}</div>
                       </div>
                     </td>
 
-                    {/* 狀態 */}
+                    {/* 狀態（快速切換開關） */}
                     <td className="px-4 py-3">
-                      <span
+                      <button
+                        onClick={() => handleToggleStatus(s.id, s.status)}
                         className={cn(
-                          'rounded-none border-2 border-black px-2 py-1 font-bold',
+                          'rounded-none border-2 border-black px-2 py-1 font-bold transition-all',
+                          'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                          'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
                           designTokens.typography.caption,
                           s.status === 'active'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
                         )}
+                        title={s.status === 'active' ? '點擊停用' : '點擊啟用'}
                       >
                         {s.status === 'active' ? '啟用' : '停用'}
-                      </span>
+                      </button>
                     </td>
 
                     {/* 操作 */}
@@ -240,48 +256,45 @@ export function SeriesTable({
               >
                 {/* 縮圖與基本資訊 */}
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="relative h-16 w-16 min-w-[64px] border-2 border-black bg-gray-100">
-                    {s.image_url ? (
-                      <Image
-                        src={s.image_url}
-                        alt={s.name}
-                        fill
-                        className="object-cover"
-                        sizes="64px"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-3xl">
-                        📦
-                      </div>
-                    )}
+                  <div className="w-16 min-w-[64px]">
+                    <SeriesThumbnail
+                      seriesId={s.id}
+                      imageUrl={s.image_url}
+                      seriesName={s.name}
+                      onUploadSuccess={() => router.refresh()}
+                    />
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className={cn('font-mono text-gray-600 mb-1', designTokens.typography.caption)}>
+                    <div className={cn('font-mono text-gray-600 mb-2', designTokens.typography.caption)}>
                       {s.code}
                     </div>
-                    <div className="mb-1">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <CategoryBadge categoryName={s.categories?.name || '未分類'} size="sm" />
-                    </div>
-                    <div className={cn('font-bold truncate', designTokens.typography.body.base)}>
-                      {s.name}
+                      <div className={cn('font-bold', designTokens.typography.body.base)}>
+                        {s.name}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 狀態 */}
+                {/* 狀態（快速切換開關） */}
                 <div className="flex items-center gap-2 mb-3">
-                  <span
+                  <button
+                    onClick={() => handleToggleStatus(s.id, s.status)}
                     className={cn(
-                      'rounded-none border-2 border-black px-2 py-1 font-bold',
+                      'rounded-none border-2 border-black px-2 py-1 font-bold transition-all',
+                      'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
+                      'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
                       designTokens.typography.caption,
                       s.status === 'active'
                         ? 'bg-green-100 text-green-800'
                         : 'bg-gray-100 text-gray-800'
                     )}
+                    title={s.status === 'active' ? '點擊停用' : '點擊啟用'}
                   >
                     {s.status === 'active' ? '啟用' : '停用'}
-                  </span>
+                  </button>
                 </div>
 
                 {/* 操作按鈕 */}

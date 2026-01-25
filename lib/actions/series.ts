@@ -337,6 +337,64 @@ export async function updateSeries(
 }
 
 /**
+ * 快速更新系列狀態 (僅管理員)
+ * @param id 系列 ID
+ * @param status 新狀態 ('active' | 'inactive')
+ */
+export async function updateSeriesStatus(
+  id: string,
+  status: 'active' | 'inactive'
+): Promise<ActionResult<Series>> {
+  try {
+    await checkAuth('admin') // 僅管理員可執行
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    // 檢查系列是否存在
+    const { data: existing } = await adminClient
+      .from('series')
+      .select('id')
+      .eq('id', id)
+      .single()
+
+    if (!existing) {
+      return { success: false, message: '系列不存在' }
+    }
+
+    // 更新狀態
+    const { data: updated, error } = await adminClient
+      .from('series')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) {
+      console.error('updateSeriesStatus 錯誤:', error)
+      return { success: false, message: '狀態更新失敗' }
+    }
+
+    // 更新快取
+    revalidatePath('/admin/series')
+    revalidatePath('/store')
+    revalidatePath(`/store/series/${id}`)
+    revalidateTag('series')
+    revalidateTag('products')
+    revalidateTag('tier-prices')
+
+    return {
+      success: true,
+      data: updated as Series,
+      message: `系列已${status === 'active' ? '啟用' : '停用'}`,
+    }
+  } catch (error) {
+    console.error('updateSeriesStatus 異常:', error)
+    return { success: false, message: error instanceof Error ? error.message : '狀態更新失敗' }
+  }
+}
+
+/**
  * 刪除系列 (僅管理員,需檢查是否有商品)
  * @param id 系列 ID
  */
