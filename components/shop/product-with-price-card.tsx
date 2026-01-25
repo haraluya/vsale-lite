@@ -116,6 +116,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       <div
         className={cn(
           "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
+          "relative",  // 新增：支援絕對定位
           designTokens.neoBrutalism.border.mobile,
           "border-black",
           imageUrl && "cursor-pointer",
@@ -143,6 +144,20 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             📦
           </div>
         )}
+
+        {/* 查看商品按鈕（右下角） */}
+        <div className="absolute right-2 bottom-2 z-10">
+          <span className={cn(
+            "inline-block rounded-none bg-white",
+            "border-2 border-black",
+            "shadow-neo-sm",
+            "px-2 py-1",
+            "text-xs font-bold",
+            "pointer-events-none"  // 不阻擋圖片點擊
+          )}>
+            查看商品
+          </span>
+        </div>
       </div>
 
       {/* 商品資訊 */}
@@ -165,23 +180,23 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             "border-black",
             "p-2 md:p-3"
           )}>
-            {/* 只有當會員價低於售價時，才顯示售價（刪除線） */}
-            {product.user_price &&
-             product.retail_price &&
-             product.user_price < product.retail_price && (
-              <div className="mb-1">
-                <span className="text-xs text-gray-500">售價</span>
-                <span className="ml-1.5 text-xs text-gray-400 line-through">
+            {/* 價格顯示（右邊對齊，同一行） */}
+            <div className="flex items-baseline gap-1.5 justify-end flex-wrap">
+              {/* 售價（刪除線） - 只有當會員價低於售價時顯示 */}
+              {product.user_price &&
+               product.retail_price &&
+               product.user_price < product.retail_price && (
+                <span className="text-xs text-gray-400 line-through">
                   ${product.retail_price}
                 </span>
-              </div>
-            )}
+              )}
 
-            {/* 顯示價格（等級價格或售價） */}
-            <div className="flex items-baseline gap-1.5">
+              {/* 會員價格 */}
               <span className="text-lg md:text-2xl font-bold text-blue-600">
                 ${displayPrice}
               </span>
+
+              {/* 價格標籤 */}
               <span className="text-xs text-gray-600">
                 ({priceLabel})
               </span>
