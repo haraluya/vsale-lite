@@ -31,13 +31,11 @@ export function Navbar({ user }: NavbarProps) {
   const confirm = useConfirm()
   const alert = useAlert()
   const [loading, setLoading] = useState(false)
-  const [cartItemsCount, setCartItemsCount] = useState(0)
-  const { getTotalItems } = useCartStore()
 
-  // 修復 Hydration Error：在客戶端載入後才讀取購物車數量
-  useEffect(() => {
-    setCartItemsCount(getTotalItems())
-  }, [getTotalItems])
+  // 即時訂閱購物車狀態變化，自動更新數量
+  const cartItemsCount = useCartStore(state =>
+    state.items.reduce((total, item) => total + item.quantity, 0)
+  )
 
   const handleLogout = async () => {
     const confirmed = await confirm({

@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { loginWithPhone } from '@/lib/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@/components/ui/loading'
 import type { ActionResult } from '@/types'
 
 export function ClientLoginForm() {
+  const [phone, setPhone] = useState('')
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     loginWithPhone,
     null
@@ -27,6 +28,8 @@ export function ClientLoginForm() {
           placeholder="0912345678"
           required
           className="mt-2"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
         />
         {state && 'errors' in state && state.errors?.phone && (
           <p className="mt-2 text-sm text-red-500">{state.errors.phone[0]}</p>

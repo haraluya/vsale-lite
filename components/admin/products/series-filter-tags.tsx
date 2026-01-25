@@ -17,7 +17,7 @@
 
 import type { Series } from '@/types'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { X, Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { X, Check } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { getAvailableTags } from '@/lib/actions/tags'
 
@@ -43,9 +43,8 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  // 折疊狀態
-  const [isSeriesExpanded, setIsSeriesExpanded] = useState(true)
-  const [isTagsExpanded, setIsTagsExpanded] = useState(false)
+  // Tab 切換狀態：'series' 或 'tags'
+  const [activeTab, setActiveTab] = useState<'series' | 'tags'>('series')
 
   // 標籤列表
   const [availableTags, setAvailableTags] = useState<string[]>([])
@@ -64,21 +63,33 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
     : []
 
   // 載入所有標籤
-  useEffect(() => {
-    async function loadTags() {
-      setIsLoadingTags(true)
-      try {
-        const result = await getAvailableTags()
-        if (result.success && result.data) {
-          setAvailableTags(result.data)
-        }
-      } catch (error) {
-        console.error('載入標籤失敗:', error)
-      } finally {
-        setIsLoadingTags(false)
+  const loadTags = async () => {
+    setIsLoadingTags(true)
+    try {
+      const result = await getAvailableTags()
+      if (result.success && result.data) {
+        setAvailableTags(result.data)
       }
+    } catch (error) {
+      console.error('載入標籤失敗:', error)
+    } finally {
+      setIsLoadingTags(false)
     }
+  }
+
+  useEffect(() => {
     loadTags()
+
+    // 監聽標籤更新事件，實時重新載入標籤列表
+    const handleTagsUpdated = () => {
+      loadTags()
+    }
+
+    window.addEventListener('product-tags-updated', handleTagsUpdated)
+
+    return () => {
+      window.removeEventListener('product-tags-updated', handleTagsUpdated)
+    }
   }, [])
 
   const handleToggleSeries = (seriesId: string) => {
@@ -201,24 +212,39 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* 系列篩選區塊 */}
-      <div className="flex flex-col gap-3">
-        {/* 系列篩選標題（可點擊折疊） */}
+      {/* Tab 切換按鈕 */}
+      <div className="flex gap-2">
         <button
-          onClick={() => setIsSeriesExpanded(!isSeriesExpanded)}
-          className="flex items-center justify-between hover:opacity-80 transition-opacity"
+          onClick={() => setActiveTab('series')}
+          className={`
+            rounded-none border-2 border-black px-4 py-2 font-bold text-sm
+            transition-all shadow-neo-sm
+            ${activeTab === 'series'
+              ? 'bg-blue-400 translate-x-[2px] translate-y-[2px] shadow-none'
+              : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
+            }
+          `}
         >
-          <h3 className="text-sm font-bold uppercase text-gray-600">系列篩選</h3>
-          {isSeriesExpanded ? (
-            <ChevronUp className="h-5 w-5 text-gray-600" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-gray-600" />
-          )}
+          系列篩選
         </button>
+        <button
+          onClick={() => setActiveTab('tags')}
+          className={`
+            rounded-none border-2 border-black px-4 py-2 font-bold text-sm
+            transition-all shadow-neo-sm
+            ${activeTab === 'tags'
+              ? 'bg-blue-400 translate-x-[2px] translate-y-[2px] shadow-none'
+              : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
+            }
+          `}
+        >
+          標籤篩選
+        </button>
+      </div>
 
-        {/* 系列篩選內容（可折疊） */}
-        {isSeriesExpanded && (
-          <>
+      {/* 系列篩選區塊 */}
+      {activeTab === 'series' && (
+      <div className="flex flex-col gap-3">
             {/* 所有系列標籤（未選中的，按分類排序平鋪） */}
             <div className="flex flex-wrap gap-2">
               {sortedUnselectedSeries.map(({ series: s, color }) => (
@@ -303,28 +329,12 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                 </div>
               </div>
             )}
-          </>
-        )}
       </div>
+      )}
 
       {/* 標籤篩選區塊 */}
-      <div className="flex flex-col gap-3 border-t-2 border-black pt-4">
-        {/* 標籤篩選標題（可點擊折疊） */}
-        <button
-          onClick={() => setIsTagsExpanded(!isTagsExpanded)}
-          className="flex items-center justify-between hover:opacity-80 transition-opacity"
-        >
-          <h3 className="text-sm font-bold uppercase text-gray-600">標籤篩選</h3>
-          {isTagsExpanded ? (
-            <ChevronUp className="h-5 w-5 text-gray-600" />
-          ) : (
-            <ChevronDown className="h-5 w-5 text-gray-600" />
-          )}
-        </button>
-
-        {/* 標籤篩選內容（可折疊） */}
-        {isTagsExpanded && (
-          <>
+      {activeTab === 'tags' && (
+      <div className="flex flex-col gap-3">
             {isLoadingTags ? (
               <div className="text-sm text-gray-500">載入標籤中...</div>
             ) : availableTags.length === 0 ? (
@@ -403,9 +413,8 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                 )}
               </>
             )}
-          </>
-        )}
       </div>
+      )}
     </div>
   )
 }

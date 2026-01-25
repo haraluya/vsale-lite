@@ -107,6 +107,10 @@ export function ProductTagsEditor({
           message: result.message || '標籤已成功更新',
           variant: 'success'
         })
+
+        // 發送標籤更新事件，通知篩選器重新載入標籤列表
+        window.dispatchEvent(new Event('product-tags-updated'))
+
         onUpdateSuccess?.()
       } else {
         await alert({

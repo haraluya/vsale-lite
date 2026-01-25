@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 import { loginWithUsername } from '@/lib/actions/admins'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@/components/ui/loading'
 import type { ActionResult } from '@/types'
 
 export function AdminLoginForm() {
+  const [username, setUsername] = useState('')
   const [state, formAction, pending] = useActionState<ActionResult | null, FormData>(
     async (_prevState: ActionResult | null, formData: FormData) => {
       const username = formData.get('username') as string
@@ -31,6 +32,8 @@ export function AdminLoginForm() {
           placeholder="請輸入管理員帳號"
           required
           className="mt-2"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
         {state && 'errors' in state && state.errors?.username && (
           <p className="mt-2 text-sm text-red-500">{state.errors.username[0]}</p>
