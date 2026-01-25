@@ -140,8 +140,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           </div>
         )}
 
-        {/* 商品名稱標籤（左上角） */}
-        <div className="absolute left-2 top-2 z-10 max-w-[70%]">
+        {/* 商品名稱標籤（左下角） */}
+        <div className="absolute left-2 bottom-2 z-10 max-w-[70%]">
           <div className={cn(
             "inline-block rounded-none bg-yellow-300",
             designTokens.neoBrutalism.border.mobile,
