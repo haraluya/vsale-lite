@@ -117,12 +117,10 @@ export async function createCategory(
       }
     }
 
-    // 6. 重新驗證快取
-    revalidatePath('/admin/categories')
-    revalidatePath('/store')
+    // 6. 重新驗證快取（使用細粒度標籤失效）
     revalidateTag('categories')
-    revalidateTag('series')
-    revalidateTag('products')
+    revalidateTag('series')  // 系列有 category 關聯
+    revalidateTag('products')  // 商品透過 series 關聯分類
 
     return {
       success: true,
@@ -241,10 +239,9 @@ export async function updateCategory(
       }
     }
 
-    // 7. 重新驗證快取
-    revalidatePath('/admin/categories')
-    revalidatePath('/store')
+    // 7. 重新驗證快取（使用細粒度標籤失效）
     revalidateTag('categories')
+    revalidateTag(`category:${id}`)  // 單一分類快取
     revalidateTag('series')
     revalidateTag('products')
 
@@ -304,10 +301,9 @@ export async function deleteCategory(id: string): Promise<ActionResult> {
       }
     }
 
-    // 4. 重新驗證快取
-    revalidatePath('/admin/categories')
-    revalidatePath('/store')
+    // 4. 重新驗證快取（使用細粒度標籤失效）
     revalidateTag('categories')
+    revalidateTag(`category:${id}`)
     revalidateTag('series')
     revalidateTag('products')
 
@@ -388,12 +384,9 @@ export async function migrateCategoryProducts(
       }
     }
 
-    // 5. 重新驗證快取
-    revalidatePath('/admin/categories')
-    revalidatePath('/admin/products')
-    revalidatePath('/store')
+    // 5. 重新驗證快取（使用細粒度標籤失效）
     revalidateTag('categories')
-    revalidateTag('products')
+    revalidateTag('products')  // 商品分類變更
 
     return {
       success: true,
@@ -449,11 +442,8 @@ export async function updateCategoriesOrder(
       }
     }
 
-    // 4. 重新驗證快取
-    revalidatePath('/admin/categories')
-    revalidatePath('/admin/products')
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
+    // 4. 重新驗證快取（使用細粒度標籤失效）
+    revalidateTag('categories')  // 排序變更
 
     return {
       success: true,

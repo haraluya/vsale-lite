@@ -295,10 +295,9 @@ export async function createProduct(
       },
     })
 
-    // 8. 重新驗證快取
+    // 8. 重新驗證快取（使用細粒度標籤失效）
     revalidateTag('products')
-    revalidatePath('/admin/products')
-    revalidatePath('/store')
+    revalidateTag('dashboard-stats')  // 影響庫存警示
 
     return {
       success: true,
@@ -415,11 +414,10 @@ export async function updateProduct(
       new_values: data,
     })
 
-    // 8. 重新驗證快取
+    // 8. 重新驗證快取（使用細粒度標籤失效）
     revalidateTag('products')
-    revalidatePath('/admin/products')
-    revalidatePath(`/admin/products/${id}`)
-    revalidatePath(`/store/${id}`)
+    revalidateTag(`product:${id}`)  // 單一商品快取
+    revalidateTag('dashboard-stats')  // 影響庫存警示
 
     return {
       success: true,
@@ -488,10 +486,9 @@ export async function updateProductStatus(
       new_values: { status },
     })
 
-    // 更新快取
-    revalidatePath('/admin/products')
-    revalidatePath('/store')
+    // 更新快取（使用細粒度標籤失效）
     revalidateTag('products')
+    revalidateTag(`product:${id}`)
 
     return {
       success: true,
@@ -563,9 +560,10 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
         notes: '商品已有訂單記錄,執行軟刪除',
       })
 
+      // 軟刪除：更新快取
       revalidateTag('products')
-      revalidatePath('/admin/products')
-      revalidatePath('/store')
+      revalidateTag(`product:${id}`)
+      revalidateTag('dashboard-stats')
 
       return {
         success: true,
@@ -601,9 +599,10 @@ export async function deleteProduct(id: string): Promise<ActionResult> {
         notes: '硬刪除商品',
       })
 
+      // 硬刪除：更新快取
       revalidateTag('products')
-      revalidatePath('/admin/products')
-      revalidatePath('/store')
+      revalidateTag(`product:${id}`)
+      revalidateTag('dashboard-stats')
 
       return {
         success: true,
@@ -686,8 +685,10 @@ export async function updateProductStock(
       notes: `庫存調整: ${existingProduct.stock} → ${stock}`,
     })
 
-    // 6. 重新驗證快取
-    revalidatePath('/admin/products')
+    // 6. 重新驗證快取（庫存調整影響統計）
+    revalidateTag('products')
+    revalidateTag(`product:${id}`)
+    revalidateTag('dashboard-stats')  // 影響庫存警示
 
     return {
       success: true,
@@ -829,8 +830,8 @@ export async function uploadProductImage(
     }
 
     // 10. 重新驗證快取
-    revalidatePath('/admin/products')
-    revalidatePath(`/admin/products/${productId}`)
+    revalidateTag('products')
+    revalidateTag(`product:${productId}`)
 
     return {
       success: true,
@@ -1304,8 +1305,8 @@ export async function deleteProductImage(productId: string): Promise<ActionResul
     }
 
     // 5. 重新驗證快取
-    revalidatePath('/admin/products')
-    revalidatePath(`/admin/products/${productId}`)
+    revalidateTag('products')
+    revalidateTag(`product:${productId}`)
 
     return {
       success: true,
@@ -1615,7 +1616,8 @@ export async function importProducts(
       }
 
       // 10. 更新快取
-      revalidatePath('/admin/products')
+      revalidateTag('products')
+      revalidateTag('dashboard-stats')  // 批次匯入影響庫存統計
 
       return {
         success: true,
@@ -1775,7 +1777,8 @@ export async function batchUpdateProducts(
     }
 
     // 4. 更新快取
-    revalidatePath("/admin/products")
+    revalidateTag("products")
+    revalidateTag("dashboard-stats")  // 批次編輯可能影響庫存統計
 
     // 5. 記錄操作日誌
     await logAudit({

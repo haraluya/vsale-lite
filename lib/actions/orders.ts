@@ -503,15 +503,58 @@ export async function getOrderById(
     const supabase = await createClient()
     const { userId, role } = await checkAuth()
 
-    // 查詢訂單主表
-    const { data: order, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', orderId)
-      .single()
+    // ⚡ Performance Optimization: 並行查詢訂單詳情（Phase 1.4）
+    // 將所有獨立查詢改為並行執行，預期提升 30-40%
+    const selectFields = role === 'admin'
+      ? 'id, phone, display_name, tier_id, address, admin_notes, tiers(name)'
+      : 'id, phone, display_name, tier_id, address, tiers(name)'
 
+    const [
+      orderResult,
+      orderItemsResult,
+      orderTimelinesResult,
+      orderCouponResult,
+      customFeesResult
+    ] = await Promise.all([
+      // 查詢訂單主表（含客戶資料 - JOIN 減少查詢次數）
+      supabase
+        .from('orders')
+        .select(`*, profiles(${selectFields})`)
+        .eq('id', orderId)
+        .single(),
+
+      // 查詢訂單明細
+      supabase
+        .from('order_items')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: true }),
+
+      // 查詢訂單歷史
+      supabase
+        .from('order_timelines')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: true }),
+
+      // 查詢訂單優惠券快照 (Feature 009)
+      supabase
+        .from('order_coupons')
+        .select('*')
+        .eq('order_id', orderId)
+        .maybeSingle(),
+
+      // 查詢訂單自訂費用 (Feature 011)
+      supabase
+        .from('order_custom_fees')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: true })
+    ])
+
+    // 檢查訂單是否存在
+    const { data: order, error } = orderResult
     if (error) {
-
       if (error.code === 'PGRST116') {
         return {
           success: false,
@@ -525,51 +568,14 @@ export async function getOrderById(
       }
     }
 
-    // 查詢訂單客戶資料 (Feature 007: 新增 address 與 admin_notes)
-    // 注意：客戶端不應該看到 admin_notes
-    // 🔧 修復：使用 maybeSingle() 避免客戶不存在時報錯
-    const selectFields = role === 'admin'
-      ? 'id, phone, display_name, tier_id, address, admin_notes, tiers(name)'
-      : 'id, phone, display_name, tier_id, address, tiers(name)'
+    // 解構並行查詢結果
+    const { data: orderItems } = orderItemsResult
+    const { data: orderTimelines } = orderTimelinesResult
+    const { data: orderCoupon } = orderCouponResult
+    const { data: customFees } = customFeesResult
 
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select(selectFields)
-      .eq('id', order.user_id)
-      .maybeSingle()
-
-    // 若客戶資料查詢失敗，記錄但不阻止訂單查詢
-    if (profileError) {
-      console.warn(`訂單 ${orderId} 的客戶資料查詢失敗:`, profileError)
-    }
-
-    // 查詢訂單明細
-    const { data: orderItems } = await supabase
-      .from('order_items')
-      .select('*')
-      .eq('order_id', orderId)
-      .order('created_at', { ascending: true })
-
-    // 查詢訂單歷史
-    const { data: orderTimelines } = await supabase
-      .from('order_timelines')
-      .select('*')
-      .eq('order_id', orderId)
-      .order('created_at', { ascending: true })
-
-    // 查詢訂單優惠券快照 (Feature 009)
-    const { data: orderCoupon } = await supabase
-      .from('order_coupons')
-      .select('*')
-      .eq('order_id', orderId)
-      .maybeSingle()  // 使用 maybeSingle 避免無優惠券時報錯
-
-    // 查詢訂單自訂費用 (Feature 011)
-    const { data: customFees } = await supabase
-      .from('order_custom_fees')
-      .select('*')
-      .eq('order_id', orderId)
-      .order('created_at', { ascending: true })
+    // 客戶資料已包含在 order.profiles 中
+    const profile = (order as any).profiles
 
     // 批次查詢操作者資料（用於時間軸）
     const actorIds = (orderTimelines || []).map(t => t.actor_id).filter(Boolean)

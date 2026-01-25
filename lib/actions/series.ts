@@ -251,11 +251,9 @@ export async function createSeries(data: CreateSeriesInput): Promise<ActionResul
       return { success: false, message: '系列建立失敗' }
     }
 
-    // 更新快取
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
+    // 更新快取（使用細粒度標籤失效）
     revalidateTag('series')
-    revalidateTag('products')
+    revalidateTag('products')  // 商品有 series 關聯
 
     return {
       success: true,
@@ -317,13 +315,11 @@ export async function updateSeries(
       return { success: false, message: '系列更新失敗' }
     }
 
-    // 更新快取
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
-    revalidatePath(`/store/series/${id}`)
+    // 更新快取（使用細粒度標籤失效）
     revalidateTag('series')
-    revalidateTag('products')
-    revalidateTag('tier-prices')
+    revalidateTag(`series:${id}`)  // 單一系列快取
+    revalidateTag('products')  // 商品有 series 關聯
+    revalidateTag('tier-prices')  // 等級價格可能依系列設定
 
     return {
       success: true,
@@ -375,12 +371,10 @@ export async function updateSeriesStatus(
       return { success: false, message: '狀態更新失敗' }
     }
 
-    // 更新快取
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
-    revalidatePath(`/store/series/${id}`)
+    // 更新快取（使用細粒度標籤失效）
     revalidateTag('series')
-    revalidateTag('products')
+    revalidateTag(`series:${id}`)
+    revalidateTag('products')  // 商品有 series 關聯
     revalidateTag('tier-prices')
 
     return {
@@ -445,11 +439,10 @@ export async function deleteSeries(id: string): Promise<ActionResult<void>> {
       return { success: false, message: '系列刪除失敗' }
     }
 
-    // 更新快取
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
+    // 更新快取（使用細粒度標籤失效）
     revalidateTag('series')
-    revalidateTag('products')
+    revalidateTag(`series:${id}`)
+    revalidateTag('products')  // 商品有 series 關聯
 
     return {
       success: true,
@@ -561,12 +554,10 @@ export async function uploadSeriesImage(
       }
     }
 
-    // 更新快取
-    revalidatePath(`/admin/series/${series_id}`)
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
+    // 更新快取（使用細粒度標籤失效）
     revalidateTag('series')
-    revalidateTag('products')
+    revalidateTag(`series:${series_id}`)
+    revalidateTag('products')  // 商品可能顯示系列圖片
 
     return {
       success: true,
@@ -624,11 +615,9 @@ export async function deleteSeriesImage(series_id: string): Promise<ActionResult
       return { success: false, message: '刪除圖片失敗' }
     }
 
-    // 更新快取
-    revalidatePath(`/admin/series/${series_id}`)
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
+    // 更新快取（使用細粒度標籤失效）
     revalidateTag('series')
+    revalidateTag(`series:${series_id}`)
     revalidateTag('products')
 
     return {
@@ -919,11 +908,9 @@ export async function importSeries(
       }
     }
 
-    // 10. 更新快取
-    revalidatePath('/admin/series')
-    revalidatePath('/store')
+    // 10. 更新快取（使用細粒度標籤失效）
     revalidateTag('series')
-    revalidateTag('products')
+    revalidateTag('products')  // 商品有 series 關聯
 
     return {
       success: true,
