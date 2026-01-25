@@ -18,7 +18,6 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ShoppingCart, Plus } from 'lucide-react'
-import { StockStatus } from './stock-status'
 import { useCartStore } from '@/stores/cart'
 import { validateCartItem } from '@/lib/actions/cart'
 import type { ProductWithPrice } from '@/types'
@@ -68,6 +67,34 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
     product.retail_price && product.user_price && product.user_price < product.retail_price
       ? Math.round(((product.retail_price - product.user_price) / product.retail_price) * 100)
       : 0
+
+  // 根據庫存狀態取得按鈕樣式
+  const getStockButtonConfig = () => {
+    switch (product.stock_status) {
+      case 'sufficient':
+        return {
+          bgColor: 'bg-green-400',
+          suffix: ''
+        }
+      case 'low':
+        return {
+          bgColor: 'bg-yellow-400',
+          suffix: ' (庫存緊張)'
+        }
+      case 'out_of_stock':
+        return {
+          bgColor: 'bg-red-400',
+          suffix: ' (缺貨)'
+        }
+      default:
+        return {
+          bgColor: 'bg-green-400',
+          suffix: ''
+        }
+    }
+  }
+
+  const stockConfig = getStockButtonConfig()
 
   // 加入購物車
   const handleAddToCart = async () => {
@@ -155,11 +182,6 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             </h3>
           </div>
         </div>
-
-        {/* 庫存標籤（右上角） */}
-        <div className="absolute right-2 top-2 z-10">
-          <StockStatus status={product.stock_status} size="sm" />
-        </div>
       </div>
 
       {/* 商品資訊 */}
@@ -224,7 +246,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           onClick={handleAddToCart}
           disabled={isAdding || !product.user_price}
           className={cn(
-            "mt-1.5 md:mt-3 w-full rounded-none bg-green-400 font-bold transition-all",
+            "mt-1.5 md:mt-3 w-full rounded-none font-bold transition-all",
+            stockConfig.bgColor,
             designTokens.neoBrutalism.border.full,
             "border-black",
             designTokens.neoBrutalism.shadow.full,
@@ -244,14 +267,14 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             // SSR 時與首次渲染時統一顯示 Plus 圖示
             <span className="flex items-center justify-center gap-1.5">
               <Plus className="h-4 w-4 md:h-5 md:w-5" />
-              <span>加入購物車</span>
+              <span>加入購物車{stockConfig.suffix}</span>
             </span>
           ) : (
             // 客戶端 hydration 完成且購物車有商品時顯示 ShoppingCart 圖示
             <span className="flex items-center justify-center gap-1.5">
               <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">再加一件 ({cartQuantity})</span>
-              <span className="sm:hidden">+1 ({cartQuantity})</span>
+              <span className="hidden sm:inline">再加一件 ({cartQuantity}){stockConfig.suffix}</span>
+              <span className="sm:hidden">+1 ({cartQuantity}){stockConfig.suffix}</span>
             </span>
           )}
         </button>
