@@ -29,9 +29,15 @@
 
 ## 🔄 站點資料遷移（多站點管理）
 
-**本專案支援多站點部署，使用智慧型 API 遷移方式避免 SQL 檔案過大問題**
+**本專案支援多站點部署（目前管理 3 個站點），使用智慧型 API 遷移方式避免 SQL 檔案過大問題**
 
-### 快速指令
+### 站點概覽
+
+- **站點 1 (主站)**: `qwovavytryvgchcowjof` - 生產環境主要站點（新加坡）
+- **站點 2**: `rdyvmgomjdglflrcfijs` - 第二營運站點（新加坡）
+- **站點 3**: `dewhcpfzrzewgknaqzwy` - 第三營運站點（孟買）
+
+### 快速指令（站點 2）
 
 ```bash
 # 1. 比較兩個站點的資料差異
@@ -40,6 +46,16 @@ pnpm site2:compare
 # 2. 執行遷移（從主站複製到站點二）
 pnpm site2:migrate
 ```
+
+### 站點 3 資訊
+
+站點 3 的完整設定資訊與連線憑證記錄在 [SITE_CREDENTIALS.md](docs/SITE_CREDENTIALS.md)。
+
+**站點 3 待執行任務**:
+1. ✅ 填寫站點資訊（已完成）
+2. ⏳ 設定環境變數 `.env.local`
+3. ⏳ 執行 Migration 同步（3 個待推送的 Migration）
+4. ⏳ 執行資料遷移
 
 ### 為什麼需要這個功能？
 
@@ -79,17 +95,21 @@ pnpm site2:migrate
 
 ### 環境變數設定
 
-在 `.env.local` 新增站點二配置：
+在 `.env.local` 新增站點配置：
 
 ```env
 # 站點二 Supabase 配置（用於資料遷移）
 NEXT_PUBLIC_SUPABASE_URL_SITE2=https://rdyvmgomjdglflrcfijs.supabase.co
-SUPABASE_SERVICE_ROLE_KEY_SITE2=your-service-role-key
+SUPABASE_SERVICE_ROLE_KEY_SITE2=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJkeXZtZ29tamRnbGZscmNmaWpzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTAwNTk2MiwiZXhwIjoyMDg0NTgxOTYyfQ.MzbZsoLp2RdHJj8qSuwnZ3FsQGuIBCAO8ExmC5YyUTE
+
+# 站點三 Supabase 配置（用於資料遷移）
+NEXT_PUBLIC_SUPABASE_URL_SITE3=https://dewhcpfzrzewgknaqzwy.supabase.co
+SUPABASE_SERVICE_ROLE_KEY_SITE3=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRld2hjcGZ6cnpld2drbmFxend5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTA4MDg5NiwiZXhwIjoyMDg0NjU2ODk2fQ.XDa2SNZLtIMyT4dmlCmKWzIP9RDJwAirruPUyzueO8s
 ```
 
 **重要**: 必須使用 `service_role` key（非 `anon` key）才有足夠權限。
 
-### 執行步驟
+### 執行步驟（站點 2）
 
 ```bash
 # 步驟 1: 確認站點二已完成 Migration
@@ -104,6 +124,20 @@ pnpm site2:migrate
 
 # 步驟 4: 驗證結果
 pnpm site2:compare  # 應該顯示所有資料表一致
+```
+
+### 執行步驟（站點 3）
+
+```bash
+# 步驟 1: 連結站點三並推送 Migration
+supabase link --project-ref dewhcpfzrzewgknaqzwy
+supabase db push
+
+# 步驟 2: 手動執行資料遷移（目前無自動化腳本）
+# 參考站點 2 的遷移腳本建立站點 3 版本
+
+# 步驟 3: 驗證結果
+# 使用 Supabase Dashboard 確認資料完整性
 ```
 
 ### 詳細文件

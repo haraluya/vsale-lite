@@ -72,7 +72,42 @@ SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
 
 ---
 
+## 站點 3 - Site 3
+
+### Vercel 部署
+- **專案名稱**: `vsale-site3`
+- **URL**: https://vsale-site3.vercel.app
+- **Vercel 帳號**: （與主站相同）
+
+### Supabase 資料庫
+- **專案 ID**: `dewhcpfzrzewgknaqzwy`
+- **區域**: AWS ap-south-1 (Mumbai)
+- **Dashboard**: https://supabase.com/dashboard/project/dewhcpfzrzewgknaqzwy
+
+#### 連線資訊
+- **API URL**: `https://dewhcpfzrzewgknaqzwy.supabase.co`
+- **Pooler Host**: `aws-0-ap-south-1.pooler.supabase.com`
+- **Port**: `6543` (Transaction Pooler) / `5432` (Direct)
+- **Database**: `postgres`
+- **Database User**: `postgres.dewhcpfzrzewgknaqzwy`
+- **Database Password**: `Devape-BM69`
+
+#### Supabase API Keys
+- **Anon Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRld2hjcGZ6cnpld2drbmFxend5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwODA4OTYsImV4cCI6MjA4NDY1Njg5Nn0.S4qBXSktlnnVAKw7w1mMCOwX8tcwB22XrXIaauDP5bk`
+- **Service Role Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRld2hjcGZ6cnpld2drbmFxend5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTA4MDg5NiwiZXhwIjoyMDg0NjU2ODk2fQ.XDa2SNZLtIMyT4dmlCmKWzIP9RDJwAirruPUyzueO8s`
+
+### 環境變數（Vercel）
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://dewhcpfzrzewgknaqzwy.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRld2hjcGZ6cnpld2drbmFxend5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwODA4OTYsImV4cCI6MjA4NDY1Njg5Nn0.S4qBXSktlnnVAKw7w1mMCOwX8tcwB22XrXIaauDP5bk
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRld2hjcGZ6cnpld2drbmFxend5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTA4MDg5NiwiZXhwIjoyMDg0NjU2ODk2fQ.XDa2SNZLtIMyT4dmlCmKWzIP9RDJwAirruPUyzueO8s
+```
+
+---
+
 ## 資料遷移狀態
+
+### 站點 2（Site 2）
 
 | 項目 | 狀態 | 說明 |
 |-----|------|-----|
@@ -81,6 +116,24 @@ SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
 | 客戶資料 | ❌ 不遷移 | 每個站點獨立客戶資料 |
 | 訂單資料 | ❌ 不遷移 | 每個站點獨立訂單資料 |
 | Supabase Storage 圖片 | ⏳ 進行中 | 包含在備份中 |
+
+### 站點 3（Site 3）
+
+| 項目 | 狀態 | 說明 |
+|-----|------|-----|
+| 資料庫結構（Migration） | ⏳ 待執行 | 等待站點 3 資訊完成後推送 |
+| 商品資料 | ⏳ 待執行 | 等待 Migration 完成後遷移 |
+| 客戶資料 | ❌ 不遷移 | 每個站點獨立客戶資料 |
+| 訂單資料 | ❌ 不遷移 | 每個站點獨立訂單資料 |
+| Supabase Storage 圖片 | ⏳ 待執行 | 等待資料遷移階段 |
+
+### 待同步的 Migration 清單（Phase 1-3）
+
+以下 Migration 需要同步到站點 2 和站點 3：
+
+1. `20260124151211_optimize_home_page_queries.sql` - 首頁查詢優化
+2. `20260125125922_performance_indexes.sql` - 效能索引優化
+3. `20260125135954_product_list_materialized_view.sql` - 商品列表物化視圖
 
 ### 需要遷移的資料表
 - `categories` - 商品分類
@@ -142,6 +195,23 @@ PGPASSWORD="Devape-BM69" psql \
   -U postgres.rdyvmgomjdglflrcfijs
 ```
 
+### 站點 3（Site 3）
+```bash
+# 使用 Transaction Pooler（建議）
+PGPASSWORD="Devape-BM69" psql \
+  -h aws-0-ap-south-1.pooler.supabase.com \
+  -p 6543 \
+  -d postgres \
+  -U postgres.dewhcpfzrzewgknaqzwy
+
+# 使用 Direct Connection
+PGPASSWORD="Devape-BM69" psql \
+  -h db.dewhcpfzrzewgknaqzwy.supabase.co \
+  -p 5432 \
+  -d postgres \
+  -U postgres.dewhcpfzrzewgknaqzwy
+```
+
 ---
 
 ## PowerShell 連線指令
@@ -158,6 +228,12 @@ $env:PGPASSWORD = "Devape-BM69"
 psql -h aws-0-ap-southeast-1.pooler.supabase.com -p 6543 -d postgres -U postgres.rdyvmgomjdglflrcfijs
 ```
 
+### 站點 3（Site 3）
+```powershell
+$env:PGPASSWORD = "Devape-BM69"
+psql -h aws-0-ap-south-1.pooler.supabase.com -p 6543 -d postgres -U postgres.dewhcpfzrzewgknaqzwy
+```
+
 ---
 
 ## 快速參考
@@ -165,10 +241,12 @@ psql -h aws-0-ap-southeast-1.pooler.supabase.com -p 6543 -d postgres -U postgres
 ### Supabase Dashboard URLs
 - **主站**: https://supabase.com/dashboard/project/qwovavytryvgchcowjof
 - **Site 2**: https://supabase.com/dashboard/project/rdyvmgomjdglflrcfijs
+- **Site 3**: https://supabase.com/dashboard/project/dewhcpfzrzewgknaqzwy
 
 ### Vercel Dashboard URLs
 - **主站**: https://vercel.com/dashboard （搜尋 vsale-lite）
 - **Site 2**: https://vercel.com/dashboard （搜尋 vsale-site2）
+- **Site 3**: https://vercel.com/dashboard （搜尋 vsale-site3）
 
 ### GitHub Repository
 - **URL**: https://github.com/haraluya/vsale-lite
