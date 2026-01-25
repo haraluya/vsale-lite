@@ -11,7 +11,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Edit, Trash2, Search, Check, X, Tags, Save } from 'lucide-react'
-import { deleteProduct, updateProductStock, batchUpdateProducts, updateProductStatus } from '@/lib/actions/products'
+import { deleteProduct, updateProductStock, batchUpdateProducts } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/admin/pagination'
@@ -20,6 +20,7 @@ import { SortableTableHeader } from '@/components/admin/products/sortable-table-
 import { ProductNameWithSeries } from '@/components/admin/products/product-name-with-series'
 import { ProductThumbnail } from '@/components/admin/products/product-thumbnail'
 import { ProductTagsEditor } from '@/components/admin/products/ProductTagsEditor'
+import { ProductStatusToggle } from '@/components/admin/product-status-toggle'
 import { TagBadgeList } from '@/components/ui/tag-badge'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
@@ -125,26 +126,6 @@ export function ProductTableWithTags({
 
   const handleCancelEditStock = () => {
     setEditingStockId(null)
-  }
-
-  const handleToggleStatus = async (productId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active'
-    const result = await updateProductStatus(productId, newStatus)
-
-    if (result.success) {
-      await alert({
-        title: '狀態更新成功',
-        message: result.message || `商品已${newStatus === 'active' ? '啟用' : '停用'}`,
-        variant: 'success',
-      })
-      router.refresh()
-    } else {
-      await alert({
-        title: '狀態更新失敗',
-        message: result.message || '狀態更新失敗',
-        variant: 'error',
-      })
-    }
   }
 
   const toggleProductSelection = (productId: string) => {
@@ -731,24 +712,15 @@ export function ProductTableWithTags({
                         </td>
                       )}
 
-                      {/* 狀態（快速切換開關）- 僅在非批次編輯模式顯示 */}
+                      {/* 狀態（快速切換開關 - 樂觀更新）- 僅在非批次編輯模式顯示 */}
                       {!batchEditMode && (
                         <td className="px-4 py-3">
-                          <button
-                            onClick={() => handleToggleStatus(product.id, product.status)}
-                            className={cn(
-                              "rounded-none border-2 border-black px-2 py-1 font-bold transition-all",
-                              "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-                              "hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
-                              designTokens.typography.caption,
-                              product.status === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-gray-100 text-gray-800'
-                            )}
-                            title={product.status === 'active' ? '點擊停用' : '點擊啟用'}
-                          >
-                            {product.status === 'active' ? '啟用' : '停用'}
-                          </button>
+                          <ProductStatusToggle
+                            productId={product.id}
+                            initialStatus={product.status as 'active' | 'inactive'}
+                            productName={product.name}
+                            onStatusChanged={() => router.refresh()}
+                          />
                         </td>
                       )}
 
@@ -826,23 +798,14 @@ export function ProductTableWithTags({
                   </div>
                 </div>
 
-                {/* 狀態（快速切換開關） */}
+                {/* 狀態（快速切換開關 - 樂觀更新） */}
                 <div className="flex items-center gap-2 mb-3">
-                  <button
-                    onClick={() => handleToggleStatus(product.id, product.status)}
-                    className={cn(
-                      "rounded-none border-2 border-black px-2 py-1 font-bold transition-all",
-                      "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-                      "hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
-                      designTokens.typography.caption,
-                      product.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
-                    )}
-                    title={product.status === 'active' ? '點擊停用' : '點擊啟用'}
-                  >
-                    {product.status === 'active' ? '啟用' : '停用'}
-                  </button>
+                  <ProductStatusToggle
+                    productId={product.id}
+                    initialStatus={product.status as 'active' | 'inactive'}
+                    productName={product.name}
+                    onStatusChanged={() => router.refresh()}
+                  />
                 </div>
 
                 {/* 標籤編輯器 */}
