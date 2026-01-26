@@ -7,9 +7,8 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    // ✅ 啟用 Cloudinary loader（圖片已遷移到 Cloudinary）
-    loader: 'cloudinary',
-    path: 'https://res.cloudinary.com/dq3e7q3aq/image/upload/',
+    // ✅ 使用自定義 Cloudinary loader（Next.js 15 已移除內建 loader）
+    loaderFile: './lib/cloudinary-loader.ts',
 
     // 支援 Cloudinary 與 Supabase 圖片
     remotePatterns: [
