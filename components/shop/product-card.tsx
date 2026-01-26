@@ -19,7 +19,6 @@ import { cn } from '@/lib/utils'
 import { StockStatus } from './stock-status'
 import { TagBadgeList } from '@/components/ui/tag-badge'
 import { designTokens } from '@/lib/design-tokens'
-import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 interface ProductCardProps {
   product: Product
@@ -37,8 +36,7 @@ function getStockBorderColor(stock: number): string {
 export function ProductCard({ product }: ProductCardProps) {
   const borderColor = getStockBorderColor(product.stock || 0)
   const hasUserPrice = product.user_price !== undefined && product.user_price !== null
-  // 🔧 修復：加上時間戳記避免圖片快取問題
-  const imageUrl = addImageCacheBusting(product.image_url, product.updated_at)
+  const imageUrl = product.image_url
 
   return (
     <Link

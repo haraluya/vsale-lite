@@ -18,7 +18,6 @@ import { useRouter } from 'next/navigation'
 import type { ImageCarouselConfig } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
-import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 interface ImageCarouselProps {
   config: ImageCarouselConfig
@@ -29,12 +28,7 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
   const { images, auto_play, interval_ms } = config
-
-  // 🔧 修復：為所有圖片加上快取破壞參數
-  const imagesWithCacheBusting = images.map(img => ({
-    ...img,
-    url: addImageCacheBusting(img.url, blockUpdatedAt)
-  }))
+  const imagesWithCacheBusting = images
 
   // 切換到指定索引
   const goToSlide = useCallback((index: number) => {
@@ -104,7 +98,7 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
             alt={`廣告圖片 ${currentIndex + 1}`}
             fill
             className="object-cover"
-            sizes="100vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1600px"
             priority={currentIndex === 0} // 第一張圖片優先載入
             loading={currentIndex === 0 ? 'eager' : 'lazy'} // ⭐ 優化：只預載第一張，其他延遲載入
           />

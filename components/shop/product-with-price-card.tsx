@@ -25,7 +25,6 @@ import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { ImageModal } from '@/components/ui/image-modal'
-import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 interface ProductWithPriceCardProps {
   product: ProductWithPrice
@@ -38,9 +37,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
   const alert = useAlert()
   const [isAdding, setIsAdding] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  // 🔧 修復：加上時間戳記避免圖片快取問題
-  const imageUrl = addImageCacheBusting(product.image_url, product.updated_at)
+  const imageUrl = product.image_url
 
   // 使用 mounted 狀態避免 hydration 不一致
   const [mounted, setMounted] = useState(false)

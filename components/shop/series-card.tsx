@@ -15,15 +15,13 @@ import Image from 'next/image'
 import type { Series } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
-import { addImageCacheBusting } from '@/lib/utils/image-cache-busting'
 
 interface SeriesCardProps {
   series: Series
 }
 
 export function SeriesCard({ series }: SeriesCardProps) {
-  // 🔧 修復：加上時間戳記避免圖片快取問題
-  const imageUrl = addImageCacheBusting(series.image_url, series.updated_at)
+  const imageUrl = series.image_url
 
   return (
     <Link href={`/store/series/${series.id}`}>
