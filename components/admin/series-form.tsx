@@ -16,6 +16,7 @@ import Image from 'next/image'
 import { createSeries, updateSeries, uploadSeriesImage, deleteSeriesImage } from '@/lib/actions/series'
 import type { Series, Category } from '@/types'
 import { Button } from '@/components/ui/button'
+import { FormSection } from '@/components/ui/form-section'
 import { Upload, X } from 'lucide-react'
 import { useAlert } from '@/lib/contexts/dialog-context'
 
@@ -181,17 +182,16 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* 錯誤訊息 */}
       {error && (
-        <div className="rounded-none border-2 border-red-600 bg-red-50 p-4">
+        <FormSection variant="danger">
           <p className="font-bold text-red-800">{error}</p>
-        </div>
+        </FormSection>
       )}
 
-      {/* 基本資訊 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-        <h2 className="mb-4 text-xl font-bold">基本資訊</h2>
+      {/* 紫色基本資訊區塊 */}
+      <FormSection variant="primary" title="基本資訊">
 
         <div className="space-y-4">
           {/* 系列名稱 */}
@@ -302,11 +302,14 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
             <p className="mt-1 text-sm text-gray-500">下架後,前台客戶將無法看到此系列</p>
           </div>
         </div>
-      </div>
+      </FormSection>
 
-      {/* 系列圖片 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-        <h2 className="mb-4 text-xl font-bold">系列圖片</h2>
+      {/* 藍色系列圖片區塊 */}
+      <FormSection
+        variant="info"
+        title="系列圖片"
+        description="📐 建議尺寸：800 × 800 像素（正方形 1:1 比例），支援 JPG, PNG, WebP 格式，大小不超過 5MB"
+      >
 
         <div className="space-y-4">
           {/* 圖片預覽 */}
@@ -333,16 +336,6 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
             </div>
           )}
 
-          {/* 建議尺寸提示 */}
-          <div className="rounded-none border-2 border-blue-500 bg-blue-50 p-3">
-            <p className="text-sm font-bold text-blue-900">
-              📐 建議尺寸：800 × 800 像素（正方形 1:1 比例）
-            </p>
-            <p className="mt-1 text-xs text-blue-700">
-              正方形圖片最適合系列展示，確保在各種裝置上都能完整顯示
-            </p>
-          </div>
-
           {/* 上傳按鈕 */}
           <div>
             <label
@@ -364,7 +357,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
             </p>
           </div>
         </div>
-      </div>
+      </FormSection>
 
       {/* 操作按鈕 */}
       <div className="flex gap-4">
