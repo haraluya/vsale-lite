@@ -39,6 +39,9 @@ export async function getActiveHomeBlocks(): Promise<ActionResult<HomePageBlock[
 
     if (error) throw error
 
+    // ✅ 直接返回資料（Cloudinary loader 會自動處理 public_id → URL 轉換）
+    // 💡 Cloudinary public_id 格式：vsale/home-blocks/xxx
+    // 💡 Cloudinary loader 會自動轉換為：https://res.cloudinary.com/dq3e7q3aq/image/upload/vsale/home-blocks/xxx
     return {
       success: true,
       data: data as HomePageBlock[],
@@ -145,6 +148,8 @@ export async function getHomeBlocksWithProducts(): Promise<ActionResult<any[]>> 
         })
         .map((product: any) => {
           const tierPrice = product.tier_prices?.[0]
+
+          // ✅ Cloudinary loader 會自動處理 public_id → URL 轉換，無需手動轉換
           return {
             ...product,
             user_price: tierPrice?.price ?? product.retail_price ?? null,
