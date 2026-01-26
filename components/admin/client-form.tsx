@@ -254,18 +254,39 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
         )}
       </div>
 
-      <div>
-        <Label htmlFor="notes">備註</Label>
+      {/* 🆕 常用地址 */}
+      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
+        <Label htmlFor="address">常用地址</Label>
         <textarea
-          id="notes"
-          name="notes"
-          defaultValue={client?.notes || ''}
-          placeholder="內部備註事項"
+          id="address"
+          name="address"
+          defaultValue={client?.address || ''}
+          placeholder="例: 台北市信義區信義路五段7號"
           rows={3}
-          className="input-neo mt-2 resize-none"
+          className="input-neo mt-2 resize-none bg-yellow-50"
         />
-        {state && 'errors' in state && state.errors?.notes && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.notes[0]}</p>
+        <p className="mt-1 text-xs text-gray-500">客戶端可見此欄位</p>
+        {state && 'errors' in state && state.errors?.address && (
+          <p className="mt-2 text-sm text-red-500">{state.errors.address[0]}</p>
+        )}
+      </div>
+
+      {/* 🆕 管理員備註 */}
+      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
+        <Label htmlFor="admin_notes">管理員備註</Label>
+        <textarea
+          id="admin_notes"
+          name="admin_notes"
+          defaultValue={client?.admin_notes || ''}
+          placeholder="僅管理員可見的內部備註"
+          rows={3}
+          className="input-neo mt-2 resize-none bg-yellow-50"
+        />
+        <p className="mt-1 text-xs text-yellow-600">
+          ⚠️ 此欄位僅管理員可見,客戶端無法查詢
+        </p>
+        {state && 'errors' in state && state.errors?.admin_notes && (
+          <p className="mt-2 text-sm text-red-500">{state.errors.admin_notes[0]}</p>
         )}
       </div>
 

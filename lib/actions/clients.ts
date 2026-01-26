@@ -31,7 +31,8 @@ export async function createClient(
       phone: formData.get('phone'),
       tier_id: formData.get('tier_id'),
       display_name: formData.get('display_name') || undefined,
-      notes: formData.get('notes') || undefined,
+      address: formData.get('address') || undefined,
+      admin_notes: formData.get('admin_notes') || undefined,
     })
 
     if (!validatedFields.success) {
@@ -104,7 +105,8 @@ export async function createClient(
         role: 'client',
         tier_id: validatedFields.data.tier_id,
         display_name: validatedFields.data.display_name,
-        notes: validatedFields.data.notes,
+        address: validatedFields.data.address,
+        admin_notes: validatedFields.data.admin_notes,
       })
 
     if (insertError) {
@@ -118,7 +120,8 @@ export async function createClient(
             role: 'client',
             tier_id: validatedFields.data.tier_id,
             display_name: validatedFields.data.display_name,
-            notes: validatedFields.data.notes,
+            address: validatedFields.data.address,
+            admin_notes: validatedFields.data.admin_notes,
           })
           .eq('id', authData.user.id)
 
@@ -189,7 +192,8 @@ export async function updateClient(
     const validatedFields = updateClientSchema.safeParse({
       tier_id: formData.get('tier_id') || undefined,
       display_name: formData.get('display_name') || undefined,
-      notes: formData.get('notes') || undefined,
+      address: formData.get('address') || undefined,
+      admin_notes: formData.get('admin_notes') || undefined,
     })
 
     if (!validatedFields.success) {

@@ -7,14 +7,16 @@ export const createClientSchema = z.object({
     .transform(val => val.replace(/[\s-]/g, '')),
   tier_id: z.string().uuid('請選擇會員等級'),
   display_name: z.string().max(50, '顯示名稱最多 50 字').optional(),
-  notes: z.string().max(500, '備註最多 500 字').optional(),
+  address: z.string().max(200, '常用地址最多 200 字').optional(),
+  admin_notes: z.string().max(500, '管理員備註最多 500 字').optional(),
 })
 
 // 更新客戶 Schema
 export const updateClientSchema = z.object({
   tier_id: z.string().uuid('請選擇會員等級').optional(),
   display_name: z.string().max(50, '顯示名稱最多 50 字').optional(),
-  notes: z.string().max(500, '備註最多 500 字').optional(),
+  address: z.string().max(200, '常用地址最多 200 字').optional(),
+  admin_notes: z.string().max(500, '管理員備註最多 500 字').optional(),
 })
 
 // 修改密碼 Schema

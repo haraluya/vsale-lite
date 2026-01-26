@@ -107,7 +107,7 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
       </div>
 
       {/* 🆕 Feature 007: 常用地址 */}
-      <div>
+      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
         <Label htmlFor="address">常用地址</Label>
         <Textarea
           id="address"
@@ -116,13 +116,13 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
           placeholder="例: 台北市信義區信義路五段7號"
           rows={3}
-          className="mt-2 resize-none"
+          className="mt-2 resize-none bg-yellow-50"
         />
         <p className="mt-1 text-xs text-gray-500">客戶端可見此欄位</p>
       </div>
 
       {/* 🆕 Feature 007: 管理員備註 */}
-      <div>
+      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
         <Label htmlFor="admin_notes">管理員備註</Label>
         <Textarea
           id="admin_notes"
@@ -131,7 +131,7 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
           onChange={(e) => setFormData({ ...formData, adminNotes: e.target.value })}
           placeholder="僅管理員可見的內部備註"
           rows={3}
-          className="mt-2 resize-none"
+          className="mt-2 resize-none bg-yellow-50"
         />
         <p className="mt-1 text-xs text-yellow-600">
           ⚠️ 此欄位僅管理員可見,客戶端無法查詢
