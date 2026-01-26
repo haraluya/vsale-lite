@@ -74,27 +74,32 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       case 'sufficient':
         return {
           bgColor: 'bg-green-400',
-          suffix: ''
+          suffix: '',
+          disabled: false
         }
       case 'low':
         return {
           bgColor: 'bg-yellow-400',
-          suffix: ' (庫存緊張)'
+          suffix: ' (庫存緊張)',
+          disabled: false
         }
       case 'out_of_stock':
         return {
           bgColor: 'bg-red-400',
-          suffix: ' (缺貨)'
+          suffix: '',
+          disabled: true
         }
       default:
         return {
           bgColor: 'bg-green-400',
-          suffix: ''
+          suffix: '',
+          disabled: false
         }
     }
   }
 
   const stockConfig = getStockButtonConfig()
+  const isOutOfStock = product.stock_status === 'out_of_stock'
 
   // 加入購物車
   const handleAddToCart = async () => {
@@ -244,7 +249,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         {/* 加入購物車按鈕 */}
         <button
           onClick={handleAddToCart}
-          disabled={isAdding || !product.user_price}
+          disabled={isAdding || !product.user_price || stockConfig.disabled}
           className={cn(
             "mt-1.5 md:mt-3 w-full rounded-none font-bold transition-all",
             stockConfig.bgColor,
@@ -261,6 +266,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         >
           {isAdding ? (
             '加入中...'
+          ) : isOutOfStock ? (
+            '缺貨'
           ) : !product.user_price ? (
             product.retail_price ? '會員價未設定' : '價格未設定'
           ) : !mounted || cartQuantity === 0 ? (
