@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
+import { FormSection } from '@/components/ui/form-section'
 import { Tier, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -47,8 +48,9 @@ export function TierForm({ tier, mode }: TierFormProps) {
   }, [state, router, alert])
 
   return (
-    <form action={formAction} className="space-y-6">
-      <div>
+    <form action={formAction} className="space-y-4">
+      {/* 紫色基本資訊區塊 */}
+      <FormSection variant="primary" title="等級資訊">
         <Label htmlFor="name">等級名稱 *</Label>
         <Input
           id="name"
@@ -61,16 +63,19 @@ export function TierForm({ tier, mode }: TierFormProps) {
         {state && 'errors' in state && state.errors?.name && (
           <p className="mt-2 text-sm text-red-500">{state.errors.name[0]}</p>
         )}
-      </div>
+      </FormSection>
 
       {/* 隱藏的 rank 欄位，新增時會由 Server Action 自動設定，編輯時保持原值 */}
       {isEdit && tier && (
         <input type="hidden" name="rank" value={tier.rank} />
       )}
 
-      {/* Feature 011: 運費設定區塊 */}
-      <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
-        <h3 className="mb-4 text-lg font-bold">運費設定</h3>
+      {/* 藍色運費設定區塊 */}
+      <FormSection
+        variant="info"
+        title="運費設定"
+        description="設定此等級客戶的運費計算方式"
+      >
 
         <div className="space-y-4">
           <Checkbox
@@ -129,7 +134,7 @@ export function TierForm({ tier, mode }: TierFormProps) {
             <input type="hidden" name="shipping_fee" value="0" />
           )}
         </div>
-      </div>
+      </FormSection>
 
       {state?.message && !state.success && (
         <ErrorInline message={state.message} />

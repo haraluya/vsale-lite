@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
+import { FormSection } from '@/components/ui/form-section'
 import { Category, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { useAlert } from '@/lib/contexts/dialog-context'
@@ -51,57 +52,60 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
   }, [state, router, alert])
 
   return (
-    <form action={formAction} className="space-y-6">
-      <div>
-        <Label htmlFor="name">分類名稱 *</Label>
-        <Input
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          placeholder="例: 飲料、零食、日用品"
-          required
-          className="mt-2"
-        />
-        {state && 'errors' in state && state.errors?.name && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.name[0]}</p>
-        )}
-      </div>
+    <form action={formAction} className="space-y-4">
+      {/* 紫色基本資訊區塊 */}
+      <FormSection variant="primary" title="分類資訊">
+        <div className="mb-4">
+          <Label htmlFor="name">分類名稱 *</Label>
+          <Input
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            placeholder="例: 飲料、零食、日用品"
+            required
+            className="mt-2"
+          />
+          {state && 'errors' in state && state.errors?.name && (
+            <p className="mt-2 text-sm text-red-500">{state.errors.name[0]}</p>
+          )}
+        </div>
 
-      <div>
-        <Label htmlFor="code">分類代碼 *</Label>
-        <Input
-          id="code"
-          name="code"
-          value={formData.code}
-          onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-          placeholder="例: DRK (3-10個大寫英文字母)"
-          required
-          pattern="[A-Z]{3,10}"
-          maxLength={10}
-          className="mt-2"
-        />
-        <p className="mt-1 text-sm text-gray-500">提示: 商品編號會使用此代碼 (如 DRK-0001)</p>
-        {state && 'errors' in state && state.errors?.code && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.code[0]}</p>
-        )}
-      </div>
+        <div className="mb-4">
+          <Label htmlFor="code">分類代碼 *</Label>
+          <Input
+            id="code"
+            name="code"
+            value={formData.code}
+            onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+            placeholder="例: DRK (3-10個大寫英文字母)"
+            required
+            pattern="[A-Z]{3,10}"
+            maxLength={10}
+            className="mt-2"
+          />
+          <p className="mt-1 text-sm text-gray-500">提示: 商品編號會使用此代碼 (如 DRK-0001)</p>
+          {state && 'errors' in state && state.errors?.code && (
+            <p className="mt-2 text-sm text-red-500">{state.errors.code[0]}</p>
+          )}
+        </div>
 
-      <div>
-        <Label htmlFor="description">分類描述</Label>
-        <Textarea
-          id="description"
-          name="description"
-          value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          placeholder="選填:描述此分類的商品類型"
-          rows={3}
-          className="mt-2"
-        />
-        {state && 'errors' in state && state.errors?.description && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.description[0]}</p>
-        )}
-      </div>
+        <div>
+          <Label htmlFor="description">分類描述</Label>
+          <Textarea
+            id="description"
+            name="description"
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            placeholder="選填:描述此分類的商品類型"
+            rows={3}
+            className="mt-2"
+          />
+          {state && 'errors' in state && state.errors?.description && (
+            <p className="mt-2 text-sm text-red-500">{state.errors.description[0]}</p>
+          )}
+        </div>
+      </FormSection>
 
       {state?.message && !state.success && (
         <ErrorInline message={state.message} />
