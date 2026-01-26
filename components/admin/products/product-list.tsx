@@ -17,6 +17,7 @@ interface ProductListProps {
   series_id: string
   series_ids?: string[]
   tag_ids?: string[]
+  status?: 'active' | 'inactive' | 'all' | 'in_stock' | 'out_of_stock' | 'backorder'
   sort: 'code' | 'series_name' | 'retail_price'
   order: 'asc' | 'desc'
   page: number
@@ -28,6 +29,7 @@ export async function ProductList({
   series_id,
   series_ids,
   tag_ids,
+  status = 'all',
   sort,
   order,
   page,
@@ -42,7 +44,7 @@ export async function ProductList({
       tag_ids,
       sort,
       order,
-      status: 'all',
+      status,
       page,
       limit,
     }),

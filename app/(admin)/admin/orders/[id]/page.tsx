@@ -63,7 +63,17 @@ export default async function AdminOrderDetailPage({ params }: AdminOrderDetailP
   // 取得訂單詳情
   const result = await getOrderById(id)
 
-  if (!result.success || !result.data) {
+  if (!result.success) {
+    console.error('[訂單詳情頁面] 查詢訂單失敗:', {
+      id,
+      success: result.success,
+      message: result.message
+    })
+    notFound()
+  }
+
+  if (!result.data) {
+    console.error('[訂單詳情頁面] 訂單資料不存在:', { id })
     notFound()
   }
 

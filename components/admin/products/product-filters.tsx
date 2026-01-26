@@ -28,11 +28,13 @@ export function ProductFilters({ series }: ProductFiltersProps) {
 
   const [search, setSearch] = useState(searchParams.get('search') || '')
   const [seriesFilter, setSeriesFilter] = useState(searchParams.get('series') || '')
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '')
 
   // 同步 URL 參數到狀態
   useEffect(() => {
     setSearch(searchParams.get('search') || '')
     setSeriesFilter(searchParams.get('series') || '')
+    setStatusFilter(searchParams.get('status') || '')
   }, [searchParams])
 
   const handleSearch = () => {
@@ -47,6 +49,11 @@ export function ProductFilters({ series }: ProductFiltersProps) {
     } else {
       params.delete('series')
     }
+    if (statusFilter) {
+      params.set('status', statusFilter)
+    } else {
+      params.delete('status')
+    }
     // 重設為第一頁
     params.delete('page')
     router.push(`/admin/products?${params.toString()}`)
@@ -59,6 +66,19 @@ export function ProductFilters({ series }: ProductFiltersProps) {
       params.set('series', value)
     } else {
       params.delete('series')
+    }
+    // 保留搜尋但重設頁碼
+    params.delete('page')
+    router.push(`/admin/products?${params.toString()}`)
+  }
+
+  const handleStatusChange = (value: string) => {
+    setStatusFilter(value)
+    const params = new URLSearchParams(searchParams.toString())
+    if (value) {
+      params.set('status', value)
+    } else {
+      params.delete('status')
     }
     // 保留搜尋但重設頁碼
     params.delete('page')
@@ -120,6 +140,27 @@ export function ProductFilters({ series }: ProductFiltersProps) {
                 {s.name}
               </option>
             ))}
+          </select>
+
+          <select
+            className={cn(
+              'rounded-none border-2 border-black bg-white font-bold',
+              designTokens.input.base,
+              designTokens.neoBrutalism.shadow.mobile
+            )}
+            value={statusFilter}
+            onChange={(e) => handleStatusChange(e.target.value)}
+          >
+            <option value="">所有狀態</option>
+            <optgroup label="庫存狀態">
+              <option value="in_stock">有庫存</option>
+              <option value="out_of_stock">缺貨</option>
+              <option value="backorder">欠貨（可預購）</option>
+            </optgroup>
+            <optgroup label="上下架狀態">
+              <option value="active">上架</option>
+              <option value="inactive">下架</option>
+            </optgroup>
           </select>
 
           <Button onClick={handleSearch}>

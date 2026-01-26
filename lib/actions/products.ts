@@ -24,7 +24,7 @@ export async function getProducts(params?: {
   series_id?: string  // 🔄 Feature 003: 改為系列篩選 (取代 category_id)
   series_ids?: string[]  // 🆕 Feature 016: 多系列篩選（陣列）
   tag_ids?: string[]  // 🆕 標籤篩選（陣列）
-  status?: 'active' | 'inactive' | 'all'
+  status?: 'active' | 'inactive' | 'all' | 'in_stock' | 'out_of_stock' | 'backorder'  // 🆕 支援庫存狀態篩選
   sort?: 'code' | 'series_name' | 'retail_price'  // 🆕 Feature 016: 排序欄位（庫存不可排序）
   order?: 'asc' | 'desc'  // 🆕 Feature 016: 排序方向
   page?: number
@@ -78,7 +78,18 @@ export async function getProducts(params?: {
 
     // 狀態篩選
     if (status !== 'all') {
-      query = query.eq('status', status)
+      // 上下架狀態篩選
+      if (status === 'active' || status === 'inactive') {
+        query = query.eq('status', status)
+      }
+      // 庫存狀態篩選
+      else if (status === 'in_stock') {
+        query = query.gt('stock', 0)
+      } else if (status === 'out_of_stock') {
+        query = query.eq('stock', 0)
+      } else if (status === 'backorder') {
+        query = query.lt('stock', 0)
+      }
     }
 
     // 排序 (Feature 016)

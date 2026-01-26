@@ -29,6 +29,7 @@ export default async function ProductsPage({
     series?: string
     series_ids?: string
     tag_ids?: string
+    status?: string
     sort?: string
     order?: string
     page?: string
@@ -42,6 +43,7 @@ export default async function ProductsPage({
   const series_ids = series_ids_param ? series_ids_param.split(',').filter(Boolean) : undefined
   const tag_ids_param = params.tag_ids || ''
   const tag_ids = tag_ids_param ? tag_ids_param.split(',').filter(Boolean) : undefined
+  const status = (params.status as 'active' | 'inactive' | 'all' | 'in_stock' | 'out_of_stock' | 'backorder') || 'all'
   const sort = (params.sort as 'code' | 'series_name' | 'retail_price') || 'code'
   const order = (params.order as 'asc' | 'desc') || 'asc'
   const page = parseInt(params.page || '1')
@@ -70,6 +72,7 @@ export default async function ProductsPage({
           series_id={series_id}
           series_ids={series_ids}
           tag_ids={tag_ids}
+          status={status}
           sort={sort}
           order={order}
           page={page}

@@ -565,6 +565,15 @@ export async function getOrderById(
     // 檢查訂單是否存在
     const { data: order, error } = orderResult
     if (error) {
+      console.error('[getOrderById] 查詢訂單失敗:', {
+        orderId,
+        errorCode: error.code,
+        errorMessage: error.message,
+        errorDetails: error.details,
+        userId,
+        role
+      })
+
       if (error.code === 'PGRST116') {
         return {
           success: false,
@@ -574,7 +583,7 @@ export async function getOrderById(
 
       return {
         success: false,
-        message: '查詢訂單詳情時發生錯誤',
+        message: `查詢訂單詳情時發生錯誤: ${error.message}`,
       }
     }
 
