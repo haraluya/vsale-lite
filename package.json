@@ -37,7 +37,9 @@
     "site3:migrate-from-mumbai": "node scripts/migrate-mumbai-to-singapore.js",
     "migrate:cloudinary": "tsx scripts/migrate-to-cloudinary.ts",
     "migrate:cloudinary:site2": "tsx scripts/migrate-to-cloudinary-site2.ts",
-    "migrate:cloudinary:site3": "tsx scripts/migrate-to-cloudinary-site3.ts"
+    "migrate:cloudinary:site3": "tsx scripts/migrate-to-cloudinary-site3.ts",
+    "fix:cloudinary:site2": "tsx scripts/fix-cloudinary-paths-site2.ts",
+    "fix:cloudinary:site3": "tsx scripts/fix-cloudinary-paths-site3.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
