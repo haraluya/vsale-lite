@@ -142,7 +142,7 @@ export function VirtualProductList({
                     </div>
 
                     {/* 建議售價 */}
-                    <div className="text-right font-mono font-bold">
+                    <div className="text-right font-mono font-bold text-base text-brand-primary">
                       {product.retail_price ? formatAmount(product.retail_price) : '-'}
                     </div>
 
@@ -240,8 +240,8 @@ export function VirtualProductList({
                       </span>
                     </div>
                     {product.retail_price && (
-                      <div className="text-sm font-medium">
-                        建議售價: <span className="font-mono">{formatAmount(product.retail_price)}</span>
+                      <div className="text-base font-bold">
+                        建議售價: <span className="font-mono text-brand-primary">{formatAmount(product.retail_price)}</span>
                       </div>
                     )}
                   </div>

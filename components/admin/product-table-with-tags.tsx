@@ -580,10 +580,10 @@ export function ProductTableWithTags({
                             step="1"
                             value={editedData?.retail_price ?? ''}
                             onChange={(e) => handleUpdateEditedProduct(product.id, 'retail_price', e.target.value ? parseFloat(e.target.value) : null)}
-                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         ) : (
-                          <span className={cn("font-mono", designTokens.typography.caption)}>
+                          <span className={cn("font-mono font-bold text-base text-brand-primary")}>
                             {product.retail_price !== null ? `$${Math.round(product.retail_price)}` : 'N/A'}
                           </span>
                         )}
@@ -802,8 +802,8 @@ export function ProductTableWithTags({
                 {/* 零售價格 */}
                 <div className="mb-3 pb-3 border-b border-gray-200">
                   <div className={cn("text-gray-600 mb-2", designTokens.typography.caption)}>零售價格:</div>
-                  <div className={cn("font-mono font-bold text-blue-600", designTokens.typography.body.base)}>
-                    {product.retail_price !== null ? `$${product.retail_price}` : 'N/A'}
+                  <div className={cn("font-mono font-bold text-brand-primary", designTokens.typography.body.large)}>
+                    {product.retail_price !== null ? `$${Math.round(product.retail_price)}` : 'N/A'}
                   </div>
                 </div>
 
