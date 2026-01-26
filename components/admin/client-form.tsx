@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { ErrorInline } from '@/components/ui/error'
 import { LoadingSpinner } from '@/components/ui/loading'
+import { FormSection } from '@/components/ui/form-section'
 import { Tier, Client, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { Copy, Check } from 'lucide-react'
@@ -196,104 +197,115 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   }
 
   return (
-    <form action={formAction} className="space-y-6">
-      <div>
-        <Label htmlFor="phone">手機號碼 *</Label>
-        <Input
-          id="phone"
-          name="phone"
-          type="tel"
-          defaultValue={client?.phone}
-          placeholder="0912345678"
-          required
-          disabled={isEdit}
-          className="mt-2"
-        />
-        {isEdit && (
-          <p className="mt-2 text-xs text-gray-500">手機號碼無法修改</p>
-        )}
-        {state && 'errors' in state && state.errors?.phone && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.phone[0]}</p>
-        )}
-      </div>
+    <form action={formAction} className="space-y-4">
+      {/* 紫色基本資訊區塊 */}
+      <FormSection variant="primary" title="基本資訊">
+        {/* 雙欄：手機號碼 + 會員等級 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <Label htmlFor="phone">手機號碼 *</Label>
+            <Input
+              id="phone"
+              name="phone"
+              type="tel"
+              defaultValue={client?.phone}
+              placeholder="0912345678"
+              required
+              disabled={isEdit}
+              className="mt-2"
+            />
+            {isEdit && (
+              <p className="mt-2 text-xs text-gray-500">手機號碼無法修改</p>
+            )}
+            {state && 'errors' in state && state.errors?.phone && (
+              <p className="mt-2 text-sm text-red-500">{state.errors.phone[0]}</p>
+            )}
+          </div>
 
-      <div>
-        <Label htmlFor="tier_id">會員等級 *</Label>
-        <select
-          id="tier_id"
-          name="tier_id"
-          defaultValue={client?.tier_id || ''}
-          required
-          className="input-neo mt-2"
-        >
-          <option value="">請選擇等級</option>
-          {tiers.map((tier) => (
-            <option key={tier.id} value={tier.id}>
-              {tier.name}
-            </option>
-          ))}
-        </select>
-        {state && 'errors' in state && state.errors?.tier_id && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.tier_id[0]}</p>
-        )}
-      </div>
+          <div>
+            <Label htmlFor="tier_id">會員等級 *</Label>
+            <select
+              id="tier_id"
+              name="tier_id"
+              defaultValue={client?.tier_id || ''}
+              required
+              className="input-neo mt-2"
+            >
+              <option value="">請選擇等級</option>
+              {tiers.map((tier) => (
+                <option key={tier.id} value={tier.id}>
+                  {tier.name}
+                </option>
+              ))}
+            </select>
+            {state && 'errors' in state && state.errors?.tier_id && (
+              <p className="mt-2 text-sm text-red-500">{state.errors.tier_id[0]}</p>
+            )}
+          </div>
+        </div>
 
-      <div>
-        <Label htmlFor="display_name">顯示名稱</Label>
-        <Input
-          id="display_name"
-          name="display_name"
-          defaultValue={client?.display_name || ''}
-          placeholder="例: 王小明、ABC商行"
-          className="mt-2"
-        />
-        {state && 'errors' in state && state.errors?.display_name && (
-          <p className="mt-2 text-sm text-red-500">
-            {state.errors.display_name[0]}
-          </p>
-        )}
-      </div>
+        {/* 單欄：顯示名稱 */}
+        <div>
+          <Label htmlFor="display_name">顯示名稱</Label>
+          <Input
+            id="display_name"
+            name="display_name"
+            defaultValue={client?.display_name || ''}
+            placeholder="例: 王小明、ABC商行"
+            className="mt-2"
+          />
+          {state && 'errors' in state && state.errors?.display_name && (
+            <p className="mt-2 text-sm text-red-500">
+              {state.errors.display_name[0]}
+            </p>
+          )}
+        </div>
+      </FormSection>
 
-      {/* 🆕 常用地址 */}
-      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
-        <Label htmlFor="address">常用地址</Label>
+      {/* 藍色地址資訊區塊 */}
+      <FormSection
+        variant="info"
+        title="常用地址"
+        description="此地址將顯示在客戶訂單頁面，方便快速填寫"
+      >
         <textarea
           id="address"
           name="address"
           defaultValue={client?.address || ''}
           placeholder="例: 台北市信義區信義路五段7號"
           rows={3}
-          className="input-neo mt-2 resize-none bg-yellow-50"
+          className="input-neo resize-none w-full"
         />
-        <p className="mt-1 text-xs text-gray-500">客戶端可見此欄位</p>
         {state && 'errors' in state && state.errors?.address && (
           <p className="mt-2 text-sm text-red-500">{state.errors.address[0]}</p>
         )}
-      </div>
+      </FormSection>
 
-      {/* 🆕 管理員備註 */}
-      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
-        <Label htmlFor="admin_notes">管理員備註</Label>
+      {/* 黃色管理員備註區塊 */}
+      <FormSection
+        variant="warning"
+        title="管理員備註"
+        description="⚠️ 此欄位僅管理員可見，客戶端無法查詢"
+      >
         <textarea
           id="admin_notes"
           name="admin_notes"
           defaultValue={client?.admin_notes || ''}
           placeholder="僅管理員可見的內部備註"
           rows={3}
-          className="input-neo mt-2 resize-none bg-yellow-50"
+          className="input-neo resize-none w-full"
         />
-        <p className="mt-1 text-xs text-yellow-600">
-          ⚠️ 此欄位僅管理員可見,客戶端無法查詢
-        </p>
         {state && 'errors' in state && state.errors?.admin_notes && (
           <p className="mt-2 text-sm text-red-500">{state.errors.admin_notes[0]}</p>
         )}
-      </div>
+      </FormSection>
 
+      {/* 錯誤訊息 */}
       {state?.message && !state.success && (
         <ErrorInline message={state.message} />
       )}
 
+      {/* 操作按鈕 */}
       <div className="flex gap-4">
         <Button type="submit" disabled={pending}>
           {pending && <LoadingSpinner className="mr-2" />}

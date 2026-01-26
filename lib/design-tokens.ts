@@ -94,6 +94,29 @@ export const designTokens = {
     highQualitySize: '1920 × 1080',        // 高畫質尺寸 (px)
     safeZone: '中央 80% 區域',              // 安全區域提示
   },
+
+  /**
+   * 表單區塊色彩系統
+   */
+  formSection: {
+    variant: {
+      default: 'bg-white border-black',
+      primary: 'bg-purple-50 border-purple-500',
+      warning: 'bg-yellow-50 border-yellow-500',
+      info: 'bg-blue-50 border-blue-500',
+      success: 'bg-green-50 border-green-500',
+      danger: 'bg-red-50 border-red-500',
+    },
+  },
+
+  /**
+   * 表單 Grid 系統
+   */
+  formGrid: {
+    twoColumn: 'grid grid-cols-1 md:grid-cols-2 gap-4',
+    threeColumn: 'grid grid-cols-1 md:grid-cols-3 gap-4',
+    fullWidth: 'col-span-1 md:col-span-2',
+  },
 } as const
 
 /**
