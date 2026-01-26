@@ -515,10 +515,6 @@ export async function getOrderById(
 
     // ⚡ Performance Optimization: 並行查詢訂單詳情（Phase 1.4）
     // 將所有獨立查詢改為並行執行，預期提升 30-40%
-    const selectFields = role === 'admin'
-      ? 'id, phone, display_name, tier_id, address, admin_notes, tiers(name)'
-      : 'id, phone, display_name, tier_id, address, tiers(name)'
-
     const [
       orderResult,
       orderItemsResult,
@@ -526,10 +522,10 @@ export async function getOrderById(
       orderCouponResult,
       customFeesResult
     ] = await Promise.all([
-      // 查詢訂單主表（含客戶資料 - JOIN 減少查詢次數）
+      // 查詢訂單主表
       supabase
         .from('orders')
-        .select(`*, profiles(${selectFields})`)
+        .select('*')
         .eq('id', orderId)
         .single(),
 
@@ -565,14 +561,14 @@ export async function getOrderById(
     // 檢查訂單是否存在
     const { data: order, error } = orderResult
     if (error) {
-      console.error('[getOrderById] 查詢訂單失敗:', {
-        orderId,
-        errorCode: error.code,
-        errorMessage: error.message,
-        errorDetails: error.details,
-        userId,
-        role
-      })
+      console.error('[getOrderById] 查詢訂單失敗')
+      console.error('- 訂單 ID:', orderId)
+      console.error('- 錯誤碼:', error.code)
+      console.error('- 錯誤訊息:', error.message)
+      console.error('- 錯誤詳情:', JSON.stringify(error.details))
+      console.error('- 使用者 ID:', userId)
+      console.error('- 使用者角色:', role)
+      console.error('- 完整錯誤物件:', JSON.stringify(error, null, 2))
 
       if (error.code === 'PGRST116') {
         return {
@@ -593,8 +589,16 @@ export async function getOrderById(
     const { data: orderCoupon } = orderCouponResult
     const { data: customFees } = customFeesResult
 
-    // 客戶資料已包含在 order.profiles 中
-    const profile = (order as any).profiles
+    // 查詢客戶資料（使用 user_id）
+    const selectFields = role === 'admin'
+      ? 'id, phone, display_name, tier_id, address, admin_notes, tiers(name)'
+      : 'id, phone, display_name, tier_id, address, tiers(name)'
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select(selectFields)
+      .eq('id', order.user_id)
+      .single()
 
     // 批次查詢操作者資料（用於時間軸）
     const actorIds = (orderTimelines || []).map(t => t.actor_id).filter(Boolean)
