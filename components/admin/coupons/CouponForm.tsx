@@ -20,6 +20,7 @@ import { getSeries } from '@/lib/actions/series'
 import type { Coupon } from '@/specs/009-coupon-system/contracts/coupons'
 import type { Tier, Series } from '@/types'
 import { Button } from '@/components/ui/button'
+import { FormSection } from '@/components/ui/form-section'
 import { AlertCircle, X } from 'lucide-react'
 
 interface CouponFormProps {
@@ -173,20 +174,19 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* 錯誤訊息 */}
       {error && (
-        <div className="border-2 border-red-500 bg-red-50 p-4">
-          <div className="flex items-center gap-2 text-red-600">
+        <FormSection variant="danger">
+          <div className="flex items-center gap-2 text-red-800">
             <AlertCircle className="h-5 w-5" />
             <span className="font-bold">{error}</span>
           </div>
-        </div>
+        </FormSection>
       )}
 
       {/* 基本資訊 */}
-      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-        <h2 className="mb-4 text-xl font-black">基本資訊</h2>
+      <FormSection variant="primary" title="基本資訊">
 
         {/* 優惠券代碼 */}
         <div className="mb-4">
@@ -306,56 +306,55 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
           </p>
         </div>
 
-        {/* 領取張數限制 */}
-        <div className="mb-4">
-          <label htmlFor="claim_limit" className="mb-2 block font-bold">
-            每位客戶可領取張數 <span className="text-red-600">*</span>
-          </label>
-          <input
-            type="number"
-            id="claim_limit"
-            value={claimLimit || ''}
-            onChange={(e) => setClaimLimit(Number(e.target.value))}
-            placeholder="1"
-            className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
-            required
-            min={1}
-            max={99}
-            step={1}
-            disabled={loading}
-          />
-          <p className="mt-1 text-sm text-gray-600">
-            設定客戶可領取此優惠券的張數上限（預設 1 張，輸入一次代碼即可領取所有張數）
-          </p>
-        </div>
+        {/* 領取張數限制與總張數上限 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="claim_limit" className="mb-2 block font-bold">
+              每位客戶可領取張數 <span className="text-red-600">*</span>
+            </label>
+            <input
+              type="number"
+              id="claim_limit"
+              value={claimLimit || ''}
+              onChange={(e) => setClaimLimit(Number(e.target.value))}
+              placeholder="1"
+              className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              required
+              min={1}
+              max={99}
+              step={1}
+              disabled={loading}
+            />
+            <p className="mt-1 text-sm text-gray-600">
+              客戶可領取的張數上限（預設 1 張）
+            </p>
+          </div>
 
-        {/* 總張數上限 */}
-        <div className="mb-4">
-          <label htmlFor="total_limit" className="mb-2 block font-bold">
-            總張數上限
-          </label>
-          <input
-            type="number"
-            id="total_limit"
-            value={totalLimit || ''}
-            onChange={(e) => setTotalLimit(e.target.value ? Number(e.target.value) : null)}
-            placeholder="不填寫 = 無限發放"
-            className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
-            min={1}
-            step={1}
-            disabled={loading}
-          />
-          <p className="mt-1 text-sm text-gray-600">
-            限制所有客戶合計可領取的總張數（不填寫表示無限發放）
-          </p>
+          <div>
+            <label htmlFor="total_limit" className="mb-2 block font-bold">
+              總張數上限
+            </label>
+            <input
+              type="number"
+              id="total_limit"
+              value={totalLimit || ''}
+              onChange={(e) => setTotalLimit(e.target.value ? Number(e.target.value) : null)}
+              placeholder="不填寫 = 無限發放"
+              className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              min={1}
+              step={1}
+              disabled={loading}
+            />
+            <p className="mt-1 text-sm text-gray-600">
+              所有客戶合計可領取的總張數（選填）
+            </p>
+          </div>
         </div>
-      </div>
+      </FormSection>
 
       {/* 生效時間 */}
-      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-        <h2 className="mb-4 text-xl font-black">生效時間</h2>
-
-        <div className="grid gap-4 md:grid-cols-2">
+      <FormSection variant="info" title="生效時間">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="valid_from" className="mb-2 block font-bold">
               開始時間 <span className="text-red-600">*</span>
@@ -394,25 +393,19 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         </div>
 
         {/* 日期範圍提示 */}
-        <div className="mt-4 rounded border-2 border-orange-400 bg-orange-50 p-4">
+        <div className="mt-4 rounded-none border-2 border-orange-500 bg-orange-50 p-4">
           <p className="text-sm font-bold text-orange-800">
-            ⚠️ 重要提示：優惠券過期後將無法領取！
-          </p>
-          <p className="mt-1 text-sm text-orange-700">
-            • 請確保「結束時間」設定在未來，建議至少 30-90 天
-          </p>
-          <p className="text-sm text-orange-700">
-            • 優惠券過期後，客戶將無法輸入口令領取
+            ⚠️ 重要：優惠券過期後將無法領取！請確保「結束時間」設定在未來，建議至少 30-90 天
           </p>
         </div>
-      </div>
+      </FormSection>
 
       {/* 等級限制 */}
-      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-        <h2 className="mb-4 text-xl font-black">等級限制（選填）</h2>
-        <p className="mb-4 text-sm text-gray-600">
-          不選擇任何等級表示所有等級均可使用此優惠券
-        </p>
+      <FormSection
+        variant="warning"
+        title="等級限制（選填）"
+        description="不選擇任何等級表示所有等級均可使用此優惠券"
+      >
 
         {tiers.length === 0 ? (
           <p className="text-gray-500">無可用等級</p>
@@ -443,14 +436,14 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
             </p>
           </div>
         )}
-      </div>
+      </FormSection>
 
       {/* 系列限制 */}
-      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-        <h2 className="mb-4 text-xl font-black">系列限制（選填）</h2>
-        <p className="mb-4 text-sm text-gray-600">
-          不選擇任何系列表示所有系列商品均可計入優惠券條件
-        </p>
+      <FormSection
+        variant="warning"
+        title="系列限制（選填）"
+        description="不選擇任何系列表示所有系列商品均可計入優惠券條件"
+      >
 
         {series.length === 0 ? (
           <p className="text-gray-500">無可用系列</p>
@@ -483,12 +476,11 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
             </p>
           </div>
         )}
-      </div>
+      </FormSection>
 
       {/* 狀態設定（僅編輯模式） */}
       {mode === 'edit' && (
-        <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-          <h2 className="mb-4 text-xl font-black">狀態設定</h2>
+        <FormSection variant="default" title="狀態設定">
 
           <div className="flex gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -514,7 +506,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               <span className="font-bold">停用</span>
             </label>
           </div>
-        </div>
+        </FormSection>
       )}
 
       {/* 提交按鈕 */}
