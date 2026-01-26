@@ -150,10 +150,12 @@ export async function getPublicSettings(): Promise<ActionResult<ParsedSetting[]>
       data: parsed,
     }
   } catch (error) {
-    console.error('[getPublicSettings] Error:', error)
+    console.error('[getPublicSettings] Network error:', error)
+    // 網路錯誤時返回空陣列，避免阻擋頁面載入
     return {
-      success: false,
-      message: error instanceof Error ? error.message : '查詢失敗',
+      success: true,
+      data: [],
+      message: '網路連線失敗，使用預設設定',
     }
   }
 }
