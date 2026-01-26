@@ -51,7 +51,7 @@ export function ProductStatusToggle({
 
       if (result.success) {
         // 成功：保持樂觀更新的狀態，顯示成功訊息
-        toast.success(result.message || `商品已${newStatus === 'active' ? '啟用' : '停用'}`)
+        toast.success(result.message || `商品已${newStatus === 'active' ? '上架' : '下架'}`)
         onStatusChanged?.()
       } else {
         // 失敗：自動回滾到原始狀態
@@ -75,10 +75,10 @@ export function ProductStatusToggle({
           ? 'bg-green-100 text-green-800'
           : 'bg-gray-100 text-gray-800'
       )}
-      title={optimisticStatus === 'active' ? '點擊停用' : '點擊啟用'}
-      aria-label={`${productName || '商品'}狀態切換：當前${optimisticStatus === 'active' ? '啟用' : '停用'}`}
+      title={optimisticStatus === 'active' ? '點擊下架' : '點擊上架'}
+      aria-label={`${productName || '商品'}狀態切換：當前${optimisticStatus === 'active' ? '上架' : '下架'}`}
     >
-      {optimisticStatus === 'active' ? '啟用' : '停用'}
+      {optimisticStatus === 'active' ? '上架' : '下架'}
     </button>
   )
 }

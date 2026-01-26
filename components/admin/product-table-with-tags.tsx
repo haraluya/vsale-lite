@@ -21,6 +21,7 @@ import { ProductNameWithSeries } from '@/components/admin/products/product-name-
 import { ProductThumbnail } from '@/components/admin/products/product-thumbnail'
 import { ProductTagsEditor } from '@/components/admin/products/ProductTagsEditor'
 import { ProductStatusToggle } from '@/components/admin/product-status-toggle'
+import { ProductStockStatusToggle } from '@/components/admin/product-stock-status-toggle'
 import { TagBadgeList } from '@/components/ui/tag-badge'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
@@ -309,47 +310,6 @@ export function ProductTableWithTags({
   return (
     <div className={designTokens.spacing.page.gap}>
       <div className={cn("card-neo", designTokens.spacing.card.padding)}>
-        {/* Search & Filter */}
-        <div className="mb-4 md:mb-6 flex flex-col gap-3 md:flex-row md:gap-4">
-          <div className="flex-1">
-            <Input
-              placeholder="搜尋商品編號或名稱..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            />
-          </div>
-
-          <select
-            className={cn(
-              "rounded-none border-2 md:border-3 border-black font-bold",
-              "px-3 py-2 md:px-4 md:py-2",
-              designTokens.neoBrutalism.shadow.mobile,
-              designTokens.typography.body.base
-            )}
-            value={seriesFilter}
-            onChange={(e) => {
-              setSeriesFilter(e.target.value)
-              const params = new URLSearchParams()
-              if (search) params.set('search', search)
-              if (e.target.value) params.set('series', e.target.value)
-              router.push(`/admin/products?${params.toString()}`)
-            }}
-          >
-            <option value="">所有系列</option>
-            {series.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-
-          <Button onClick={handleSearch}>
-            <Search className="mr-2 h-4 w-4 md:h-5 md:w-5" />
-            搜尋
-          </Button>
-        </div>
-
         {/* Batch Actions */}
         {selectedProductIds.length > 0 && (
           <div className={cn(
@@ -509,6 +469,8 @@ export function ProductTableWithTags({
                 <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>
                   庫存
                 </th>
+                {/* 庫存狀態 */}
+                {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>庫存狀態</th>}
                 {/* 單位（批次編輯模式） */}
                 {batchEditMode && (
                   <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>
@@ -531,8 +493,8 @@ export function ProductTableWithTags({
                     </div>
                   </th>
                 )}
-                {/* 狀態 */}
-                {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>狀態</th>}
+                {/* 上架 */}
+                {!batchEditMode && <th className={cn("px-4 py-3 text-left font-bold", designTokens.typography.body.base)}>上架</th>}
                 {/* 操作 */}
                 {!batchEditMode && <th className={cn("px-4 py-3 text-right font-bold", designTokens.typography.body.base)}>操作</th>}
               </tr>
@@ -694,6 +656,18 @@ export function ProductTableWithTags({
                         )}
                       </td>
 
+                      {/* 庫存狀態（快速切換開關 - 樂觀更新）- 僅在非批次編輯模式顯示 */}
+                      {!batchEditMode && (
+                        <td className="px-4 py-3">
+                          <ProductStockStatusToggle
+                            productId={product.id}
+                            initialStockStatus={product.stock_status as 'sufficient' | 'low' | 'out_of_stock'}
+                            productName={product.name}
+                            onStatusChanged={() => router.refresh()}
+                          />
+                        </td>
+                      )}
+
                       {/* 單位 - 僅在批次編輯模式顯示 */}
                       {batchEditMode && (
                         <td className="px-4 py-3">
@@ -798,11 +772,19 @@ export function ProductTableWithTags({
                   </div>
                 </div>
 
-                {/* 狀態（快速切換開關 - 樂觀更新） */}
+                {/* 狀態與庫存狀態（快速切換開關 - 樂觀更新） */}
                 <div className="flex items-center gap-2 mb-3">
+                  <div className={cn("text-gray-600", designTokens.typography.caption)}>上架:</div>
                   <ProductStatusToggle
                     productId={product.id}
                     initialStatus={product.status as 'active' | 'inactive'}
+                    productName={product.name}
+                    onStatusChanged={() => router.refresh()}
+                  />
+                  <div className={cn("text-gray-600 ml-2", designTokens.typography.caption)}>庫存狀態:</div>
+                  <ProductStockStatusToggle
+                    productId={product.id}
+                    initialStockStatus={product.stock_status as 'sufficient' | 'low' | 'out_of_stock'}
                     productName={product.name}
                     onStatusChanged={() => router.refresh()}
                   />

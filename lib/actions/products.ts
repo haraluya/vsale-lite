@@ -711,6 +711,86 @@ export async function updateProductStock(
 }
 
 /**
+ * 快速更新商品庫存狀態 (僅管理員)
+ * @param id 商品 ID
+ * @param stockStatus 新庫存狀態 ('sufficient' | 'low' | 'out_of_stock')
+ */
+export async function updateProductStockStatus(
+  id: string,
+  stockStatus: 'sufficient' | 'low' | 'out_of_stock'
+): Promise<ActionResult<Product>> {
+  try {
+    await checkAuth('admin') // 僅管理員可執行
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    // 檢查商品是否存在
+    const { data: existing } = await adminClient
+      .from('products')
+      .select('id, stock_status')
+      .eq('id', id)
+      .single()
+
+    if (!existing) {
+      return { success: false, message: '商品不存在' }
+    }
+
+    // 更新庫存狀態
+    const { data: updated, error } = await adminClient
+      .from('products')
+      .update({ stock_status: stockStatus })
+      .eq('id', id)
+      .select('*, series(name, color)')
+      .single()
+
+    if (error) {
+      console.error('updateProductStockStatus 錯誤:', error)
+      return { success: false, message: '庫存狀態更新失敗' }
+    }
+
+    // 記錄操作日誌
+    await logAudit({
+      target_type: 'product',
+      target_id: id,
+      action_type: 'updated',
+      old_values: { stock_status: existing.stock_status },
+      new_values: { stock_status: stockStatus },
+    })
+
+    // 重新驗證快取
+    revalidateTag('products')
+    revalidateTag(`product:${id}`)
+    revalidateTag('dashboard-stats')
+
+    // 轉換 series 為平坦結構
+    const product: Product = {
+      ...updated,
+      series_name: updated.series?.name || null,
+      series_color: updated.series?.color || null,
+    }
+
+    return {
+      success: true,
+      data: product,
+      message: '庫存狀態更新成功',
+    }
+  } catch (error: unknown) {
+    console.error('updateProductStockStatus error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '庫存狀態更新失敗',
+    }
+  }
+}
+
+/**
  * 上傳商品圖片
  * Feature: 002-product-management (US4)
  */

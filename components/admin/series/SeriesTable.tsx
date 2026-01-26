@@ -83,7 +83,7 @@ export function SeriesTable({
     if (result.success) {
       await alert({
         title: '狀態更新成功',
-        message: result.message || `系列已${newStatus === 'active' ? '啟用' : '停用'}`,
+        message: result.message || `系列已${newStatus === 'active' ? '上架' : '下架'}`,
         variant: 'success',
       })
       router.refresh()
@@ -152,7 +152,7 @@ export function SeriesTable({
                 <th className={cn('px-4 py-3 text-left', designTokens.typography.body.base)}>
                   <SortableHeader label="分類 / 系列名稱" sortKey="category_name" />
                 </th>
-                <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>狀態</th>
+                <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>上架</th>
                 <th className={cn('px-4 py-3 text-right font-bold', designTokens.typography.body.base)}>操作</th>
               </tr>
             </thead>
@@ -204,9 +204,9 @@ export function SeriesTable({
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
                         )}
-                        title={s.status === 'active' ? '點擊停用' : '點擊啟用'}
+                        title={s.status === 'active' ? '點擊下架' : '點擊上架'}
                       >
-                        {s.status === 'active' ? '啟用' : '停用'}
+                        {s.status === 'active' ? '上架' : '下架'}
                       </button>
                     </td>
 
