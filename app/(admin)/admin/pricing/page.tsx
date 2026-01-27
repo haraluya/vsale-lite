@@ -24,11 +24,12 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 interface PricingPageProps {
-  searchParams: Promise<{ series_id?: string; category_id?: string }>
+  searchParams: Promise<{ mode?: string; series_id?: string; category_id?: string }>
 }
 
 export default async function PricingPage({ searchParams }: PricingPageProps) {
   const params = await searchParams
+  const mode = params.mode
   const seriesId = params.series_id
   const categoryId = params.category_id
 
@@ -71,6 +72,7 @@ export default async function PricingPage({ searchParams }: PricingPageProps) {
 
   return (
     <PricingPageClient
+      initialMode={mode as 'series' | 'category' | 'quotation' | undefined}
       series={series}
       selectedSeriesId={seriesId}
       seriesProducts={seriesProducts}

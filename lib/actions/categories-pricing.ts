@@ -40,10 +40,17 @@ export async function getCategoryProductsForPricing(
 
     const seriesIds = seriesData.map((s) => s.id)
 
-    // 2. 查詢所有系列的商品
+    // 2. 查詢所有系列的商品（包含系列資訊）
     const { data: products, error: productsError } = await adminClient
       .from('products')
-      .select('*')
+      .select(`
+        *,
+        series (
+          id,
+          name,
+          sort_order
+        )
+      `)
       .in('series_id', seriesIds)
       .eq('status', 'active')
       .order('code', { ascending: true })

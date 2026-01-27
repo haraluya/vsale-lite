@@ -20,9 +20,9 @@ export function CategorySelector({ categories, selectedCategoryId }: CategorySel
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = e.target.value
     if (categoryId) {
-      window.location.href = `/admin/pricing?category_id=${categoryId}`
+      window.location.href = `/admin/pricing?mode=category&category_id=${categoryId}`
     } else {
-      window.location.href = '/admin/pricing'
+      window.location.href = '/admin/pricing?mode=category'
     }
   }
 

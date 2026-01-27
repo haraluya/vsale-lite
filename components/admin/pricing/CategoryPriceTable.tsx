@@ -120,6 +120,15 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
   // 取得所有等級 (從第一個商品取得)
   const tiers = products[0]?.tier_prices || []
 
+  // 依系列排序商品
+  const sortedProducts = [...products].sort((a: any, b: any) => {
+    const seriesA = a.series?.sort_order || 999
+    const seriesB = b.series?.sort_order || 999
+    if (seriesA !== seriesB) return seriesA - seriesB
+    // 同系列內依商品編號排序
+    return (a.code || '').localeCompare(b.code || '', 'zh-TW')
+  })
+
   return (
     <div className="space-y-4">
       {/* 錯誤訊息 */}
@@ -145,7 +154,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
             <thead className="bg-gray-100">
               <tr>
                 <th className="sticky left-0 z-10 border-b-2 border-r-2 border-black bg-gray-100 px-4 py-3 text-left font-bold">
-                  商品編號 / 名稱
+                  系列 / 商品名稱
                 </th>
                 {tiers.map((tier) => (
                   <th key={tier.tier_id} className="border-b-2 border-black px-3 py-2 text-left font-bold">
@@ -160,7 +169,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
               </tr>
             </thead>
             <tbody>
-              {products.map((product, idx) => (
+              {sortedProducts.map((product: any, idx) => (
                 <tr
                   key={product.id}
                   className={`border-b border-gray-200 hover:bg-gray-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
@@ -168,7 +177,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                   {/* 商品資訊 */}
                   <td className="sticky left-0 z-10 border-r-2 border-black bg-white px-4 py-3">
                     <div className="font-bold">{product.name}</div>
-                    <div className="text-sm text-gray-600">{product.code}</div>
+                    <div className="text-sm text-gray-600">{product.series?.name || '未分類'}</div>
                   </td>
 
                   {/* 各等級價格 */}

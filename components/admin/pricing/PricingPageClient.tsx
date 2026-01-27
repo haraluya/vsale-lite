@@ -18,6 +18,7 @@ import { QuotationGenerator } from '@/components/admin/pricing/QuotationGenerato
 import type { Series, Category, Tier } from '@/types'
 
 interface PricingPageClientProps {
+  initialMode?: 'series' | 'category' | 'quotation'
   series: Series[]
   selectedSeriesId?: string
   seriesProducts?: any[]
@@ -30,6 +31,7 @@ interface PricingPageClientProps {
 }
 
 export function PricingPageClient({
+  initialMode,
   series,
   selectedSeriesId,
   seriesProducts = [],
@@ -40,7 +42,7 @@ export function PricingPageClient({
   selectedCategory = null,
   tiers,
 }: PricingPageClientProps) {
-  const [mode, setMode] = useState<'series' | 'category' | 'quotation'>('series')
+  const [mode, setMode] = useState<'series' | 'category' | 'quotation'>(initialMode || 'series')
 
   return (
     <div>

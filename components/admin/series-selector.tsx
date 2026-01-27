@@ -19,9 +19,9 @@ export function SeriesSelector({ series, selectedSeriesId }: SeriesSelectorProps
     const seriesId = e.target.value
     if (seriesId) {
       // 使用 window.location.href 強制完整頁面重載，確保 Server Component 資料完全刷新
-      window.location.href = `/admin/pricing?series_id=${seriesId}`
+      window.location.href = `/admin/pricing?mode=series&series_id=${seriesId}`
     } else {
-      window.location.href = '/admin/pricing'
+      window.location.href = '/admin/pricing?mode=series'
     }
   }
 
