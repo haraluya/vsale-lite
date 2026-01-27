@@ -1,11 +1,11 @@
 /**
  * Image Optimization Utilities
- * ⭐ 優化：圖片格式優化與 Supabase Image Transformation
+ * ⭐ 優化：圖片格式優化
  *
  * 提供圖片 URL 優化功能：
- * - 自動添加 WebP 格式轉換
- * - 響應式尺寸調整
- * - 品質壓縮
+ * - Cloudinary 圖片：直接返回原始 URL（由 Next.js Image loader 自動優化）
+ * - Supabase 圖片：添加 Image Transformation 參數
+ * - 其他圖片：直接返回原始 URL
  */
 
 /**
@@ -20,32 +20,40 @@ export interface ImageTransformOptions {
 }
 
 /**
- * 優化 Supabase Storage 圖片 URL（使用 Image Transformation API）
+ * 優化圖片 URL
  *
  * @param url - 原始圖片 URL
- * @param options - 轉換選項
+ * @param options - 轉換選項（僅適用於 Supabase）
  * @returns 優化後的圖片 URL
  *
  * @example
  * ```ts
- * // 轉換為 WebP 格式，寬度 600px，品質 80%
- * const optimizedUrl = optimizeSupabaseImage(imageUrl, {
- *   width: 600,
- *   quality: 80,
- *   format: 'webp'
- * })
+ * // Cloudinary 圖片 - 直接返回（Next.js Image 會自動優化）
+ * const url1 = optimizeImage('vsale/products/xxx.jpg')
+ * // → 'vsale/products/xxx.jpg'
+ *
+ * // Supabase 圖片 - 添加轉換參數
+ * const url2 = optimizeImage('https://xxx.supabase.co/storage/...', { width: 600 })
+ * // → 'https://xxx.supabase.co/storage/...?width=600&format=webp&quality=80'
  * ```
  */
-export function optimizeSupabaseImage(
+export function optimizeImage(
   url: string | null | undefined,
   options: ImageTransformOptions = {}
 ): string {
   if (!url) return ''
 
-  // 檢查是否為 Supabase Storage URL
+  // 1. Cloudinary 圖片 - 直接返回（Next.js Image loader 會自動處理）
+  if (url.includes('cloudinary.com') || !url.startsWith('http')) {
+    return url
+  }
+
+  // 2. 非 Supabase 圖片 - 直接返回
   if (!url.includes('supabase.co/storage/v1/object/public/')) {
     return url
   }
+
+  // 3. Supabase Storage URL - 添加 Image Transformation 參數
 
   // 預設選項
   const {
@@ -77,12 +85,11 @@ export function optimizeSupabaseImage(
 
 /**
  * 為商品卡片優化圖片
- * - 寬度 300px
- * - WebP 格式
- * - 品質 80%
+ * - Cloudinary: 由 Next.js Image 自動優化
+ * - Supabase: 寬度 300px, WebP 格式, 品質 80%
  */
 export function optimizeProductCardImage(url: string | null | undefined): string {
-  return optimizeSupabaseImage(url, {
+  return optimizeImage(url, {
     width: 300,
     quality: 80,
     format: 'webp'
@@ -91,12 +98,11 @@ export function optimizeProductCardImage(url: string | null | undefined): string
 
 /**
  * 為輪播圖優化圖片
- * - 寬度 1920px（桌面全寬）
- * - WebP 格式
- * - 品質 85%（較高品質，因為是主視覺）
+ * - Cloudinary: 由 Next.js Image 自動優化
+ * - Supabase: 寬度 1920px, WebP 格式, 品質 85%
  */
 export function optimizeCarouselImage(url: string | null | undefined): string {
-  return optimizeSupabaseImage(url, {
+  return optimizeImage(url, {
     width: 1920,
     quality: 85,
     format: 'webp'
@@ -105,12 +111,11 @@ export function optimizeCarouselImage(url: string | null | undefined): string {
 
 /**
  * 為系列卡片優化圖片
- * - 寬度 600px
- * - WebP 格式
- * - 品質 80%
+ * - Cloudinary: 由 Next.js Image 自動優化
+ * - Supabase: 寬度 600px, WebP 格式, 品質 80%
  */
 export function optimizeSeriesCardImage(url: string | null | undefined): string {
-  return optimizeSupabaseImage(url, {
+  return optimizeImage(url, {
     width: 600,
     quality: 80,
     format: 'webp'
@@ -119,12 +124,11 @@ export function optimizeSeriesCardImage(url: string | null | undefined): string 
 
 /**
  * 為商品詳情頁優化圖片
- * - 寬度 1200px
- * - WebP 格式
- * - 品質 85%
+ * - Cloudinary: 由 Next.js Image 自動優化
+ * - Supabase: 寬度 1200px, WebP 格式, 品質 85%
  */
 export function optimizeProductDetailImage(url: string | null | undefined): string {
-  return optimizeSupabaseImage(url, {
+  return optimizeImage(url, {
     width: 1200,
     quality: 85,
     format: 'webp'
