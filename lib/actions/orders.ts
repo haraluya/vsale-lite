@@ -1121,7 +1121,8 @@ export async function deleteOrder(
 
     // 重新驗證相關頁面
     revalidatePath('/admin/orders')
-    revalidatePath(`/admin/orders/${order_id}`)
+    // 註解：不重新驗證已刪除的訂單詳情頁面，避免 PGRST116 錯誤
+    // revalidatePath(`/admin/orders/${order_id}`)
     revalidateTag('orders')
 
     return {

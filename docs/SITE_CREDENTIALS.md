@@ -1,6 +1,6 @@
 # Vsale 多站點環境資訊
 
-**最後更新**: 2026-01-22
+**最後更新**: 2026-01-26
 
 > ⚠️ **重要提醒**: 此檔案包含敏感資訊，請勿提交到 Git！已加入 `.gitignore`
 
@@ -101,6 +101,89 @@ SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
 NEXT_PUBLIC_SUPABASE_URL=https://dewhcpfzrzewgknaqzwy.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRld2hjcGZ6cnpld2drbmFxend5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwODA4OTYsImV4cCI6MjA4NDY1Njg5Nn0.S4qBXSktlnnVAKw7w1mMCOwX8tcwB22XrXIaauDP5bk
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRld2hjcGZ6cnpld2drbmFxend5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTA4MDg5NiwiZXhwIjoyMDg0NjU2ODk2fQ.XDa2SNZLtIMyT4dmlCmKWzIP9RDJwAirruPUyzueO8s
+```
+
+---
+
+## 共用資源 - Cloudinary CDN
+
+**用途**: 圖片 CDN 服務（三個站點共用同一個 Cloudinary 帳號）
+
+### Cloudinary 帳號資訊
+- **Cloud Name**: `dq3e7q3aq`
+- **API Key**: `847781913351469`
+- **API Secret**: `_AZ9RjpN-Rbl3okHFZk_qwnRcdk`
+- **Dashboard**: https://console.cloudinary.com/console/c-dq3e7q3aq
+
+### 資料夾結構
+```
+dq3e7q3aq/
+├── vsale/              # 主站圖片
+│   ├── series/         # 系列圖片
+│   ├── products/       # 商品圖片
+│   ├── announcements/  # 廣告圖片
+│   └── home-blocks/    # 首頁區塊圖片
+├── vsale-site2/        # 站點 2 圖片
+│   ├── series/
+│   ├── products/
+│   ├── announcements/
+│   └── home-blocks/
+└── vsale-site3/        # 站點 3 圖片
+    ├── series/
+    ├── products/
+    ├── announcements/
+    └── home-blocks/
+```
+
+### Vercel 環境變數設定
+
+所有站點的 Vercel 專案都需要設定以下環境變數（**Production + Preview + Development**）：
+
+```env
+# Cloudinary CDN（所有站點共用）
+CLOUDINARY_CLOUD_NAME=dq3e7q3aq
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dq3e7q3aq
+CLOUDINARY_API_KEY=847781913351469
+CLOUDINARY_API_SECRET=_AZ9RjpN-Rbl3okHFZk_qwnRcdk
+```
+
+**設定步驟**:
+1. 前往 [Vercel Dashboard](https://vercel.com/dashboard)
+2. 選擇專案 → Settings → Environment Variables
+3. 點擊 "Add New" 新增變數
+4. **重要**: 確保勾選 Production、Preview、Development 三個環境
+5. 儲存後需要 Redeploy 才會生效
+
+**驗證環境變數**:
+- 主站: https://vsale-lite.vercel.app/api/check-env
+- 站點 2: https://vsale-site2.vercel.app/api/check-env
+- 站點 3: https://vsale-site3.vercel.app/api/check-env
+
+查看 `isConfigured: true` 表示設定正確。
+
+### 圖片遷移狀態
+
+| 站點 | 系列圖片 | 商品圖片 | 廣告圖片 | 首頁區塊 |
+|------|---------|---------|---------|---------|
+| 主站 | ✅ 完成 | ✅ 完成 | ✅ 完成 | ✅ 完成 |
+| 站點 2 | ✅ 完成 (37) | ✅ 完成 (199/201) | ✅ 完成 (2) | ✅ 完成 |
+| 站點 3 | ✅ 完成 (37) | ✅ 完成 (194/196) | ✅ 完成 | ✅ 完成 |
+
+**注意**: 部分商品圖片上傳失敗是因為 Supabase Storage 中檔案不存在。
+
+### 相關腳本
+```bash
+# 檢查圖片路徑
+tsx scripts/check-cloudinary-paths.ts
+
+# 修正圖片路徑
+tsx scripts/fix-all-cloudinary-paths.ts
+
+# 遷移站點 2 圖片
+pnpm migrate:cloudinary:site2
+
+# 遷移站點 3 圖片
+pnpm migrate:cloudinary:site3
 ```
 
 ---

@@ -129,6 +129,32 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
     return (a.code || '').localeCompare(b.code || '', 'zh-TW')
   })
 
+  // 為每個系列分配循環底色（使用專案設計系統的淡色）
+  const seriesColors = [
+    'bg-blue-50',    // 藍色 - 清新
+    'bg-purple-50',  // 紫色 - 優雅
+    'bg-green-50',   // 綠色 - 自然
+    'bg-yellow-50',  // 黃色 - 明亮
+    'bg-pink-50',    // 粉色 - 柔和
+  ]
+
+  // 計算每個商品所屬系列的顏色索引
+  const getSeriesColorClass = (product: any) => {
+    // 取得所有唯一系列（依排序順序）
+    const uniqueSeries = Array.from(
+      new Map(
+        sortedProducts.map((p: any) => [
+          p.series?.id || 'uncategorized',
+          p.series?.sort_order || 999,
+        ])
+      ).entries()
+    ).sort((a, b) => a[1] - b[1])
+
+    const seriesId = product.series?.id || 'uncategorized'
+    const seriesIndex = uniqueSeries.findIndex(([id]) => id === seriesId)
+    return seriesColors[seriesIndex % seriesColors.length]
+  }
+
   return (
     <div className="space-y-4">
       {/* 錯誤訊息 */}
@@ -169,13 +195,15 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
               </tr>
             </thead>
             <tbody>
-              {sortedProducts.map((product: any, idx) => (
-                <tr
-                  key={product.id}
-                  className={`border-b border-gray-200 hover:bg-gray-50 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                >
-                  {/* 商品資訊 */}
-                  <td className="sticky left-0 z-10 border-r-2 border-black bg-white px-4 py-3">
+              {sortedProducts.map((product: any, idx) => {
+                const seriesColorClass = getSeriesColorClass(product)
+                return (
+                  <tr
+                    key={product.id}
+                    className={`border-b border-gray-200 hover:bg-opacity-70 ${seriesColorClass}`}
+                  >
+                    {/* 商品資訊 */}
+                    <td className={`sticky left-0 z-10 border-r-2 border-black px-4 py-3 ${seriesColorClass}`}>
                     <div className="font-bold">{product.name}</div>
                     <div className="text-sm text-gray-600">{product.series?.name || '未分類'}</div>
                   </td>
@@ -206,7 +234,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                               value={currentPrice ?? ''}
                               onChange={(e) => handlePriceChange(product.id, tier.tier_id, e.target.value)}
                               placeholder="未設定"
-                              className="w-28 rounded-none border-2 border-gray-300 px-3 py-1 text-sm focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-28 rounded-none border-2 border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                             {/* 折扣率顯示 */}
                             {currentPrice && product.retail_price && (
@@ -235,7 +263,8 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                     )
                   })}
                 </tr>
-              ))}
+                )
+              })}
             </tbody>
           </table>
         </div>
