@@ -1,9 +1,8 @@
 -- =============================================
--- Migration: 恢復出貨中訂單到待確認狀態
--- 用途: 允許管理員將 shipping 狀態的訂單恢復到 pending，並自動回補庫存
+-- Migration: 修復 revert_shipping_to_pending 函數
+-- 修正: 移除不必要的 admin_users 表查詢，避免權限錯誤
 -- =============================================
 
--- 建立恢復訂單狀態並回補庫存的函數
 CREATE OR REPLACE FUNCTION "public"."revert_shipping_to_pending"(
   "p_order_id" uuid,
   "p_admin_id" uuid,
@@ -79,6 +78,3 @@ BEGIN
   RETURN;
 END;
 $$;
-
--- 設定函數註解
-COMMENT ON FUNCTION "public"."revert_shipping_to_pending" IS '將出貨中訂單恢復到待確認狀態，並自動回補庫存';
