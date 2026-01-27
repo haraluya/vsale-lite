@@ -92,8 +92,8 @@ export default async function ShopLayout({
           unusedCouponCount={unusedCouponCount}
         />
 
-        {/* 主要內容 */}
-        <main>{children}</main>
+        {/* 主要內容 - 添加頂部間距與次導覽列保持呼吸空間 */}
+        <main className="pt-6 md:pt-8">{children}</main>
       </div>
     </div>
   )
