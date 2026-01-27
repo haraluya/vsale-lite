@@ -192,11 +192,8 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               </div>
             </div>
 
-            {/* 分隔線 */}
-            <div className="border-t-2 border-gray-200 my-8 md:my-10"></div>
-
             {/* 底部操作區 */}
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-5 mt-8 md:mt-10">
               <SectionHeader title="訂單操作" />
               <div className="flex flex-wrap gap-3">
                 {canEdit && (
