@@ -416,10 +416,8 @@ export async function getOrders(
       query = query.eq('status', status)
     }
 
-    // 訂單編號搜尋（僅限管理員）
-    if (search && role === 'admin') {
-      query = query.ilike('order_number', `%${search}%`)
-    }
+    // 🔧 修復：移除資料庫層級的訂單編號搜尋，改為客戶端統一過濾
+    // 原本的 query.ilike('order_number', `%${search}%`) 會導致搜尋客戶名稱/電話時返回空陣列
 
     const { data: orders, count, error } = await query
 
