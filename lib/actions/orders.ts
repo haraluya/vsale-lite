@@ -718,19 +718,20 @@ export async function markAsShipping(
       p_actor_id: userId,
     })
 
-    if (error || !data) {
+    if (error) {
       return {
         success: false,
         message: error?.message || '標記出貨時發生錯誤',
       }
     }
 
-    // 檢查 Function 回傳結果
-    const result = data as { success: boolean; error?: string; order_id?: string }
-    if (!result.success) {
+    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+
+    if (!result || !result.success) {
       return {
         success: false,
-        message: result.error || '標記出貨失敗',
+        message: result?.message || '標記出貨失敗',
       }
     }
 
@@ -784,19 +785,20 @@ export async function updateOrderStatus(
       p_actor_id: userId,
     })
 
-    if (error || !data) {
+    if (error) {
       return {
         success: false,
         message: error?.message || '更新訂單狀態時發生錯誤',
       }
     }
 
-    // 檢查 Function 回傳結果
-    const result = data as { success: boolean; error?: string; order_id?: string; new_status?: string }
-    if (!result.success) {
+    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+
+    if (!result || !result.success) {
       return {
         success: false,
-        message: result.error || '更新訂單狀態失敗',
+        message: result?.message || '更新訂單狀態失敗',
       }
     }
 
@@ -856,19 +858,20 @@ export async function cancelOrder(
       p_actor_id: userId,
     })
 
-    if (error || !data) {
+    if (error) {
       return {
         success: false,
         message: error?.message || '取消訂單時發生錯誤',
       }
     }
 
-    // 檢查 Function 回傳結果
-    const result = data as { success: boolean; error?: string; order_id?: string }
-    if (!result.success) {
+    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+
+    if (!result || !result.success) {
       return {
         success: false,
-        message: result.error || '取消訂單失敗',
+        message: result?.message || '取消訂單失敗',
       }
     }
 
@@ -1103,19 +1106,20 @@ export async function deleteOrder(
       p_reason: reason || '管理員刪除訂單',
     })
 
-    if (error || !data) {
+    if (error) {
       return {
         success: false,
         message: error?.message || '刪除訂單時發生錯誤',
       }
     }
 
-    // 檢查 Function 回傳結果
-    const result = data as { success: boolean; error?: string; order_number?: string; message?: string }
-    if (!result.success) {
+    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+
+    if (!result || !result.success) {
       return {
         success: false,
-        message: result.error || '刪除訂單失敗',
+        message: result?.message || result?.error || '刪除訂單失敗',
       }
     }
 
