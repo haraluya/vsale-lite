@@ -113,23 +113,25 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
           <div className={cn('rounded-none bg-white', getNeoBrutalismClasses(), designTokens.spacing.card.padding)}>
             {/* 左右分欄 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
-              {/* 左欄：客戶資訊 */}
+              {/* 左欄：客戶資料 */}
               <div className="flex flex-col gap-4 md:gap-5">
+                {/* 客戶資料標題 */}
+                <div className="text-[11px] text-gray-500 uppercase tracking-wide font-bold pb-2 border-b border-gray-300">
+                  客戶資料
+                </div>
+
                 {/* 客戶姓名 */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center flex-shrink-0">
-                    <User className="h-5 w-5" />
+                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
+                    👤
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={cn(designTokens.typography.caption, 'text-gray-500 mb-1')}>
+                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
                       客戶姓名（點擊編輯）
                     </div>
                     <button
                       onClick={() => setShowClientDialog(true)}
-                      className={cn(
-                        designTokens.typography.body.large,
-                        'font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer'
-                      )}
+                      className="text-xl font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
                     >
                       {order.user.name}
                     </button>
@@ -138,14 +140,14 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
                 {/* 手機號碼 */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center flex-shrink-0">
-                    <Phone className="h-5 w-5" />
+                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
+                    📱
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={cn(designTokens.typography.caption, 'text-gray-500 mb-1')}>
+                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
                       手機號碼
                     </div>
-                    <div className={cn(designTokens.typography.body.large, 'font-bold')}>
+                    <div className="text-xl font-bold text-gray-900">
                       {order.user.phone}
                     </div>
                   </div>
@@ -153,32 +155,37 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
                 {/* 會員等級 */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center flex-shrink-0">
-                    <Award className="h-5 w-5" />
+                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
+                    ⭐
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={cn(designTokens.typography.caption, 'text-gray-500 mb-1')}>
+                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
                       會員等級
                     </div>
-                    <div className={cn(designTokens.typography.body.large, 'font-bold text-purple-700')}>
+                    <div className="text-xl font-bold text-purple-700">
                       {order.user.tier_name}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 右欄：訂單資訊 */}
+              {/* 右欄：訂單資料 */}
               <div className="flex flex-col gap-4 md:gap-5">
+                {/* 訂單資料標題 */}
+                <div className="text-[11px] text-gray-500 uppercase tracking-wide font-bold pb-2 border-b border-gray-300">
+                  訂單資料
+                </div>
+
                 {/* 訂單編號 */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center flex-shrink-0">
-                    <Hash className="h-5 w-5" />
+                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
+                    #
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={cn(designTokens.typography.caption, 'text-gray-500 mb-1')}>
+                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
                       訂單編號
                     </div>
-                    <div className={cn(designTokens.typography.body.base, 'font-mono font-bold')}>
+                    <div className="text-base font-mono font-bold text-gray-900">
                       {order.order_number}
                     </div>
                   </div>
@@ -186,11 +193,11 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
                 {/* 訂單狀態 */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center flex-shrink-0">
-                    <Package className="h-5 w-5" />
+                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
+                    📦
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={cn(designTokens.typography.caption, 'text-gray-500 mb-1')}>
+                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
                       訂單狀態
                     </div>
                     <OrderStatusBadge status={order.status} size="md" />
@@ -199,14 +206,14 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
                 {/* 建立時間 */}
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center flex-shrink-0">
-                    <Calendar className="h-5 w-5" />
+                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
+                    📅
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className={cn(designTokens.typography.caption, 'text-gray-500 mb-1')}>
+                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
                       建立時間
                     </div>
-                    <div className={cn(designTokens.typography.body.base, 'font-medium')}>
+                    <div className="text-sm font-medium text-gray-900">
                       {formatDate(order.created_at)}
                     </div>
                   </div>
@@ -219,7 +226,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
             {/* 底部操作區 */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className={cn(designTokens.typography.caption, 'text-gray-500 font-bold uppercase')}>
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-wide">
                 訂單操作
               </div>
               <div className="flex flex-wrap gap-3">
