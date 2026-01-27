@@ -267,7 +267,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               ))}
 
               {/* 運費 (Feature 011) */}
-              {order.shipping_fee && order.shipping_fee > 0 && (
+              {order.shipping_fee > 0 && (
                 <div className="grid grid-cols-12 gap-2 md:gap-4 bg-blue-50 p-3 md:p-4">
                   <div className={cn('col-span-6 md:col-span-8 text-right font-bold', designTokens.typography.body.base)}>
                     🚚 運費
@@ -284,7 +284,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               )}
 
               {/* 自訂費用 (Feature 011) */}
-              {order.custom_fees && order.custom_fees.length > 0 && (
+              {order.custom_fees?.length > 0 && (
                 <>
                   {order.custom_fees.map((fee) => (
                     <div key={fee.id} className="grid grid-cols-12 gap-2 md:gap-4 bg-purple-50 p-3 md:p-4">
