@@ -259,6 +259,10 @@ export type OrderItem = {
   quantity: number
   subtotal: number
   created_at: string
+  // 🆕 JOIN 查詢時包含系列資訊（可選）
+  series?: {
+    name: string
+  } | null
 }
 
 // 訂單操作歷史

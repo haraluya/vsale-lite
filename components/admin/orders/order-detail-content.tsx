@@ -8,8 +8,21 @@ import { OrderActions } from '@/components/admin/order-actions'
 import { OrderCommentSection } from '@/components/admin/order-comment-section'
 import { OrderEditor } from './order-editor'
 import { ClientQuickViewDialog } from '@/components/admin/client-quick-view-dialog'
+import { InfoField, SectionHeader, NoteField } from './info-field'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, User, Phone, Award, Calendar, FileText, Edit, Hash, Package } from 'lucide-react'
+import {
+  ArrowLeft,
+  User,
+  Phone,
+  Award,
+  Calendar,
+  FileText,
+  Edit,
+  Hash,
+  Package,
+  MapPin,
+  AlertTriangle,
+} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import type { OrderDetail, OrderTimelineWithActor } from '@/types'
@@ -109,115 +122,73 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
       ) : (
         /* 檢視模式 */
         <>
-          {/* 客戶資訊區塊 - 方案 A：左右分欄型 */}
+          {/* 客戶資訊區塊 - 統一設計系統版本 */}
           <div className={cn('rounded-none bg-white', getNeoBrutalismClasses(), designTokens.spacing.card.padding)}>
             {/* 左右分欄 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-6 md:mb-8">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
               {/* 左欄：客戶資料 */}
-              <div className="flex flex-col gap-4 md:gap-5">
-                {/* 客戶資料標題 */}
-                <div className="text-[11px] text-gray-500 uppercase tracking-wide font-bold pb-2 border-b border-gray-300">
-                  客戶資料
-                </div>
+              <div className="flex flex-col gap-5">
+                <SectionHeader title="客戶資料" icon={User} />
 
-                {/* 客戶姓名 */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
-                    👤
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
-                      客戶姓名（點擊編輯）
-                    </div>
-                    <button
-                      onClick={() => setShowClientDialog(true)}
-                      className="text-xl font-bold text-blue-600 hover:text-blue-700 hover:underline cursor-pointer"
-                    >
-                      {order.user.name}
-                    </button>
-                  </div>
-                </div>
+                <InfoField
+                  icon={User}
+                  iconColor="blue"
+                  label="客戶姓名（點擊編輯）"
+                  value={order.user.name}
+                  valueSize="base"
+                  valueColor="blue"
+                  onClick={() => setShowClientDialog(true)}
+                />
 
-                {/* 手機號碼 */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
-                    📱
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
-                      手機號碼
-                    </div>
-                    <div className="text-xl font-bold text-gray-900">
-                      {order.user.phone}
-                    </div>
-                  </div>
-                </div>
+                <InfoField
+                  icon={Phone}
+                  iconColor="green"
+                  label="手機號碼"
+                  value={order.user.phone}
+                  valueSize="base"
+                  valueColor="gray"
+                />
 
-                {/* 會員等級 */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
-                    ⭐
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
-                      會員等級
-                    </div>
-                    <div className="text-xl font-bold text-purple-700">
-                      {order.user.tier_name}
-                    </div>
-                  </div>
-                </div>
+                <InfoField
+                  icon={Award}
+                  iconColor="purple"
+                  label="會員等級"
+                  value={order.user.tier_name}
+                  valueSize="base"
+                  valueColor="purple"
+                />
               </div>
 
               {/* 右欄：訂單資料 */}
-              <div className="flex flex-col gap-4 md:gap-5">
-                {/* 訂單資料標題 */}
-                <div className="text-[11px] text-gray-500 uppercase tracking-wide font-bold pb-2 border-b border-gray-300">
-                  訂單資料
-                </div>
+              <div className="flex flex-col gap-5">
+                <SectionHeader title="訂單資料" icon={Package} />
 
-                {/* 訂單編號 */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
-                    #
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
-                      訂單編號
-                    </div>
-                    <div className="text-base font-mono font-bold text-gray-900">
-                      {order.order_number}
-                    </div>
-                  </div>
-                </div>
+                <InfoField
+                  icon={Hash}
+                  iconColor="orange"
+                  label="訂單編號"
+                  value={<span className="font-mono">{order.order_number}</span>}
+                  valueSize="base"
+                  valueColor="black"
+                />
 
-                {/* 訂單狀態 */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
-                    📦
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
-                      訂單狀態
-                    </div>
-                    <OrderStatusBadge status={order.status} size="md" />
-                  </div>
-                </div>
+                <InfoField
+                  icon={Package}
+                  iconColor="blue"
+                  label="訂單狀態"
+                  value={<OrderStatusBadge status={order.status} size="md" />}
+                  valueSize="base"
+                  valueColor="gray"
+                />
 
-                {/* 建立時間 */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-200 border-2 border-black flex items-center justify-center text-xl flex-shrink-0">
-                    📅
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[11px] text-gray-500 uppercase tracking-wide mb-1">
-                      建立時間
-                    </div>
-                    <div className="text-sm font-medium text-gray-900">
-                      {formatDate(order.created_at)}
-                    </div>
-                  </div>
-                </div>
+                <InfoField
+                  icon={Calendar}
+                  iconColor="purple"
+                  label="建立時間"
+                  value={formatDate(order.created_at)}
+                  valueSize="sm"
+                  valueColor="gray"
+                />
               </div>
             </div>
 
@@ -253,56 +224,32 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
             </div>
           </div>
 
-          {/* ========== 區塊 2: 客戶地址與備註（獨立區塊） ========== */}
+          {/* ========== 區塊 2: 客戶地址與備註（獨立區塊） - 統一設計系統版本 ========== */}
           {(order.user.address || order.user.admin_notes) && (
-            <div className={cn(
-              'rounded-none bg-white',
-              getNeoBrutalismClasses(),
-              designTokens.spacing.card.padding,
-              designTokens.spacing.card.gap
-            )}>
-              <h2 className={cn(designTokens.typography.h3, 'mb-4 md:mb-6')}>
-                客戶資訊補充
-              </h2>
+            <div
+              className={cn(
+                'rounded-none bg-white',
+                getNeoBrutalismClasses(),
+                designTokens.spacing.card.padding,
+                designTokens.spacing.card.gap
+              )}
+            >
+              <SectionHeader title="客戶資訊補充" icon={FileText} className="mb-5" />
 
-              <div className="space-y-4 md:space-y-5">
+              <div className="space-y-5">
                 {/* 常用地址（條件顯示） */}
                 {order.user.address && (
-                  <div>
-                    <div className={cn(
-                      designTokens.typography.label,
-                      'text-gray-700 mb-2 flex items-center gap-1.5'
-                    )}>
-                      📍 常用地址
-                    </div>
-                    <div className={cn(
-                      'rounded-none border-2 border-gray-300 bg-gray-50 p-3 md:p-4',
-                      designTokens.typography.body.base,
-                      'text-gray-900'
-                    )}>
-                      {order.user.address}
-                    </div>
-                  </div>
+                  <NoteField icon={MapPin} label="常用地址" content={order.user.address} variant="info" />
                 )}
 
                 {/* 管理員備註（條件顯示） */}
                 {order.user.admin_notes && (
-                  <div>
-                    <div className={cn(
-                      designTokens.typography.label,
-                      'text-yellow-800 mb-2 flex items-center gap-1.5'
-                    )}>
-                      ⚠️ 管理員備註
-                    </div>
-                    <div className={cn(
-                      'rounded-none border-2 border-yellow-500 bg-yellow-50',
-                      'p-3 md:p-4',
-                      designTokens.typography.body.base,
-                      'text-yellow-900 font-medium'
-                    )}>
-                      {order.user.admin_notes}
-                    </div>
-                  </div>
+                  <NoteField
+                    icon={AlertTriangle}
+                    label="管理員備註"
+                    content={order.user.admin_notes}
+                    variant="warning"
+                  />
                 )}
               </div>
             </div>
@@ -319,26 +266,10 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               訂單明細
             </h2>
 
-            {/* 客戶訂單備註 */}
+            {/* 客戶訂單備註 - 統一設計系統版本 */}
             {order.notes && (
               <div className="border-b-2 border-black bg-blue-50 p-4 md:p-5">
-                <div className="flex items-start gap-3">
-                  <FileText className="h-5 w-5 text-blue-700 mt-0.5" />
-                  <div className="flex-1">
-                    <div className={cn(designTokens.typography.label, 'text-blue-800 mb-2')}>
-                      💬 客戶訂單備註
-                    </div>
-                    <div
-                      className={cn(
-                        'rounded-none border-2 border-blue-400 bg-white p-3 md:p-4 text-blue-900',
-                        designTokens.typography.body.base,
-                        'font-medium'
-                      )}
-                    >
-                      {order.notes}
-                    </div>
-                  </div>
-                </div>
+                <NoteField icon={FileText} label="客戶訂單備註" content={order.notes} variant="info" />
               </div>
             )}
 
@@ -346,6 +277,9 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               {order.items.map(item => (
                 <div key={item.id} className="grid grid-cols-12 gap-2 md:gap-4 p-3 md:p-4">
                   <div className={cn('col-span-12 md:col-span-6 font-bold', designTokens.typography.body.base)}>
+                    {item.series?.name && (
+                      <span className="text-purple-700">【{item.series.name}】</span>
+                    )}
                     {item.product_name_snapshot}
                   </div>
                   <div

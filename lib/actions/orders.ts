@@ -529,10 +529,10 @@ export async function getOrderById(
         .eq('id', orderId)
         .single(),
 
-      // 查詢訂單明細
+      // 查詢訂單明細（JOIN series 表取得系列名稱）
       supabase
         .from('order_items')
-        .select('*')
+        .select('*, series:series_id_snapshot(name)')
         .eq('order_id', orderId)
         .order('created_at', { ascending: true }),
 
