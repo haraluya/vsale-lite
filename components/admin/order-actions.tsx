@@ -1,7 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
-import { markAsShipping } from '@/lib/actions/orders'
+import { markAsShipping, revertShippingToPending } from '@/lib/actions/orders'
 import { OrderStatusUpdater } from './order-status-updater'
 import { OrderCancelButton } from './order-cancel-button'
 import { OrderDeleteButton } from './order-delete-button'
@@ -56,6 +56,31 @@ export function OrderActions({ orderId, orderNumber, currentStatus, compact = fa
     })
   }
 
+  const handleRevertToPending = async () => {
+    const confirmed = await confirm({
+      title: '確認恢復到待確認',
+      description: '確定要將訂單恢復到待確認狀態嗎？庫存將會回補。',
+      variant: 'warning',
+      confirmText: '確定恢復',
+      cancelText: '取消',
+    })
+
+    if (!confirmed) {
+      return
+    }
+
+    startTransition(async () => {
+      const result = await revertShippingToPending(orderId)
+
+      if (result.success) {
+        toast.success(result.message || '訂單已恢復到待確認狀態！')
+        window.location.reload() // 重新載入頁面以顯示最新狀態
+      } else {
+        toast.error(result.message || '恢復失敗')
+      }
+    })
+  }
+
   const buttons = (
     <>
       {currentStatus === 'pending' && (
@@ -65,6 +90,15 @@ export function OrderActions({ orderId, orderNumber, currentStatus, compact = fa
           className="rounded-none border-2 md:border-3 border-black bg-blue-400 px-4 md:px-6 py-2 md:py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo text-sm md:text-base"
         >
           {isPending ? '處理中...' : '🚚 標記出貨'}
+        </button>
+      )}
+      {currentStatus === 'shipping' && (
+        <button
+          onClick={handleRevertToPending}
+          disabled={isPending}
+          className="rounded-none border-2 md:border-3 border-black bg-yellow-400 px-4 md:px-6 py-2 md:py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo text-sm md:text-base"
+        >
+          {isPending ? '處理中...' : '↩️ 恢復到待確認'}
         </button>
       )}
       <OrderStatusUpdater orderId={orderId} currentStatus={currentStatus} />

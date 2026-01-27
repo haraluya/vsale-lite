@@ -831,6 +831,72 @@ export async function updateOrderStatus(
 }
 
 /**
+ * 恢復出貨中訂單到待確認狀態並回補庫存
+ * - 僅能恢復 shipping 狀態的訂單
+ * - 自動回補庫存（將之前扣減的庫存加回去）
+ * - 呼叫 PostgreSQL Function 確保原子性操作
+ * - 自動記錄操作歷史
+ */
+export async function revertShippingToPending(
+  orderId: string,
+  reason?: string
+): Promise<ActionResult<{ orderId: string }>> {
+  try {
+    const supabase = await createClient()
+    const { userId, role } = await checkAuth()
+
+    // 僅管理員可執行此操作
+    if (role !== 'admin') {
+      return {
+        success: false,
+        message: '僅管理員可執行此操作',
+      }
+    }
+
+    // 呼叫 PostgreSQL Function 進行原子性操作
+    const { data, error } = await supabase.rpc('revert_shipping_to_pending', {
+      p_order_id: orderId,
+      p_admin_id: userId,
+      p_reason: reason || null,
+    })
+
+    if (error) {
+      return {
+        success: false,
+        message: error?.message || '恢復訂單狀態時發生錯誤',
+      }
+    }
+
+    // PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+
+    if (!result || !result.success) {
+      return {
+        success: false,
+        message: result?.message || '恢復訂單狀態失敗',
+      }
+    }
+
+    // 重新驗證相關頁面
+    revalidatePath('/admin/orders')
+    revalidatePath(`/admin/orders/${orderId}`)
+    revalidatePath('/store/orders')
+    revalidateTag('orders')
+
+    return {
+      success: true,
+      data: { orderId },
+      message: result.message || '訂單已恢復到待確認狀態，庫存已回補',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '恢復訂單狀態時發生未知錯誤',
+    }
+  }
+}
+
+/**
  * 取消訂單並回補庫存 (US3 - 管理員)
  * - 僅能取消 pending 或 confirmed 狀態的訂單
  * - 若訂單已確認，會自動回補庫存
