@@ -4,8 +4,7 @@
  *
  * 報價產生器
  * - 選擇等級下拉選單
- * - 系列多選（checkbox 網格）
- * - 商品列表預覽（依系列分欄）
+ * - 系列多選（依分類分組）
  * - 文字框 + 報價/複製按鈕
  */
 
@@ -25,6 +24,12 @@ interface Series {
   id: string
   name: string
   code: string
+  category_id: string
+  categories: {
+    id: string
+    name: string
+    sort_order: number
+  }
 }
 
 interface QuotationGeneratorProps {
@@ -104,7 +109,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
       text += `=== ${series.series_name} ===\n`
       series.products.forEach((product: any) => {
         const priceText = product.price ? `$${Math.round(product.price)}` : '價格未設定'
-        text += `${product.code} ${product.name} - ${priceText}\n`
+        text += `${product.name} - ${priceText}\n`
         totalProducts++
       })
       text += '\n'
@@ -134,6 +139,26 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
     }
   }
 
+  // 依分類分組系列
+  const groupedSeries = seriesList.reduce(
+    (acc, series) => {
+      const categoryName = series.categories?.name || '未分類'
+      if (!acc[categoryName]) {
+        acc[categoryName] = []
+      }
+      acc[categoryName].push(series)
+      return acc
+    },
+    {} as Record<string, Series[]>
+  )
+
+  // 依分類排序
+  const sortedCategories = Object.keys(groupedSeries).sort((a, b) => {
+    const categoryA = seriesList.find((s) => s.categories?.name === a)?.categories
+    const categoryB = seriesList.find((s) => s.categories?.name === b)?.categories
+    return (categoryA?.sort_order || 999) - (categoryB?.sort_order || 999)
+  })
+
   return (
     <div className="space-y-6">
       {/* 等級選擇 */}
@@ -153,112 +178,86 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
         </select>
       </div>
 
-      {/* 系列多選 */}
+      {/* 系列多選（依分類分組） */}
       <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
         <label className="mb-3 block font-bold">選擇系列 (可複選)</label>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          {seriesList.map((series) => (
-            <label
-              key={series.id}
-              className={`flex items-center gap-2 rounded-none border-2 border-black p-3 cursor-pointer transition-all ${
-                selectedSeriesIds.has(series.id)
-                  ? 'bg-purple-400 shadow-neo-sm'
-                  : 'bg-white hover:bg-gray-50'
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={selectedSeriesIds.has(series.id)}
-                onChange={() => handleSeriesToggle(series.id)}
-                className="h-4 w-4"
-              />
-              <span className="font-medium text-sm">
-                {series.name} ({series.code})
-              </span>
-            </label>
+        <div className="space-y-4">
+          {sortedCategories.map((categoryName) => (
+            <div key={categoryName}>
+              <h3 className="mb-2 font-bold text-sm text-purple-700">{categoryName}</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {groupedSeries[categoryName].map((series) => (
+                  <label
+                    key={series.id}
+                    className={`flex items-center gap-2 rounded-none border-2 border-black p-3 cursor-pointer transition-all ${
+                      selectedSeriesIds.has(series.id)
+                        ? 'bg-purple-400 shadow-neo-sm'
+                        : 'bg-white hover:bg-gray-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedSeriesIds.has(series.id)}
+                      onChange={() => handleSeriesToggle(series.id)}
+                      className="h-4 w-4"
+                    />
+                    <span className="font-medium text-sm">
+                      {series.name} ({series.code})
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* 商品列表預覽 */}
+      {/* 報價文字框與按鈕 */}
+      {!isLoading && quotationData.length > 0 && (
+        <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+          <div className="flex items-center justify-between mb-3">
+            <label className="font-bold">報價文字</label>
+            <div className="flex gap-2">
+              <button
+                onClick={handleGenerateQuotation}
+                disabled={!selectedTierId || selectedSeriesIds.size === 0}
+                className="rounded-none border-2 border-black bg-purple-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                產生報價
+              </button>
+              <button
+                onClick={handleCopyToClipboard}
+                disabled={!quotationText}
+                className="rounded-none border-2 border-black bg-green-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                複製
+              </button>
+            </div>
+          </div>
+          <textarea
+            value={quotationText}
+            readOnly
+            placeholder="點擊「產生報價」按鈕生成報價文字..."
+            className="w-full h-96 rounded-none border-2 border-gray-300 px-4 py-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+          />
+          <div className="mt-4 rounded-none border-2 border-black bg-blue-50 p-4">
+            <p className="text-sm font-bold text-blue-700">💡 使用提示</p>
+            <ul className="mt-2 text-xs text-gray-700 space-y-1">
+              <li>1. 選擇等級</li>
+              <li>2. 勾選要報價的系列</li>
+              <li>3. 點擊「產生報價」</li>
+              <li>4. 點擊「複製」發送給客戶</li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {/* 載入中 */}
       {isLoading && (
         <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
           <p className="text-lg text-gray-500">載入中...</p>
-        </div>
-      )}
-
-      {!isLoading && quotationData.length > 0 && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-          <h3 className="mb-4 text-lg font-bold">商品列表預覽</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {quotationData.map((series) => (
-              <div
-                key={series.series_id}
-                className="rounded-none border-2 border-black p-4 bg-gray-50"
-              >
-                <h4 className="font-bold text-purple-700 mb-2">{series.series_name}</h4>
-                <ul className="space-y-1 text-sm">
-                  {series.products.map((product: any, idx: number) => (
-                    <li key={idx} className="flex justify-between">
-                      <span className="text-gray-700">
-                        {product.code} {product.name}
-                      </span>
-                      <span className="font-medium">
-                        {product.price ? `$${Math.round(product.price)}` : 'N/A'}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 報價按鈕與文字框 */}
-      {!isLoading && quotationData.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* 文字框 */}
-          <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-            <label className="mb-3 block font-bold">報價文字</label>
-            <textarea
-              value={quotationText}
-              readOnly
-              placeholder="點擊「產生報價」按鈕生成報價文字..."
-              className="w-full h-96 rounded-none border-2 border-gray-300 px-4 py-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
-            />
-          </div>
-
-          {/* 按鈕 */}
-          <div className="flex flex-col gap-4">
-            <button
-              onClick={handleGenerateQuotation}
-              disabled={!selectedTierId || selectedSeriesIds.size === 0}
-              className="rounded-none border-2 md:border-3 border-black bg-purple-400 px-8 py-6 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <FileText className="mx-auto mb-2 h-8 w-8" />
-              產生報價
-            </button>
-
-            <button
-              onClick={handleCopyToClipboard}
-              disabled={!quotationText}
-              className="rounded-none border-2 md:border-3 border-black bg-green-400 px-8 py-6 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Copy className="mx-auto mb-2 h-8 w-8" />
-              複製到剪貼簿
-            </button>
-
-            <div className="rounded-none border-2 border-black bg-blue-50 p-4">
-              <p className="text-sm font-bold text-blue-700">💡 使用提示</p>
-              <ul className="mt-2 text-xs text-gray-700 space-y-1">
-                <li>1. 選擇等級</li>
-                <li>2. 勾選要報價的系列</li>
-                <li>3. 點擊「產生報價」</li>
-                <li>4. 點擊「複製」發送給客戶</li>
-              </ul>
-            </div>
-          </div>
         </div>
       )}
 

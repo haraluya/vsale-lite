@@ -11,6 +11,7 @@ import type { ActionResult } from '@/types'
 
 /**
  * 查詢系列列表 (用於報價功能)
+ * 包含分類資訊用於分組顯示
  */
 export async function getSeriesForQuotation(): Promise<ActionResult<any[]>> {
   try {
@@ -20,7 +21,19 @@ export async function getSeriesForQuotation(): Promise<ActionResult<any[]>> {
 
     const { data, error } = await adminClient
       .from('series')
-      .select('id, name, code, status, sort_order')
+      .select(`
+        id,
+        name,
+        code,
+        status,
+        sort_order,
+        category_id,
+        categories (
+          id,
+          name,
+          sort_order
+        )
+      `)
       .eq('status', 'active')
       .order('sort_order', { ascending: true })
 
