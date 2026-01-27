@@ -23,6 +23,12 @@
 - ✅ `supabase migration list` - 查看 Migration 狀態
 - ✅ `pnpm db:diff` - 檢查資料庫差異
 
+**⚠️ 多站點 Migration 同步規則**：
+- 🔴 **每次資料庫修改都必須同步到站點 2 和站點 3**
+- 📋 **必須提供手動執行 SQL 指令**（Dashboard SQL Editor 或 CLI）
+- ✅ 站點 2 Dashboard：https://supabase.com/dashboard/project/rdyvmgomjdglflrcfijs/sql/new
+- ✅ 站點 3 Dashboard：https://supabase.com/dashboard/project/dewhcpfzrzewgknaqzwy/sql/new
+
 詳見：[資料庫安全協議](docs/DATABASE_SAFETY_PROTOCOL.md)
 
 ---
