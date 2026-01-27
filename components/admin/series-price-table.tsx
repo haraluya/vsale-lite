@@ -32,6 +32,9 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
   // 初始化價格狀態 (key: "product_id_tier_id", value: price)
   const [prices, setPrices] = useState<Record<string, number | null>>({})
 
+  // 快速填入狀態 (key: tier_id, value: amount)
+  const [quickFillAmounts, setQuickFillAmounts] = useState<Record<string, string>>({})
+
   // 當 products 變更時，同步更新價格狀態（修復系列切換後價格不顯示的問題）
   useEffect(() => {
     const initialPrices: Record<string, number | null> = {}
@@ -44,10 +47,37 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
     setPrices(initialPrices)
   }, [products])
 
+  // 當系列變更時，重置快速填入輸入框
+  useEffect(() => {
+    setQuickFillAmounts({})
+  }, [series.id])
+
   const handlePriceChange = (productId: string, tierId: string, value: string) => {
     const key = `${productId}_${tierId}`
     const numValue = value === '' ? null : parseFloat(value)
     setPrices((prev) => ({ ...prev, [key]: numValue }))
+  }
+
+  // 快速填入該等級所有商品的價格
+  const handleQuickFill = (tierId: string) => {
+    const amount = quickFillAmounts[tierId]
+    if (!amount || amount === '') return
+
+    const numValue = parseFloat(amount)
+    if (isNaN(numValue) || numValue < 0) return
+
+    const updatedPrices = { ...prices }
+    products.forEach((product) => {
+      const key = `${product.id}_${tierId}`
+      updatedPrices[key] = numValue
+    })
+    setPrices(updatedPrices)
+
+    // 清空該等級的快速填入輸入框
+    setQuickFillAmounts((prev) => ({
+      ...prev,
+      [tierId]: '',
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -151,11 +181,39 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                     key={tier.tier_id}
                     className="border-b-2 border-black px-3 py-2 text-left font-bold"
                   >
-                    {tier.tier_name}
-                    {tier.is_protected && (
-                      <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
-                        自動
-                      </span>
+                    <div className="mb-2">
+                      {tier.tier_name}
+                      {tier.is_protected && (
+                        <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
+                          自動
+                        </span>
+                      )}
+                    </div>
+                    {/* 快速填入 */}
+                    {!tier.is_protected && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={quickFillAmounts[tier.tier_id] || ''}
+                          onChange={(e) =>
+                            setQuickFillAmounts((prev) => ({
+                              ...prev,
+                              [tier.tier_id]: e.target.value,
+                            }))
+                          }
+                          placeholder="金額"
+                          className="w-16 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleQuickFill(tier.tier_id)}
+                          className="rounded-none border border-black bg-green-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                        >
+                          帶入
+                        </button>
+                      </div>
                     )}
                   </th>
                 ))}
@@ -245,7 +303,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
           <div className="text-sm text-gray-600">
             <p>💡 提示:</p>
             <ul className="ml-4 mt-1 list-disc space-y-1">
-              <li>可逐一設定各商品在不同等級的價格</li>
+              <li>使用「快速填入」功能可一鍵將該等級所有商品設定為相同價格</li>
               <li>零售等級價格自動同步商品的零售價格,無法手動修改</li>
               <li>留空的價格欄位，客戶端會自動顯示原價（零售價格）</li>
               <li>支援批量設定,一次儲存所有變更</li>
