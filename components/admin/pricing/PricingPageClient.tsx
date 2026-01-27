@@ -12,14 +12,21 @@
 import { useState } from 'react'
 import { SeriesSelector } from '@/components/admin/series-selector'
 import { SeriesPriceTable } from '@/components/admin/series-price-table'
-import { ProductPricingForm } from '@/components/admin/pricing/ProductPricingForm'
-import type { Series } from '@/types'
+import { CategorySelector } from '@/components/admin/category-selector'
+import { CategoryPriceTable } from '@/components/admin/pricing/CategoryPriceTable'
+import { QuotationGenerator } from '@/components/admin/pricing/QuotationGenerator'
+import type { Series, Category, Tier } from '@/types'
 
 interface PricingPageClientProps {
   series: Series[]
   selectedSeriesId?: string
   seriesProducts?: any[]
   selectedSeries?: Series | null
+  categories: Category[]
+  selectedCategoryId?: string
+  categoryProducts?: any[]
+  selectedCategory?: Category | null
+  tiers: Tier[]
 }
 
 export function PricingPageClient({
@@ -27,8 +34,13 @@ export function PricingPageClient({
   selectedSeriesId,
   seriesProducts = [],
   selectedSeries = null,
+  categories,
+  selectedCategoryId,
+  categoryProducts = [],
+  selectedCategory = null,
+  tiers,
 }: PricingPageClientProps) {
-  const [mode, setMode] = useState<'series' | 'product'>('series')
+  const [mode, setMode] = useState<'series' | 'category' | 'quotation'>('series')
 
   return (
     <div>
@@ -51,14 +63,24 @@ export function PricingPageClient({
           選擇系列
         </button>
         <button
-          onClick={() => setMode('product')}
+          onClick={() => setMode('category')}
           className={`flex-1 rounded-none border-2 border-black px-6 py-3 font-bold transition-all ${
-            mode === 'product'
+            mode === 'category'
               ? 'bg-green-400 shadow-neo-sm md:shadow-neo translate-x-0 translate-y-0'
               : 'bg-white hover:translate-x-[2px] hover:translate-y-[2px]'
           }`}
         >
-          選擇商品
+          選擇分類
+        </button>
+        <button
+          onClick={() => setMode('quotation')}
+          className={`flex-1 rounded-none border-2 border-black px-6 py-3 font-bold transition-all ${
+            mode === 'quotation'
+              ? 'bg-purple-400 shadow-neo-sm md:shadow-neo translate-x-0 translate-y-0'
+              : 'bg-white hover:translate-x-[2px] hover:translate-y-[2px]'
+          }`}
+        >
+          報價
         </button>
       </div>
 
@@ -89,10 +111,37 @@ export function PricingPageClient({
         </div>
       )}
 
-      {/* 選擇商品模式 */}
-      {mode === 'product' && (
+      {/* 選擇分類模式 */}
+      {mode === 'category' && (
         <div className="space-y-6">
-          <ProductPricingForm />
+          {/* 分類選擇器 */}
+          <CategorySelector categories={categories} selectedCategoryId={selectedCategoryId} />
+
+          {/* 分類價格表格 */}
+          {selectedCategory && categoryProducts.length > 0 ? (
+            <CategoryPriceTable category={selectedCategory} products={categoryProducts} />
+          ) : selectedCategoryId && selectedCategory ? (
+            <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
+              <p className="text-lg text-gray-500">此分類尚無商品</p>
+            </div>
+          ) : (
+            <div className="rounded-none border-2 md:border-3 border-black bg-green-50 p-8 text-center shadow-neo">
+              <p className="text-lg font-bold">請選擇分類</p>
+              <p className="mt-4 text-sm text-gray-600">
+                選擇分類後,可批量設定該分類所有商品在各會員等級的價格
+              </p>
+              <p className="mt-2 text-sm text-gray-600">
+                💡 提示：零售價格由商品的零售價格欄位控制,無法在此修改
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* 報價模式 */}
+      {mode === 'quotation' && (
+        <div className="space-y-6">
+          <QuotationGenerator tiers={tiers} />
         </div>
       )}
     </div>
