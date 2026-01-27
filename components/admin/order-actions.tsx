@@ -24,9 +24,10 @@ interface OrderActionsProps {
   orderId: string
   orderNumber: string
   currentStatus: OrderStatus
+  compact?: boolean // 緊湊模式，不顯示外層包裝
 }
 
-export function OrderActions({ orderId, orderNumber, currentStatus }: OrderActionsProps) {
+export function OrderActions({ orderId, orderNumber, currentStatus, compact = false }: OrderActionsProps) {
   const confirm = useConfirm()
   const [isPending, startTransition] = useTransition()
 
@@ -55,31 +56,39 @@ export function OrderActions({ orderId, orderNumber, currentStatus }: OrderActio
     })
   }
 
+  const buttons = (
+    <>
+      {currentStatus === 'pending' && (
+        <button
+          onClick={handleMarkAsShipping}
+          disabled={isPending}
+          className="rounded-none border-2 md:border-3 border-black bg-blue-400 px-4 md:px-6 py-2 md:py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo text-sm md:text-base"
+        >
+          {isPending ? '處理中...' : '🚚 標記出貨'}
+        </button>
+      )}
+      <OrderStatusUpdater orderId={orderId} currentStatus={currentStatus} />
+      <OrderCancelButton
+        orderId={orderId}
+        currentStatus={currentStatus}
+        orderNumber={orderNumber}
+      />
+      <OrderDeleteButton
+        orderId={orderId}
+        currentStatus={currentStatus}
+        orderNumber={orderNumber}
+      />
+    </>
+  )
+
+  if (compact) {
+    return <div className="flex flex-wrap gap-3">{buttons}</div>
+  }
+
   return (
     <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
       <h2 className="mb-4 text-xl font-bold">訂單操作</h2>
-      <div className="flex flex-wrap gap-4">
-        {currentStatus === 'pending' && (
-          <button
-            onClick={handleMarkAsShipping}
-            disabled={isPending}
-            className="rounded-none border-2 md:border-3 border-black bg-blue-400 px-6 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
-          >
-            {isPending ? '處理中...' : '標記出貨（扣減庫存）'}
-          </button>
-        )}
-        <OrderStatusUpdater orderId={orderId} currentStatus={currentStatus} />
-        <OrderCancelButton
-          orderId={orderId}
-          currentStatus={currentStatus}
-          orderNumber={orderNumber}
-        />
-        <OrderDeleteButton
-          orderId={orderId}
-          currentStatus={currentStatus}
-          orderNumber={orderNumber}
-        />
-      </div>
+      <div className="flex flex-wrap gap-4">{buttons}</div>
     </div>
   )
 }

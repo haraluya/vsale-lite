@@ -109,123 +109,96 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
       ) : (
         /* 檢視模式 */
         <>
-          {/* 訂單標題 */}
+          {/* 客戶資訊區塊 - 最優先顯示 */}
           <div className={cn('rounded-none bg-white', getNeoBrutalismClasses(), designTokens.spacing.card.padding)}>
-            <div className="mb-4 flex flex-col justify-between gap-3 md:gap-4 md:flex-row md:items-center">
-              <div>
-                <h1 className={cn(designTokens.typography.h1, 'mb-2 font-mono')}>{order.order_number}</h1>
-                <OrderStatusBadge status={order.status} size="lg" />
-              </div>
+            {/* 第一層：客戶資訊（放大） */}
+            <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-3 mb-4 md:mb-6">
               <div className="flex items-center gap-3">
-                {canEdit && (
-                  <Button
-                    onClick={() => setEditMode(true)}
-                    className={cn(
-                      'bg-blue-600 hover:bg-blue-700 text-white font-bold',
-                      'border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo',
-                      'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-                      designTokens.button.md
-                    )}
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    編輯訂單
-                  </Button>
-                )}
-                <div className={cn(designTokens.typography.caption, 'text-gray-600')}>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    建立時間：{formatDate(order.created_at)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 客戶資訊 - 響應式單欄/三欄布局 */}
-            <div className="grid gap-3 md:gap-4 border-t-2 border-black pt-4 grid-cols-1 md:grid-cols-3">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
+                <User className="h-6 w-6 md:h-8 md:w-8 text-gray-600" />
                 <div>
-                  <div className={cn(designTokens.typography.caption, 'text-gray-600 flex items-center gap-1')}>
+                  <div className={cn(designTokens.typography.caption, 'text-gray-600 flex items-center gap-1 mb-1')}>
                     客戶姓名
-                    <span className="text-xs text-blue-600">(點擊編輯資料)</span>
+                    <span className="text-xs text-blue-600">(點擊編輯)</span>
                   </div>
                   <button
                     onClick={() => setShowClientDialog(true)}
                     className={cn(
-                      designTokens.typography.body.base,
-                      'font-bold text-blue-600 hover:text-blue-800 hover:underline',
+                      'text-xl md:text-2xl font-bold text-blue-600 hover:text-blue-800 hover:underline',
                       'transition-colors cursor-pointer text-left',
-                      'flex items-center gap-1 group'
+                      'flex items-center gap-2 group'
                     )}
                     title="點擊編輯客戶資料（地址、備註）"
                   >
                     {order.user.name}
-                    <Edit className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <Edit className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
+              <div className="flex items-center gap-3">
+                <Phone className="h-6 w-6 md:h-8 md:w-8 text-gray-600" />
                 <div>
-                  <div className={cn(designTokens.typography.caption, 'text-gray-600')}>手機號碼</div>
-                  <div className={cn(designTokens.typography.body.base, 'font-bold')}>{order.user.phone}</div>
+                  <div className={cn(designTokens.typography.caption, 'text-gray-600 mb-1')}>手機號碼</div>
+                  <div className="text-xl md:text-2xl font-bold">{order.user.phone}</div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Award className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
+              <div className="flex items-center gap-3">
+                <Award className="h-6 w-6 md:h-8 md:w-8 text-gray-600" />
                 <div>
-                  <div className={cn(designTokens.typography.caption, 'text-gray-600')}>會員等級</div>
-                  <div className={cn(designTokens.typography.body.base, 'font-bold')}>{order.user.tier_name}</div>
+                  <div className={cn(designTokens.typography.caption, 'text-gray-600 mb-1')}>會員等級</div>
+                  <div className="text-xl md:text-2xl font-bold">{order.user.tier_name}</div>
                 </div>
               </div>
             </div>
 
-            {/* 客戶地址與備註 (Feature 007 - US2) */}
-            {(order.user.address || order.user.admin_notes) && (
-              <div
-                className={cn(
-                  'mt-3 md:mt-4 border-t-2 border-black pt-3 md:pt-4',
-                  designTokens.spacing.card.gap
-                )}
-              >
-                {order.user.address && (
-                  <div>
-                    <div className={cn(designTokens.typography.caption, 'font-bold text-gray-700')}>客戶地址</div>
-                    <div className={cn(designTokens.typography.body.base, 'mt-1 text-gray-900')}>
-                      {order.user.address}
-                    </div>
-                  </div>
-                )}
-                {order.user.admin_notes && (
-                  <div>
-                    <div className={cn(designTokens.typography.caption, 'font-bold text-yellow-700')}>
-                      管理員備註
-                    </div>
-                    <div
-                      className={cn(
-                        'mt-1 rounded-none border-2 border-yellow-500 bg-yellow-50 p-2 md:p-3 text-yellow-900',
-                        designTokens.typography.body.base
-                      )}
-                    >
-                      {order.user.admin_notes}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 備註 */}
-            {order.notes && (
-              <div className="mt-3 md:mt-4 border-t-2 border-black pt-3 md:pt-4">
-                <div className="flex items-start gap-2">
-                  <FileText className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
-                  <div>
-                    <div className={cn(designTokens.typography.caption, 'text-gray-600')}>客戶備註</div>
-                    <div className={cn(designTokens.typography.body.base, 'font-medium')}>{order.notes}</div>
+            {/* 第二層：訂單資訊 */}
+            <div className="border-t-2 md:border-t-3 border-black pt-4 md:pt-6">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6 mb-4">
+                <div>
+                  <div className={cn(designTokens.typography.caption, 'text-gray-600 mb-1')}>訂單編號</div>
+                  <div className={cn(designTokens.typography.h2, 'font-mono')}>{order.order_number}</div>
+                </div>
+                <div>
+                  <div className={cn(designTokens.typography.caption, 'text-gray-600 mb-1')}>訂單狀態</div>
+                  <OrderStatusBadge status={order.status} size="lg" />
+                </div>
+                <div>
+                  <div className={cn(designTokens.typography.caption, 'text-gray-600 mb-1')}>建立時間</div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    <span className={cn(designTokens.typography.body.base, 'font-medium')}>
+                      {formatDate(order.created_at)}
+                    </span>
                   </div>
                 </div>
               </div>
-            )}
+
+              {/* 第三層：訂單操作按鈕 */}
+              <div className="border-t-2 border-gray-200 pt-4">
+                <div className={cn(designTokens.typography.caption, 'text-gray-600 font-bold mb-3')}>訂單操作</div>
+                <div className="flex flex-wrap gap-3">
+                  {canEdit && (
+                    <Button
+                      onClick={() => setEditMode(true)}
+                      className={cn(
+                        'bg-blue-600 hover:bg-blue-700 text-white font-bold',
+                        'border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo',
+                        'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                        'px-4 md:px-6 py-2 md:py-3 text-sm md:text-base'
+                      )}
+                    >
+                      <Edit className="h-4 w-4 mr-2" />
+                      編輯訂單
+                    </Button>
+                  )}
+                  <OrderActions
+                    orderId={order.id}
+                    orderNumber={order.order_number}
+                    currentStatus={order.status}
+                    compact
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* 訂單明細 */}
@@ -238,6 +211,61 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
             >
               訂單明細
             </h2>
+
+            {/* 常用地址與管理員備註（條件顯示） */}
+            {(order.user.address || order.user.admin_notes) && (
+              <div className="border-b-2 border-black bg-gray-50 p-3 md:p-4 space-y-3">
+                {order.user.address && (
+                  <div>
+                    <div className={cn(designTokens.typography.caption, 'font-bold text-gray-700 mb-1')}>
+                      📍 常用地址
+                    </div>
+                    <div className={cn(designTokens.typography.body.base, 'text-gray-900')}>
+                      {order.user.address}
+                    </div>
+                  </div>
+                )}
+                {order.user.admin_notes && (
+                  <div>
+                    <div className={cn(designTokens.typography.caption, 'font-bold text-yellow-700 mb-1')}>
+                      ⚠️ 管理員備註
+                    </div>
+                    <div
+                      className={cn(
+                        'rounded-none border-2 border-yellow-500 bg-yellow-50 p-2 md:p-3 text-yellow-900',
+                        designTokens.typography.body.base
+                      )}
+                    >
+                      {order.user.admin_notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 客戶備註（移動到這裡，加上底色） */}
+            {order.notes && (
+              <div className="border-b-2 border-black bg-blue-50 p-3 md:p-4">
+                <div className="flex items-start gap-2">
+                  <FileText className="h-5 w-5 text-blue-700" />
+                  <div className="flex-1">
+                    <div className={cn(designTokens.typography.caption, 'font-bold text-blue-700 mb-1')}>
+                      💬 客戶訂單備註
+                    </div>
+                    <div
+                      className={cn(
+                        'rounded-none border-2 border-blue-400 bg-white p-2 md:p-3 text-blue-900',
+                        designTokens.typography.body.base,
+                        'font-medium'
+                      )}
+                    >
+                      {order.notes}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="divide-y-2 divide-black">
               {order.items.map(item => (
                 <div key={item.id} className="grid grid-cols-12 gap-2 md:gap-4 p-3 md:p-4">
@@ -423,9 +451,6 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               </div>
             </div>
           )}
-
-          {/* 訂單操作 */}
-          <OrderActions orderId={order.id} orderNumber={order.order_number} currentStatus={order.status} />
 
           {/* 操作歷史與留言 (Feature 007 - US1) */}
           <div className={cn('rounded-none bg-white', getNeoBrutalismClasses(), designTokens.spacing.card.padding)}>
