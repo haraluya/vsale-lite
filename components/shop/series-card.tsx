@@ -15,6 +15,7 @@ import Image from 'next/image'
 import type { Series } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { optimizeSeriesCardImage } from '@/lib/utils/image-optimization'
 
 interface SeriesCardProps {
   series: Series
@@ -22,6 +23,9 @@ interface SeriesCardProps {
 
 export function SeriesCard({ series }: SeriesCardProps) {
   const imageUrl = series.image_url
+
+  // ⭐ 優化：使用優化後的圖片 URL（600px, WebP, 80% 品質）
+  const optimizedImageUrl = optimizeSeriesCardImage(imageUrl)
 
   return (
     <Link href={`/store/series/${series.id}`}>
@@ -41,11 +45,12 @@ export function SeriesCard({ series }: SeriesCardProps) {
         )}>
           {imageUrl ? (
             <Image
-              src={imageUrl}
+              src={optimizedImageUrl}
               alt={series.name}
               fill
               className="object-cover transition-transform group-hover:scale-105"
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              quality={80}
             />
           ) : (
             <div className="flex h-full items-center justify-center bg-gray-100">

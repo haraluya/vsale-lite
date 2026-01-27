@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils'
 import { StockStatus } from './stock-status'
 import { TagBadgeList } from '@/components/ui/tag-badge'
 import { designTokens } from '@/lib/design-tokens'
+import { optimizeProductCardImage } from '@/lib/utils/image-optimization'
 
 interface ProductCardProps {
   product: Product
@@ -37,6 +38,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const borderColor = getStockBorderColor(product.stock || 0)
   const hasUserPrice = product.user_price !== undefined && product.user_price !== null
   const imageUrl = product.image_url
+
+  // ⭐ 優化：使用優化後的圖片 URL（300px, WebP, 80% 品質）
+  const optimizedImageUrl = optimizeProductCardImage(imageUrl)
 
   return (
     <Link
@@ -66,12 +70,13 @@ export function ProductCard({ product }: ProductCardProps) {
       )}>
         {imageUrl ? (
           <Image
-            src={imageUrl}
+            src={optimizedImageUrl}
             alt={product.name}
             width={300}
             height={300}
             className="h-full w-full object-cover transition-transform group-hover:scale-105"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            quality={80}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-gray-300">

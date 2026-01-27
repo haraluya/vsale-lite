@@ -25,6 +25,7 @@ import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { ImageModal } from '@/components/ui/image-modal'
+import { optimizeProductCardImage } from '@/lib/utils/image-optimization'
 
 interface ProductWithPriceCardProps {
   product: ProductWithPrice
@@ -38,6 +39,9 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
   const [isAdding, setIsAdding] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const imageUrl = product.image_url
+
+  // ⭐ 優化：預先產生優化後的圖片 URL（300px, WebP, 80% 品質）
+  const optimizedImageUrl = optimizeProductCardImage(imageUrl)
 
   // 使用 mounted 狀態避免 hydration 不一致
   const [mounted, setMounted] = useState(false)
@@ -152,7 +156,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       >
         {imageUrl ? (
           <Image
-            src={imageUrl}
+            src={optimizedImageUrl}
             alt={product.name}
             width={300}
             height={300}
@@ -162,6 +166,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             )}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             loading="lazy" // ⭐ 優化：商品圖片延遲載入
+            quality={80}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-gray-300">

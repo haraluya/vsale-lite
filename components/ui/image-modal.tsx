@@ -7,15 +7,17 @@
  * - 背景點擊關閉
  * - 圖片縮放適應螢幕
  * - 關閉按鈕與標題顯示
+ * - ⭐ 優化：使用 Supabase Image Transformation API 優化圖片載入速度
  */
 
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import Image from 'next/image'
-import { X } from 'lucide-react'
+import { X, Loader2 } from 'lucide-react'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+import { optimizeProductDetailImage } from '@/lib/utils/image-optimization'
 
 interface ImageModalProps {
   isOpen: boolean
@@ -25,6 +27,8 @@ interface ImageModalProps {
 }
 
 export function ImageModal({ isOpen, onClose, imageUrl, imageName }: ImageModalProps) {
+  const [isImageLoading, setIsImageLoading] = useState(true)
+
   // ESC 鍵關閉
   const handleEscKey = useCallback(
     (e: KeyboardEvent) => {
@@ -40,6 +44,7 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName }: ImageModalP
     if (isOpen) {
       document.body.style.overflow = 'hidden'
       document.addEventListener('keydown', handleEscKey)
+      setIsImageLoading(true) // 重設載入狀態
     } else {
       document.body.style.overflow = ''
       document.removeEventListener('keydown', handleEscKey)
@@ -52,6 +57,9 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName }: ImageModalP
   }, [isOpen, handleEscKey])
 
   if (!isOpen) return null
+
+  // ⭐ 優化：使用 Supabase Image Transformation API（1200px, WebP, 85% 品質）
+  const optimizedImageUrl = optimizeProductDetailImage(imageUrl)
 
   return (
     <div
@@ -89,15 +97,29 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName }: ImageModalP
           designTokens.neoBrutalism.border.full,
           "border-black",
           designTokens.neoBrutalism.shadow.full,
-          "overflow-hidden"
+          "overflow-hidden",
+          "min-h-[300px] flex items-center justify-center"
         )}>
+          {/* 載入指示器 */}
+          {isImageLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+              <Loader2 className="h-12 w-12 animate-spin text-gray-400" />
+            </div>
+          )}
+
+          {/* 優化後的圖片 */}
           <Image
-            src={imageUrl}
+            src={optimizedImageUrl}
             alt={imageName}
             width={1200}
             height={1200}
-            className="h-auto max-h-[80vh] w-auto max-w-[85vw] object-contain"
-            priority={isOpen}
+            className={cn(
+              "h-auto max-h-[80vh] w-auto max-w-[85vw] object-contain",
+              isImageLoading ? "opacity-0" : "opacity-100 transition-opacity duration-300"
+            )}
+            priority={true}
+            onLoad={() => setIsImageLoading(false)}
+            onError={() => setIsImageLoading(false)}
           />
         </div>
 
