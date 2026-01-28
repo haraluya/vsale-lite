@@ -3,7 +3,7 @@ import { getTiers } from '@/lib/actions/tiers'
 import { ClientTable } from '@/components/admin/client-table'
 import { ClientFilterWrapper } from '@/components/admin/client-filter-wrapper'
 import { ExcelExport } from '@/components/admin/excel-export'
-import { ExcelImport } from '@/components/admin/excel-import'
+import { ExcelImportButton } from '@/components/admin/excel-import-button'
 import { ExcelTemplateDownload } from '@/components/admin/excel-template-download'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -55,6 +55,7 @@ export default async function ClientsPage({
         <div className="flex flex-wrap gap-2 md:gap-3">
           {/* Feature 006 - US7: Excel 功能按鈕 */}
           <ExcelTemplateDownload />
+          <ExcelImportButton />
           <ExcelExport
             filters={{
               tier_id: tier_id || undefined,
@@ -69,9 +70,6 @@ export default async function ClientsPage({
           </Link>
         </div>
       </div>
-
-      {/* Feature 006 - US7: Excel 匯入區塊 */}
-      <ExcelImport />
 
       {/* Feature 006 - US6: 客戶篩選元件 */}
       <ClientFilterWrapper

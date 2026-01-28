@@ -38,6 +38,7 @@ export function ClientTable({
   const [isDeleting, setIsDeleting] = useState(false)
   const [copiedClientId, setCopiedClientId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState('您的公司名稱')
+  const [templateMenuOpen, setTemplateMenuOpen] = useState<string | null>(null) // 記錄哪個客戶的選單開啟
 
   // 高亮關鍵字 Hook
   const highlightKeyword = useHighlightKeyword(searchKeyword)
@@ -45,11 +46,8 @@ export function ClientTable({
   // 範本選擇 Hook
   const {
     templates,
-    selectedTemplateId,
-    setSelectedTemplateId,
     loading: templateLoading,
     copyToClipboard,
-    previewTemplate,
   } = useNotificationTemplate()
 
   // 載入公司名稱
@@ -111,7 +109,7 @@ export function ClientTable({
     }
   }
 
-  const handleCopyLoginInfo = async (client: Client) => {
+  const handleCopyLoginInfo = async (client: Client, templateId: string) => {
     // 產生前台網址並去除 www
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
     const loginUrl = removeWwwFromUrl(`${baseUrl}/login`)
@@ -119,50 +117,39 @@ export function ClientTable({
     const displayName = client.display_name || ''
     const phone = client.phone
 
-    // 使用選中的範本複製登入資訊（密碼固定為「請向管理員索取」）
-    const success = await copyToClipboard({
-      companyName,
-      clientName: displayName,
-      loginUrl,
-      phone,
-      password: '(請向管理員索取)',
-    })
+    // 找到選中的範本
+    const template = templates.find(t => t.id === templateId)
+    if (!template) return
 
-    if (success) {
+    // 手動產生通知文字並複製到剪貼簿
+    const text = template.template
+      .replace(/\{公司名稱\}/g, companyName)
+      .replace(/\{客戶名稱\}/g, displayName)
+      .replace(/\{前台網址\}/g, loginUrl)
+      .replace(/\{登入電話\}/g, phone)
+      .replace(/\{登入密碼\}/g, '(請向管理員索取)')
+
+    try {
+      await navigator.clipboard.writeText(text)
+      await alert({
+        title: '複製成功',
+        message: `已使用「${template.name}」範本複製登入資訊`,
+        variant: 'success',
+      })
       setCopiedClientId(client.id)
       setTimeout(() => setCopiedClientId(null), 2000)
+      setTemplateMenuOpen(null)
+    } catch (error) {
+      await alert({
+        title: '複製失敗',
+        message: '無法存取剪貼簿，請手動複製',
+        variant: 'error',
+      })
     }
   }
 
   return (
     <div className={designTokens.spacing.page.gap}>
-      {/* 範本選擇器 */}
-      {templates.length > 0 && (
-        <div className="rounded-none border-2 md:border-3 border-blue-500 bg-blue-50 p-4 shadow-neo-sm md:shadow-neo">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <Label htmlFor="template-select" className="text-sm font-bold text-blue-900 whitespace-nowrap">
-              複製範本選擇
-            </Label>
-            <select
-              id="template-select"
-              value={selectedTemplateId || ''}
-              onChange={(e) => setSelectedTemplateId(e.target.value)}
-              className="flex-1 rounded-none border-2 border-black px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              disabled={templateLoading}
-            >
-              {templates.map((tmpl) => (
-                <option key={tmpl.id} value={tmpl.id}>
-                  {tmpl.name} {tmpl.is_default ? '(預設)' : ''}
-                </option>
-              ))}
-            </select>
-            <p className="text-xs text-blue-700">
-              點擊客戶的「複製登入資訊」按鈕時，將使用此範本
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* 桌面版: 完整表格 */}
       <div className={cn(
         "hidden lg:block card-neo bg-white overflow-hidden"
@@ -186,10 +173,7 @@ export function ClientTable({
                 <th className="px-6 py-3 text-left text-sm font-bold">
                   會員等級
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-bold">
-                  建立時間
-                </th>
-                <th className="px-6 py-3 text-right text-sm font-bold">
+                <th className="px-6 py-3 text-right text-sm font-bold w-[400px]">
                   操作
                 </th>
               </tr>
@@ -197,7 +181,7 @@ export function ClientTable({
             <tbody className="divide-y-2 divide-gray-200">
               {clients.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
                     {searchKeyword || total === 0
                       ? '查無符合條件的客戶'
                       : '尚無客戶資料,點擊「快速開戶」建立第一位客戶'}
@@ -236,39 +220,58 @@ export function ClientTable({
                           {client.tier_name || '未設定'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">
-                        {formatDateTW(client.created_at)}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => handleCopyLoginInfo(client)}
-                            className="border-2 md:border-3 border-black bg-green-100 hover:bg-green-200"
-                            title="複製登入資訊（不含密碼）"
-                          >
-                            {copiedClientId === client.id ? (
-                              <>
-                                <Check className="h-3 w-3 mr-1" />
-                                已複製
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-3 w-3 mr-1" />
-                                複製帳密
-                              </>
+                      <td className="px-6 py-4">
+                        <div className="flex justify-end gap-2 flex-wrap">
+                          {/* 複製帳密按鈕與選單 */}
+                          <div className="relative">
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => setTemplateMenuOpen(templateMenuOpen === client.id ? null : client.id)}
+                              className="border-2 border-black bg-green-100 hover:bg-green-200 whitespace-nowrap"
+                              title="複製登入資訊（不含密碼）"
+                            >
+                              {copiedClientId === client.id ? (
+                                <>
+                                  <Check className="h-4 w-4 mr-1" />
+                                  已複製
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="h-4 w-4 mr-1" />
+                                  複製帳密
+                                </>
+                              )}
+                            </Button>
+
+                            {/* 範本選單 */}
+                            {templateMenuOpen === client.id && templates.length > 0 && (
+                              <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-none border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                {templates.map((template) => (
+                                  <button
+                                    key={template.id}
+                                    onClick={() => handleCopyLoginInfo(client, template.id)}
+                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 border-b border-gray-200 last:border-b-0 whitespace-nowrap"
+                                  >
+                                    {template.name}
+                                    {template.is_default && (
+                                      <span className="ml-2 text-xs text-gray-500">(預設)</span>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
                             )}
-                          </Button>
+                          </div>
+
                           <Link href={`/admin/clients/${client.id}/edit`}>
-                            <Button size="sm" variant="secondary">
-                              <Edit className="h-3 w-3 mr-1" />
+                            <Button size="sm" variant="secondary" className="whitespace-nowrap">
+                              <Edit className="h-4 w-4 mr-1" />
                               編輯
                             </Button>
                           </Link>
                           <Link href={`/admin/clients/${client.id}/password`}>
-                            <Button size="sm" variant="secondary">
-                              <Key className="h-3 w-3 mr-1" />
+                            <Button size="sm" variant="secondary" className="whitespace-nowrap">
+                              <Key className="h-4 w-4 mr-1" />
                               改密碼
                             </Button>
                           </Link>
@@ -277,9 +280,9 @@ export function ClientTable({
                             variant="secondary"
                             onClick={() => handleDeleteClick(client)}
                             disabled={isDeleting}
-                            className="border-2 md:border-3 border-black bg-red-500 text-white hover:bg-red-600"
+                            className="border-2 border-black bg-red-500 text-white hover:bg-red-600 whitespace-nowrap"
                           >
-                            <Trash2 className="h-3 w-3 mr-1" />
+                            <Trash2 className="h-4 w-4 mr-1" />
                             刪除
                           </Button>
                         </div>
@@ -357,24 +360,46 @@ export function ClientTable({
 
                 {/* 操作按鈕 */}
                 <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleCopyLoginInfo(client)}
-                    className="border-2 border-black bg-green-100 hover:bg-green-200"
-                  >
-                    {copiedClientId === client.id ? (
-                      <>
-                        <Check className="h-3 w-3 mr-1" />
-                        已複製
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3 w-3 mr-1" />
-                        複製
-                      </>
+                  {/* 複製帳密按鈕與選單 */}
+                  <div className="relative col-span-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setTemplateMenuOpen(templateMenuOpen === client.id ? null : client.id)}
+                      className="w-full border-2 border-black bg-green-100 hover:bg-green-200"
+                    >
+                      {copiedClientId === client.id ? (
+                        <>
+                          <Check className="h-3 w-3 mr-1" />
+                          已複製
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3 w-3 mr-1" />
+                          複製帳密
+                        </>
+                      )}
+                    </Button>
+
+                    {/* 範本選單 */}
+                    {templateMenuOpen === client.id && templates.length > 0 && (
+                      <div className="absolute bottom-full left-0 mb-1 z-50 w-full rounded-none border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        {templates.map((template) => (
+                          <button
+                            key={template.id}
+                            onClick={() => handleCopyLoginInfo(client, template.id)}
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 border-b border-gray-200 last:border-b-0"
+                          >
+                            {template.name}
+                            {template.is_default && (
+                              <span className="ml-2 text-xs text-gray-500">(預設)</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     )}
-                  </Button>
+                  </div>
+
                   <Link href={`/admin/clients/${client.id}/edit`}>
                     <Button size="sm" variant="secondary" className="w-full">
                       <Edit className="h-3 w-3 mr-1" />
@@ -392,16 +417,11 @@ export function ClientTable({
                     variant="secondary"
                     onClick={() => handleDeleteClick(client)}
                     disabled={isDeleting}
-                    className="border-2 border-black bg-red-500 text-white hover:bg-red-600"
+                    className="col-span-2 border-2 border-black bg-red-500 text-white hover:bg-red-600"
                   >
                     <Trash2 className="h-3 w-3 mr-1" />
                     刪除
                   </Button>
-                </div>
-
-                {/* 註冊時間 */}
-                <div className={cn("text-gray-500 text-right", designTokens.typography.caption)}>
-                  {formatDateTW(client.created_at)}
                 </div>
               </div>
             )

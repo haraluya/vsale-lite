@@ -102,7 +102,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
     const tierName = tiers.find((t) => t.id === selectedTierId)?.name || '未知等級'
     let totalProducts = 0
 
-    let text = '【報價單】\n'
+    let text = '【 報價單 】\n'
     text += `等級: ${tierName}\n\n`
 
     quotationData.forEach((series) => {
@@ -128,7 +128,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
     const tierName = tiers.find((t) => t.id === selectedTierId)?.name || '未知等級'
     let totalProducts = 0
 
-    let text = '【報價單】\n'
+    let text = '【 報價單(含售價) 】\n'
     text += `等級: ${tierName}\n\n`
 
     quotationData.forEach((series) => {

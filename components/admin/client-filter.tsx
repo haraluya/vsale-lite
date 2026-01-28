@@ -81,65 +81,36 @@ export function ClientFilter({
   }
 
   return (
-    <div className="space-y-4">
-      {/* 搜尋欄 */}
-      <div className="card-neo bg-white p-4">
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              type="search"
-              placeholder="搜尋手機號碼或顯示名稱..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          {hasActiveFilters && (
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={clearFilters}
-              className="border-2 md:border-3 border-black bg-red-500 text-white hover:bg-red-600"
-            >
-              <X className="mr-2 h-4 w-4" />
-              清除篩選
-            </Button>
-          )}
+    <div className="card-neo bg-white p-4">
+      {/* 搜尋欄與清除按鈕 */}
+      <div className="flex gap-2 mb-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Input
+            type="search"
+            placeholder="搜尋手機號碼或顯示名稱..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-10"
+          />
         </div>
-
-        {/* 篩選結果數量提示 */}
         {hasActiveFilters && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-gray-600">
-            <span>
-              找到 <span className="font-bold text-blue-600">{totalCount}</span> 位客戶
-            </span>
-            {selectedTierIds.length > 0 && (
-              <span className="text-gray-400">
-                • 已選擇 {selectedTierIds.length} 個等級
-              </span>
-            )}
-            {search && (
-              <span className="text-gray-400">
-                • 搜尋關鍵字: <span className="font-mono font-bold">{search}</span>
-              </span>
-            )}
-          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={clearFilters}
+            className="border-2 md:border-3 border-black bg-red-500 text-white hover:bg-red-600 flex-shrink-0"
+          >
+            <X className="mr-2 h-4 w-4" />
+            清除篩選
+          </Button>
         )}
       </div>
 
-      {/* 等級快速切換按鈕 */}
-      <div className="card-neo bg-white p-4">
+      {/* 等級篩選按鈕 */}
+      <div>
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-sm font-bold text-gray-700">等級篩選</h3>
-          {selectedTierIds.length > 0 && (
-            <button
-              onClick={() => setSelectedTierIds([])}
-              className="text-xs text-blue-600 hover:underline"
-            >
-              清除等級篩選
-            </button>
-          )}
         </div>
         <div className="flex flex-wrap gap-2">
           {tiers.map((tier) => {
@@ -164,6 +135,25 @@ export function ClientFilter({
           })}
         </div>
       </div>
+
+      {/* 篩選結果數量提示 */}
+      {hasActiveFilters && (
+        <div className="mt-4 pt-4 border-t-2 border-gray-200 flex items-center gap-2 text-sm text-gray-600">
+          <span>
+            找到 <span className="font-bold text-blue-600">{totalCount}</span> 位客戶
+          </span>
+          {selectedTierIds.length > 0 && (
+            <span className="text-gray-400">
+              • 已選擇 {selectedTierIds.length} 個等級
+            </span>
+          )}
+          {search && (
+            <span className="text-gray-400">
+              • 搜尋關鍵字: <span className="font-mono font-bold">{search}</span>
+            </span>
+          )}
+        </div>
+      )}
     </div>
   )
 }
