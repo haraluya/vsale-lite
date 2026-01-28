@@ -45,16 +45,19 @@ const TIER_COLORS = [
 ] as const
 
 /**
- * 根據字串產生簡單的 hash 值
+ * 根據字串產生穩定的 hash 值（使用改進的 FNV-1a 演算法）
+ * 對 UUID 字串有更好的分佈特性
  */
-function simpleHash(str: string): number {
-  let hash = 0
+function stringHash(str: string): number {
+  let hash = 2166136261 // FNV offset basis
+
   for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Convert to 32bit integer
+    hash ^= str.charCodeAt(i)
+    // FNV prime: 16777619
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24)
   }
-  return Math.abs(hash)
+
+  return Math.abs(hash >>> 0) // Convert to unsigned 32-bit integer
 }
 
 /**
@@ -63,7 +66,7 @@ function simpleHash(str: string): number {
  * @returns Tailwind 背景色類別
  */
 export function getTierColor(tierId: string): string {
-  const hash = simpleHash(tierId)
+  const hash = stringHash(tierId)
   const colorIndex = hash % TIER_COLORS.length
   return TIER_COLORS[colorIndex]
 }
