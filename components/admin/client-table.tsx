@@ -3,18 +3,20 @@
 import { Client } from '@/types'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Edit, Trash2, Key, Copy, Check } from 'lucide-react'
 import { deleteClient } from '@/lib/actions/clients'
-import { getSetting, getClientLoginTemplate } from '@/lib/actions/system'
-import { removeWwwFromUrl, replaceTemplateVariables } from '@/lib/utils/template-helpers'
+import { getSetting } from '@/lib/actions/system'
+import { removeWwwFromUrl } from '@/lib/utils/template-helpers'
 import { useHighlightKeyword } from './client-filter'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/date-utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
+import { useNotificationTemplate } from '@/lib/hooks/use-notification-template'
 
 type ClientTableProps = {
   clients: Client[]
@@ -35,9 +37,31 @@ export function ClientTable({
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
   const [copiedClientId, setCopiedClientId] = useState<string | null>(null)
+  const [companyName, setCompanyName] = useState('您的公司名稱')
 
   // 高亮關鍵字 Hook
   const highlightKeyword = useHighlightKeyword(searchKeyword)
+
+  // 範本選擇 Hook
+  const {
+    templates,
+    selectedTemplateId,
+    setSelectedTemplateId,
+    loading: templateLoading,
+    copyToClipboard,
+    previewTemplate,
+  } = useNotificationTemplate()
+
+  // 載入公司名稱
+  useEffect(() => {
+    const loadSettings = async () => {
+      const companyNameResult = await getSetting('company_name')
+      if (companyNameResult.success && companyNameResult.data) {
+        setCompanyName(companyNameResult.data)
+      }
+    }
+    loadSettings()
+  }, [])
 
   const limit = 20
   const totalPages = Math.ceil(total / limit)
@@ -88,47 +112,56 @@ export function ClientTable({
   }
 
   const handleCopyLoginInfo = async (client: Client) => {
-    // 1. 讀取公司名稱設定
-    const companyNameResult = await getSetting('company_name')
-    const companyName = companyNameResult.success ? companyNameResult.data : '您的公司名稱'
-
-    // 2. 產生前台網址並去除 www
+    // 產生前台網址並去除 www
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : ''
     const loginUrl = removeWwwFromUrl(`${baseUrl}/login`)
-
-    // 3. 讀取系統設定範本
-    const templateResult = await getClientLoginTemplate()
-    const template = templateResult.success && templateResult.data ? templateResult.data : ''
 
     const displayName = client.display_name || ''
     const phone = client.phone
 
-    // 4. 替換範本變數（密碼固定為「請向管理員索取」）
-    const fullGuide = template
-      ? replaceTemplateVariables(template, {
-          客戶名稱: displayName,
-          前台網址: loginUrl,
-          登入電話: phone,
-          登入密碼: '(請向管理員索取)',
-          公司名稱: companyName,
-        })
-      : `【${companyName} - 登入資訊】
+    // 使用選中的範本複製登入資訊（密碼固定為「請向管理員索取」）
+    const success = await copyToClipboard({
+      companyName,
+      clientName: displayName,
+      loginUrl,
+      phone,
+      password: '(請向管理員索取)',
+    })
 
-客戶名稱: ${displayName}
-前台網址: ${loginUrl}
-登入電話: ${phone}
-登入密碼: (請向管理員索取)
-
-請使用以上資訊登入系統進行下單。`
-
-    // 5. 複製到剪貼簿
-    navigator.clipboard.writeText(fullGuide)
-    setCopiedClientId(client.id)
-    setTimeout(() => setCopiedClientId(null), 2000)
+    if (success) {
+      setCopiedClientId(client.id)
+      setTimeout(() => setCopiedClientId(null), 2000)
+    }
   }
 
   return (
     <div className={designTokens.spacing.page.gap}>
+      {/* 範本選擇器 */}
+      {templates.length > 0 && (
+        <div className="rounded-none border-2 md:border-3 border-blue-500 bg-blue-50 p-4 shadow-neo-sm md:shadow-neo">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <Label htmlFor="template-select" className="text-sm font-bold text-blue-900 whitespace-nowrap">
+              複製範本選擇
+            </Label>
+            <select
+              id="template-select"
+              value={selectedTemplateId || ''}
+              onChange={(e) => setSelectedTemplateId(e.target.value)}
+              className="flex-1 rounded-none border-2 border-black px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              disabled={templateLoading}
+            >
+              {templates.map((tmpl) => (
+                <option key={tmpl.id} value={tmpl.id}>
+                  {tmpl.name} {tmpl.is_default ? '(預設)' : ''}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-blue-700">
+              點擊客戶的「複製登入資訊」按鈕時，將使用此範本
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* 桌面版: 完整表格 */}
       <div className={cn(

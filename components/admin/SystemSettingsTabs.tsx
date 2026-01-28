@@ -136,12 +136,9 @@ export function SystemSettingsTabs({
             <div>
               <h2 className="text-xl font-black mb-4">客戶通知設定</h2>
               <p className="mb-4 text-sm text-gray-600">
-                管理客戶登入資訊範本與通知訊息格式
+                建立多個自訂範本，在複製登入資訊時選擇使用
               </p>
-              <ClientNotificationSettings
-                settings={clientNotificationSettings}
-                updateAction={updateAction}
-              />
+              <ClientNotificationSettings />
             </div>
           )
         }

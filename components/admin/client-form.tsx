@@ -2,8 +2,8 @@
 
 import { useActionState, useState, useEffect } from 'react'
 import { createClient, updateClient } from '@/lib/actions/clients'
-import { getClientLoginTemplate, getSetting } from '@/lib/actions/system'
-import { replaceTemplateVariables, removeWwwFromUrl } from '@/lib/utils/template-helpers'
+import { getSetting } from '@/lib/actions/system'
+import { removeWwwFromUrl } from '@/lib/utils/template-helpers'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,6 +14,7 @@ import { Tier, Client, ActionResult } from '@/types'
 import { useRouter } from 'next/navigation'
 import { Copy, Check } from 'lucide-react'
 import { useAlert } from '@/lib/contexts/dialog-context'
+import { useNotificationTemplate } from '@/lib/hooks/use-notification-template'
 
 type ClientFormProps = {
   client?: Client
@@ -26,24 +27,26 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
   const alert = useAlert()
   const isEdit = mode === 'edit'
   const [copied, setCopied] = useState(false)
-  const [template, setTemplate] = useState('')
   const [companyName, setCompanyName] = useState('您的公司名稱')
+
+  // 使用範本選擇 Hook
+  const {
+    templates,
+    selectedTemplateId,
+    setSelectedTemplateId,
+    loading: templateLoading,
+    copyToClipboard,
+    previewTemplate,
+  } = useNotificationTemplate()
 
   const [state, formAction, pending] = useActionState<
     ActionResult<{ id: string; password?: string; phone?: string; display_name?: string }> | null,
     FormData
   >(isEdit && client ? updateClient.bind(null, client.id) : createClient, null)
 
-  // 載入範本與公司名稱
+  // 載入公司名稱
   useEffect(() => {
     const loadSettings = async () => {
-      // 載入範本
-      const templateResult = await getClientLoginTemplate()
-      if (templateResult.success && templateResult.data) {
-        setTemplate(templateResult.data)
-      }
-
-      // 載入公司名稱
       const companyNameResult = await getSetting('company_name')
       if (companyNameResult.success && companyNameResult.data) {
         setCompanyName(companyNameResult.data)
@@ -81,28 +84,27 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
     const password = state.data.password
     const displayName = state.data.display_name || '客戶'
 
-    // 使用系統設定的範本 + 變數替換
-    const fullGuide = template
-      ? replaceTemplateVariables(template, {
-          客戶名稱: displayName,
-          前台網址: loginUrl,
-          登入電話: phone,
-          登入密碼: password,
-          公司名稱: companyName,
-        })
-      : `【${companyName} - 登入資訊】
+    // 使用選中的範本預覽
+    const fullGuide = previewTemplate({
+      companyName,
+      clientName: displayName,
+      loginUrl,
+      phone,
+      password,
+    })
 
-客戶名稱: ${displayName}
-前台網址: ${loginUrl}
-登入電話: ${phone}
-登入密碼: ${password}
-
-請使用以上資訊登入系統進行下單，首次使用輸入"NEW100"領取百元折價券。`
-
-    const handleCopyGuide = () => {
-      navigator.clipboard.writeText(fullGuide)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+    const handleCopyGuide = async () => {
+      const success = await copyToClipboard({
+        companyName,
+        clientName: displayName,
+        loginUrl,
+        phone,
+        password,
+      })
+      if (success) {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      }
     }
 
     return (
@@ -112,6 +114,28 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
             ✅ 客戶建立成功!
           </h3>
           <div className="space-y-4">
+            {/* 範本選擇器 */}
+            {templates.length > 0 && (
+              <div>
+                <Label htmlFor="template-select" className="text-sm font-medium text-gray-700 mb-2">
+                  選擇通知範本
+                </Label>
+                <select
+                  id="template-select"
+                  value={selectedTemplateId || ''}
+                  onChange={(e) => setSelectedTemplateId(e.target.value)}
+                  className="w-full rounded-none border-2 border-black px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  disabled={templateLoading}
+                >
+                  {templates.map((tmpl) => (
+                    <option key={tmpl.id} value={tmpl.id}>
+                      {tmpl.name} {tmpl.is_default ? '(預設)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div>
               <p className="text-sm font-medium text-gray-700 mb-2">
                 請將以下登入資訊提供給客戶:

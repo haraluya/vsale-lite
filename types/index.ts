@@ -484,6 +484,18 @@ export type ParsedSetting = {
   description: string | null
 }
 
+// 客戶通知範本
+export type NotificationTemplate = {
+  id: string
+  name: string
+  template: string
+  is_default: boolean
+  created_at: string
+  updated_at: string
+  created_by: string | null
+  updated_by: string | null
+}
+
 // 操作類型
 export type AuditActionType = 'created' | 'updated' | 'deleted' | 'stock_adjusted' | 'comment_added'
 
