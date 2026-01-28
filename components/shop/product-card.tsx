@@ -105,11 +105,14 @@ export function ProductCard({ product }: ProductCardProps) {
           "line-clamp-2 font-bold text-sm md:text-base leading-tight"
         )}>{product.name}</h3>
 
-        {/* 商品簡介 */}
+        {/* 商品簡介（一行 + fadeout 效果） */}
         {product.description && (
-          <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed">
-            {product.description}
-          </p>
+          <div className="relative">
+            <p className="text-xs text-gray-600 leading-relaxed overflow-hidden whitespace-nowrap">
+              {product.description}
+            </p>
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+          </div>
         )}
 
         <p className="text-xs text-gray-500">

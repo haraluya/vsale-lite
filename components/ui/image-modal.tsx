@@ -24,9 +24,10 @@ interface ImageModalProps {
   onClose: () => void
   imageUrl: string
   imageName: string
+  description?: string  // 商品簡介（選填）
 }
 
-export function ImageModal({ isOpen, onClose, imageUrl, imageName }: ImageModalProps) {
+export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }: ImageModalProps) {
   const [isImageLoading, setIsImageLoading] = useState(true)
 
   // ESC 鍵關閉
@@ -123,20 +124,48 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName }: ImageModalP
           />
         </div>
 
-        {/* 圖片標題 */}
+        {/* 商品資訊 */}
         <div className={cn(
           "mt-4 rounded-none bg-white",
           designTokens.neoBrutalism.border.full,
           "border-black",
           designTokens.neoBrutalism.shadow.full,
-          "px-4 py-3"
+          "overflow-hidden"
         )}>
-          <p className={cn(
-            "text-center font-bold",
-            designTokens.typography.body.base
+          {/* 商品名稱 */}
+          <div className={cn(
+            "bg-yellow-300",
+            "border-b-2 md:border-b-3",
+            "border-black",
+            "px-4 py-3"
           )}>
-            {imageName}
-          </p>
+            <p className={cn(
+              "font-bold",
+              designTokens.typography.body.large
+            )}>
+              {imageName}
+            </p>
+          </div>
+
+          {/* 商品簡介 */}
+          {description && (
+            <div className="px-4 py-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={cn(
+                  "rounded-none bg-blue-400",
+                  "border-2 border-black",
+                  "w-1 h-4"
+                )} />
+                <p className="font-bold text-sm text-gray-700">商品簡介</p>
+              </div>
+              <p className={cn(
+                "whitespace-pre-wrap text-gray-700 leading-relaxed",
+                designTokens.typography.body.small
+              )}>
+                {description}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

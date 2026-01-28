@@ -193,17 +193,18 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
       {/* 商品資訊 */}
       <div className="space-y-1.5 md:space-y-3">
-        {/* 商品簡介 */}
+        {/* 商品簡介（一行 + fadeout 效果） */}
         {product.description && (
           <div className={cn(
-            "rounded-none bg-gray-50",
+            "rounded-none bg-gray-50 relative",
             designTokens.neoBrutalism.border.mobile,
             "border-gray-400",
             "p-2"
           )}>
-            <p className="text-xs text-gray-700 line-clamp-3 leading-relaxed">
+            <p className="text-xs text-gray-700 leading-relaxed overflow-hidden whitespace-nowrap pr-8">
               {product.description}
             </p>
+            <div className="absolute right-2 top-0 bottom-0 w-12 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none" />
           </div>
         )}
 
@@ -310,6 +311,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           onClose={() => setIsModalOpen(false)}
           imageUrl={imageUrl}
           imageName={product.name}
+          description={product.description}
         />
       )}
     </div>
