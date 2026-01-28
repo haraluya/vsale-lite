@@ -13,7 +13,7 @@ import { getSetting } from '@/lib/actions/system'
 import { removeWwwFromUrl } from '@/lib/utils/template-helpers'
 import { useHighlightKeyword } from './client-filter'
 import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
-import { cn } from '@/lib/utils'
+import { cn, getTierColor } from '@/lib/utils'
 import { formatDateTW } from '@/lib/date-utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { useNotificationTemplate } from '@/lib/hooks/use-notification-template'
@@ -165,9 +165,6 @@ export function ClientTable({
                   顯示名稱
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-bold">
-                  地址
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-bold">
                   備註
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-bold">
@@ -181,7 +178,7 @@ export function ClientTable({
             <tbody className="divide-y-2 divide-gray-200">
               {clients.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                     {searchKeyword || total === 0
                       ? '查無符合條件的客戶'
                       : '尚無客戶資料,點擊「快速開戶」建立第一位客戶'}
@@ -189,12 +186,7 @@ export function ClientTable({
                 </tr>
               ) : (
                 clients.map((client) => {
-                  // 地址與備註摘要 (最多 30 字)
-                  const addressPreview = client.address
-                    ? client.address.length > 30
-                      ? client.address.substring(0, 30) + '...'
-                      : client.address
-                    : '-'
+                  // 備註摘要 (最多 30 字)
                   const notesPreview = client.admin_notes
                     ? client.admin_notes.length > 30
                       ? client.admin_notes.substring(0, 30) + '...'
@@ -203,20 +195,20 @@ export function ClientTable({
 
                   return (
                     <tr key={client.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-sm font-mono">
+                      <td className="px-6 py-4 text-base font-mono font-bold">
                         {highlightKeyword(client.phone)}
                       </td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-6 py-4 text-base font-bold">
                         {client.display_name ? highlightKeyword(client.display_name) : '-'}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600" title={client.address || ''}>
-                        {addressPreview}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600" title={client.admin_notes || ''}>
                         <span className="text-yellow-700">{notesPreview}</span>
                       </td>
                       <td className="px-6 py-4 text-sm">
-                        <span className="inline-block rounded-none border-2 border-black bg-blue-100 px-3 py-1 text-xs font-bold">
+                        <span className={cn(
+                          "inline-block rounded-none border-2 border-black px-3 py-1 text-xs font-bold",
+                          client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
+                        )}>
                           {client.tier_name || '未設定'}
                         </span>
                       </td>
@@ -310,12 +302,6 @@ export function ClientTable({
           </div>
         ) : (
           clients.map((client) => {
-            const addressPreview = client.address
-              ? client.address.length > 20
-                ? client.address.substring(0, 20) + '...'
-                : client.address
-              : '-'
-
             return (
               <div
                 key={client.id}
@@ -337,24 +323,20 @@ export function ClientTable({
                       {highlightKeyword(client.phone)}
                     </div>
                   </div>
-                  <span className="inline-block rounded-none border-2 border-black bg-blue-100 px-2 py-1 text-xs font-bold whitespace-nowrap">
+                  <span className={cn(
+                    "inline-block rounded-none border-2 border-black px-2 py-1 text-xs font-bold whitespace-nowrap",
+                    client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
+                  )}>
                     {client.tier_name || '未設定'}
                   </span>
                 </div>
 
-                {/* 地址與註冊時間 */}
-                {(client.address || client.admin_notes) && (
+                {/* 備註 */}
+                {client.admin_notes && (
                   <div className={cn("text-gray-600", designTokens.typography.caption)}>
-                    {client.address && (
-                      <div title={client.address}>
-                        地址: {addressPreview}
-                      </div>
-                    )}
-                    {client.admin_notes && (
-                      <div className="text-yellow-700" title={client.admin_notes}>
-                        備註: {client.admin_notes.length > 20 ? client.admin_notes.substring(0, 20) + '...' : client.admin_notes}
-                      </div>
-                    )}
+                    <div className="text-yellow-700" title={client.admin_notes}>
+                      備註: {client.admin_notes.length > 20 ? client.admin_notes.substring(0, 20) + '...' : client.admin_notes}
+                    </div>
                   </div>
                 )}
 

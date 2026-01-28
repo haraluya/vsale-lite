@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { cn, getTierColor } from '@/lib/utils'
 
 type ClientFilterProps = {
   tiers: Tier[]
@@ -115,19 +116,17 @@ export function ClientFilter({
         <div className="flex flex-wrap gap-2">
           {tiers.map((tier) => {
             const isSelected = selectedTierIds.includes(tier.id)
+            const tierColor = getTierColor(tier.id)
             return (
               <button
                 key={tier.id}
                 onClick={() => toggleTier(tier.id)}
-                className={`
-                  rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold
-                  transition-all duration-150
-                  ${
-                    isSelected
-                      ? 'bg-blue-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                      : 'bg-white text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-gray-50'
-                  }
-                `}
+                className={cn(
+                  'rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold transition-all duration-150',
+                  isSelected
+                    ? 'bg-blue-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                    : `${tierColor} text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-opacity-80`
+                )}
               >
                 {tier.name}
               </button>
