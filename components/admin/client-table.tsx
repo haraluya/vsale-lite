@@ -206,7 +206,7 @@ export function ClientTable({
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span className={cn(
-                          "inline-block rounded-none border-2 border-black px-3 py-1 text-xs font-bold",
+                          "inline-block rounded-none border-2 border-black px-3 py-1 text-sm font-bold",
                           client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
                         )}>
                           {client.tier_name || '未設定'}
@@ -324,7 +324,7 @@ export function ClientTable({
                     </div>
                   </div>
                   <span className={cn(
-                    "inline-block rounded-none border-2 border-black px-2 py-1 text-xs font-bold whitespace-nowrap",
+                    "inline-block rounded-none border-2 border-black px-2 py-1 text-sm font-bold whitespace-nowrap",
                     client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
                   )}>
                     {client.tier_name || '未設定'}
