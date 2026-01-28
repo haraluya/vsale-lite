@@ -70,23 +70,30 @@ export function ClientNotificationSettings() {
 
   // 新增範本
   const handleCreateTemplate = async () => {
-    const name = await prompt({
+    const result = await prompt({
       title: '新增範本',
-      placeholder: '請輸入範本名稱（例如：批發專用）',
-      variant: 'info',
+      fields: [
+        {
+          name: 'name',
+          label: '範本名稱',
+          placeholder: '請輸入範本名稱（例如：批發專用）',
+          required: true,
+        }
+      ]
     })
 
-    if (!name) return
+    if (!result) return
+    const name = result.name
 
     setLoading(true)
-    const result = await createNotificationTemplate({
+    const apiResult = await createNotificationTemplate({
       name,
       template: '【{公司名稱} - 登入資訊】\n\n客戶名稱: {客戶名稱}\n前台網址: {前台網址}\n登入電話: {登入電話}\n登入密碼: {登入密碼}',
       is_default: false,
     })
     setLoading(false)
 
-    if (result.success) {
+    if (apiResult.success) {
       await alert({
         title: '建立成功',
         message: `範本「${name}」已建立`,
@@ -96,7 +103,7 @@ export function ClientNotificationSettings() {
     } else {
       await alert({
         title: '建立失敗',
-        message: result.message,
+        message: apiResult.message,
         variant: 'error',
       })
     }
@@ -104,22 +111,31 @@ export function ClientNotificationSettings() {
 
   // 重新命名範本
   const handleRenameTemplate = async (template: NotificationTemplate) => {
-    const newName = await prompt({
+    const result = await prompt({
       title: '重新命名範本',
-      placeholder: '請輸入新名稱',
-      variant: 'info',
+      fields: [
+        {
+          name: 'name',
+          label: '新名稱',
+          placeholder: '請輸入新名稱',
+          defaultValue: template.name,
+          required: true,
+        }
+      ]
     })
 
-    if (!newName || newName === template.name) return
+    if (!result) return
+    const newName = result.name
+    if (newName === template.name) return
 
     setLoading(true)
-    const result = await updateNotificationTemplate({
+    const apiResult = await updateNotificationTemplate({
       id: template.id,
       name: newName,
     })
     setLoading(false)
 
-    if (result.success) {
+    if (apiResult.success) {
       await alert({
         title: '重新命名成功',
         message: `範本已重新命名為「${newName}」`,
@@ -129,7 +145,7 @@ export function ClientNotificationSettings() {
     } else {
       await alert({
         title: '重新命名失敗',
-        message: result.message,
+        message: apiResult.message,
         variant: 'error',
       })
     }
