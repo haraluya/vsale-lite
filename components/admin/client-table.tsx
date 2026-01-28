@@ -158,19 +158,19 @@ export function ClientTable({
           <table className="w-full">
             <thead className="border-b-2 md:border-b-3 border-black bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-sm font-bold">
+                <th className="px-6 py-3 text-left text-sm font-bold w-[140px]">
                   手機號碼
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-bold">
+                <th className="px-6 py-3 text-left text-sm font-bold w-[150px]">
                   顯示名稱
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-bold">
+                <th className="px-6 py-3 text-left text-sm font-bold w-[180px]">
                   備註
                 </th>
-                <th className="px-6 py-3 text-left text-sm font-bold">
+                <th className="px-6 py-3 text-left text-sm font-bold w-[120px]">
                   會員等級
                 </th>
-                <th className="px-6 py-3 text-right text-sm font-bold w-[400px]">
+                <th className="px-6 py-3 text-right text-sm font-bold w-[480px]">
                   操作
                 </th>
               </tr>
