@@ -193,6 +193,20 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
       {/* 商品資訊 */}
       <div className="space-y-1.5 md:space-y-3">
+        {/* 商品簡介 */}
+        {product.description && (
+          <div className={cn(
+            "rounded-none bg-gray-50",
+            designTokens.neoBrutalism.border.mobile,
+            "border-gray-400",
+            "p-2"
+          )}>
+            <p className="text-xs text-gray-700 line-clamp-3 leading-relaxed">
+              {product.description}
+            </p>
+          </div>
+        )}
+
         {/* 價格顯示 */}
         {displayPrice ? (
           <div className={cn(

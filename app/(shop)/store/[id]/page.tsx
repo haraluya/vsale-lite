@@ -210,20 +210,36 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {/* 商品描述 */}
             {product.description && (
               <div className={cn(
-                "rounded-none bg-white",
+                "rounded-none bg-gradient-to-br from-blue-50 to-purple-50",
                 designTokens.neoBrutalism.border.full,
                 "border-black",
                 designTokens.neoBrutalism.shadow.full,
                 designTokens.spacing.card.padding
               )}>
-                <h2 className={cn(
-                  designTokens.typography.h2,
-                  "mb-2 md:mb-3"
-                )}>商品描述</h2>
+                <div className="flex items-center gap-2 mb-3 md:mb-4">
+                  <div className={cn(
+                    "rounded-none bg-blue-400",
+                    "border-2 border-black",
+                    "w-1 h-6 md:h-7"
+                  )} />
+                  <h2 className={cn(
+                    designTokens.typography.h2,
+                    "m-0"
+                  )}>商品簡介</h2>
+                </div>
                 <p className={cn(
-                  "whitespace-pre-wrap text-gray-700",
+                  "whitespace-pre-wrap text-gray-800 leading-relaxed",
                   designTokens.typography.body.base
                 )}>{product.description}</p>
+                <div className={cn(
+                  "mt-3 rounded-none bg-white/70",
+                  "border-2 border-black",
+                  "px-3 py-2"
+                )}>
+                  <p className="text-xs text-gray-600">
+                    💡 商品列表顯示時，簡介會自動截短至約50字（3行）
+                  </p>
+                </div>
               </div>
             )}
 

@@ -105,7 +105,14 @@ export function ProductCard({ product }: ProductCardProps) {
           "line-clamp-2 font-bold text-sm md:text-base leading-tight"
         )}>{product.name}</h3>
 
-        <p className="text-xs text-gray-600">
+        {/* 商品簡介 */}
+        {product.description && (
+          <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed">
+            {product.description}
+          </p>
+        )}
+
+        <p className="text-xs text-gray-500">
           編號: {product.code}
         </p>
 
