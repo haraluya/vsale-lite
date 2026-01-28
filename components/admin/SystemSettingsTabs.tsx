@@ -79,38 +79,25 @@ export function SystemSettingsTabs({
                 )}
               </div>
 
-              {/* Logo 管理 */}
-              {logoUrlSetting && (
+              {/* 品牌圖片管理 - 整合所有尺寸 */}
+              {(logoUrlSetting || logoIconUrlSetting || faviconUrlSetting) && (
                 <div className="rounded-none border-2 md:border-3 border-green-500 bg-green-50 p-6 shadow-neo-sm md:shadow-neo">
                   <h2 className="text-xl font-black mb-4 flex items-center gap-2">
                     <span className="text-2xl">🖼️</span>
-                    Logo 管理
-                  </h2>
-                  <p className="mb-4 text-sm text-gray-700">
-                    上傳的 Logo 會顯示在左上角（建議尺寸：200 × 60 像素）
-                  </p>
-                  <div className="max-w-md">
-                    <LogoUploader
-                      logoType="logo"
-                      currentUrl={logoUrlSetting.value as string}
-                      uploadAction={uploadAction}
-                      deleteAction={deleteAction}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 其他品牌圖片設定 */}
-              {(logoIconUrlSetting || faviconUrlSetting) && (
-                <div className="rounded-none border-2 md:border-3 border-blue-500 bg-blue-50 p-6 shadow-neo-sm md:shadow-neo">
-                  <h2 className="text-xl font-black mb-4 flex items-center gap-2">
-                    <span className="text-2xl">🎨</span>
-                    其他品牌圖片
+                    品牌圖片管理
                   </h2>
                   <p className="mb-4 text-sm text-gray-700">
                     同一品牌的不同尺寸圖片，用於不同顯示場景
                   </p>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {logoUrlSetting && (
+                      <LogoUploader
+                        logoType="logo"
+                        currentUrl={logoUrlSetting.value as string}
+                        uploadAction={uploadAction}
+                        deleteAction={deleteAction}
+                      />
+                    )}
                     {faviconUrlSetting && (
                       <LogoUploader
                         logoType="favicon"
