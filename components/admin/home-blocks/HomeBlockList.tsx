@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react'
 import { Plus, Loader2 } from 'lucide-react'
 import { designTokens } from '@/lib/design-tokens'
-import { getAllHomeBlocks, getHomeBlockById, deleteHomeBlock, moveBlockUp, moveBlockDown } from '@/lib/actions/home-blocks'
+import { getAllHomeBlocks, getHomeBlockById, deleteHomeBlock, batchUpdateBlocksOrder } from '@/lib/actions/home-blocks'
 import { useAlert } from '@/lib/contexts/dialog-context'
-import { HomeBlockCard } from './HomeBlockCard'
+import { HomeBlockSortableList } from './HomeBlockSortableList'
 import { HomeBlockForm } from './HomeBlockForm'
 import { BlockTypeDialog } from './BlockTypeDialog'
 import type { HomePageBlock, BlockType } from '@/types'
@@ -121,35 +121,24 @@ export function HomeBlockList() {
     setSelectedType(null)
   }
 
-  // 處理向上移動
-  const handleMoveUp = async (blockId: string) => {
-    const result = await moveBlockUp(blockId)
+  // 處理儲存排序
+  const handleSaveOrder = async (newBlocks: HomePageBlock[]) => {
+    const result = await batchUpdateBlocksOrder(newBlocks)
 
     if (!result.success) {
       await alert({
-        title: '移動失敗',
-        message: result.message || '向上移動失敗',
+        title: '儲存失敗',
+        message: result.message || '儲存排序失敗',
         variant: 'error',
       })
-      return
+      throw new Error(result.message)
     }
 
-    // 重新載入列表
-    fetchBlocks()
-  }
-
-  // 處理向下移動
-  const handleMoveDown = async (blockId: string) => {
-    const result = await moveBlockDown(blockId)
-
-    if (!result.success) {
-      await alert({
-        title: '移動失敗',
-        message: result.message || '向下移動失敗',
-        variant: 'error',
-      })
-      return
-    }
+    await alert({
+      title: '儲存成功',
+      message: result.message || '排序已更新',
+      variant: 'success',
+    })
 
     // 重新載入列表
     fetchBlocks()
@@ -215,20 +204,12 @@ export function HomeBlockList() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blocks.map((block, index) => (
-            <HomeBlockCard
-              key={block.id}
-              block={block}
-              isFirst={index === 0}
-              isLast={index === blocks.length - 1}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onMoveUp={handleMoveUp}
-              onMoveDown={handleMoveDown}
-            />
-          ))}
-        </div>
+        <HomeBlockSortableList
+          blocks={blocks}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          onSaveOrder={handleSaveOrder}
+        />
       )}
 
       {/* 類型選擇對話框 */}

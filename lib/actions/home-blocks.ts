@@ -630,3 +630,48 @@ export async function uploadBlockImage(
     }
   }
 }
+
+/**
+ * 批次更新區塊排序（後台）
+ * 接收重新排序後的區塊陣列，批次更新所有區塊的 sort_order
+ * @param blocks 重新排序後的區塊陣列（順序即為新的 sort_order）
+ */
+export async function batchUpdateBlocksOrder(
+  blocks: HomePageBlock[]
+): Promise<ActionResult<void>> {
+  try {
+    await checkAuth('admin')
+
+    const supabase = await createClient()
+
+    // 批次更新每個區塊的 sort_order
+    const updates = blocks.map((block, index) =>
+      supabase
+        .from('home_page_blocks')
+        .update({ sort_order: index })
+        .eq('id', block.id)
+    )
+
+    const results = await Promise.all(updates)
+
+    // 檢查是否有錯誤
+    const errors = results.filter((result) => result.error)
+    if (errors.length > 0) {
+      throw new Error('部分區塊更新失敗')
+    }
+
+    revalidatePath('/store/home')
+    revalidatePath('/admin/announcements')
+
+    return {
+      success: true,
+      message: `已成功更新 ${blocks.length} 個區塊的排序`,
+    }
+  } catch (error) {
+    console.error('批次更新區塊排序失敗:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '批次更新區塊排序失敗',
+    }
+  }
+}
