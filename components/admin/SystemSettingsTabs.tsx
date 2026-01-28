@@ -58,34 +58,67 @@ export function SystemSettingsTabs({
 
         // 品牌設定
         if (activeTab === 'branding') {
+          // 取得圖片設定
+          const logoUrlSetting = brandingSettings.find((s) => s.key === 'logo_url')
+          const logoIconUrlSetting = brandingSettings.find((s) => s.key === 'logo_icon_url')
+          const faviconUrlSetting = brandingSettings.find((s) => s.key === 'favicon_url')
+
+          // 其他非圖片設定
+          const otherBrandingSettings = brandingSettings.filter(
+            (s) => !['logo_url', 'logo_icon_url', 'favicon_url'].includes(s.key)
+          )
+
           return (
             <div className="space-y-6">
-              <div>
-                <h2 className="text-xl font-black mb-4">Logo 管理</h2>
-                <p className="mb-4 text-sm text-gray-600">
-                  上傳的 Logo 會顯示在左上角（建議尺寸：200 × 60 像素）
-                </p>
-                {logoUrl && (
+              {/* Logo 管理 */}
+              {logoUrlSetting && (
+                <div>
+                  <h2 className="text-xl font-black mb-4">Logo 管理</h2>
+                  <p className="mb-4 text-sm text-gray-600">
+                    上傳的 Logo 會顯示在左上角（建議尺寸：200 × 60 像素）
+                  </p>
                   <div className="max-w-md">
                     <LogoUploader
                       logoType="logo"
-                      currentUrl={logoUrl}
+                      currentUrl={logoUrlSetting.value as string}
                       uploadAction={uploadAction}
                       deleteAction={deleteAction}
                     />
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* 其他品牌設定 */}
-              {brandingSettings.filter((s) => s.key !== 'logo_url').length >
-                0 && (
+              {(logoIconUrlSetting || faviconUrlSetting) && (
                 <div>
                   <h2 className="text-xl font-black mb-4">其他品牌設定</h2>
-                  <SystemSettingsForm
-                    settings={brandingSettings.filter(
-                      (s) => s.key !== 'logo_url'
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {faviconUrlSetting && (
+                      <LogoUploader
+                        logoType="favicon"
+                        currentUrl={faviconUrlSetting.value as string}
+                        uploadAction={uploadAction}
+                        deleteAction={deleteAction}
+                      />
                     )}
+                    {logoIconUrlSetting && (
+                      <LogoUploader
+                        logoType="logo-icon"
+                        currentUrl={logoIconUrlSetting.value as string}
+                        uploadAction={uploadAction}
+                        deleteAction={deleteAction}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 其他文字設定（如果有）*/}
+              {otherBrandingSettings.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-black mb-4">文字設定</h2>
+                  <SystemSettingsForm
+                    settings={otherBrandingSettings}
                     updateAction={updateAction}
                   />
                 </div>
