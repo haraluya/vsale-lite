@@ -425,22 +425,3 @@ export async function setDefaultTemplate(
     }
   }
 }
-
-/**
- * 產生通知文字（替換變數）
- */
-export function generateNotificationText(input: {
-  template: string
-  companyName: string
-  clientName: string
-  loginUrl: string
-  phone: string
-  password: string
-}): string {
-  return input.template
-    .replace(/\{公司名稱\}/g, input.companyName)
-    .replace(/\{客戶名稱\}/g, input.clientName)
-    .replace(/\{前台網址\}/g, input.loginUrl)
-    .replace(/\{登入電話\}/g, input.phone)
-    .replace(/\{登入密碼\}/g, input.password)
-}
