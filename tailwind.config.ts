@@ -6,6 +6,15 @@ const config: Config = {
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  safelist: [
+    // 等級標籤循環色系統 (Neo-Brutalism 風格 - 鮮豔飽和)
+    'bg-blue-300',
+    'bg-purple-300',
+    'bg-green-300',
+    'bg-yellow-300',
+    'bg-pink-300',
+    'bg-orange-300',
+  ],
   theme: {
     extend: {
       boxShadow: {
