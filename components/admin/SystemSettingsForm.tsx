@@ -12,9 +12,11 @@ import { Button } from '@/components/ui/button'
 interface SystemSettingsFormProps {
   settings: ParsedSetting[]
   updateAction: (formData: FormData) => Promise<void>
+  /** 特定欄位的使用說明（選填）*/
+  fieldHints?: Record<string, string>
 }
 
-export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFormProps) {
+export function SystemSettingsForm({ settings, updateAction, fieldHints }: SystemSettingsFormProps) {
   const [loading, setLoading] = useState(false)
   // 儲存當前的值（初始值 + 變更）
   const [values, setValues] = useState<Record<string, string | number | boolean | object>>(() => {
@@ -96,6 +98,11 @@ export function SystemSettingsForm({ settings, updateAction }: SystemSettingsFor
                   {isChanged && <span className="ml-2 text-xs text-blue-600">(已修改)</span>}
                 </label>
                 <p className="text-xs text-gray-500 mb-2">{setting.key}</p>
+                {fieldHints?.[setting.key] && (
+                  <p className="text-xs text-blue-600 mb-2 bg-blue-50 p-2 rounded border border-blue-200">
+                    💡 {fieldHints[setting.key]}
+                  </p>
+                )}
 
                 {/* 根據型別顯示不同的輸入框 */}
                 {setting.value_type === 'boolean' && (

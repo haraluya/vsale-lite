@@ -55,14 +55,24 @@ export function SystemSettingsTabs({
           const allTextSettings = [...generalSettings, ...textBrandingSettings]
 
           return (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* 基本設定 */}
-              <div>
-                <h2 className="text-xl font-black mb-4">基本設定</h2>
+              <div className="rounded-none border-2 md:border-3 border-purple-500 bg-purple-50 p-6 shadow-neo-sm md:shadow-neo">
+                <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+                  <span className="text-2xl">📝</span>
+                  基本設定
+                </h2>
+                <p className="text-sm text-gray-700 mb-4">
+                  設定網站名稱、公司資訊等基本參數
+                </p>
                 {allTextSettings.length > 0 ? (
                   <SystemSettingsForm
                     settings={allTextSettings}
                     updateAction={updateAction}
+                    fieldHints={{
+                      site_title: '顯示位置：瀏覽器分頁標題（首頁和所有子頁面）',
+                      company_name: '顯示位置：SEO 描述（搜尋引擎、社群分享）、客戶登入資訊通知',
+                    }}
                   />
                 ) : (
                   <p className="text-sm text-gray-500">目前無設定項目</p>
@@ -71,9 +81,12 @@ export function SystemSettingsTabs({
 
               {/* Logo 管理 */}
               {logoUrlSetting && (
-                <div>
-                  <h2 className="text-xl font-black mb-4">Logo 管理</h2>
-                  <p className="mb-4 text-sm text-gray-600">
+                <div className="rounded-none border-2 md:border-3 border-green-500 bg-green-50 p-6 shadow-neo-sm md:shadow-neo">
+                  <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🖼️</span>
+                    Logo 管理
+                  </h2>
+                  <p className="mb-4 text-sm text-gray-700">
                     上傳的 Logo 會顯示在左上角（建議尺寸：200 × 60 像素）
                   </p>
                   <div className="max-w-md">
@@ -89,8 +102,14 @@ export function SystemSettingsTabs({
 
               {/* 其他品牌圖片設定 */}
               {(logoIconUrlSetting || faviconUrlSetting) && (
-                <div>
-                  <h2 className="text-xl font-black mb-4">其他品牌圖片</h2>
+                <div className="rounded-none border-2 md:border-3 border-blue-500 bg-blue-50 p-6 shadow-neo-sm md:shadow-neo">
+                  <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🎨</span>
+                    其他品牌圖片
+                  </h2>
+                  <p className="mb-4 text-sm text-gray-700">
+                    設定網站的 Favicon 和圖示版 Logo
+                  </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {faviconUrlSetting && (
                       <LogoUploader
@@ -114,7 +133,10 @@ export function SystemSettingsTabs({
 
               {/* 庫存歸零功能 */}
               <div>
-                <h2 className="text-xl font-black mb-4">系統操作</h2>
+                <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+                  <span className="text-2xl">⚙️</span>
+                  系統操作
+                </h2>
                 <StockResetButton />
               </div>
             </div>
