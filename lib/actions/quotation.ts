@@ -120,6 +120,8 @@ export async function getQuotationData(
           code: p.code,
           name: p.name,
           price: priceMap.get(p.id) || p.retail_price || null,
+          retail_price: p.retail_price,
+          tier_price: priceMap.get(p.id) || null,
         }))
 
       return {

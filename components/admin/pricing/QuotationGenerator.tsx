@@ -120,6 +120,37 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
     setQuotationText(text)
   }
 
+  const handleGenerateQuotationWithRetail = () => {
+    if (!selectedTierId || quotationData.length === 0) {
+      return
+    }
+
+    const tierName = tiers.find((t) => t.id === selectedTierId)?.name || '未知等級'
+    let totalProducts = 0
+
+    let text = '【報價單】\n'
+    text += `等級: ${tierName}\n\n`
+
+    quotationData.forEach((series) => {
+      text += `=== ${series.series_name} ===\n`
+      series.products.forEach((product: any) => {
+        const tierPrice = product.tier_price
+          ? `$${Math.round(product.tier_price)}`
+          : product.price
+            ? `$${Math.round(product.price)}`
+            : '價格未設定'
+        const retailPrice = product.retail_price ? `$${Math.round(product.retail_price)}` : 'N/A'
+        text += `${product.name} - ${tierPrice}/${retailPrice}\n`
+        totalProducts++
+      })
+      text += '\n'
+    })
+
+    text += `---\n總計: ${totalProducts} 項商品`
+
+    setQuotationText(text)
+  }
+
   const handleCopyToClipboard = async () => {
     if (!quotationText) return
 
@@ -217,7 +248,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
         <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
           <div className="flex items-center justify-between mb-3">
             <label className="font-bold">報價文字</label>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleGenerateQuotation}
                 disabled={!selectedTierId || selectedSeriesIds.size === 0}
@@ -225,6 +256,14 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
               >
                 <FileText className="h-4 w-4" />
                 產生報價
+              </button>
+              <button
+                onClick={handleGenerateQuotationWithRetail}
+                disabled={!selectedTierId || selectedSeriesIds.size === 0}
+                className="rounded-none border-2 border-black bg-blue-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+              >
+                <FileText className="h-4 w-4" />
+                產生報價(含售價)
               </button>
               <button
                 onClick={handleCopyToClipboard}
