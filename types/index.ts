@@ -655,7 +655,7 @@ export type DeleteBackupResult = ActionResult<void>
 // ===================================
 
 // 區塊類型
-export type BlockType = 'image_carousel' | 'product_display' | 'text_block'
+export type BlockType = 'image_carousel' | 'image_carousel_portrait' | 'product_display' | 'text_block'
 
 // 圖片輪播 Config
 export interface ImageCarouselConfig {

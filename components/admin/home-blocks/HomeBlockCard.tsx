@@ -27,7 +27,9 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
   const getBlockTypeLabel = () => {
     switch (block.block_type) {
       case 'image_carousel':
-        return '圖片輪播'
+        return '圖片輪播 (橫向)'
+      case 'image_carousel_portrait':
+        return '海報輪播 (直向)'
       case 'product_display':
         return '商品展示'
       case 'text_block':
@@ -42,10 +44,12 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
     switch (block.block_type) {
       case 'image_carousel':
         return 'bg-blue-100 text-blue-800'
+      case 'image_carousel_portrait':
+        return 'bg-purple-100 text-purple-800'
       case 'product_display':
         return 'bg-green-100 text-green-800'
       case 'text_block':
-        return 'bg-purple-100 text-purple-800'
+        return 'bg-yellow-100 text-yellow-800'
       default:
         return 'bg-gray-100 text-gray-800'
     }
@@ -53,7 +57,7 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
 
   // 取得縮圖內容
   const renderThumbnail = () => {
-    if (block.block_type === 'image_carousel') {
+    if (block.block_type === 'image_carousel' || block.block_type === 'image_carousel_portrait') {
       const config = block.config as ImageCarouselConfig
       const firstImage = config.images?.[0]?.url
 

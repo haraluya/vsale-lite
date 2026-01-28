@@ -43,19 +43,19 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
   const [isActive, setIsActive] = useState(initialData?.is_active ?? true)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // 圖片輪播 Config
+  // 圖片輪播 Config（支援橫向 16:9 和直向 4:5）
   const [carouselImages, setCarouselImages] = useState<Array<{ url: string; series_id?: string | null }>>(
-    initialData?.block_type === 'image_carousel'
+    (initialData?.block_type === 'image_carousel' || initialData?.block_type === 'image_carousel_portrait')
       ? (initialData.config as ImageCarouselConfig).images
       : []
   )
   const [autoPlay, setAutoPlay] = useState(
-    initialData?.block_type === 'image_carousel'
+    (initialData?.block_type === 'image_carousel' || initialData?.block_type === 'image_carousel_portrait')
       ? (initialData.config as ImageCarouselConfig).auto_play
       : true
   )
   const [intervalMs, setIntervalMs] = useState(
-    initialData?.block_type === 'image_carousel'
+    (initialData?.block_type === 'image_carousel' || initialData?.block_type === 'image_carousel_portrait')
       ? (initialData.config as ImageCarouselConfig).interval_ms
       : 5000
   )
@@ -134,13 +134,13 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
     | TextBlockConfig => {
     console.log('🔧 buildConfig 被呼叫，blockType:', blockType)
 
-    if (blockType === 'image_carousel') {
+    if (blockType === 'image_carousel' || blockType === 'image_carousel_portrait') {
       const config = {
         images: carouselImages,
         auto_play: autoPlay,
         interval_ms: intervalMs,
       }
-      console.log('🔧 回傳 image_carousel config:', config)
+      console.log('🔧 回傳 image_carousel/portrait config:', config)
       return config
     } else if (blockType === 'product_display') {
       const config = {
@@ -351,9 +351,11 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
       </div>
 
       {/* 條件式欄位 */}
-      {blockType === 'image_carousel' && (
+      {(blockType === 'image_carousel' || blockType === 'image_carousel_portrait') && (
         <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 rounded">
-          <h3 className="font-bold text-lg">圖片輪播設定</h3>
+          <h3 className="font-bold text-lg">
+            {blockType === 'image_carousel' ? '圖片輪播設定 (橫向 16:9)' : '海報輪播設定 (直向 4:5)'}
+          </h3>
 
           <ImageUploadMultiple
             blockId={blockId || null}

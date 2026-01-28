@@ -1,4 +1,5 @@
 import { ImageCarousel } from './ImageCarousel'
+import { ImageCarouselPortrait } from './ImageCarouselPortrait'
 import { ProductDisplay } from './ProductDisplay'
 import { TextBlock } from './TextBlock'
 import type { HomePageBlock, ImageCarouselConfig, ProductDisplayConfig, TextBlockConfig } from '@/types'
@@ -28,6 +29,19 @@ export function BlockRenderer({ block }: BlockRendererProps) {
           <ImageCarousel
             config={block.config as ImageCarouselConfig}
             blockUpdatedAt={block.updated_at} // 🔧 修復：傳入更新時間避免快取問題
+          />
+        </div>
+      )
+
+    case 'image_carousel_portrait':
+      return (
+        <div className={cn(
+          designTokens.container.default,
+          'px-4 md:px-6 lg:px-8'
+        )}>
+          <ImageCarouselPortrait
+            config={block.config as ImageCarouselConfig}
+            blockUpdatedAt={block.updated_at}
           />
         </div>
       )

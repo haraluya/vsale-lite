@@ -34,7 +34,8 @@ export function BlockTypeSelector({ value, onChange, disabled = false }: BlockTy
           disabled:opacity-50
         `}
       >
-        <option value="image_carousel">圖片輪播</option>
+        <option value="image_carousel">圖片輪播 (橫向 16:9)</option>
+        <option value="image_carousel_portrait">海報輪播 (直向 4:5)</option>
         <option value="product_display">商品展示</option>
         <option value="text_block">文字區塊</option>
       </select>

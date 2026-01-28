@@ -68,7 +68,7 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
 
           {/* 類型選擇按鈕 */}
           <div className="space-y-3">
-            {/* 圖片輪播 */}
+            {/* 圖片輪播 (16:9) */}
             <button
               onClick={() => handleSelect('image_carousel')}
               className={`
@@ -83,12 +83,36 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
             >
               <div className="flex items-start">
                 <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-1">圖片輪播</h3>
+                  <h3 className="font-bold text-lg mb-1">圖片輪播 (橫向 16:9)</h3>
                   <p className="text-sm text-black/80">
                     上傳最多 5 張圖片，支援自動播放與系列連結
                   </p>
                 </div>
                 <div className="ml-4 text-2xl">🎠</div>
+              </div>
+            </button>
+
+            {/* 海報輪播 (4:5) */}
+            <button
+              onClick={() => handleSelect('image_carousel_portrait')}
+              className={`
+                w-full p-4 text-left bg-purple-400 text-black
+                ${designTokens.neoBrutalism.border.full}
+                ${designTokens.neoBrutalism.shadow.full}
+                border-black rounded-none
+                hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                transition-all duration-150
+              `}
+            >
+              <div className="flex items-start">
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg mb-1">海報輪播 (直向 4:5)</h3>
+                  <p className="text-sm text-black/80">
+                    上傳最多 5 張圖片，4:5 比例，支援自動播放與系列連結
+                  </p>
+                </div>
+                <div className="ml-4 text-2xl">🖼️</div>
               </div>
             </button>
 
