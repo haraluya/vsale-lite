@@ -311,7 +311,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           onClose={() => setIsModalOpen(false)}
           imageUrl={imageUrl}
           imageName={product.name}
-          description={product.description}
+          description={product.description ?? undefined}
         />
       )}
     </div>

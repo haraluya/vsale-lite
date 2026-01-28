@@ -160,7 +160,7 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
               </div>
               <p className={cn(
                 "whitespace-pre-wrap text-gray-700 leading-relaxed",
-                designTokens.typography.body.small
+                designTokens.typography.body.base
               )}>
                 {description}
               </p>
