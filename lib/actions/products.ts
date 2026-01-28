@@ -1903,3 +1903,55 @@ export async function batchUpdateProducts(
     }
   }
 }
+
+/**
+ * 庫存歸零
+ * 將所有商品的庫存設為 0
+ */
+export async function resetAllStock(): Promise<ActionResult<{ updated_count: number }>> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 使用 Admin Client 更新所有商品庫存
+    const adminClient = await createAdminClient()
+
+    const { error, count } = await adminClient
+      .from('products')
+      .update({ stock: 0 })
+      .neq('stock', 0) // 只更新庫存不為 0 的商品（提升效能）
+
+    if (error) {
+      console.error('resetAllStock 錯誤:', error)
+      return {
+        success: false,
+        message: `庫存歸零失敗: ${error.message}`,
+      }
+    }
+
+    // 3. 更新快取
+    revalidateTag('products')
+    revalidateTag('dashboard-stats') // 庫存歸零會影響統計數據
+
+    // 4. 記錄操作日誌
+    await logAudit({
+      target_type: 'product',
+      target_id: 'all',
+      action_type: 'updated',
+      new_values: { stock: 0, updated_count: count || 0 },
+      notes: `批次將所有商品庫存歸零，共影響 ${count || 0} 個商品`,
+    })
+
+    return {
+      success: true,
+      data: { updated_count: count || 0 },
+      message: `成功將 ${count || 0} 個商品的庫存歸零`,
+    }
+  } catch (error) {
+    console.error('resetAllStock 錯誤:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '庫存歸零失敗',
+    }
+  }
+}

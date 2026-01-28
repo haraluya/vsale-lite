@@ -1,7 +1,7 @@
 'use client'
 
 import { Tabs } from '@/components/ui/tabs'
-import { Settings, Image as ImageIcon, Bell, Database } from 'lucide-react'
+import { Settings, Bell, Database } from 'lucide-react'
 import { ParsedSetting } from '@/types'
 import { SystemSettingsForm } from '@/components/admin/SystemSettingsForm'
 import { ClientNotificationSettings } from '@/components/admin/ClientNotificationSettings'
@@ -9,6 +9,7 @@ import { LogoUploader } from '@/components/admin/LogoUploader'
 import { BackupManager } from '@/components/admin/BackupManager'
 import { BackupStatus } from '@/components/admin/BackupStatus'
 import { StorageFolderGuide } from '@/components/admin/StorageFolderGuide'
+import { StockResetButton } from '@/components/admin/StockResetButton'
 
 interface SystemSettingsTabsProps {
   generalSettings: ParsedSetting[]
@@ -31,7 +32,6 @@ export function SystemSettingsTabs({
 }: SystemSettingsTabsProps) {
   const tabs = [
     { id: 'general', label: '一般設定', icon: Settings },
-    { id: 'branding', label: '品牌設定', icon: ImageIcon },
     { id: 'notifications', label: '客戶通知', icon: Bell },
     { id: 'system', label: '備份管理', icon: Database },
   ]
@@ -39,37 +39,36 @@ export function SystemSettingsTabs({
   return (
     <Tabs tabs={tabs} defaultTab="general">
       {(activeTab) => {
-        // 一般設定
+        // 一般設定（整合品牌設定）
         if (activeTab === 'general') {
-          return (
-            <div>
-              <h2 className="text-xl font-black mb-4">一般設定</h2>
-              {generalSettings.length > 0 ? (
-                <SystemSettingsForm
-                  settings={generalSettings}
-                  updateAction={updateAction}
-                />
-              ) : (
-                <p className="text-sm text-gray-500">目前無一般設定項目</p>
-              )}
-            </div>
-          )
-        }
-
-        // 品牌設定
-        if (activeTab === 'branding') {
-          // 取得圖片設定
+          // 取得品牌設定中的圖片設定
           const logoUrlSetting = brandingSettings.find((s) => s.key === 'logo_url')
           const logoIconUrlSetting = brandingSettings.find((s) => s.key === 'logo_icon_url')
           const faviconUrlSetting = brandingSettings.find((s) => s.key === 'favicon_url')
 
-          // 其他非圖片設定
-          const otherBrandingSettings = brandingSettings.filter(
+          // 其他非圖片的品牌設定（如 company_name, site_title）
+          const textBrandingSettings = brandingSettings.filter(
             (s) => !['logo_url', 'logo_icon_url', 'favicon_url'].includes(s.key)
           )
 
+          // 合併一般設定與文字品牌設定
+          const allTextSettings = [...generalSettings, ...textBrandingSettings]
+
           return (
             <div className="space-y-6">
+              {/* 基本設定 */}
+              <div>
+                <h2 className="text-xl font-black mb-4">基本設定</h2>
+                {allTextSettings.length > 0 ? (
+                  <SystemSettingsForm
+                    settings={allTextSettings}
+                    updateAction={updateAction}
+                  />
+                ) : (
+                  <p className="text-sm text-gray-500">目前無設定項目</p>
+                )}
+              </div>
+
               {/* Logo 管理 */}
               {logoUrlSetting && (
                 <div>
@@ -88,10 +87,10 @@ export function SystemSettingsTabs({
                 </div>
               )}
 
-              {/* 其他品牌設定 */}
+              {/* 其他品牌圖片設定 */}
               {(logoIconUrlSetting || faviconUrlSetting) && (
                 <div>
-                  <h2 className="text-xl font-black mb-4">其他品牌設定</h2>
+                  <h2 className="text-xl font-black mb-4">其他品牌圖片</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {faviconUrlSetting && (
                       <LogoUploader
@@ -113,16 +112,11 @@ export function SystemSettingsTabs({
                 </div>
               )}
 
-              {/* 其他文字設定（如果有）*/}
-              {otherBrandingSettings.length > 0 && (
-                <div>
-                  <h2 className="text-xl font-black mb-4">文字設定</h2>
-                  <SystemSettingsForm
-                    settings={otherBrandingSettings}
-                    updateAction={updateAction}
-                  />
-                </div>
-              )}
+              {/* 庫存歸零功能 */}
+              <div>
+                <h2 className="text-xl font-black mb-4">系統操作</h2>
+                <StockResetButton />
+              </div>
             </div>
           )
         }
