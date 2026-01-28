@@ -108,9 +108,9 @@ export function SystemSettingsTabs({
                     其他品牌圖片
                   </h2>
                   <p className="mb-4 text-sm text-gray-700">
-                    設定網站的 Favicon 和圖示版 Logo
+                    同一品牌的不同尺寸圖片，用於不同顯示場景
                   </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     {faviconUrlSetting && (
                       <LogoUploader
                         logoType="favicon"
