@@ -7,6 +7,7 @@ import { designTokens } from '@/lib/design-tokens'
 import { uploadBlockImage } from '@/lib/actions/home-blocks'
 import { deleteBlockImages } from '@/lib/utils/block-image-cleanup'
 import { getActiveSeries } from '@/lib/actions/shop'
+import { getComboDealsList } from '@/lib/actions/combo-deals' // 🆕 Feature 021: 組合優惠列表
 import type { Series, ImageCarouselConfig } from '@/types'
 import { useAlert } from '@/lib/contexts/dialog-context'
 
@@ -24,18 +25,28 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
   const alert = useAlert()
   const [uploading, setUploading] = useState<number | null>(null) // 正在上傳的圖片索引
   const [series, setSeries] = useState<Series[]>([])
-  const [loadingSeries, setLoadingSeries] = useState(true)
+  const [comboDeals, setComboDeals] = useState<Array<{ id: string; name: string }>>([]) // 🆕 Feature 021: 組合優惠列表
+  const [loadingData, setLoadingData] = useState(true) // 修改：統一載入狀態
 
-  // 載入系列列表
+  // 載入系列列表與組合優惠列表
   useEffect(() => {
-    async function fetchSeries() {
-      const result = await getActiveSeries()
-      if (result.success && result.data) {
-        setSeries(result.data)
+    async function fetchData() {
+      const [seriesResult, comboDealsResult] = await Promise.all([
+        getActiveSeries(),
+        getComboDealsList({ status: 'active' }), // 🆕 Feature 021: 載入組合優惠
+      ])
+
+      if (seriesResult.success && seriesResult.data) {
+        setSeries(seriesResult.data)
       }
-      setLoadingSeries(false)
+
+      if (comboDealsResult.success && comboDealsResult.data) {
+        setComboDeals(comboDealsResult.data)
+      }
+
+      setLoadingData(false)
     }
-    fetchSeries()
+    fetchData()
   }, [])
 
   // 處理圖片上傳
@@ -95,6 +106,7 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
     newImages[index] = {
       url: result.data!.url,
       series_id: null,
+      combo_deal_id: null, // 🆕 Feature 021: 預設無組合優惠連結
       width: dimensions.width,
       height: dimensions.height,
     }
@@ -135,7 +147,16 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
   // 處理系列連結設定
   const handleSeriesChange = (index: number, seriesId: string | null) => {
     const newImages = [...images]
-    newImages[index] = { ...newImages[index], series_id: seriesId || null }
+    // 設定系列時清除組合優惠連結（互斥）
+    newImages[index] = { ...newImages[index], series_id: seriesId || null, combo_deal_id: null }
+    onChange(newImages)
+  }
+
+  // 🆕 Feature 021: 處理組合優惠連結設定
+  const handleComboDealChange = (index: number, comboDealId: string | null) => {
+    const newImages = [...images]
+    // 設定組合優惠時清除系列連結（互斥）
+    newImages[index] = { ...newImages[index], combo_deal_id: comboDealId || null, series_id: null }
     onChange(newImages)
   }
 
@@ -190,32 +211,70 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
               )}
             </div>
 
-            {/* 系列連結設定 */}
-            <div className="flex-1">
-              <label className="block text-xs font-medium mb-1">
-                點擊圖片跳轉到系列（可選）
-              </label>
-              {loadingSeries ? (
-                <div className="text-xs text-gray-500">載入系列列表...</div>
-              ) : (
-                <select
-                  value={image.series_id || ''}
-                  onChange={(e) => handleSeriesChange(index, e.target.value || null)}
-                  className={`
-                    w-full rounded-none bg-white text-sm
-                    ${designTokens.neoBrutalism.border.mobile}
-                    border-black px-3 py-2
-                    focus:outline-none focus:ring-2 focus:ring-blue-500
-                  `}
-                >
-                  <option value="">不設定連結（純展示）</option>
-                  {series.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} ({s.code})
-                    </option>
-                  ))}
-                </select>
-              )}
+            {/* 連結設定（系列或組合優惠） */}
+            <div className="flex-1 space-y-3">
+              {/* 系列連結 */}
+              <div>
+                <label className="block text-xs font-medium mb-1">
+                  點擊圖片跳轉到系列（可選）
+                </label>
+                {loadingData ? (
+                  <div className="text-xs text-gray-500">載入中...</div>
+                ) : (
+                  <select
+                    value={image.series_id || ''}
+                    onChange={(e) => handleSeriesChange(index, e.target.value || null)}
+                    disabled={!!(image as any).combo_deal_id} // 🆕 已設定組合優惠時禁用
+                    className={`
+                      w-full rounded-none bg-white text-sm
+                      ${designTokens.neoBrutalism.border.mobile}
+                      border-black px-3 py-2
+                      focus:outline-none focus:ring-2 focus:ring-blue-500
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                    `}
+                  >
+                    <option value="">不設定連結（純展示）</option>
+                    {series.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} ({s.code})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* 🆕 Feature 021: 組合優惠連結 */}
+              <div>
+                <label className="block text-xs font-medium mb-1">
+                  或跳轉到組合優惠（可選）
+                </label>
+                {loadingData ? (
+                  <div className="text-xs text-gray-500">載入中...</div>
+                ) : (
+                  <select
+                    value={(image as any).combo_deal_id || ''}
+                    onChange={(e) => handleComboDealChange(index, e.target.value || null)}
+                    disabled={!!image.series_id} // 已設定系列時禁用
+                    className={`
+                      w-full rounded-none bg-white text-sm
+                      ${designTokens.neoBrutalism.border.mobile}
+                      border-black px-3 py-2
+                      focus:outline-none focus:ring-2 focus:ring-blue-500
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                    `}
+                  >
+                    <option value="">不設定組合優惠連結</option>
+                    {comboDeals.map((combo) => (
+                      <option key={combo.id} value={combo.id}>
+                        {combo.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  💡 系列連結與組合優惠連結僅能擇一設定
+                </p>
+              </div>
             </div>
           </div>
         ))}

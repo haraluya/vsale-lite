@@ -36,6 +36,9 @@ export interface Coupon {
   // 關聯資料（JOIN 查詢時包含）
   tier_restrictions?: string[];  // tier_id 陣列
   series_restrictions?: string[];  // series_id 陣列
+  // 🆕 Feature 021: 組合優惠限制
+  combo_restrictions?: string[];  // combo_deal_id 陣列（僅包含特定組合優惠）
+  combo_apply_all?: boolean;  // true = 適用所有組合優惠（coupon_combo_restrictions 中有 combo_deal_id = NULL 的記錄）
 }
 
 /**

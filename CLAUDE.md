@@ -2,7 +2,7 @@
 
 **專案名稱**: Vsale-lite
 **專案類型**: B2B 批發訂貨系統
-**最後更新**: 2026-01-14
+**最後更新**: 2026-01-30
 
 ---
 
@@ -88,7 +88,12 @@ pnpm site2:migrate
 6. `coupons` - 優惠券
 7. `coupon_tier_restrictions` - 優惠券等級限制
 8. `coupon_series_restrictions` - 優惠券系列限制
-9. `system_settings` - 系統設定
+9. `combo_deals` - 組合優惠
+10. `combo_deal_series` - 組合優惠系列關聯
+11. `combo_deal_tiers` - 組合優惠等級限制
+12. `combo_deal_mix_match_config` - 組合優惠任選配置
+13. `coupon_combo_restrictions` - 優惠券組合優惠限制
+14. `system_settings` - 系統設定
 
 ### 不遷移的資料（站點獨立）
 
@@ -96,6 +101,7 @@ pnpm site2:migrate
 - `admin_users` - 管理員帳號
 - `orders` - 訂單
 - `order_items` - 訂單明細
+- `order_combo_deal_items` - 訂單組合優惠項目
 - `user_coupons` - 使用者優惠券
 - `audit_logs` - 操作日誌
 
@@ -330,12 +336,14 @@ const value = await prompt({
 8. ✅ **運費與訂單修改** - 運費自動計算、滿額免運、訂單狀態流程、訂單修改功能
 9. ✅ **統一對話框系統** - 替換原生對話框、Neo-Brutalism 設計、ESLint 規則
 10. ✅ **專案健康檢查系統** - 七大領域檢查、並行執行、報告產生
+11. ✅ **組合優惠系統** - 各選/任選模式、後台管理、前台展示、購物車整合、訂單快照、廣告連結
 
 ### 核心資料模型
 - **認證與會員**: `tiers`, `profiles`
 - **商品目錄**: `categories`, `series`, `products`, `tier_prices`
 - **訂單系統**: `orders`, `order_items`, `order_timelines`, `order_custom_fees`
 - **優惠券**: `coupons`, `user_coupons`, `coupon_tier_restrictions`, `coupon_series_restrictions`, `order_coupons`
+- **組合優惠**: `combo_deals`, `combo_deal_series`, `combo_deal_tiers`, `combo_deal_mix_match_config`, `order_combo_deal_items`, `coupon_combo_restrictions`
 - **系統管理**: `admin_users`, `audit_logs`, `system_settings`
 
 詳細資料模型請參考：`supabase/migrations/README.md`

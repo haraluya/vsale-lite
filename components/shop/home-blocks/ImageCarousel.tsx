@@ -49,7 +49,10 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
   // 處理圖片點擊
   const handleImageClick = () => {
     const currentImage = imagesWithCacheBusting[currentIndex]
-    if (currentImage?.series_id) {
+    // 🆕 Feature 021: 支援組合優惠連結
+    if ((currentImage as any)?.combo_deal_id) {
+      router.push(`/store/combo-deals/${(currentImage as any).combo_deal_id}`)
+    } else if (currentImage?.series_id) {
       router.push(`/store/series/${currentImage.series_id}`)
     }
   }
@@ -86,11 +89,14 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
           designTokens.neoBrutalism.border.full,
           'border-black',
           designTokens.neoBrutalism.shadow.full,
-          currentImage?.series_id && 'cursor-pointer'
+          (currentImage?.series_id || (currentImage as any)?.combo_deal_id) && 'cursor-pointer' // 🆕 Feature 021: 支援組合優惠
         )}
         onClick={handleImageClick}
-        role={currentImage?.series_id ? 'button' : undefined}
-        aria-label={currentImage?.series_id ? '點擊查看系列商品' : undefined}
+        role={(currentImage?.series_id || (currentImage as any)?.combo_deal_id) ? 'button' : undefined}
+        aria-label={
+          (currentImage as any)?.combo_deal_id ? '點擊查看組合優惠' :
+          currentImage?.series_id ? '點擊查看系列商品' : undefined
+        }
       >
         {currentImage?.url ? (
           <Image

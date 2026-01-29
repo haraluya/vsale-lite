@@ -11,6 +11,7 @@ export const ImageCarouselConfigSchema = z.object({
       z.object({
         url: z.string().url('圖片 URL 格式不正確'),
         series_id: z.string().uuid('系列 ID 格式不正確').nullable().optional(),
+        combo_deal_id: z.string().uuid('組合優惠 ID 格式不正確').nullable().optional(), // 🆕 Feature 021: 組合優惠連結
       })
     )
     .min(0, '圖片陣列不可為 undefined') // 允許空陣列（新建區塊時）

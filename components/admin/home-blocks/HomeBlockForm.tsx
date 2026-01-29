@@ -44,7 +44,7 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // 圖片輪播 Config（支援橫向 16:9 和直向 4:5）
-  const [carouselImages, setCarouselImages] = useState<Array<{ url: string; series_id?: string | null }>>(
+  const [carouselImages, setCarouselImages] = useState<Array<{ url: string; series_id?: string | null; combo_deal_id?: string | null }>>(
     (initialData?.block_type === 'image_carousel' || initialData?.block_type === 'image_carousel_portrait')
       ? (initialData.config as ImageCarouselConfig).images
       : []

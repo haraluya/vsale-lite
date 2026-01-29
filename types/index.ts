@@ -675,6 +675,7 @@ export interface ImageCarouselConfig {
   images: Array<{
     url: string                  // 圖片 URL（Supabase Storage 公開 URL）
     series_id?: string | null    // 可選：連結到系列頁面的 UUID
+    combo_deal_id?: string | null // 🆕 Feature 021: 可選：連結到組合優惠頁面的 UUID
     width?: number               // 可選：圖片原始寬度（px）
     height?: number              // 可選：圖片原始高度（px）
   }>

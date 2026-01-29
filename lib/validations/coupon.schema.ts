@@ -88,6 +88,9 @@ export const createCouponSchema = z
     valid_until: z.string().datetime('生效結束時間格式錯誤'),
     tier_restrictions: z.array(z.string().uuid()).optional().default([]),
     series_restrictions: z.array(z.string().uuid()).optional().default([]),
+    // 🆕 Feature 021: 組合優惠限制
+    combo_restrictions: z.array(z.string().uuid()).optional().default([]),
+    combo_apply_all: z.boolean().optional().default(false), // true = 插入 combo_deal_id = NULL
   })
   .refine(
     (data) => {
@@ -141,6 +144,9 @@ export const updateCouponSchema = z.object({
   status: z.enum(['active', 'inactive']).optional(),
   tier_restrictions: z.array(z.string().uuid()).optional(),
   series_restrictions: z.array(z.string().uuid()).optional(),
+  // 🆕 Feature 021: 組合優惠限制
+  combo_restrictions: z.array(z.string().uuid()).optional(),
+  combo_apply_all: z.boolean().optional(),
 })
 
 /**
@@ -160,12 +166,17 @@ export const claimCouponSchema = z.object({
 /**
  * 驗證優惠券 Schema (含購物車資料)
  *
+ * @feature 021-combo-deals: 新增 comboDeals 參數
+ *
  * @example
  * ```typescript
  * const validation = validateCouponSchema.safeParse({
  *   couponCode: 'WELCOME100',
  *   cartItems: [
  *     { product_id: 'p1', series_id: 's1', price: 300, quantity: 2 },
+ *   ],
+ *   comboDeals: [
+ *     { id: 'cd1', combo_deal_id: 'combo1', combo_deal_name: '組合優惠', ... },
  *   ],
  * });
  * ```
@@ -180,6 +191,18 @@ export const validateCouponSchema = z.object({
       quantity: z.number().positive(),
     })
   ),
+  // 🆕 Feature 021: 組合優惠支援
+  comboDeals: z.array(
+    z.object({
+      id: z.string(),
+      combo_deal_id: z.string().uuid(),
+      combo_deal_name: z.string(),
+      selected_products: z.array(z.any()),
+      original_price: z.number(),
+      discounted_price: z.number(),
+      discount_amount: z.number(),
+    })
+  ).optional().default([]),
 })
 
 // ============================================================================
