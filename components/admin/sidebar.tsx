@@ -23,6 +23,7 @@ import {
   DollarSign,
   ShoppingBag,
   Ticket,
+  Gift,
   Megaphone,
   UserCog,
   FileText,
@@ -71,6 +72,7 @@ const navSections: NavSection[] = [
     items: [
       { label: '訂單管理', href: '/admin/orders', icon: ShoppingBag },
       { label: '優惠券管理', href: '/admin/coupons', icon: Ticket },
+      { label: '組合優惠', href: '/admin/combo-deals', icon: Gift },
       { label: '廣告管理', href: '/admin/announcements', icon: Megaphone },
     ],
   },

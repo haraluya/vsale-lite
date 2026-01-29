@@ -5,9 +5,11 @@
  * Feature: 004-cart-and-orders (US1 - 客戶加入商品到購物車)
  * Feature: 009-coupon-system (優惠券折扣顯示)
  * Feature: 011-shipping-and-order-edit (US2 - 訂單建立時自動計算運費)
+ * Feature: 021-combo-deals (Phase 7 - T061 - 組合優惠折扣顯示)
  *
  * 購物車摘要元件
  * - 顯示總金額、總數量
+ * - 顯示組合優惠折扣（分項顯示）
  * - 顯示優惠券折扣（如果有）
  * - 顯示運費預覽（自動計算）
  * - 提供結帳按鈕
@@ -16,7 +18,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Ticket, Truck } from 'lucide-react'
+import { ShoppingCart, Ticket, Truck, Package } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import {
   getShippingFeeStatusText,
@@ -24,6 +26,7 @@ import {
   calculateFreeShippingGap,
   formatFreeShippingMessage,
 } from '@/lib/utils/shipping-calculator'
+import type { ComboDealCartItem } from '@/stores/cart'
 
 interface CartSummaryProps {
   totalAmount: number
@@ -31,6 +34,7 @@ interface CartSummaryProps {
   isEmpty: boolean
   couponDiscount?: number
   couponCode?: string
+  comboDeals?: ComboDealCartItem[] // 🆕 Feature 021: 組合優惠項目
   onOpenCouponSelector?: () => void
 }
 
@@ -40,11 +44,18 @@ export function CartSummary({
   isEmpty,
   couponDiscount = 0,
   couponCode,
+  comboDeals = [], // 🆕 Feature 021
   onOpenCouponSelector,
 }: CartSummaryProps) {
   const [shippingFee, setShippingFee] = useState<number | null>(null)
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null)
   const [isLoadingShipping, setIsLoadingShipping] = useState(true)
+
+  // 🆕 Feature 021: 計算組合優惠總折扣
+  const totalComboDiscount = comboDeals.reduce(
+    (sum, item) => sum + item.discount_amount,
+    0
+  )
 
   // 計算運費
   useEffect(() => {
@@ -107,8 +118,8 @@ export function CartSummary({
   const freeShippingGap = calculateFreeShippingGap(totalAmount, freeShippingThreshold)
   const freeShippingMessage = formatFreeShippingMessage(freeShippingGap)
 
-  // 計算最終總金額
-  const finalAmount = totalAmount - couponDiscount + (shippingFee ?? 0)
+  // 🆕 Feature 021: 計算最終總金額（含組合優惠折扣）
+  const finalAmount = totalAmount - totalComboDiscount - couponDiscount + (shippingFee ?? 0)
 
   return (
     <div className="sticky top-24 rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
@@ -128,6 +139,19 @@ export function CartSummary({
             NT$ {totalAmount.toLocaleString()}
           </span>
         </div>
+
+        {/* 🆕 Feature 021: 組合優惠折扣 */}
+        {comboDeals.map((item) => (
+          <div key={item.id} className="flex items-center justify-between pb-2">
+            <span className="text-sm text-green-600 font-bold flex items-center gap-1">
+              <Package className="inline w-4 h-4" />
+              組合優惠 ({item.combo_deal_name})
+            </span>
+            <span className="text-lg font-bold text-green-600">
+              - NT$ {item.discount_amount.toLocaleString()}
+            </span>
+          </div>
+        ))}
 
         {/* 優惠券折扣 */}
         {couponDiscount > 0 && couponCode && (

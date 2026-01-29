@@ -15,6 +15,7 @@ export const orderStatusSchema = z.enum([
 ])
 
 // 建立訂單
+// Feature 021: 新增組合優惠項目支援 (Phase 7 - T064)
 export const createOrderSchema = z.object({
   items: z.array(
     z.object({
@@ -23,8 +24,29 @@ export const createOrderSchema = z.object({
         .int('數量必須為整數')
         .positive('數量必須大於 0'),
     })
-  ).min(1, '訂單至少需要一個商品')
-    .max(50, '單筆訂單商品項目不得超過 50 項'),
+  ).max(50, '單筆訂單商品項目不得超過 50 項')
+    .default([]), // 🆕 改為非必填，允許空陣列（當只有組合優惠時）
+
+  // 🆕 Feature 021: 組合優惠項目
+  comboDealItems: z.array(
+    z.object({
+      comboDealId: z.string().uuid('無效的組合優惠 ID'),
+      comboDealName: z.string().min(1, '組合優惠名稱不得為空'),
+      selectedProducts: z.array(
+        z.object({
+          product_id: z.string().uuid('無效的商品 ID'),
+          series_id: z.string().uuid('無效的系列 ID'),
+          quantity: z.number()
+            .int('數量必須為整數')
+            .positive('數量必須大於 0'),
+        })
+      ).min(1, '組合優惠至少需要一個商品'),
+      originalPrice: z.number().nonnegative('原價不得為負數'),
+      discountedPrice: z.number().nonnegative('優惠價不得為負數'),
+      discountAmount: z.number().nonnegative('折扣金額不得為負數'),
+    })
+  ).max(10, '單筆訂單組合優惠不得超過 10 項')
+    .default([]), // 預設為空陣列
 
   notes: z.string()
     .max(500, '備註不得超過 500 字')
@@ -35,7 +57,14 @@ export const createOrderSchema = z.object({
   userCouponId: z.string().uuid('無效的優惠券 ID')
     .optional()
     .nullable(),
-})
+}).refine(
+  // 🆕 確保至少有一般商品或組合優惠項目
+  (data) => data.items.length > 0 || data.comboDealItems.length > 0,
+  {
+    message: '訂單至少需要一個商品或組合優惠',
+    path: ['items'],
+  }
+)
 
 // 更新訂單狀態
 // Feature 011: 僅允許特定狀態轉換 (shipping→completed)

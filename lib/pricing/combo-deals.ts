@@ -17,7 +17,7 @@ import type {
 // -----------------------------------------------------
 
 /**
- * 計算組合優惠的價格
+ * 計算組合優惠的價格（使用價格映射表）
  * @param selectedProducts - 選擇的商品列表（含數量）
  * @param tierPrices - 商品等級價格映射表（product_id => price）
  * @param comboDeal - 組合優惠資料
@@ -27,18 +27,61 @@ export function calculateComboDealPrice(
   selectedProducts: SelectedProduct[],
   tierPrices: Map<string, number>,
   comboDeal: Pick<ComboDeal, 'discount_type' | 'discount_value'>
+): ComboDealPricing;
+
+/**
+ * 計算組合優惠的價格（商品已包含價格）
+ * @param selectedProducts - 選擇的商品列表（含數量和價格）
+ * @param discountType - 折扣類型
+ * @param discountValue - 折扣值
+ * @returns 價格計算結果
+ */
+export function calculateComboDealPrice(
+  selectedProducts: Array<{ quantity: number; unit_price: number }>,
+  discountType: DiscountType,
+  discountValue: number
+): ComboDealPricing;
+
+/**
+ * 計算組合優惠的價格（實作）
+ */
+export function calculateComboDealPrice(
+  selectedProducts: any[],
+  secondParam: any,
+  thirdParam?: any
 ): ComboDealPricing {
-  // 計算原價總和（基於等級價格）
-  const originalPrice = selectedProducts.reduce((sum, product) => {
-    const tierPrice = tierPrices.get(product.product_id) || 0;
-    return sum + tierPrice * product.quantity;
-  }, 0);
+  let originalPrice: number;
+  let discountType: DiscountType;
+  let discountValue: number;
+
+  // 判斷呼叫方式
+  if (secondParam instanceof Map) {
+    // 使用價格映射表
+    const tierPrices = secondParam as Map<string, number>;
+    const comboDeal = thirdParam as Pick<ComboDeal, 'discount_type' | 'discount_value'>;
+
+    originalPrice = selectedProducts.reduce((sum, product) => {
+      const tierPrice = tierPrices.get(product.product_id) || 0;
+      return sum + tierPrice * product.quantity;
+    }, 0);
+
+    discountType = comboDeal.discount_type;
+    discountValue = comboDeal.discount_value;
+  } else {
+    // 商品已包含價格
+    originalPrice = selectedProducts.reduce((sum, product) => {
+      return sum + product.unit_price * product.quantity;
+    }, 0);
+
+    discountType = secondParam as DiscountType;
+    discountValue = thirdParam as number;
+  }
 
   // 套用組合折扣
   const { discountedPrice, discountAmount } = applyDiscount(
     originalPrice,
-    comboDeal.discount_type,
-    comboDeal.discount_value
+    discountType,
+    discountValue
   );
 
   return {

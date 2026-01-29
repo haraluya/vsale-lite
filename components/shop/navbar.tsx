@@ -16,7 +16,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { CurrentUser } from '@/types'
-import { LogOut, User, ShoppingCart, Package, Ticket } from 'lucide-react'
+import { LogOut, User, ShoppingCart, Package, Ticket, Gift } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
 import { Logo } from '@/components/ui/logo'
 import { designTokens } from '@/lib/design-tokens'
@@ -95,11 +95,29 @@ export function Navbar({ user }: NavbarProps) {
 
           {/* 功能按鈕區域 */}
           <div className="flex items-center gap-2 md:gap-4">
+            {/* 優惠活動按鈕 */}
+            <Link
+              href="/store/promotions"
+              className={cn(
+                "flex items-center gap-2 rounded-none bg-yellow-100 font-bold transition-all",
+                designTokens.neoBrutalism.border.full,
+                "border-black",
+                designTokens.neoBrutalism.shadow.mobile,
+                "md:shadow-neo",
+                designTokens.neoBrutalism.hover,
+                "px-3 py-2 md:px-4",
+                "min-h-[44px] min-w-[44px]"  // WCAG 2.1 AA 觸控目標
+              )}
+            >
+              <Gift className="h-4 w-4 md:h-5 md:w-5" />
+              <span className="hidden sm:inline">優惠活動</span>
+            </Link>
+
             {/* 我的訂單按鈕 */}
             <Link
               href="/store/orders"
               className={cn(
-                "flex items-center gap-2 rounded-none bg-yellow-100 font-bold transition-all",
+                "flex items-center gap-2 rounded-none bg-blue-100 font-bold transition-all",
                 designTokens.neoBrutalism.border.full,
                 "border-black",
                 designTokens.neoBrutalism.shadow.mobile,
