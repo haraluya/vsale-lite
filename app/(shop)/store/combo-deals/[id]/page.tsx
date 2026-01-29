@@ -20,14 +20,18 @@ import { Loader2 } from 'lucide-react'
 export const dynamic = 'force-dynamic'
 
 interface PageProps {
-  params: { id: string }
-  searchParams: { edit?: string; cart_item_id?: string } // 🆕 Phase 7: 編輯模式參數
+  params: Promise<{ id: string }> // Next.js 15: params 必須是 Promise
+  searchParams: Promise<{ edit?: string; cart_item_id?: string }> // Next.js 15: searchParams 必須是 Promise
 }
 
 export default async function ComboDealDetailPage({
   params,
   searchParams,
 }: PageProps) {
+  // Next.js 15: await params 和 searchParams
+  const resolvedParams = await params
+  const resolvedSearchParams = await searchParams
+
   const supabase = await createClient()
 
   const {
@@ -39,7 +43,7 @@ export default async function ComboDealDetailPage({
   }
 
   // 取得組合優惠詳情
-  const result = await getComboDealDetailForClient(params.id)
+  const result = await getComboDealDetailForClient(resolvedParams.id)
 
   if (!result.success || !result.data) {
     return (
@@ -57,8 +61,8 @@ export default async function ComboDealDetailPage({
   const comboDeal = result.data
 
   // 🆕 Phase 7: 檢查是否為編輯模式
-  const editMode = searchParams.edit === 'true'
-  const cartItemId = searchParams.cart_item_id || null
+  const editMode = resolvedSearchParams.edit === 'true'
+  const cartItemId = resolvedSearchParams.cart_item_id || null
 
   // 組合模式文字
   const modeText = comboDeal.combo_mode === 'each' ? '各選組合' : '任選組合'

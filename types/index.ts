@@ -725,3 +725,8 @@ export type UpdateHomeBlockInput = {
   config?: ImageCarouselConfig | ProductDisplayConfig | TextBlockConfig
   is_active?: boolean
 }
+
+// ===================================
+// Feature 021: 組合優惠系統型別
+// ===================================
+export * from './combo-deals'

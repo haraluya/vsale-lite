@@ -84,7 +84,7 @@ export function ProductSelectorClient({
           designTokens.neoBrutalism.border.full,
           'border-red-600',
           'p-6 text-center',
-          designTokens.neoBrutalism.shadow.sm
+          designTokens.neoBrutalism.shadow.mobile
         )}
       >
         <AlertCircle className="mx-auto mb-3 h-12 w-12 text-red-600" />
@@ -96,7 +96,7 @@ export function ProductSelectorClient({
             'mt-4 inline-block rounded-none bg-blue-400 font-bold transition-all',
             designTokens.neoBrutalism.border.full,
             'border-black',
-            designTokens.neoBrutalism.shadow.sm,
+            designTokens.neoBrutalism.shadow.mobile,
             designTokens.neoBrutalism.hover,
             'px-6 py-3'
           )}

@@ -20,21 +20,21 @@ export const comboDealSchema = z
     poster_url: z.string().url('請上傳海報圖片'),
 
     combo_mode: z.enum(['each', 'mix_match'], {
-      required_error: '請選擇組合模式',
+      message: '請選擇組合模式',
     }),
 
     discount_type: z.enum(['fixed', 'percentage'], {
-      required_error: '請選擇折扣方式',
+      message: '請選擇折扣方式',
     }),
 
     discount_value: z.number().positive('折扣值必須大於 0'),
 
     start_date: z.date({
-      required_error: '請選擇活動開始日期',
+      message: '請選擇活動開始日期',
     }),
 
     end_date: z.date({
-      required_error: '請選擇活動結束日期',
+      message: '請選擇活動結束日期',
     }),
 
     series: z

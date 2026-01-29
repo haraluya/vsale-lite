@@ -52,15 +52,15 @@ export function ProductSelector({
       return initialSelection.map((item) => {
         // 從 comboDeal 中找出對應的商品和系列資訊
         for (const series of comboDeal.series) {
-          const product = series.products.find((p) => p.id === item.product_id)
+          const product = series.products.find((p) => p.product_id === item.product_id)
           if (product) {
             return {
               product_id: item.product_id,
-              product_name: product.name,
+              product_name: product.product_name,
               series_id: item.series_id,
               series_name: series.series_name,
               quantity: item.quantity,
-              unit_price: product.price,
+              unit_price: product.tier_price,
             }
           }
         }
@@ -267,21 +267,21 @@ export function ProductSelector({
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {series.products.map((product) => {
-                const isSelected = isProductSelected(product.id)
+                const isSelected = isProductSelected(product.product_id)
                 const canSelect =
                   !isSelected && seriesSelectedCount < requiredQuantity
 
                 return (
                   <button
-                    key={product.id}
+                    key={product.product_id}
                     onClick={() =>
                       canSelect || isSelected
                         ? handleToggleProduct(
-                            product.id,
-                            product.name,
+                            product.product_id,
+                            product.product_name,
                             series.series_id,
                             series.series_name,
-                            product.price,
+                            product.tier_price,
                             requiredQuantity
                           )
                         : null
@@ -305,10 +305,10 @@ export function ProductSelector({
 
                     {/* 商品圖片 */}
                     <div className="relative w-full aspect-square bg-gray-100 mb-2 overflow-hidden">
-                      {product.image_url ? (
+                      {product.product_image ? (
                         <Image
-                          src={product.image_url}
-                          alt={product.name}
+                          src={product.product_image}
+                          alt={product.product_name}
                           fill
                           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                           className="object-cover"
@@ -322,12 +322,12 @@ export function ProductSelector({
 
                     {/* 商品名稱 */}
                     <h4 className="text-sm md:text-base font-bold text-foreground mb-1 line-clamp-2 min-h-[2.5em]">
-                      {product.name}
+                      {product.product_name}
                     </h4>
 
                     {/* 商品價格 */}
                     <p className="text-sm md:text-base font-bold text-blue-600">
-                      ${product.price}
+                      ${product.tier_price}
                     </p>
 
                     {/* 庫存狀態 */}
@@ -388,12 +388,12 @@ export function ProductSelector({
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                 {series.products.map((product) => {
-                  const quantity = getProductQuantity(product.id)
+                  const quantity = getProductQuantity(product.product_id)
                   const canIncrease = !isLimitReached || quantity > 0
 
                   return (
                     <div
-                      key={product.id}
+                      key={product.product_id}
                       className={cn(
                         'rounded-none border-2 md:border-3 border-black bg-white p-3 shadow-neo-sm md:shadow-neo',
                         quantity > 0 && 'bg-green-50'
@@ -401,10 +401,10 @@ export function ProductSelector({
                     >
                       {/* 商品圖片 */}
                       <div className="relative w-full aspect-square bg-gray-100 mb-2 overflow-hidden">
-                        {product.image_url ? (
+                        {product.product_image ? (
                           <Image
-                            src={product.image_url}
-                            alt={product.name}
+                            src={product.product_image}
+                            alt={product.product_name}
                             fill
                             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                             className="object-cover"
@@ -418,12 +418,12 @@ export function ProductSelector({
 
                       {/* 商品名稱 */}
                       <h5 className="text-sm md:text-base font-bold text-foreground mb-1 line-clamp-2 min-h-[2.5em]">
-                        {product.name}
+                        {product.product_name}
                       </h5>
 
                       {/* 商品價格 */}
                       <p className="text-sm md:text-base font-bold text-blue-600 mb-2">
-                        ${product.price}
+                        ${product.tier_price}
                       </p>
 
                       {/* 數量選擇器 */}
@@ -431,11 +431,11 @@ export function ProductSelector({
                         <button
                           onClick={() =>
                             handleQuantityChange(
-                              product.id,
-                              product.name,
+                              product.product_id,
+                              product.product_name,
                               series.series_id,
                               series.series_name,
-                              product.price,
+                              product.tier_price,
                               -1
                             )
                           }
@@ -457,11 +457,11 @@ export function ProductSelector({
                         <button
                           onClick={() =>
                             handleQuantityChange(
-                              product.id,
-                              product.name,
+                              product.product_id,
+                              product.product_name,
                               series.series_id,
                               series.series_name,
-                              product.price,
+                              product.tier_price,
                               1
                             )
                           }

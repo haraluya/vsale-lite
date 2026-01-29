@@ -191,7 +191,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={designTokens.formElements.input}
+              className={designTokens.input.base}
               placeholder="例：夏季搭配組"
               required
               maxLength={100}
@@ -223,7 +223,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
               id="display_order"
               value={displayOrder}
               onChange={(e) => setDisplayOrder(e.target.value)}
-              className={designTokens.formElements.input}
+              className={designTokens.input.base}
               placeholder="留空則依建立時間排序"
               min="0"
             />
@@ -232,7 +232,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
       </FormSection>
 
       {/* 組合模式 */}
-      <FormSection variant="secondary" title="組合模式">
+      <FormSection variant="default" title="組合模式">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 各選模式 */}
@@ -291,7 +291,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
                 id="mix_match_total_quantity"
                 value={mixMatchTotalQuantity}
                 onChange={(e) => setMixMatchTotalQuantity(e.target.value)}
-                className={designTokens.formElements.input}
+                className={designTokens.input.base}
                 placeholder="例：3"
                 required={comboMode === 'mix_match'}
                 min="1"
@@ -372,7 +372,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
                 id="discount_value"
                 value={discountValue}
                 onChange={(e) => setDiscountValue(e.target.value)}
-                className={`${designTokens.formElements.input} flex-1`}
+                className={`${designTokens.input.base} flex-1`}
                 placeholder={discountType === 'fixed' ? '例：200' : '例：85（85 折）'}
                 required
                 min="0.01"
@@ -403,7 +403,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
               id="start_date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className={designTokens.formElements.input}
+              className={designTokens.input.base}
               required
             />
             {fieldErrors.start_date && (
@@ -421,7 +421,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
               id="end_date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className={designTokens.formElements.input}
+              className={designTokens.input.base}
               required
             />
             {fieldErrors.end_date && (

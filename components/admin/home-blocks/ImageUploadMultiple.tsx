@@ -41,7 +41,7 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
       }
 
       if (comboDealsResult.success && comboDealsResult.data) {
-        setComboDeals(comboDealsResult.data)
+        setComboDeals(comboDealsResult.data.items.map(cd => ({ id: cd.id, name: cd.name })))
       }
 
       setLoadingData(false)

@@ -209,7 +209,7 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
 
   return (
     <div className={`rounded-none border-2 md:border-3 ${borderColor} bg-white p-4 shadow-neo`}>
-      <h3 className={`${designTokens.typography.sectionTitle} mb-4`}>
+      <h3 className={`${designTokens.typography.h3} mb-4`}>
         組合優惠海報 <span className="text-red-600">*</span>
         {previewFile && <span className="ml-2 text-xs text-blue-600">(待確認)</span>}
       </h3>

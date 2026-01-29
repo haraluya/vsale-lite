@@ -229,20 +229,22 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                             designTokens.typography.body.large,
                             "font-bold text-yellow-900"
                           )}>
-                            📦 {snapshot.combo_deal_name}
+                            📦 {snapshot.name}
                           </h3>
                         </div>
 
                         {/* 商品清單 */}
                         <div className="space-y-1 mb-2 ml-7">
-                          {snapshot.selected_products.map((product, idx) => (
-                            <div key={idx} className={cn(
-                              designTokens.typography.caption,
-                              "text-gray-700"
-                            )}>
-                              • {product.product_name} × {product.quantity} ({formatCurrency(product.unit_price)})
-                            </div>
-                          ))}
+                          {snapshot.series.flatMap(series =>
+                            series.products.map((product, idx) => (
+                              <div key={`${series.series_id}-${idx}`} className={cn(
+                                designTokens.typography.caption,
+                                "text-gray-700"
+                              )}>
+                                • {product.product_name} × {product.quantity} ({formatCurrency(product.unit_price)})
+                              </div>
+                            ))
+                          )}
                         </div>
 
                         {/* 價格資訊 */}

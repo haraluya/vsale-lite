@@ -23,7 +23,7 @@ import { designTokens } from '@/lib/design-tokens'
 
 export function CheckoutContent() {
   const router = useRouter()
-  const { items, clearCart, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
+  const { items, comboDeals, clearCart, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
 
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
   const [notes, setNotes] = useState('')
@@ -92,9 +92,17 @@ export function CheckoutContent() {
         return
       }
 
-      // 2. 建立訂單（含優惠券資訊）
+      // 2. 建立訂單（含優惠券資訊與組合優惠）
       const result = await createOrder({
         items,
+        comboDealItems: comboDeals.map(deal => ({
+          comboDealId: deal.combo_deal_id,
+          comboDealName: deal.combo_deal_name,
+          selectedProducts: deal.selected_products,
+          originalPrice: deal.original_price,
+          discountedPrice: deal.discounted_price,
+          discountAmount: deal.discount_amount,
+        })),
         notes: notes.trim() || null,
         userCouponId: appliedCoupon?.user_coupon_id || null,
       })

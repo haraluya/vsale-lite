@@ -20,7 +20,8 @@ export default async function NewComboDealPage() {
   const series = seriesResult.success && seriesResult.data ? seriesResult.data : []
 
   // 載入等級資料
-  const tiers = await getTiers()
+  const tiersResult = await getTiers()
+  const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
   return (
     <div>

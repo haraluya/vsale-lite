@@ -103,7 +103,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
 
         // 🆕 Feature 021: 處理組合優惠資料
         if (comboDealsResult.success && comboDealsResult.data) {
-          setComboDeals(comboDealsResult.data.map(cd => ({ id: cd.id, name: cd.name })))
+          setComboDeals(comboDealsResult.data.items.map(cd => ({ id: cd.id, name: cd.name })))
         }
       } catch (err) {
         console.error('載入資料失敗:', err)

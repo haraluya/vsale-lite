@@ -63,7 +63,7 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
         'rounded-none bg-yellow-50',
         designTokens.neoBrutalism.border.full,
         'border-yellow-400',
-        designTokens.neoBrutalism.shadow.sm,
+        designTokens.neoBrutalism.shadow.mobile,
         'p-4 md:p-6'
       )}
     >

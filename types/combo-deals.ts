@@ -180,6 +180,7 @@ export interface ComboDealFormData {
   series: ComboDealFormSeries[];
   tier_ids: string[];
   mix_match_total_quantity?: number; // Required for mix_match mode
+  display_order?: number; // 全域顯示順位（選填）
 }
 
 // -----------------------------------------------------
