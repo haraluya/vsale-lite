@@ -1,0 +1,35 @@
+# Node.js dependencies
+node_modules/
+
+# Next.js build outputs
+.next/
+out/
+build/
+dist/
+
+# Testing
+coverage/
+
+# Minified files
+*.min.js
+
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
+
+# Vercel
+.vercel/
+
+# Vitest
+.vitest/
+
+# Supabase
+supabase/.temp/
+supabase/snippets/
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code
+.claude/
