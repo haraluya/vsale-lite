@@ -55,6 +55,7 @@
     "@types/xlsx": "^0.0.36",
     "@vercel/blob": "^2.0.0",
     "archiver": "^7.0.1",
+    "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.9.0",
     "clsx": "^2.1.1",

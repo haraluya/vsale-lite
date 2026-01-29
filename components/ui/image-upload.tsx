@@ -11,12 +11,14 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Upload, X, Loader2 } from 'lucide-react'
-import { uploadProductImage, deleteProductImage } from '@/lib/actions/products'
+import { deleteProductImage, updateProductImageUrl } from '@/lib/actions/products'
+import { uploadProductImageDirect } from '@/lib/supabase/client-upload'
+import { compressProductImage, shouldCompress } from '@/lib/utils/image-compression'
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/lib/contexts/dialog-context'
 
 /**
- * 為 Promise 添加超時保護
+ * 為 Promise 添加超時保護（保留用於刪除功能）
  */
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return Promise.race([
@@ -25,6 +27,23 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
       setTimeout(() => reject(new Error('操作超時，請檢查網路連線後重試')), timeoutMs)
     ),
   ])
+}
+
+/**
+ * 格式化上傳狀態文字
+ */
+function getUploadStatusText(
+  isCompressing: boolean,
+  isUploading: boolean,
+  progress: number
+): string {
+  if (isCompressing) return '壓縮中...'
+  if (isUploading) {
+    if (progress < 10) return '準備上傳...'
+    if (progress < 90) return `上傳中... ${Math.round(progress)}%`
+    return '更新資料庫...'
+  }
+  return '上傳中...'
 }
 
 interface ImageUploadProps {
@@ -43,6 +62,8 @@ export function ImageUpload({
   const confirm = useConfirm()
   const [imageUrl, setImageUrl] = useState<string | null>(currentImageUrl || null)
   const [uploading, setUploading] = useState(false)
+  const [isCompressing, setIsCompressing] = useState(false)
+  const [progress, setProgress] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -52,30 +73,58 @@ export function ImageUpload({
 
     setError(null)
     setUploading(true)
+    setProgress(0)
 
     try {
-      // 添加 120 秒前端超時保護（後端重試總時間：30s × 3 + 延遲 7s = 97s）
-      const result = await withTimeout(
-        uploadProductImage(productId, file),
-        120000  // 120 秒（足夠完成 3 次重試）
+      let fileToUpload = file
+
+      // 1. 壓縮圖片（如果需要）
+      if (shouldCompress(file)) {
+        setIsCompressing(true)
+        console.log('🗜️ 圖片大小超過 1.5MB，開始壓縮...')
+        fileToUpload = await compressProductImage(file)
+        setIsCompressing(false)
+        setProgress(5)
+      }
+
+      // 2. 直接上傳至 Supabase Storage
+      console.log('📤 開始直接上傳至 Supabase Storage...')
+      const uploadResult = await uploadProductImageDirect(
+        productId,
+        fileToUpload,
+        (uploadProgress) => {
+          // 進度：5-90%
+          setProgress(5 + uploadProgress * 0.85)
+        }
       )
 
-      if (result.success && result.data?.url) {
-        setImageUrl(result.data.url)
-        onUploadSuccess?.(result.data.url)
-      } else {
-        setError(result.message || '上傳失敗')
+      if (!uploadResult.success || !uploadResult.url) {
+        setError(uploadResult.error || '上傳失敗')
+        return
       }
+
+      setProgress(90)
+
+      // 3. 呼叫 Server Action 更新資料庫
+      console.log('💾 更新資料庫 image_url...')
+      const updateResult = await updateProductImageUrl(productId, uploadResult.url)
+
+      if (!updateResult.success) {
+        setError(updateResult.message || '更新資料庫失敗')
+        return
+      }
+
+      setProgress(100)
+      setImageUrl(uploadResult.url)
+      onUploadSuccess?.(uploadResult.url)
+      console.log('✅ 圖片上傳完成!')
     } catch (err) {
-      // 區分超時錯誤與其他錯誤
-      if (err instanceof Error && err.message.includes('超時')) {
-        setError(err.message)
-      } else {
-        setError('上傳失敗，請稍後再試')
-      }
+      setError('上傳失敗，請稍後再試')
       console.error('Image upload error:', err)
     } finally {
       setUploading(false)
+      setIsCompressing(false)
+      setProgress(0)
       // 清除檔案輸入，允許重複上傳同檔案
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
@@ -153,7 +202,7 @@ export function ImageUpload({
               {uploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  上傳中...
+                  {getUploadStatusText(isCompressing, uploading, progress)}
                 </>
               ) : (
                 <>
@@ -183,7 +232,24 @@ export function ImageUpload({
           {uploading ? (
             <>
               <Loader2 className="h-12 w-12 animate-spin text-gray-400" />
-              <p className="mt-4 text-sm font-bold text-gray-600">上傳中...</p>
+              <p className="mt-4 text-sm font-bold text-gray-600">
+                {getUploadStatusText(isCompressing, uploading, progress)}
+              </p>
+              {progress > 0 && !isCompressing && (
+                <div className="mt-4 w-full max-w-xs">
+                  {/* Neo-Brutalism 進度條 */}
+                  <div className="h-6 w-full rounded-none border-2 border-black bg-white shadow-neo-sm overflow-hidden">
+                    <div
+                      className="h-full bg-purple-500 transition-all duration-300"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-center text-xs text-gray-500">
+                    {Math.round(progress)}%
+                  </p>
+                </div>
+              )}
+              <p className="mt-2 text-xs text-gray-500">大檔案可能需要 30-60 秒，請耐心等候</p>
             </>
           ) : (
             <>

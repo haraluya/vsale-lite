@@ -946,6 +946,93 @@ export async function uploadProductImage(
 }
 
 /**
+ * 更新商品圖片 URL（配合客戶端直接上傳）
+ * Feature: 圖片上傳超時問題改善
+ *
+ * @param productId 商品 ID
+ * @param imageUrl 新的圖片 URL（來自 Supabase Storage）
+ * @returns 更新結果
+ *
+ * @example
+ * ```typescript
+ * // 前端直接上傳後，呼叫此函式更新資料庫
+ * const result = await uploadProductImageDirect(productId, file)
+ * if (result.success) {
+ *   await updateProductImageUrl(productId, result.url)
+ * }
+ * ```
+ */
+export async function updateProductImageUrl(
+  productId: string,
+  imageUrl: string
+): Promise<ActionResult<void>> {
+  try {
+    // 1. 驗證權限
+    await checkAuth('admin')
+
+    // 2. 驗證輸入
+    if (!productId || !imageUrl) {
+      return {
+        success: false,
+        message: '商品 ID 與圖片 URL 不可為空',
+      }
+    }
+
+    // 使用 Admin Client 繞過 RLS
+    const adminClient = createAdminClient()
+
+    // 3. 檢查商品是否存在
+    const { data: product } = await adminClient
+      .from('products')
+      .select('id')
+      .eq('id', productId)
+      .single()
+
+    if (!product) {
+      return {
+        success: false,
+        message: '商品不存在',
+      }
+    }
+
+    // 4. 更新圖片 URL
+    const { error } = await adminClient
+      .from('products')
+      .update({ image_url: imageUrl })
+      .eq('id', productId)
+
+    if (error) {
+      console.error('更新商品圖片 URL 失敗:', error)
+      return {
+        success: false,
+        message: '更新失敗',
+      }
+    }
+
+    // 5. 重新驗證快取
+    revalidateTag('products')
+    revalidateTag(`product:${productId}`)
+
+    return {
+      success: true,
+      message: '圖片 URL 更新成功',
+    }
+  } catch (error: unknown) {
+    console.error('updateProductImageUrl error:', error)
+    if (error instanceof Error) {
+      return {
+        success: false,
+        message: error.message,
+      }
+    }
+    return {
+      success: false,
+      message: '更新圖片 URL 失敗',
+    }
+  }
+}
+
+/**
  * 根據商品 ID 陣列查詢商品（用於批次標籤管理）
  * Feature: 006-ux-enhancement (US9)
  */
