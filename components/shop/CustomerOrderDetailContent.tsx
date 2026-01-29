@@ -1,10 +1,12 @@
 /**
  * Customer Order Detail Content (Client Component)
  * Feature: 004-cart-and-orders (US2, US4)
+ * Feature: 021-combo-deals (Phase 7 - T066)
  *
  * 客戶訂單詳情頁面內容
  * - 顯示訂單完整資訊
  * - 顯示訂單明細與總金額
+ * - 顯示組合優惠項目（黃色背景標示）
  * - RLS 自動確保客戶只能看到自己的訂單
  */
 
@@ -22,6 +24,7 @@ import { formatDateTW } from '@/lib/date-utils'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { designTokens } from '@/lib/design-tokens'
+import { Package } from 'lucide-react'  // 🆕 Feature 021
 
 interface Props {
   orderId: string
@@ -209,6 +212,63 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
               "mb-4"
             )}>訂單商品</h2>
             <div className={designTokens.spacing.card.gap}>
+              {/* 🆕 Feature 021: 組合優惠項目 */}
+              {order.combo_deal_items && order.combo_deal_items.length > 0 && (
+                <>
+                  {order.combo_deal_items.map((comboDealItem) => {
+                    const snapshot = comboDealItem.combo_deal_snapshot
+                    return (
+                      <div
+                        key={comboDealItem.id}
+                        className="rounded-none bg-yellow-50 border-2 border-yellow-400 p-3 md:p-4 mb-3 md:mb-4 last:mb-0"
+                      >
+                        {/* 組合優惠標題 */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <Package className="w-5 h-5 text-yellow-700 flex-shrink-0" />
+                          <h3 className={cn(
+                            designTokens.typography.body.large,
+                            "font-bold text-yellow-900"
+                          )}>
+                            📦 {snapshot.combo_deal_name}
+                          </h3>
+                        </div>
+
+                        {/* 商品清單 */}
+                        <div className="space-y-1 mb-2 ml-7">
+                          {snapshot.selected_products.map((product, idx) => (
+                            <div key={idx} className={cn(
+                              designTokens.typography.caption,
+                              "text-gray-700"
+                            )}>
+                              • {product.product_name} × {product.quantity} ({formatCurrency(product.unit_price)})
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* 價格資訊 */}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ml-7">
+                          <div className={cn(
+                            designTokens.typography.caption,
+                            "text-gray-600"
+                          )}>
+                            原價: <span className="line-through">{formatCurrency(comboDealItem.original_price)}</span>
+                            {' '}→ 折扣 {formatCurrency(comboDealItem.discount_amount)}
+                          </div>
+                          <div className="text-left sm:text-right">
+                            <p className={cn(
+                              "text-lg md:text-xl font-bold text-green-600"
+                            )}>
+                              {formatCurrency(comboDealItem.discounted_price)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </>
+              )}
+
+              {/* 一般商品項目 */}
               {order.items.map((item) => (
                 <div
                   key={item.id}

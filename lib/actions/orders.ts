@@ -23,10 +23,13 @@ import type {
   OrderTimelineWithActor,
 } from '@/types'
 import { logAudit } from './audit'
+import { createComboDealSnapshot } from '@/lib/utils/combo-deal-snapshot'
+import type { ComboDealSnapshot } from '@/types/combo-deals'
 
 /**
  * 訂單管理 Server Actions
  * Feature: 004-cart-and-orders
+ * Feature: 021-combo-deals (Phase 7 - T064-T065)
  */
 
 /**
@@ -62,7 +65,7 @@ export async function createOrder(
       }
     }
 
-    const { items, notes, userCouponId } = validated.data
+    const { items, notes, userCouponId, comboDealItems = [] } = validated.data
 
     // 1. 驗證並查詢優惠券（如果有）
     let couponData: {
@@ -197,6 +200,141 @@ export async function createOrder(
       })
     }
 
+    // 🆕 Phase 7: 計算組合優惠總額
+    let comboDealTotalAmount = 0
+    const comboDealSnapshotsData: Array<{
+      comboDealId: string
+      snapshot: ComboDealSnapshot
+      originalPrice: number
+      discountedPrice: number
+      discountAmount: number
+      productIds: string[]
+    }> = []
+
+    // 處理組合優惠項目
+    for (const comboDealItem of comboDealItems) {
+      // 查詢組合優惠詳情（用於建立快照）
+      const { data: comboDeal, error: comboDealError } = await supabase
+        .from('combo_deals')
+        .select(`
+          id,
+          name,
+          combo_mode,
+          discount_type,
+          discount_value,
+          combo_deal_series(
+            series_id,
+            required_quantity,
+            display_order,
+            series:series(name)
+          )
+        `)
+        .eq('id', comboDealItem.comboDealId)
+        .single()
+
+      if (comboDealError || !comboDeal) {
+        return {
+          success: false,
+          message: `組合優惠「${comboDealItem.comboDealName}」不存在或已失效`,
+        }
+      }
+
+      // 查詢任選模式配置（如果適用）
+      let mixMatchTotalQuantity: number | undefined
+      if (comboDeal.combo_mode === 'mix_match') {
+        const { data: mixMatchConfig } = await supabase
+          .from('combo_deal_mix_match_config')
+          .select('total_quantity')
+          .eq('combo_deal_id', comboDeal.id)
+          .single()
+
+        mixMatchTotalQuantity = mixMatchConfig?.total_quantity
+      }
+
+      // 建立商品價格對照表（用於快照）
+      const selectedProductIds = comboDealItem.selectedProducts.map(p => p.product_id)
+      const { data: selectedProductsData } = await supabase
+        .from('products')
+        .select(`
+          id,
+          name,
+          code,
+          series_id,
+          retail_price,
+          tier_prices(price, tier_id)
+        `)
+        .in('id', selectedProductIds)
+
+      const tierPrices = new Map<string, number>()
+      selectedProductsData?.forEach(product => {
+        const tierPriceData = (product.tier_prices as any)?.find((tp: any) => tp.tier_id === tierId)
+        const price = tierPriceData?.price ?? product.retail_price
+        if (price !== null && price !== undefined) {
+          tierPrices.set(product.id, price)
+        }
+      })
+
+      // 轉換為 ComboDealWithDetails 格式（簡化版）
+      const comboDealWithDetails = {
+        id: comboDeal.id,
+        name: comboDeal.name,
+        combo_mode: comboDeal.combo_mode,
+        discount_type: comboDeal.discount_type,
+        discount_value: comboDeal.discount_value,
+        series: (comboDeal.combo_deal_series as any[]).map(cds => ({
+          series_id: cds.series_id,
+          series_name: (cds.series as any)?.name || '',
+          required_quantity: cds.required_quantity,
+          display_order: cds.display_order,
+          products: selectedProductsData
+            ?.filter(p => p.series_id === cds.series_id)
+            .map(p => ({
+              product_id: p.id,
+              product_name: p.name,
+              product_code: (p as any).code,
+            })) || [],
+        })),
+        mix_match_total_quantity: mixMatchTotalQuantity,
+      }
+
+      // 轉換 selectedProducts 格式
+      const selectedProducts = comboDealItem.selectedProducts.map(sp => {
+        const product = selectedProductsData?.find(p => p.id === sp.product_id)
+        return {
+          product_id: sp.product_id,
+          series_id: sp.series_id,
+          quantity: sp.quantity,
+          product_name: product?.name || '',
+          unit_price: tierPrices.get(sp.product_id) || 0,
+        }
+      })
+
+      // 建立快照
+      const snapshot = createComboDealSnapshot(
+        comboDealWithDetails as any,
+        selectedProducts as any,
+        tierPrices,
+        {
+          originalPrice: comboDealItem.originalPrice,
+          discountedPrice: comboDealItem.discountedPrice,
+          discountAmount: comboDealItem.discountAmount,
+        }
+      )
+
+      // 累加組合優惠金額（使用優惠後價格）
+      comboDealTotalAmount += comboDealItem.discountedPrice
+
+      // 儲存快照資料（稍後插入資料庫）
+      comboDealSnapshotsData.push({
+        comboDealId: comboDeal.id,
+        snapshot,
+        originalPrice: comboDealItem.originalPrice,
+        discountedPrice: comboDealItem.discountedPrice,
+        discountAmount: comboDealItem.discountAmount,
+        productIds: selectedProductIds,
+      })
+    }
+
     // 5. 計算優惠券折扣（如果有）
     if (couponData) {
       if (couponData.discount_type === 'fixed') {
@@ -227,11 +365,13 @@ export async function createOrder(
 
     const orderNumber = orderNumberData as string
 
-    // 7. 計算運費（使用原始商品金額，不扣除優惠券折扣）
+    // 7. 計算運費（使用原始商品金額 + 組合優惠優惠後金額，不扣除優惠券折扣）
+    const subtotalForShipping = totalAmount + comboDealTotalAmount
+
     const { data: shippingFeeData, error: shippingFeeError } = await supabase
       .rpc('calculate_shipping_fee', {
         p_user_id: userId,
-        p_subtotal: totalAmount,
+        p_subtotal: subtotalForShipping, // 🆕 包含組合優惠
       })
 
     if (shippingFeeError) {
@@ -243,10 +383,10 @@ export async function createOrder(
 
     const shippingFee = (shippingFeeData as number) || 0
 
-    // 8. 建立訂單主表（訂單總額 = 商品金額 - 優惠券折扣 + 運費）
+    // 8. 建立訂單主表（訂單總額 = 商品金額 + 組合優惠金額 - 優惠券折扣 + 運費）
     const finalTotalAmount = couponData
-      ? totalAmount - couponData.discount_amount + shippingFee
-      : totalAmount + shippingFee
+      ? totalAmount + comboDealTotalAmount - couponData.discount_amount + shippingFee
+      : totalAmount + comboDealTotalAmount + shippingFee
 
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -339,6 +479,32 @@ export async function createOrder(
       }
     }
 
+    // 🆕 Phase 7: 建立組合優惠訂單記錄
+    if (comboDealSnapshotsData.length > 0) {
+      const comboDealOrderItems = comboDealSnapshotsData.map(item => ({
+        order_id: order.id,
+        combo_deal_id: item.comboDealId,
+        combo_deal_snapshot: item.snapshot,
+        product_ids: item.productIds,
+        original_price: item.originalPrice,
+        discounted_price: item.discountedPrice,
+        discount_amount: item.discountAmount,
+      }))
+
+      const { error: comboDealItemsError } = await supabase
+        .from('order_combo_deal_items')
+        .insert(comboDealOrderItems)
+
+      if (comboDealItemsError) {
+        // 回滾訂單（CASCADE 會自動刪除 order_items 和 order_coupons）
+        await supabase.from('orders').delete().eq('id', order.id)
+        return {
+          success: false,
+          message: '建立組合優惠訂單記錄時發生錯誤',
+        }
+      }
+    }
+
     // 11. 建立訂單歷史記錄
     const { error: timelineError } = await supabase
       .from('order_timelines')
@@ -360,12 +526,18 @@ export async function createOrder(
     revalidateTag('orders')
 
     // 建立成功訊息
-    let successMessage = `訂單建立成功!訂單編號: ${order.order_number}`
+    let successMessage = `訂單建立成功！訂單編號: ${order.order_number}`
+
+    if (comboDealItems.length > 0) {
+      successMessage += `（含 ${comboDealItems.length} 個組合優惠）`
+    }
+
     if (shippingFee > 0) {
       successMessage += `，運費 NT$ ${shippingFee}`
     } else {
       successMessage += `，免運`
     }
+
     if (couponData) {
       successMessage += `，已使用優惠券「${couponData.code}」折扣 NT$ ${couponData.discount_amount}`
     }
@@ -518,7 +690,8 @@ export async function getOrderById(
       orderItemsResult,
       orderTimelinesResult,
       orderCouponResult,
-      customFeesResult
+      customFeesResult,
+      comboDealItemsResult  // 🆕 Feature 021: 組合優惠項目
     ] = await Promise.all([
       // 查詢訂單主表
       supabase
@@ -551,6 +724,13 @@ export async function getOrderById(
       // 查詢訂單自訂費用 (Feature 011)
       supabase
         .from('order_custom_fees')
+        .select('*')
+        .eq('order_id', orderId)
+        .order('created_at', { ascending: true }),
+
+      // 查詢訂單組合優惠項目 (Feature 021)
+      supabase
+        .from('order_combo_deal_items')
         .select('*')
         .eq('order_id', orderId)
         .order('created_at', { ascending: true })
@@ -586,6 +766,7 @@ export async function getOrderById(
     const { data: orderTimelines } = orderTimelinesResult
     const { data: orderCoupon } = orderCouponResult
     const { data: customFees } = customFeesResult
+    const { data: comboDealItems } = comboDealItemsResult  // 🆕 Feature 021
 
     // 查詢客戶資料（使用 user_id）
     const selectFields = role === 'admin'
@@ -672,6 +853,18 @@ export async function getOrderById(
         amount: fee.amount,
         created_at: fee.created_at,
         created_by: fee.created_by,
+      })),
+      // 🆕 Feature 021: 組合優惠項目
+      combo_deal_items: (comboDealItems || []).map((item: any) => ({
+        id: item.id,
+        order_id: item.order_id,
+        combo_deal_id: item.combo_deal_id,
+        combo_deal_snapshot: item.combo_deal_snapshot,
+        product_ids: item.product_ids,
+        original_price: item.original_price,
+        discounted_price: item.discounted_price,
+        discount_amount: item.discount_amount,
+        created_at: item.created_at,
       })),
     }
 

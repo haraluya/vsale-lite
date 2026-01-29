@@ -319,6 +319,7 @@ export type OrderDetail = Order & {
   timelines?: OrderTimelineWithActor[]
   coupon?: OrderCoupon | null  // 🆕 Feature 009: 優惠券快照（選填）
   custom_fees?: OrderCustomFee[]  // 🆕 Feature 011: 自訂費用項目（選填）
+  combo_deal_items?: import('@/types/combo-deals').OrderComboDealItem[]  // 🆕 Feature 021: 組合優惠項目（選填）
 }
 
 // 訂單查詢參數
