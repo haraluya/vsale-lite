@@ -61,6 +61,7 @@ export function ImageUpload({
 }: ImageUploadProps) {
   const confirm = useConfirm()
   const [imageUrl, setImageUrl] = useState<string | null>(currentImageUrl || null)
+  const [imageKey, setImageKey] = useState(Date.now()) // 用於強制重新渲染
   const [uploading, setUploading] = useState(false)
   const [isCompressing, setIsCompressing] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -115,9 +116,15 @@ export function ImageUpload({
       }
 
       setProgress(100)
+
+      // 強制更新圖片 URL 和 key（繞過快取）
       setImageUrl(uploadResult.url)
+      setImageKey(Date.now())
+
+      // 通知父元件刷新
       onUploadSuccess?.(uploadResult.url)
-      console.log('✅ 圖片上傳完成!')
+
+      console.log('✅ 圖片上傳完成!', uploadResult.url)
     } catch (err) {
       setError('上傳失敗，請稍後再試')
       console.error('Image upload error:', err)
@@ -149,6 +156,7 @@ export function ImageUpload({
 
       if (result.success) {
         setImageUrl(null)
+        setImageKey(Date.now())
         onDeleteSuccess?.()
       } else {
         setError(result.message)
@@ -182,11 +190,13 @@ export function ImageUpload({
         <div className="relative">
           <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-none border-2 md:border-3 border-black shadow-neo">
             <Image
+              key={imageKey}
               src={imageUrl}
               alt="商品圖片"
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 400px"
+              unoptimized={imageUrl.includes('?t=')} // 帶時間戳的 URL 不使用最佳化
             />
           </div>
 

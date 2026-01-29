@@ -45,6 +45,19 @@ export async function uploadProductImageDirect(
   try {
     const supabase = createClient()
 
+    // 0. 檢查認證狀態
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      console.error('❌ 認證失敗:', authError)
+      return {
+        success: false,
+        error: '請重新登入後再試',
+      }
+    }
+
+    console.log('✅ 認證成功，用戶 ID:', user.id)
+
     // 1. 取得副檔名
     let ext = file.name.split('.').pop()?.toLowerCase()
 
@@ -84,10 +97,23 @@ export async function uploadProductImageDirect(
     const uploadTime = Date.now() - uploadStartTime
 
     if (uploadError) {
-      console.error('❌ 直接上傳失敗 (耗時:', uploadTime, 'ms):', uploadError)
+      console.error('❌ 直接上傳失敗 (耗時:', uploadTime, 'ms):', {
+        message: uploadError.message,
+        name: uploadError.name,
+        cause: uploadError.cause,
+      })
+
+      // 提供更友善的錯誤訊息
+      let userMessage = uploadError.message
+      if (uploadError.message?.includes('policy')) {
+        userMessage = '權限不足，請確認您是管理員帳號'
+      } else if (uploadError.message?.includes('size')) {
+        userMessage = '檔案大小超過限制'
+      }
+
       return {
         success: false,
-        error: uploadError.message,
+        error: userMessage,
       }
     }
 
@@ -96,17 +122,22 @@ export async function uploadProductImageDirect(
     // 通知進度：上傳完成
     onProgress?.(90)
 
-    // 4. 取得公開 URL
+    // 4. 取得公開 URL（添加時間戳繞過快取）
     const {
       data: { publicUrl },
     } = supabase.storage.from('products').getPublicUrl(filePath)
+
+    // 添加時間戳繞過瀏覽器快取
+    const urlWithTimestamp = `${publicUrl}?t=${Date.now()}`
+
+    console.log('🔗 圖片 URL（含時間戳）:', urlWithTimestamp)
 
     // 通知進度：完成
     onProgress?.(100)
 
     return {
       success: true,
-      url: publicUrl,
+      url: urlWithTimestamp,
     }
   } catch (error) {
     console.error('uploadProductImageDirect error:', error)
