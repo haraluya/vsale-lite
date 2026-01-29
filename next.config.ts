@@ -3,7 +3,7 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      bodySizeLimit: '5mb', // 提升至 5MB 以支援圖片上傳
+      bodySizeLimit: '3mb', // 提升至 3MB 以支援圖片上傳
     },
   },
   images: {

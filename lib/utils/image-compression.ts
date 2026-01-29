@@ -1,7 +1,7 @@
 /**
  * 客戶端圖片壓縮工具
  *
- * 使用 browser-image-compression 將圖片壓縮至 1-2MB
+ * 使用 browser-image-compression 將圖片壓縮至 1MB 以下
  * 目的：縮短上傳時間，節省網路流量
  *
  * Feature: 圖片上傳超時問題改善
@@ -35,7 +35,7 @@ export async function compressProductImage(
   options?: CompressionOptions
 ): Promise<File> {
   const defaultOptions: CompressionOptions = {
-    maxSizeMB: 1.5, // 壓縮至 1.5MB（平衡品質與速度）
+    maxSizeMB: 1.0, // 壓縮至 1MB（平衡品質與速度）
     maxWidthOrHeight: 1920, // 最大 1920px（符合 Full HD）
     useWebWorker: true, // 使用 Worker 避免阻塞
   }
@@ -72,6 +72,6 @@ export async function compressProductImage(
  * ```
  */
 export function shouldCompress(file: File): boolean {
-  const threshold = 1.5 * 1024 * 1024 // 1.5MB
+  const threshold = 1.0 * 1024 * 1024 // 1MB
   return file.size > threshold
 }

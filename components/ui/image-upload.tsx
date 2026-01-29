@@ -5,7 +5,7 @@
  * Feature: 002-product-management (US4)
  *
  * 提供圖片上傳、預覽、刪除功能
- * 支援 JPG, PNG, WebP 格式,限制 5MB
+ * 支援 JPG, PNG, WebP 格式,限制 3MB
  */
 
 import { useState, useRef } from 'react'
@@ -81,7 +81,7 @@ export function ImageUpload({
       // 1. 壓縮圖片（如果需要）
       if (shouldCompress(file)) {
         setIsCompressing(true)
-        console.log('🗜️ 圖片大小超過 1.5MB，開始壓縮...')
+        console.log('🗜️ 圖片大小超過 1MB，開始壓縮...')
         fileToUpload = await compressProductImage(file)
         setIsCompressing(false)
         setProgress(5)
@@ -255,7 +255,7 @@ export function ImageUpload({
             <>
               <Upload className="h-12 w-12 text-gray-400" />
               <p className="mt-4 text-sm font-bold text-gray-600">點擊上傳商品圖片</p>
-              <p className="mt-2 text-xs text-gray-500">支援 JPG, PNG, WebP (最大 5MB)</p>
+              <p className="mt-2 text-xs text-gray-500">支援 JPG, PNG, WebP (最大 3MB)</p>
             </>
           )}
         </div>
@@ -282,7 +282,7 @@ export function ImageUpload({
       <p className="text-xs text-gray-600">
         • 支援格式: JPG, PNG, WebP
         <br />
-        • 檔案大小限制: 5MB
+        • 檔案大小限制: 3MB
         <br />• 上傳新圖片將自動覆蓋舊圖片
       </p>
     </div>

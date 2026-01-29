@@ -831,13 +831,13 @@ export async function uploadProductImage(
       }
     }
 
-    // 3. 驗證檔案大小 (5MB)
-    const maxSize = 5 * 1024 * 1024
+    // 3. 驗證檔案大小 (3MB)
+    const maxSize = 3 * 1024 * 1024
     if (file.size > maxSize) {
       console.error('❌ 檔案過大:', file.size)
       return {
         success: false,
-        message: '檔案大小不可超過 5MB',
+        message: '檔案大小不可超過 3MB',
       }
     }
 
