@@ -181,35 +181,41 @@ export function StorePageClient({
         />
       </div>
 
-      {/* 優惠活動特殊篩選 */}
-      {comboDeals.length > 0 && (
-        <div className="mb-4">
-          <button
-            onClick={() => setShowPromotionsOnly(!showPromotionsOnly)}
-            className={cn(
-              'rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold transition-all w-full md:w-auto',
-              showPromotionsOnly
-                ? 'bg-red-500 text-white shadow-neo-sm md:shadow-neo'
-                : 'bg-white text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-            )}
-          >
-            🔥 優惠活動 ({comboDeals.length} 個)
-          </button>
-        </div>
-      )}
+      {/* 篩選按鈕群組 */}
+      <div className="mb-4 space-y-3">
+        {/* 優惠活動按鈕 */}
+        {comboDeals.length > 0 && (
+          <div>
+            <h3 className="mb-2 text-sm font-bold">優惠活動</h3>
+            <button
+              onClick={() => setShowPromotionsOnly(!showPromotionsOnly)}
+              className={cn(
+                'rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold transition-all',
+                designTokens.neoBrutalism.shadow.mobile,
+                'md:shadow-neo',
+                showPromotionsOnly
+                  ? 'bg-red-500 text-white'
+                  : 'bg-white text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              )}
+            >
+              🔥 優惠活動 ({comboDeals.length} 個)
+            </button>
+          </div>
+        )}
 
-      {/* 分類篩選 */}
-      {categories.length > 0 && (
-        <div className="mb-4">
-          <h3 className="mb-2 text-sm font-bold">類別</h3>
-          <FilterButtons
-            options={categoryOptions}
-            selected={selectedCategories}
-            onToggle={handleCategoryToggle}
-            multiSelect={true}
-          />
-        </div>
-      )}
+        {/* 分類篩選 */}
+        {categories.length > 0 && (
+          <div>
+            <h3 className="mb-2 text-sm font-bold">類別</h3>
+            <FilterButtons
+              options={categoryOptions}
+              selected={selectedCategories}
+              onToggle={handleCategoryToggle}
+              multiSelect={true}
+            />
+          </div>
+        )}
+      </div>
 
       {/* 篩選狀態與清除按鈕 */}
       {(hasFilters || isSearching) && (
@@ -277,7 +283,7 @@ export function StorePageClient({
           )}
         </>
       ) : showPromotionsOnly ? (
-        /* 優惠活動模式：顯示組合優惠卡片 */
+        /* 優惠活動模式：僅顯示組合優惠 */
         <>
           {comboDeals.length === 0 ? (
             <div className={cn(
@@ -304,9 +310,9 @@ export function StorePageClient({
           )}
         </>
       ) : (
-        /* 預設或篩選後：顯示系列 */
+        /* 預設或篩選後：先顯示組合優惠，再顯示系列 */
         <>
-          {displaySeries.length === 0 ? (
+          {displaySeries.length === 0 && comboDeals.length === 0 ? (
             <div className={cn(
               "rounded-none bg-white text-center",
               designTokens.neoBrutalism.border.full,
@@ -325,10 +331,41 @@ export function StorePageClient({
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-              {displaySeries.map((s) => (
-                <SeriesCard key={s.id} series={s} />
-              ))}
+            <div className="space-y-8">
+              {/* 🔥 組合優惠區塊（優先顯示在最上方） */}
+              {comboDeals.length > 0 && (
+                <div>
+                  <h2 className={cn(
+                    designTokens.typography.h2,
+                    "mb-4 flex items-center gap-2"
+                  )}>
+                    <span>🔥 優惠活動</span>
+                    <span className="text-base font-normal text-gray-500">
+                      ({comboDeals.length} 個)
+                    </span>
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                    {comboDeals.map((deal) => (
+                      <ComboDealCard key={deal.id} deal={deal} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 系列區塊 */}
+              {displaySeries.length > 0 && (
+                <div>
+                  <h2 className={cn(
+                    designTokens.typography.h2,
+                    "mb-4"
+                  )}>商品系列</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                    {displaySeries.map((s) => (
+                      <SeriesCard key={s.id} series={s} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </>
