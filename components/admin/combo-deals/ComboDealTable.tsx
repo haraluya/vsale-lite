@@ -114,9 +114,11 @@ export function ComboDealTable({
   // 格式化折扣顯示
   const formatDiscount = (type: string, value: number) => {
     if (type === 'fixed') {
-      return `省 $${value}`
+      return `省 $${Math.floor(value)}`
     }
-    return `${value / 10} 折`
+    const discount = value / 10
+    // 如果是整數就不顯示小數點，否則保留一位小數
+    return `${discount % 1 === 0 ? Math.floor(discount) : discount.toFixed(1)} 折`
   }
 
   // 格式化狀態徽章

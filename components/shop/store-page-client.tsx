@@ -10,6 +10,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { SeriesCard } from '@/components/shop/series-card'
+import { ComboDealCard } from '@/components/shop/combo-deals/ComboDealCard'
 import { SearchBar } from '@/components/ui/search-bar'
 import { FilterButtons, ClearFiltersButton, FilterResultCount, FilterOption } from '@/components/ui/filter-buttons'
 import { globalSearch } from '@/lib/actions/shop'
@@ -18,18 +19,34 @@ import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Series, Product } from '@/types'
 
+interface ComboDeal {
+  id: string
+  name: string
+  poster_url: string
+  combo_mode: 'each' | 'mix_match'
+  discount_type: 'fixed' | 'percentage'
+  discount_value: number
+  start_date: string
+  end_date: string
+  series_count: number
+  mix_match_total_quantity?: number
+}
+
 interface StorePageClientProps {
   series: Series[]
   categories: { id: string; name: string }[]
   availableTags: string[]
+  comboDeals: ComboDeal[]
 }
 
 export function StorePageClient({
   series,
   categories,
   availableTags,
+  comboDeals,
 }: StorePageClientProps) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [showPromotionsOnly, setShowPromotionsOnly] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchedSeries, setSearchedSeries] = useState<Series[]>([])
   const [searchedProducts, setSearchedProducts] = useState<Product[]>([])
@@ -113,6 +130,7 @@ export function StorePageClient({
    */
   const handleClearFilters = () => {
     setSelectedCategories([])
+    setShowPromotionsOnly(false)
     setSearchQuery('')
     setIsSearching(false)
     setSearchedSeries([])
@@ -120,13 +138,14 @@ export function StorePageClient({
   }
 
   /**
-   * 根據分類篩選系列（僅在非搜尋模式時使用）
+   * 根據分類篩選系列（僅在非搜尋模式且非優惠活動模式時使用）
    */
   const filteredSeries = useMemo(() => {
-    if (selectedCategories.length === 0) {
-      return series
+    // 分類篩選
+    if (selectedCategories.length > 0) {
+      return series.filter((s) => s.category_id && selectedCategories.includes(s.category_id))
     }
-    return series.filter((s) => s.category_id && selectedCategories.includes(s.category_id))
+    return series
   }, [series, selectedCategories])
 
   /**
@@ -148,7 +167,7 @@ export function StorePageClient({
     color: 'bg-blue-100 border-blue-500 text-blue-900',
   }))
 
-  const hasFilters = selectedCategories.length > 0
+  const hasFilters = selectedCategories.length > 0 || showPromotionsOnly
 
   return (
     <>
@@ -161,6 +180,23 @@ export function StorePageClient({
           minLength={2}
         />
       </div>
+
+      {/* 優惠活動特殊篩選 */}
+      {comboDeals.length > 0 && (
+        <div className="mb-4">
+          <button
+            onClick={() => setShowPromotionsOnly(!showPromotionsOnly)}
+            className={cn(
+              'rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold transition-all w-full md:w-auto',
+              showPromotionsOnly
+                ? 'bg-red-500 text-white shadow-neo-sm md:shadow-neo'
+                : 'bg-white text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+            )}
+          >
+            🔥 優惠活動 ({comboDeals.length} 個)
+          </button>
+        </div>
+      )}
 
       {/* 分類篩選 */}
       {categories.length > 0 && (
@@ -237,6 +273,33 @@ export function StorePageClient({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+        </>
+      ) : showPromotionsOnly ? (
+        /* 優惠活動模式：顯示組合優惠卡片 */
+        <>
+          {comboDeals.length === 0 ? (
+            <div className={cn(
+              "rounded-none bg-white text-center",
+              designTokens.neoBrutalism.border.full,
+              "border-black",
+              designTokens.neoBrutalism.shadow.full,
+              "p-8 md:p-12"
+            )}>
+              <p className={cn(
+                designTokens.typography.body.large,
+                "text-gray-500"
+              )}>目前沒有適用於您等級的優惠活動</p>
+              <p className="mt-2 text-sm text-gray-400">
+                請稍後再來看看，或聯繫客服了解更多優惠資訊
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+              {comboDeals.map((deal) => (
+                <ComboDealCard key={deal.id} deal={deal} />
+              ))}
             </div>
           )}
         </>

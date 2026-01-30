@@ -15,6 +15,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getActiveSeries } from '@/lib/actions/shop'
 import { getActiveCategories, getAvailableTags } from '@/lib/actions/products'
+import { getActiveComboDealsByTier } from '@/lib/actions/combo-deals'
 import { StorePageClient } from '@/components/shop/store-page-client'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
@@ -39,15 +40,17 @@ export default async function ProductsPage() {
   }
 
   // ⚡ 並行化查詢 - 使用 Promise.all 同時執行所有獨立查詢
-  const [seriesResult, categoriesResult, tagsResult] = await Promise.all([
+  const [seriesResult, categoriesResult, tagsResult, comboDealsResult] = await Promise.all([
     getActiveSeries(), // 查詢所有啟用的系列 (Feature 003)
     getActiveCategories(), // 查詢分類 (Feature 006 - US2)
     getAvailableTags(), // 查詢標籤 (Feature 006 - US2)
+    getActiveComboDealsByTier(), // 查詢符合等級的組合優惠 (Feature 021)
   ])
 
   const series = seriesResult.success ? seriesResult.data : []
   const categories = categoriesResult.success ? categoriesResult.data : []
   const availableTags = tagsResult.success ? tagsResult.data : []
+  const comboDeals = comboDealsResult.success ? comboDealsResult.data : []
 
   return (
     <div className={cn(
@@ -63,6 +66,7 @@ export default async function ProductsPage() {
           series={series || []}
           categories={categories || []}
           availableTags={availableTags || []}
+          comboDeals={comboDeals || []}
         />
       </div>
     </div>
