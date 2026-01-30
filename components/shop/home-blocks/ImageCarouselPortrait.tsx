@@ -81,7 +81,7 @@ function ImageCarouselPortraitComponent({ config, blockUpdatedAt }: ImageCarouse
   const currentImage = imagesWithCacheBusting[currentIndex]
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto">
+    <div className="relative w-full">
       {/* 圖片容器 - 4:5 比例 */}
       <div
         className={cn(
