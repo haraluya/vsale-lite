@@ -928,7 +928,13 @@ export async function validateCoupon(
     const seriesRestrictions =
       coupon.series_restrictions?.map((r: any) => r.series_id) || []
 
-    // 7. 計算折扣
+    // 7. 🆕 Feature 021: 計算組合優惠總金額（優惠後價格）
+    const comboDealsTotal = comboDeals.reduce(
+      (sum, combo) => sum + combo.discounted_price,
+      0
+    )
+
+    // 8. 計算折扣（包含組合優惠金額）
     const result = calculateCouponDiscount({
       coupon: {
         ...coupon,
@@ -937,6 +943,7 @@ export async function validateCoupon(
       },
       cartItems: data.cartItems as CartItemForCoupon[],
       userTierId: tierId,
+      comboDealsTotal, // 🆕 傳入組合優惠總金額
     })
 
     return {

@@ -110,6 +110,20 @@ export const createCouponSchema = z
     },
     { message: '折扣值範圍錯誤', path: ['discount_value'] }
   )
+  .refine(
+    (data) => {
+      // 🆕 Feature 021: 驗證系列限制與組合優惠互斥
+      // 規則：優惠券允許組合優惠時，不可設定系列限制
+      const hasSeriesRestrictions = data.series_restrictions && data.series_restrictions.length > 0
+      const allowsCombo = data.combo_apply_all || (data.combo_restrictions && data.combo_restrictions.length > 0)
+
+      return !(hasSeriesRestrictions && allowsCombo)
+    },
+    {
+      message: '優惠券允許組合優惠時，不可設定系列限制（兩者互斥）',
+      path: ['series_restrictions']
+    }
+  )
 
 /**
  * 更新優惠券 Schema
@@ -122,32 +136,53 @@ export const createCouponSchema = z
  * });
  * ```
  */
-export const updateCouponSchema = z.object({
-  code: couponCodeSchema.optional(),
-  discount_type: discountTypeSchema.optional(),
-  discount_value: z.number().optional(),
-  min_order_amount: z.number().nonnegative().optional().nullable(),
-  claim_limit: z
-    .number()
-    .int('領取張數必須為整數')
-    .min(1, '每位客戶至少可領取 1 張')
-    .max(99, '每位客戶最多可領取 99 張')
-    .optional(),
-  total_limit: z
-    .number()
-    .int('總張數必須為整數')
-    .min(1, '總張數至少為 1 張')
-    .optional()
-    .nullable(), // NULL = 無限發放
-  valid_from: z.string().datetime().optional(),
-  valid_until: z.string().datetime().optional(),
-  status: z.enum(['active', 'inactive']).optional(),
-  tier_restrictions: z.array(z.string().uuid()).optional(),
-  series_restrictions: z.array(z.string().uuid()).optional(),
-  // 🆕 Feature 021: 組合優惠限制
-  combo_restrictions: z.array(z.string().uuid()).optional(),
-  combo_apply_all: z.boolean().optional(),
-})
+export const updateCouponSchema = z
+  .object({
+    code: couponCodeSchema.optional(),
+    discount_type: discountTypeSchema.optional(),
+    discount_value: z.number().optional(),
+    min_order_amount: z.number().nonnegative().optional().nullable(),
+    claim_limit: z
+      .number()
+      .int('領取張數必須為整數')
+      .min(1, '每位客戶至少可領取 1 張')
+      .max(99, '每位客戶最多可領取 99 張')
+      .optional(),
+    total_limit: z
+      .number()
+      .int('總張數必須為整數')
+      .min(1, '總張數至少為 1 張')
+      .optional()
+      .nullable(), // NULL = 無限發放
+    valid_from: z.string().datetime().optional(),
+    valid_until: z.string().datetime().optional(),
+    status: z.enum(['active', 'inactive']).optional(),
+    tier_restrictions: z.array(z.string().uuid()).optional(),
+    series_restrictions: z.array(z.string().uuid()).optional(),
+    // 🆕 Feature 021: 組合優惠限制
+    combo_restrictions: z.array(z.string().uuid()).optional(),
+    combo_apply_all: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      // 🆕 Feature 021: 驗證系列限制與組合優惠互斥（更新時）
+      // 注意：更新時欄位為可選，需要檢查是否有提供值
+      const hasSeriesRestrictions = data.series_restrictions !== undefined && data.series_restrictions.length > 0
+      const allowsCombo = data.combo_apply_all === true || (data.combo_restrictions !== undefined && data.combo_restrictions.length > 0)
+
+      // 如果兩者都有提供值，則檢查互斥
+      if (data.series_restrictions !== undefined || data.combo_apply_all !== undefined || data.combo_restrictions !== undefined) {
+        return !(hasSeriesRestrictions && allowsCombo)
+      }
+
+      // 如果沒有提供相關欄位，則通過驗證
+      return true
+    },
+    {
+      message: '優惠券允許組合優惠時，不可設定系列限制（兩者互斥）',
+      path: ['series_restrictions']
+    }
+  )
 
 /**
  * 領取優惠券 Schema

@@ -25,8 +25,10 @@ export interface CartItemForCoupon {
 /**
  * 計算優惠券折扣
  *
- * @param params - 優惠券 + 購物車 + 客戶等級
+ * @param params - 優惠券 + 購物車 + 客戶等級 + 組合優惠金額
  * @returns CouponDiscountResult
+ *
+ * @feature 021-combo-deals: 支援組合優惠金額計算
  *
  * @example
  * ```typescript
@@ -34,6 +36,7 @@ export interface CartItemForCoupon {
  *   coupon,
  *   cartItems,
  *   userTierId: 'tier-id',
+ *   comboDealsTotal: 250, // 組合優惠優惠後總價
  * });
  *
  * if (result.valid) {
@@ -45,8 +48,9 @@ export function calculateCouponDiscount(params: {
   coupon: Coupon
   cartItems: CartItemForCoupon[]
   userTierId: string
+  comboDealsTotal?: number // 🆕 組合優惠優惠後總價（預設 0）
 }): CouponDiscountResult {
-  const { coupon, cartItems, userTierId } = params
+  const { coupon, cartItems, userTierId, comboDealsTotal = 0 } = params
 
   // 1. 驗證等級限制
   if (
@@ -60,20 +64,23 @@ export function calculateCouponDiscount(params: {
     }
   }
 
-  // 2. 計算適用商品總額（考慮系列限制）
+  // 2. 計算適用商品總額（考慮系列限制與組合優惠）
   let eligibleAmount = 0
 
   if (coupon.series_restrictions && coupon.series_restrictions.length > 0) {
-    // 有系列限制：僅計算限定系列商品
+    // 🆕 有系列限制：僅計算限定系列商品，組合優惠不計入
+    // 理由：系列限制與組合優惠互斥（根據業務規則）
     eligibleAmount = cartItems
       .filter((item) => coupon.series_restrictions!.includes(item.series_id))
       .reduce((sum, item) => sum + item.price * item.quantity, 0)
   } else {
-    // 無系列限制：計算全部商品
-    eligibleAmount = cartItems.reduce(
+    // 🆕 無系列限制：計算全部商品 + 組合優惠
+    // 理由：優惠券折扣應用於總金額（包含組合優惠優惠後價格）
+    const cartTotal = cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     )
+    eligibleAmount = cartTotal + comboDealsTotal
   }
 
   // 3. 驗證最低金額
@@ -109,8 +116,10 @@ export function calculateCouponDiscount(params: {
 /**
  * 驗證優惠券使用條件（不含折扣計算）
  *
- * @param params - 優惠券 + 購物車 + 客戶等級
+ * @param params - 優惠券 + 購物車 + 客戶等級 + 組合優惠金額
  * @returns 驗證結果（僅 valid/error）
+ *
+ * @feature 021-combo-deals: 支援組合優惠金額
  *
  * @example
  * ```typescript
@@ -118,6 +127,7 @@ export function calculateCouponDiscount(params: {
  *   coupon,
  *   cartItems,
  *   userTierId: 'tier-id',
+ *   comboDealsTotal: 250,
  * });
  *
  * if (!result.valid) {
@@ -129,6 +139,7 @@ export function validateCouponConditions(params: {
   coupon: Coupon
   cartItems: CartItemForCoupon[]
   userTierId: string
+  comboDealsTotal?: number // 🆕 組合優惠優惠後總價
 }): Pick<CouponDiscountResult, 'valid' | 'error'> {
   const result = calculateCouponDiscount(params)
   return {
