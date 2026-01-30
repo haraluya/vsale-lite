@@ -15,6 +15,8 @@ import { ProductSelectorClient } from '@/components/shop/combo-deals/ProductSele
 import { CountdownTimer } from '@/components/shop/combo-deals/CountdownTimer'
 import Image from 'next/image'
 import { Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { designTokens } from '@/lib/design-tokens'
 
 // 動態渲染（需要使用者認證）
 export const dynamic = 'force-dynamic'
@@ -74,8 +76,14 @@ export default async function ComboDealDetailPage({
       : `${Math.round(comboDeal.discount_value / 10)} 折`
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <div className="container mx-auto px-4 py-6 md:py-8">
+    <div className={cn(
+      "min-h-screen bg-background",
+      designTokens.spacing.page.padding
+    )}>
+      <div className={cn(
+        designTokens.container.default,
+        designTokens.spacing.page.gap
+      )}>
         {/* 🆕 Phase 7: 編輯模式標示 */}
         {editMode && (
           <div className="mb-4 rounded-none border-2 md:border-3 border-blue-600 bg-blue-50 p-4 shadow-neo-sm">

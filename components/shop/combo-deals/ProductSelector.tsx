@@ -265,46 +265,28 @@ export function ProductSelector({
               此系列無可用商品
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
               {series.products.map((product) => {
                 const isSelected = isProductSelected(product.product_id)
                 const canSelect =
                   !isSelected && seriesSelectedCount < requiredQuantity
 
                 return (
-                  <button
+                  <div
                     key={product.product_id}
-                    onClick={() =>
-                      canSelect || isSelected
-                        ? handleToggleProduct(
-                            product.product_id,
-                            product.product_name,
-                            series.series_id,
-                            series.series_name,
-                            product.tier_price,
-                            requiredQuantity
-                          )
-                        : null
-                    }
-                    disabled={!canSelect && !isSelected}
                     className={cn(
-                      'group relative rounded-none border-2 md:border-3 border-black p-3 text-left transition-all',
-                      isSelected
-                        ? 'bg-green-100 shadow-neo translate-x-[2px] translate-y-[2px]'
-                        : canSelect
-                          ? 'bg-white shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                          : 'bg-gray-100 opacity-50 cursor-not-allowed'
+                      'group relative rounded-none bg-white p-2 md:p-4 transition-all',
+                      designTokens.neoBrutalism.border.full,
+                      designTokens.neoBrutalism.shadow.full,
+                      'border-black'
                     )}
                   >
-                    {/* 選擇標記 */}
-                    {isSelected && (
-                      <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-green-600 border-2 border-black flex items-center justify-center">
-                        <Check className="w-4 h-4 text-white" strokeWidth={3} />
-                      </div>
-                    )}
-
                     {/* 商品圖片 */}
-                    <div className="relative w-full aspect-square bg-gray-100 mb-2 overflow-hidden">
+                    <div className={cn(
+                      "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100 relative",
+                      designTokens.neoBrutalism.border.mobile,
+                      "border-black"
+                    )}>
                       {product.product_image ? (
                         <Image
                           src={product.product_image}
@@ -314,27 +296,87 @@ export function ProductSelector({
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                          無圖片
+                        <div className="w-full h-full flex items-center justify-center text-4xl md:text-6xl text-gray-300">
+                          📦
                         </div>
                       )}
                     </div>
 
-                    {/* 商品名稱 */}
-                    <h4 className="text-sm md:text-base font-bold text-foreground mb-1 line-clamp-2 min-h-[2.5em]">
-                      {product.product_name}
-                    </h4>
+                    {/* 商品資訊 */}
+                    <div className="space-y-1.5 md:space-y-2">
+                      {/* 商品名稱（黃色標籤） */}
+                      <div className={cn(
+                        "rounded-none bg-yellow-300 p-1.5 md:p-2",
+                        designTokens.neoBrutalism.border.mobile,
+                        "border-black"
+                      )}>
+                        <h4 className="text-sm md:text-base font-bold text-foreground line-clamp-2 min-h-[2.5em]">
+                          {product.product_name}
+                        </h4>
+                      </div>
 
-                    {/* 商品價格 */}
-                    <p className="text-sm md:text-base font-bold text-blue-600">
-                      ${product.tier_price}
-                    </p>
+                      {/* 商品價格 */}
+                      <p className="text-lg md:text-2xl font-bold text-brand-primary">
+                        ${product.tier_price}
+                        <span className="text-xs ml-1 font-normal text-gray-600">
+                          /件
+                        </span>
+                      </p>
 
-                    {/* 庫存狀態 */}
-                    {product.stock !== undefined && product.stock <= 0 && (
-                      <p className="text-xs text-gray-500 mt-1">庫存不足</p>
-                    )}
-                  </button>
+                      {/* 選擇狀態或選擇按鈕 */}
+                      {isSelected ? (
+                        <button
+                          onClick={() =>
+                            handleToggleProduct(
+                              product.product_id,
+                              product.product_name,
+                              series.series_id,
+                              series.series_name,
+                              product.tier_price,
+                              requiredQuantity
+                            )
+                          }
+                          className={cn(
+                            'w-full rounded-none bg-green-500 text-white font-bold transition-all',
+                            designTokens.neoBrutalism.border.full,
+                            'border-black',
+                            designTokens.neoBrutalism.shadow.mobile,
+                            'px-4 py-2 md:py-3 text-sm md:text-base',
+                            'flex items-center justify-center gap-2'
+                          )}
+                        >
+                          <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={3} />
+                          已選擇
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            canSelect &&
+                            handleToggleProduct(
+                              product.product_id,
+                              product.product_name,
+                              series.series_id,
+                              series.series_name,
+                              product.tier_price,
+                              requiredQuantity
+                            )
+                          }
+                          disabled={!canSelect}
+                          className={cn(
+                            'w-full rounded-none font-bold transition-all',
+                            designTokens.neoBrutalism.border.full,
+                            'border-black',
+                            canSelect
+                              ? 'bg-white shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                              : 'bg-gray-200 text-gray-500 cursor-not-allowed',
+                            'px-4 py-2 md:py-3 text-sm md:text-base'
+                          )}
+                        >
+                          選擇此商品
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 )
               })}
             </div>
@@ -386,7 +428,7 @@ export function ProductSelector({
                 此系列無可用商品
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
                 {series.products.map((product) => {
                   const quantity = getProductQuantity(product.product_id)
                   const canIncrease = !isLimitReached || quantity > 0
@@ -395,12 +437,18 @@ export function ProductSelector({
                     <div
                       key={product.product_id}
                       className={cn(
-                        'rounded-none border-2 md:border-3 border-black bg-white p-3 shadow-neo-sm md:shadow-neo',
-                        quantity > 0 && 'bg-green-50'
+                        'group relative rounded-none bg-white p-2 md:p-4 transition-all',
+                        designTokens.neoBrutalism.border.full,
+                        designTokens.neoBrutalism.shadow.full,
+                        'border-black'
                       )}
                     >
                       {/* 商品圖片 */}
-                      <div className="relative w-full aspect-square bg-gray-100 mb-2 overflow-hidden">
+                      <div className={cn(
+                        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100 relative",
+                        designTokens.neoBrutalism.border.mobile,
+                        "border-black"
+                      )}>
                         {product.product_image ? (
                           <Image
                             src={product.product_image}
@@ -410,71 +458,89 @@ export function ProductSelector({
                             className="object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            無圖片
+                          <div className="w-full h-full flex items-center justify-center text-4xl md:text-6xl text-gray-300">
+                            📦
                           </div>
                         )}
                       </div>
 
-                      {/* 商品名稱 */}
-                      <h5 className="text-sm md:text-base font-bold text-foreground mb-1 line-clamp-2 min-h-[2.5em]">
-                        {product.product_name}
-                      </h5>
+                      {/* 商品資訊 */}
+                      <div className="space-y-1.5 md:space-y-2">
+                        {/* 商品名稱（黃色標籤） */}
+                        <div className={cn(
+                          "rounded-none bg-yellow-300 p-1.5 md:p-2",
+                          designTokens.neoBrutalism.border.mobile,
+                          "border-black"
+                        )}>
+                          <h5 className="text-sm md:text-base font-bold text-foreground line-clamp-2 min-h-[2.5em]">
+                            {product.product_name}
+                          </h5>
+                        </div>
 
-                      {/* 商品價格 */}
-                      <p className="text-sm md:text-base font-bold text-blue-600 mb-2">
-                        ${product.tier_price}
-                      </p>
+                        {/* 商品價格 */}
+                        <p className="text-lg md:text-2xl font-bold text-brand-primary">
+                          ${product.tier_price}
+                          <span className="text-xs ml-1 font-normal text-gray-600">
+                            /件
+                          </span>
+                        </p>
 
-                      {/* 數量選擇器 */}
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(
-                              product.product_id,
-                              product.product_name,
-                              series.series_id,
-                              series.series_name,
-                              product.tier_price,
-                              -1
-                            )
-                          }
-                          disabled={quantity === 0}
-                          className={cn(
-                            'flex-shrink-0 w-8 h-8 rounded-none border-2 border-black bg-red-300 flex items-center justify-center transition-all',
-                            quantity > 0
-                              ? 'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm'
-                              : 'opacity-30 cursor-not-allowed'
-                          )}
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
+                        {/* 數量選擇器 */}
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(
+                                product.product_id,
+                                product.product_name,
+                                series.series_id,
+                                series.series_name,
+                                product.tier_price,
+                                -1
+                              )
+                            }
+                            disabled={quantity === 0}
+                            className={cn(
+                              'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
+                              designTokens.neoBrutalism.border.full,
+                              'border-black',
+                              quantity > 0
+                                ? 'bg-red-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                                : 'bg-gray-200 opacity-30 cursor-not-allowed'
+                            )}
+                          >
+                            <Minus className="w-5 h-5 md:w-6 md:h-6" strokeWidth={3} />
+                          </button>
 
-                        <span className="flex-1 text-center text-base md:text-lg font-bold">
-                          {quantity}
-                        </span>
+                          <div className="flex-1 text-center">
+                            <span className="text-xl md:text-2xl font-black">
+                              {quantity}
+                            </span>
+                          </div>
 
-                        <button
-                          onClick={() =>
-                            handleQuantityChange(
-                              product.product_id,
-                              product.product_name,
-                              series.series_id,
-                              series.series_name,
-                              product.tier_price,
-                              1
-                            )
-                          }
-                          disabled={!canIncrease}
-                          className={cn(
-                            'flex-shrink-0 w-8 h-8 rounded-none border-2 border-black bg-green-300 flex items-center justify-center transition-all',
-                            canIncrease
-                              ? 'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm'
-                              : 'opacity-30 cursor-not-allowed'
-                          )}
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
+                          <button
+                            onClick={() =>
+                              handleQuantityChange(
+                                product.product_id,
+                                product.product_name,
+                                series.series_id,
+                                series.series_name,
+                                product.tier_price,
+                                1
+                              )
+                            }
+                            disabled={!canIncrease}
+                            className={cn(
+                              'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
+                              designTokens.neoBrutalism.border.full,
+                              'border-black',
+                              canIncrease
+                                ? 'bg-green-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                                : 'bg-gray-200 opacity-30 cursor-not-allowed'
+                            )}
+                          >
+                            <Plus className="w-5 h-5 md:w-6 md:h-6" strokeWidth={3} />
+                          </button>
+                        </div>
                       </div>
 
                       {/* 庫存狀態 */}

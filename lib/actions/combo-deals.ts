@@ -1155,11 +1155,15 @@ export async function getComboDealDetailForClient(
           `)
           .eq('series_id', s.series_id)
           .eq('status', 'active')
-          .order('display_order', { ascending: true, nullsFirst: false })
           .order('name', { ascending: true })
 
+        // 只有在真正有錯誤時才記錄（避免空物件誤判）
+        if (productsError && Object.keys(productsError).length > 0) {
+          console.error(`查詢系列 ${s.series_id} (${s.series?.name || '未知'}) 的商品失敗:`, productsError)
+        }
+
+        // 如果查詢失敗但系列有效，返回空商品列表（不中斷流程）
         if (productsError) {
-          console.error(`查詢系列 ${s.series_id} 的商品失敗:`, productsError)
           return {
             series_id: s.series_id,
             series_name: s.series?.name || '',
@@ -1186,15 +1190,15 @@ export async function getComboDealDetailForClient(
           })
         }
 
-        // 過濾掉無價格的商品
+        // 過濾掉無價格的商品，並轉換為元件期望的格式
         const productsWithPrices = (products || [])
           .filter((p) => priceMap.has(p.id))
           .map((p) => ({
-            id: p.id,
-            name: p.name,
-            image_url: p.image_url,
+            product_id: p.id,
+            product_name: p.name,
+            product_image: p.image_url,
             stock: p.stock,
-            price: priceMap.get(p.id)!,
+            tier_price: priceMap.get(p.id)!,
           }))
 
         return {
