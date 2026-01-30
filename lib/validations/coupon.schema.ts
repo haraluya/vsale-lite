@@ -91,6 +91,7 @@ export const createCouponSchema = z
     // 🆕 Feature 021: 組合優惠限制
     combo_restrictions: z.array(z.string().uuid()).optional().default([]),
     combo_apply_all: z.boolean().optional().default(false), // true = 插入 combo_deal_id = NULL
+    exclude_combo_deals: z.boolean().optional().default(false), // 🆕 排除組合優惠
   })
   .refine(
     (data) => {
@@ -122,6 +123,20 @@ export const createCouponSchema = z
     {
       message: '優惠券允許組合優惠時，不可設定系列限制（兩者互斥）',
       path: ['series_restrictions']
+    }
+  )
+  .refine(
+    (data) => {
+      // 🆕 驗證排除組合優惠與組合優惠限制互斥
+      // 規則：如果排除組合優惠，則不應設定組合優惠限制
+      const excludeCombo = data.exclude_combo_deals
+      const hasComboRestrictions = data.combo_apply_all || (data.combo_restrictions && data.combo_restrictions.length > 0)
+
+      return !(excludeCombo && hasComboRestrictions)
+    },
+    {
+      message: '排除組合優惠時，不可設定組合優惠限制（兩者互斥）',
+      path: ['exclude_combo_deals']
     }
   )
 
@@ -162,6 +177,7 @@ export const updateCouponSchema = z
     // 🆕 Feature 021: 組合優惠限制
     combo_restrictions: z.array(z.string().uuid()).optional(),
     combo_apply_all: z.boolean().optional(),
+    exclude_combo_deals: z.boolean().optional(), // 🆕 排除組合優惠
   })
   .refine(
     (data) => {
@@ -181,6 +197,24 @@ export const updateCouponSchema = z
     {
       message: '優惠券允許組合優惠時，不可設定系列限制（兩者互斥）',
       path: ['series_restrictions']
+    }
+  )
+  .refine(
+    (data) => {
+      // 🆕 驗證排除組合優惠與組合優惠限制互斥（更新時）
+      const excludeCombo = data.exclude_combo_deals === true
+      const hasComboRestrictions = data.combo_apply_all === true || (data.combo_restrictions !== undefined && data.combo_restrictions.length > 0)
+
+      // 如果有提供相關欄位，則檢查互斥
+      if (data.exclude_combo_deals !== undefined || data.combo_apply_all !== undefined || data.combo_restrictions !== undefined) {
+        return !(excludeCombo && hasComboRestrictions)
+      }
+
+      return true
+    },
+    {
+      message: '排除組合優惠時，不可設定組合優惠限制（兩者互斥）',
+      path: ['exclude_combo_deals']
     }
   )
 

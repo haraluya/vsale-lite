@@ -59,6 +59,16 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       ? new Date(coupon.valid_until).toISOString().slice(0, 16)
       : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 16)
   )
+  // 🆕 無限期狀態（預設為 true）
+  const [isUnlimitedPeriod, setIsUnlimitedPeriod] = useState(() => {
+    // 如果是編輯模式且結束時間是 2099 年，視為無限期
+    if (coupon?.valid_until) {
+      const until = new Date(coupon.valid_until)
+      return until.getFullYear() >= 2099
+    }
+    // 新建模式預設無限期
+    return true
+  })
   const [status, setStatus] = useState<'active' | 'inactive'>(
     coupon?.status === 'inactive' ? 'inactive' : 'active'
   )
@@ -69,9 +79,17 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
     coupon?.series_restrictions || []
   )
   // 🆕 Feature 021: 組合優惠限制狀態
-  const [comboRestrictionMode, setComboRestrictionMode] = useState<'none' | 'all' | 'specific'>(
-    coupon?.combo_apply_all ? 'all' : (coupon?.combo_restrictions && coupon.combo_restrictions.length > 0 ? 'specific' : 'none')
-  )
+  const [comboRestrictionMode, setComboRestrictionMode] = useState<'none' | 'exclude' | 'all' | 'specific'>(() => {
+    // 如果是編輯模式，根據現有資料判斷
+    if (coupon) {
+      if ((coupon as any).exclude_combo_deals) return 'exclude'
+      if (coupon.combo_apply_all) return 'all'
+      if (coupon.combo_restrictions && coupon.combo_restrictions.length > 0) return 'specific'
+      return 'none'
+    }
+    // 新建模式預設為「排除組合優惠」
+    return 'exclude'
+  })
   const [selectedComboDeals, setSelectedComboDeals] = useState<string[]>(
     coupon?.combo_restrictions || []
   )
@@ -158,12 +176,16 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         discount_value: Number(discountValue),
         min_order_amount: minOrderAmount ? Number(minOrderAmount) : null,
         valid_from: new Date(validFrom).toISOString(),
-        valid_until: new Date(validUntil).toISOString(),
+        // 🆕 無限期：如果勾選無限期，結束時間設為 2099-12-31
+        valid_until: isUnlimitedPeriod
+          ? new Date('2099-12-31T23:59:59').toISOString()
+          : new Date(validUntil).toISOString(),
         claim_limit: Number(claimLimit),
         total_limit: totalLimit ? Number(totalLimit) : null,
         tier_restrictions: selectedTiers,
         series_restrictions: selectedSeries,
         // 🆕 Feature 021: 組合優惠限制
+        exclude_combo_deals: comboRestrictionMode === 'exclude',
         combo_apply_all: comboRestrictionMode === 'all',
         combo_restrictions: comboRestrictionMode === 'specific' ? selectedComboDeals : [],
       }
@@ -380,11 +402,28 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       </FormSection>
 
       {/* 生效時間 */}
-      <FormSection variant="info" title="生效時間">
+      <FormSection variant="info" title="活動期間">
+        {/* 🆕 無限期選項 */}
+        <div className="mb-4">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isUnlimitedPeriod}
+              onChange={(e) => setIsUnlimitedPeriod(e.target.checked)}
+              className="h-5 w-5"
+              disabled={loading}
+            />
+            <span className="font-bold text-lg">無限期（推薦）</span>
+          </label>
+          <p className="mt-1 text-sm text-gray-600">
+            勾選後，優惠券將永久有效，不會過期
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="valid_from" className="mb-2 block font-bold">
-              開始時間 <span className="text-red-600">*</span>
+              開始日期 <span className="text-red-600">*</span>
             </label>
             <input
               type="datetime-local"
@@ -402,29 +441,31 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
 
           <div>
             <label htmlFor="valid_until" className="mb-2 block font-bold">
-              結束時間 <span className="text-red-600">*</span>
+              結束日期 {!isUnlimitedPeriod && <span className="text-red-600">*</span>}
             </label>
             <input
               type="datetime-local"
               id="valid_until"
               value={validUntil}
               onChange={(e) => setValidUntil(e.target.value)}
-              className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black"
-              required
-              disabled={loading}
+              className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:bg-gray-100"
+              required={!isUnlimitedPeriod}
+              disabled={loading || isUnlimitedPeriod}
             />
             <p className="mt-1 text-sm text-gray-600">
-              預設為 30 天後（建議設定較長期限避免過期）
+              {isUnlimitedPeriod ? '已設定為無限期' : '預設為 30 天後（建議設定較長期限避免過期）'}
             </p>
           </div>
         </div>
 
         {/* 日期範圍提示 */}
-        <div className="mt-4 rounded-none border-2 border-orange-500 bg-orange-50 p-4">
-          <p className="text-sm font-bold text-orange-800">
-            ⚠️ 重要：優惠券過期後將無法領取！請確保「結束時間」設定在未來，建議至少 30-90 天
-          </p>
-        </div>
+        {!isUnlimitedPeriod && (
+          <div className="mt-4 rounded-none border-2 border-orange-500 bg-orange-50 p-4">
+            <p className="text-sm font-bold text-orange-800">
+              ⚠️ 重要：優惠券過期後將無法領取！請確保「結束時間」設定在未來，建議至少 30-90 天
+            </p>
+          </div>
+        )}
       </FormSection>
 
       {/* 等級限制 */}
@@ -526,6 +567,18 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               <span className="font-bold">無限制（優惠券可用於所有訂單，包含組合優惠）</span>
             </label>
 
+            <label className="flex items-center gap-2 cursor-pointer rounded border-2 border-red-400 bg-red-50 p-3 hover:border-red-600">
+              <input
+                type="radio"
+                value="exclude"
+                checked={comboRestrictionMode === 'exclude'}
+                onChange={(e) => setComboRestrictionMode('exclude')}
+                className="h-4 w-4"
+                disabled={loading}
+              />
+              <span className="font-bold text-red-800">❌ 排除組合優惠（優惠券不可用於包含組合優惠的訂單，推薦）</span>
+            </label>
+
             <label className="flex items-center gap-2 cursor-pointer rounded border-2 border-gray-300 p-3 hover:border-black">
               <input
                 type="radio"
@@ -594,7 +647,8 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               💡 組合優惠限制說明：
             </p>
             <ul className="mt-2 text-sm text-blue-800 space-y-1">
-              <li>• <strong>無限制</strong>：優惠券可用於任何訂單（預設）</li>
+              <li>• <strong>無限制</strong>：優惠券可用於任何訂單（包含普通商品與組合優惠）</li>
+              <li>• <strong>❌ 排除組合優惠（推薦）</strong>：優惠券僅適用於普通商品訂單，不可用於包含組合優惠的訂單</li>
               <li>• <strong>適用所有組合優惠</strong>：僅當購物車包含組合優惠時可用</li>
               <li>• <strong>僅適用指定組合優惠</strong>：僅當購物車包含指定的組合優惠時可用</li>
             </ul>

@@ -160,6 +160,7 @@ export async function createCoupon(
         claim_limit: data.claim_limit,
         valid_from: data.valid_from,
         valid_until: data.valid_until,
+        exclude_combo_deals: data.exclude_combo_deals, // 🆕 排除組合優惠
       })
       .select()
       .single()
@@ -473,6 +474,9 @@ export async function updateCoupon(
     }
     if (data.status) {
       updateData.status = data.status
+    }
+    if (data.exclude_combo_deals !== undefined) {
+      updateData.exclude_combo_deals = data.exclude_combo_deals
     }
 
     // 6. 更新優惠券
@@ -905,8 +909,19 @@ export async function validateCoupon(
       }
     }
 
-    // 5. 🆕 Feature 021: 檢查組合優惠限制
+    // 5. 🆕 檢查排除組合優惠
     const comboDeals = data.comboDeals || []
+    if (coupon.exclude_combo_deals && comboDeals.length > 0) {
+      return {
+        success: true,
+        data: {
+          valid: false,
+          error: '此優惠券不可用於包含組合優惠的訂單',
+        },
+      }
+    }
+
+    // 6. 🆕 Feature 021: 檢查組合優惠限制
     const comboRestrictionCheck = await checkCouponComboRestrictions(
       coupon.id,
       comboDeals
@@ -922,19 +937,19 @@ export async function validateCoupon(
       }
     }
 
-    // 6. 轉換關聯資料為 ID 陣列
+    // 7. 轉換關聯資料為 ID 陣列
     const tierRestrictions =
       coupon.tier_restrictions?.map((r: any) => r.tier_id) || []
     const seriesRestrictions =
       coupon.series_restrictions?.map((r: any) => r.series_id) || []
 
-    // 7. 🆕 Feature 021: 計算組合優惠總金額（優惠後價格）
+    // 8. 🆕 Feature 021: 計算組合優惠總金額（優惠後價格）
     const comboDealsTotal = comboDeals.reduce(
       (sum, combo) => sum + combo.discounted_price,
       0
     )
 
-    // 8. 計算折扣（包含組合優惠金額）
+    // 9. 計算折扣（包含組合優惠金額）
     const result = calculateCouponDiscount({
       coupon: {
         ...coupon,
