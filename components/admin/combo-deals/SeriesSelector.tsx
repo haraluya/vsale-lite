@@ -12,7 +12,7 @@
 
 import { ChevronUp, ChevronDown, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { Series, ComboMode } from '@/types'
+import type { Series, Category, ComboMode } from '@/types'
 import { designTokens } from '@/lib/design-tokens'
 
 interface SelectedSeries {
@@ -23,6 +23,7 @@ interface SelectedSeries {
 
 interface SeriesSelectorProps {
   availableSeries: Series[]
+  categories: Category[]
   selectedSeries: SelectedSeries[]
   onChange: (series: SelectedSeries[]) => void
   comboMode: ComboMode
@@ -31,6 +32,7 @@ interface SeriesSelectorProps {
 
 export function SeriesSelector({
   availableSeries,
+  categories,
   selectedSeries,
   onChange,
   comboMode,
@@ -127,6 +129,34 @@ export function SeriesSelector({
     return availableSeries.find((s) => s.id === seriesId)?.name || '未知系列'
   }
 
+  /**
+   * 按分類分組系列
+   */
+  const groupSeriesByCategory = () => {
+    // 過濾出未選擇且啟用的系列
+    const unselectedSeries = availableSeries
+      .filter((s) => !selectedSeries.some((selected) => selected.series_id === s.id))
+      .filter((s) => s.status === 'active')
+
+    // 按分類分組
+    const grouped = new Map<string, Series[]>()
+    unselectedSeries.forEach((series) => {
+      const categoryId = series.category_id || 'uncategorized'
+      if (!grouped.has(categoryId)) {
+        grouped.set(categoryId, [])
+      }
+      grouped.get(categoryId)!.push(series)
+    })
+
+    // 按分類的 sort_order 排序
+    const sortedCategories = categories
+      .filter((c) => c.status === 'active')
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .filter((c) => grouped.has(c.id))
+
+    return { grouped, sortedCategories }
+  }
+
   return (
     <div className="space-y-4">
       {/* 已選擇的系列列表 */}
@@ -217,33 +247,53 @@ export function SeriesSelector({
           <p className="text-sm text-gray-600 py-4 text-center border-2 border-dashed border-gray-300 rounded-none">
             已達最大系列數量 (5 個)
           </p>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-            {availableSeries
-              .filter((s) => !selectedSeries.some((selected) => selected.series_id === s.id))
-              .filter((s) => s.status === 'active')
-              .map((series) => (
-                <button
-                  key={series.id}
-                  type="button"
-                  onClick={() => handleAddSeries(series.id)}
-                  disabled={disabled}
-                  className="p-3 border-2 border-black rounded-none bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
-                >
-                  <span className="font-bold text-sm">{series.name}</span>
-                  {series.code && (
-                    <span className="block text-xs text-gray-600 mt-1">{series.code}</span>
-                  )}
-                </button>
-              ))}
-          </div>
-        )}
+        ) : (() => {
+          const { grouped, sortedCategories } = groupSeriesByCategory()
 
-        {availableSeries.filter((s) => s.status === 'active').length === 0 && (
-          <p className="text-sm text-gray-600 py-4 text-center border-2 border-dashed border-gray-300 rounded-none">
-            沒有可用的系列，請先建立系列
-          </p>
-        )}
+          if (sortedCategories.length === 0) {
+            return (
+              <p className="text-sm text-gray-600 py-4 text-center border-2 border-dashed border-gray-300 rounded-none">
+                沒有可用的系列，請先建立系列
+              </p>
+            )
+          }
+
+          return (
+            <div className="space-y-4">
+              {sortedCategories.map((category) => {
+                const seriesInCategory = grouped.get(category.id) || []
+                if (seriesInCategory.length === 0) return null
+
+                return (
+                  <div key={category.id}>
+                    {/* 分類標題 */}
+                    <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-gray-300">
+                      {category.name}
+                    </h4>
+
+                    {/* 該分類下的系列 */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                      {seriesInCategory.map((series) => (
+                        <button
+                          key={series.id}
+                          type="button"
+                          onClick={() => handleAddSeries(series.id)}
+                          disabled={disabled}
+                          className="p-3 border-2 border-black rounded-none bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
+                        >
+                          <span className="font-bold text-sm">{series.name}</span>
+                          {series.code && (
+                            <span className="block text-xs text-gray-600 mt-1">{series.code}</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })()}
       </div>
 
       {/* 提示訊息 */}

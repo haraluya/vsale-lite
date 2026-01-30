@@ -7,6 +7,7 @@
 
 import { getActiveSeries } from '@/lib/actions/shop'
 import { getTiers } from '@/lib/actions/tiers'
+import { getCategories } from '@/lib/actions/categories'
 import { ComboDealForm } from '@/components/admin/combo-deals/ComboDealForm'
 import { generatePageMetadata } from '@/lib/metadata'
 
@@ -23,6 +24,10 @@ export default async function NewComboDealPage() {
   const tiersResult = await getTiers()
   const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
+  // 載入分類資料
+  const categoriesResult = await getCategories()
+  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : []
+
   return (
     <div>
       <div className="mb-8">
@@ -30,7 +35,7 @@ export default async function NewComboDealPage() {
         <p className="mt-2 text-gray-600">建立新的組合優惠活動</p>
       </div>
 
-      <ComboDealForm series={series} tiers={tiers} mode="create" />
+      <ComboDealForm series={series} tiers={tiers} categories={categories} mode="create" />
     </div>
   )
 }

@@ -16,7 +16,7 @@ import { useRouter } from 'next/navigation'
 import { createComboDeal, updateComboDeal } from '@/lib/actions/combo-deals'
 import { PosterUpload } from './PosterUpload'
 import { SeriesSelector } from './SeriesSelector'
-import type { ComboDealWithDetails, Series, Tier, ComboMode, DiscountType, ComboDealFormData } from '@/types'
+import type { ComboDealWithDetails, Series, Tier, Category, ComboMode, DiscountType, ComboDealFormData } from '@/types'
 import { Button } from '@/components/ui/button'
 import { FormSection } from '@/components/ui/form-section'
 import { useAlert } from '@/lib/contexts/dialog-context'
@@ -26,6 +26,7 @@ interface ComboDealFormProps {
   comboDeal?: ComboDealWithDetails
   series: Series[]
   tiers: Tier[]
+  categories: Category[]
   mode: 'create' | 'edit'
 }
 
@@ -35,7 +36,7 @@ interface SelectedSeries {
   display_order: number
 }
 
-export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormProps) {
+export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: ComboDealFormProps) {
   const router = useRouter()
   const alert = useAlert()
 
@@ -51,10 +52,10 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
   const [discountType, setDiscountType] = useState<DiscountType>(comboDeal?.discount_type || 'fixed')
   const [discountValue, setDiscountValue] = useState(comboDeal?.discount_value?.toString() || '')
   const [startDate, setStartDate] = useState(
-    comboDeal?.start_date ? new Date(comboDeal.start_date).toISOString().slice(0, 16) : ''
+    comboDeal?.start_date ? new Date(comboDeal.start_date).toISOString().slice(0, 10) : ''
   )
   const [endDate, setEndDate] = useState(
-    comboDeal?.end_date ? new Date(comboDeal.end_date).toISOString().slice(0, 16) : ''
+    comboDeal?.end_date ? new Date(comboDeal.end_date).toISOString().slice(0, 10) : ''
   )
 
   // Series selection
@@ -76,8 +77,6 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
     comboDeal?.tiers.map((t) => t.tier_id) || []
   )
 
-  // Display order
-  const [displayOrder, setDisplayOrder] = useState(comboDeal?.display_order?.toString() || '')
 
   /**
    * Handle form submission
@@ -129,7 +128,6 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
           comboMode === 'mix_match' && mixMatchTotalQuantity
             ? parseInt(mixMatchTotalQuantity)
             : undefined,
-        display_order: displayOrder ? parseInt(displayOrder) : undefined,
       }
 
       // Call server action
@@ -212,22 +210,6 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
               <p className="mt-1 text-sm text-red-600">{fieldErrors.poster_url[0]}</p>
             )}
           </div>
-
-          {/* 顯示順位 */}
-          <div>
-            <label htmlFor="display_order" className={`${designTokens.typography.label} mb-2 block`}>
-              顯示順位 <span className="text-gray-500 text-sm">(選填，數字越小越前面)</span>
-            </label>
-            <input
-              type="number"
-              id="display_order"
-              value={displayOrder}
-              onChange={(e) => setDisplayOrder(e.target.value)}
-              className={designTokens.input.base}
-              placeholder="留空則依建立時間排序"
-              min="0"
-            />
-          </div>
         </div>
       </FormSection>
 
@@ -308,6 +290,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
       <FormSection variant="info" title="選擇系列">
         <SeriesSelector
           availableSeries={series}
+          categories={categories}
           selectedSeries={selectedSeries}
           onChange={setSelectedSeries}
           comboMode={comboMode}
@@ -399,7 +382,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
               開始日期 <span className="text-red-600">*</span>
             </label>
             <input
-              type="datetime-local"
+              type="date"
               id="start_date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
@@ -417,7 +400,7 @@ export function ComboDealForm({ comboDeal, series, tiers, mode }: ComboDealFormP
               結束日期 <span className="text-red-600">*</span>
             </label>
             <input
-              type="datetime-local"
+              type="date"
               id="end_date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}

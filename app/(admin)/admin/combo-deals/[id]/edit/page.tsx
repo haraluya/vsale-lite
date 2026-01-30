@@ -9,6 +9,7 @@ import { notFound } from 'next/navigation'
 import { getComboDealDetail } from '@/lib/actions/combo-deals'
 import { getActiveSeries } from '@/lib/actions/shop'
 import { getTiers } from '@/lib/actions/tiers'
+import { getCategories } from '@/lib/actions/categories'
 import { ComboDealForm } from '@/components/admin/combo-deals/ComboDealForm'
 import { generatePageMetadata } from '@/lib/metadata'
 
@@ -36,6 +37,10 @@ export default async function EditComboDealPage({ params }: { params: Promise<{ 
   const tiersResult = await getTiers()
   const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
+  // 載入分類資料
+  const categoriesResult = await getCategories()
+  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : []
+
   return (
     <div>
       <div className="mb-8">
@@ -43,7 +48,7 @@ export default async function EditComboDealPage({ params }: { params: Promise<{ 
         <p className="mt-2 text-gray-600">{comboDeal.name}</p>
       </div>
 
-      <ComboDealForm comboDeal={comboDeal} series={series} tiers={tiers} mode="edit" />
+      <ComboDealForm comboDeal={comboDeal} series={series} tiers={tiers} categories={categories} mode="edit" />
     </div>
   )
 }

@@ -7,7 +7,7 @@
  */
 
 import { useState } from 'react'
-import { Upload, X, Check, Loader2 } from 'lucide-react'
+import { Upload, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { useAlert } from '@/lib/contexts/dialog-context'
@@ -23,11 +23,10 @@ interface PosterUploadProps {
 export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }: PosterUploadProps) {
   const alert = useAlert()
   const [uploading, setUploading] = useState(false)
-  const [previewFile, setPreviewFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   /**
-   * 處理檔案選擇
+   * 處理檔案選擇 - 選擇後自動上傳
    */
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -58,31 +57,20 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
       return
     }
 
-    // 3. 建立預覽
+    // 3. 建立預覽並自動上傳
     const reader = new FileReader()
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       setPreviewUrl(reader.result as string)
-      setPreviewFile(file)
+      // 自動上傳
+      await uploadFile(file)
     }
     reader.readAsDataURL(file)
   }
 
   /**
-   * 取消預覽
+   * 上傳檔案到 Supabase Storage
    */
-  const handleCancelPreview = () => {
-    setPreviewFile(null)
-    setPreviewUrl(null)
-  }
-
-  /**
-   * T028: 整合 Supabase Storage 上傳
-   *
-   * 上傳海報圖片至 Supabase Storage (combo-deals bucket)
-   */
-  const handleConfirmUpload = async () => {
-    if (!previewFile) return
-
+  const uploadFile = async (file: File) => {
     setUploading(true)
 
     try {
@@ -90,14 +78,14 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
       const supabase = createClient()
 
       // 2. 產生唯一檔名
-      const fileExt = previewFile.name.split('.').pop()
+      const fileExt = file.name.split('.').pop()
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
       const filePath = `combo-deals/${fileName}`
 
       // 3. 上傳至 Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('combo-deals')
-        .upload(filePath, previewFile, {
+        .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false,
         })
@@ -116,7 +104,6 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
       onUploadComplete(publicUrl)
 
       // 6. 清空預覽
-      setPreviewFile(null)
       setPreviewUrl(null)
 
       await alert({
@@ -126,6 +113,8 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
       })
     } catch (error) {
       console.error('上傳失敗:', error)
+      // 清空預覽
+      setPreviewUrl(null)
       await alert({
         title: '上傳失敗',
         message: error instanceof Error ? error.message : '上傳失敗，請重試',
@@ -136,14 +125,12 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
     }
   }
 
-  // 決定邊框顏色
-  const borderColor = previewFile ? 'border-blue-500' : 'border-black'
 
   return (
-    <div className={`rounded-none border-2 md:border-3 ${borderColor} bg-white p-4 shadow-neo`}>
+    <div className={`rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo`}>
       <h3 className={`${designTokens.typography.h3} mb-4`}>
         組合優惠海報 <span className="text-red-600">*</span>
-        {previewFile && <span className="ml-2 text-xs text-blue-600">(待確認)</span>}
+        {uploading && <span className="ml-2 text-xs text-blue-600">(上傳中...)</span>}
       </h3>
 
       {/* 預覽區域 */}
@@ -160,66 +147,48 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
               />
             </div>
           </div>
-          {previewUrl && (
-            <p className="mt-2 text-sm text-blue-600 font-bold">
-              ⬆️ 預覽新圖片（點擊「確認上傳」以儲存）
+          {uploading && (
+            <p className="mt-2 text-sm text-blue-600 font-bold flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              上傳中，請稍候...
             </p>
           )}
         </div>
       )}
 
-      {/* 上傳按鈕與操作 */}
-      {!previewFile ? (
-        <label className="block">
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handleFileSelect}
-            disabled={disabled || uploading}
-            className="hidden"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            disabled={disabled || uploading}
-            onClick={(e) => {
-              e.preventDefault()
-              const input = e.currentTarget.previousElementSibling as HTMLInputElement
-              input?.click()
-            }}
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            選擇圖片
-          </Button>
-        </label>
-      ) : (
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="flex-1"
-            onClick={handleCancelPreview}
-            disabled={uploading}
-          >
-            <X className="mr-2 h-4 w-4" />
-            取消
-          </Button>
-          <Button type="button" className="flex-1" onClick={handleConfirmUpload} disabled={uploading}>
-            {uploading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                上傳中...
-              </>
-            ) : (
-              <>
-                <Check className="mr-2 h-4 w-4" />
-                確認上傳
-              </>
-            )}
-          </Button>
-        </div>
-      )}
+      {/* 上傳按鈕 */}
+      <label className="block">
+        <input
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleFileSelect}
+          disabled={disabled || uploading}
+          className="hidden"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          disabled={disabled || uploading}
+          onClick={(e) => {
+            e.preventDefault()
+            const input = e.currentTarget.previousElementSibling as HTMLInputElement
+            input?.click()
+          }}
+        >
+          {uploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              上傳中...
+            </>
+          ) : (
+            <>
+              <Upload className="mr-2 h-4 w-4" />
+              {currentUrl ? '更換圖片' : '選擇圖片'}
+            </>
+          )}
+        </Button>
+      </label>
 
       <p className="mt-2 text-xs text-gray-500">
         建議尺寸：16:9 比例（例如 1920×1080 像素） | 支援格式：JPG, PNG, WebP | 最大 3MB
