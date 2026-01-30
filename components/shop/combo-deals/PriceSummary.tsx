@@ -16,7 +16,7 @@ import { designTokens } from '@/lib/design-tokens'
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/stores/cart'
-import type { ComboDealWithDetails } from '@/types'
+import type { ComboDealWithDetails, ComboDealPricing } from '@/types'
 
 interface PriceSummaryProps {
   comboDeal: ComboDealWithDetails
@@ -27,12 +27,9 @@ interface PriceSummaryProps {
     series_name: string
     quantity: number
     unit_price: number
+    retail_price?: number // 🆕 零售價（用於顯示折扣明細）
   }>
-  priceInfo: {
-    originalPrice: number
-    discountedPrice: number
-    discountAmount: number
-  }
+  priceInfo: ComboDealPricing
   isValid: boolean
   isValidating: boolean
   editMode?: boolean // 🆕 Phase 7: 是否為編輯模式
@@ -144,7 +141,7 @@ export function PriceSummary({
                     {product.product_name} × {product.quantity}
                   </span>
                   <span className="flex-shrink-0">
-                    ${((product as any).retail_price ? (product as any).retail_price * product.quantity : product.unit_price * product.quantity).toFixed(0)}
+                    ${(product.retail_price ? product.retail_price * product.quantity : product.unit_price * product.quantity).toFixed(0)}
                   </span>
                 </div>
               ))}
