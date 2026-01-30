@@ -1192,18 +1192,18 @@ export async function getComboDealDetailForClient(
           })
         }
 
-        // 過濾掉無價格的商品，並轉換為元件期望的格式
+        // 轉換為元件期望的格式（使用價格回退機制：等級價格 → 零售價）
         const productsWithPrices = (products || [])
-          .filter((p) => priceMap.has(p.id))
           .map((p) => ({
             product_id: p.id,
             product_name: p.name,
             product_image: p.image_url,
             stock: p.stock,
             stock_status: p.stock_status, // 🆕 庫存狀態標籤
-            tier_price: priceMap.get(p.id)!,
+            tier_price: priceMap.get(p.id) ?? p.retail_price, // 🔄 價格回退：優先等級價格，未設定時使用零售價
             retail_price: p.retail_price, // 🆕 零售價
           }))
+          .filter((p) => p.tier_price !== null && p.tier_price !== undefined) // 只過濾掉完全沒有價格的商品
 
         return {
           series_id: s.series_id,

@@ -1141,7 +1141,7 @@ export async function searchProducts(query: string): Promise<ActionResult<Produc
           image_url,
           category:category_id (id, name)
         ),
-        tier_prices!inner (
+        tier_prices!left (
           price
         ),
         tags
@@ -1170,7 +1170,7 @@ export async function searchProducts(query: string): Promise<ActionResult<Produc
       category_name: item.series?.category?.name,
       description: item.description,
       retail_price: item.retail_price,
-      user_price: item.tier_prices[0]?.price, // 用戶等級價格
+      user_price: item.tier_prices[0]?.price ?? item.retail_price, // 🔄 價格回退：優先等級價格，未設定時使用零售價
       stock: item.stock,
       stock_status: item.stock_status,
       unit: item.unit,
@@ -1258,7 +1258,7 @@ export async function filterProducts(params: {
           image_url,
           category:category_id (id, name)
         ),
-        tier_prices!inner (
+        tier_prices!left (
           price
         ),
         tags
@@ -1317,7 +1317,7 @@ export async function filterProducts(params: {
       category_name: item.series?.category?.name,
       description: item.description,
       retail_price: item.retail_price,
-      user_price: item.tier_prices[0]?.price,
+      user_price: item.tier_prices[0]?.price ?? item.retail_price, // 🔄 價格回退：優先等級價格，未設定時使用零售價
       stock: item.stock,
       stock_status: item.stock_status,
       unit: item.unit,
