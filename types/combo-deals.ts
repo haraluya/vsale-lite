@@ -87,6 +87,7 @@ export interface ComboDealWithDetails extends ComboDeal {
       tier_price: number;
       retail_price: number; // 🆕 零售價（顯示會員折扣力度）
       stock: number;
+      stock_status: 'sufficient' | 'low' | 'out_of_stock'; // 🆕 庫存狀態標籤
     }>;
   }>;
   tiers: Array<{

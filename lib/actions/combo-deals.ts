@@ -1152,6 +1152,7 @@ export async function getComboDealDetailForClient(
             image_url,
             status,
             stock,
+            stock_status,
             retail_price
           `)
           .eq('series_id', s.series_id)
@@ -1199,6 +1200,7 @@ export async function getComboDealDetailForClient(
             product_name: p.name,
             product_image: p.image_url,
             stock: p.stock,
+            stock_status: p.stock_status, // 🆕 庫存狀態標籤
             tier_price: priceMap.get(p.id)!,
             retail_price: p.retail_price, // 🆕 零售價
           }))
