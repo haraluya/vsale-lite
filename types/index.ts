@@ -232,6 +232,7 @@ export type ProductDetailInfo = {
   series_id: string
   series_name: string
   unit_price: number      // 用戶等級價格
+  retail_price: number    // 🆕 零售價（顯示會員折扣）
   image_url: string | null
 }
 

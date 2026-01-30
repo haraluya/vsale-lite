@@ -113,7 +113,7 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
       </div>
 
       {/* 商品清單 */}
-      <div className="space-y-2">
+      <div className="space-y-2 mb-4">
         <div className="text-sm font-semibold text-gray-700 mb-2">
           包含商品 ({totalQuantity} 件):
         </div>
@@ -154,9 +154,17 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
                 )}
               </div>
 
-              {/* 單價 × 數量 */}
+              {/* 🆕 顯示零售價（而非等級價格） */}
               <div className="text-sm text-gray-600 whitespace-nowrap sm:text-right">
-                {detail?.unit_price ? (
+                {detail?.retail_price ? (
+                  <>
+                    <span className="text-gray-600 font-semibold">
+                      NT$ {detail.retail_price.toLocaleString()}
+                    </span>
+                    {' × '}
+                    <span className="font-semibold">{product.quantity}</span>
+                  </>
+                ) : detail?.unit_price ? (
                   <>
                     <span className="text-green-600 font-semibold">
                       NT$ {detail.unit_price.toLocaleString()}
@@ -171,6 +179,58 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
             </div>
           )
         })}
+      </div>
+
+      {/* 🆕 價格明細（完整折扣明細） */}
+      <div className={cn(
+        'rounded-none bg-white border-2 border-yellow-300 p-3 space-y-2'
+      )}>
+        {/* 小計（零售價總計） */}
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-700">小計</span>
+          <span className="font-semibold text-gray-700">
+            NT$ {item.original_price.toLocaleString()}
+          </span>
+        </div>
+
+        {/* 🆕 會員折扣（如果有） */}
+        {(() => {
+          // 計算會員折扣：零售價總計 - 等級價格總計
+          const retailTotal = item.selected_products.reduce((sum, product) => {
+            const detail = productDetails?.get(product.product_id)
+            const retailPrice = detail?.retail_price || detail?.unit_price || 0
+            return sum + retailPrice * product.quantity
+          }, 0)
+          const tierTotal = item.original_price
+          const memberDiscount = retailTotal - tierTotal
+
+          if (memberDiscount > 0) {
+            return (
+              <div className="flex justify-between text-sm text-blue-600 font-bold">
+                <span>會員專屬折扣</span>
+                <span>-NT$ {memberDiscount.toLocaleString()}</span>
+              </div>
+            )
+          }
+          return null
+        })()}
+
+        {/* 組合優惠折扣 */}
+        <div className="flex justify-between text-sm text-green-600 font-bold">
+          <span>組合優惠折扣</span>
+          <span>-NT$ {item.discount_amount.toLocaleString()}</span>
+        </div>
+
+        {/* 分隔線 */}
+        <div className="border-t-2 border-yellow-300 pt-2" />
+
+        {/* 總計 */}
+        <div className="flex justify-between text-base font-black">
+          <span className="text-gray-900">總計</span>
+          <span className="text-red-600">
+            NT$ {item.discounted_price.toLocaleString()}
+          </span>
+        </div>
       </div>
     </div>
   )

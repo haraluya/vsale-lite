@@ -373,6 +373,7 @@ export async function getComboDealProductDetails(
         series_id: product.series_id,
         series_name: seriesData?.name || '未分類',
         unit_price: unitPrice,
+        retail_price: product.retail_price ?? unitPrice, // 🆕 零售價
         image_url: product.image_url,
       })
     })

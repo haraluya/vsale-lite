@@ -31,13 +31,17 @@ export function calculateComboDealPrice(
 
 /**
  * 計算組合優惠的價格（商品已包含價格）
- * @param selectedProducts - 選擇的商品列表（含數量和價格）
+ * @param selectedProducts - 選擇的商品列表（含數量、等級價格、零售價）
  * @param discountType - 折扣類型
  * @param discountValue - 折扣值
- * @returns 價格計算結果
+ * @returns 價格計算結果（含會員折扣明細）
  */
 export function calculateComboDealPrice(
-  selectedProducts: Array<{ quantity: number; unit_price: number }>,
+  selectedProducts: Array<{
+    quantity: number;
+    unit_price: number;
+    retail_price?: number; // 🆕 零售價（選填，用於計算會員折扣）
+  }>,
   discountType: DiscountType,
   discountValue: number
 ): ComboDealPricing;
@@ -50,7 +54,8 @@ export function calculateComboDealPrice(
   secondParam: any,
   thirdParam?: any
 ): ComboDealPricing {
-  let originalPrice: number;
+  let tierPrice: number;
+  let retailPrice: number;
   let discountType: DiscountType;
   let discountValue: number;
 
@@ -60,32 +65,55 @@ export function calculateComboDealPrice(
     const tierPrices = secondParam as Map<string, number>;
     const comboDeal = thirdParam as Pick<ComboDeal, 'discount_type' | 'discount_value'>;
 
-    originalPrice = selectedProducts.reduce((sum, product) => {
-      const tierPrice = tierPrices.get(product.product_id) || 0;
-      return sum + tierPrice * product.quantity;
+    tierPrice = selectedProducts.reduce((sum, product) => {
+      const price = tierPrices.get(product.product_id) || 0;
+      return sum + price * product.quantity;
+    }, 0);
+
+    // 零售價（若未提供則等於等級價格）
+    retailPrice = selectedProducts.reduce((sum, product) => {
+      const price = product.retail_price || tierPrices.get(product.product_id) || 0;
+      return sum + price * product.quantity;
     }, 0);
 
     discountType = comboDeal.discount_type;
     discountValue = comboDeal.discount_value;
   } else {
     // 商品已包含價格
-    originalPrice = selectedProducts.reduce((sum, product) => {
+    tierPrice = selectedProducts.reduce((sum, product) => {
       return sum + product.unit_price * product.quantity;
+    }, 0);
+
+    // 🆕 計算零售價（若有提供）
+    retailPrice = selectedProducts.reduce((sum, product) => {
+      const price = product.retail_price || product.unit_price;
+      return sum + price * product.quantity;
     }, 0);
 
     discountType = secondParam as DiscountType;
     discountValue = thirdParam as number;
   }
 
-  // 套用組合折扣
+  // 計算會員折扣
+  const memberDiscount = retailPrice - tierPrice;
+
+  // 套用組合優惠折扣
   const { discountedPrice, discountAmount } = applyDiscount(
-    originalPrice,
+    tierPrice,
     discountType,
     discountValue
   );
 
   return {
-    originalPrice: Math.round(originalPrice),
+    // 🆕 完整價格結構
+    retailPrice: Math.round(retailPrice),
+    memberDiscount: Math.round(memberDiscount),
+    tierPrice: Math.round(tierPrice),
+    comboDealDiscount: Math.round(discountAmount),
+    finalPrice: Math.round(discountedPrice),
+
+    // 🔧 向後相容欄位
+    originalPrice: Math.round(tierPrice),
     discountedPrice: Math.round(discountedPrice),
     discountAmount: Math.round(discountAmount),
   };

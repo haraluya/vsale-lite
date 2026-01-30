@@ -85,6 +85,7 @@ export interface ComboDealWithDetails extends ComboDeal {
       product_code?: string;
       product_image?: string;
       tier_price: number;
+      retail_price: number; // 🆕 零售價（顯示會員折扣力度）
       stock: number;
     }>;
   }>;
@@ -149,9 +150,17 @@ export interface SelectedProduct {
 }
 
 export interface ComboDealPricing {
-  originalPrice: number;
-  discountedPrice: number;
-  discountAmount: number;
+  // 🆕 完整價格結構（顯示會員折扣力度）
+  retailPrice: number;        // 零售價總計
+  memberDiscount: number;     // 會員折扣金額
+  tierPrice: number;          // 等級價格總計
+  comboDealDiscount: number;  // 組合優惠折扣金額
+  finalPrice: number;         // 最終價格
+
+  // 🔧 向後相容欄位（避免破壞現有代碼）
+  originalPrice: number;      // = tierPrice
+  discountedPrice: number;    // = finalPrice
+  discountAmount: number;     // = comboDealDiscount
 }
 
 export interface ComboDealValidationResult {

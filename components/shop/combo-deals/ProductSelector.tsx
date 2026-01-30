@@ -37,6 +37,7 @@ interface SelectedProduct {
   series_name: string
   quantity: number
   unit_price: number
+  retail_price: number // 🆕 零售價（顯示會員折扣）
 }
 
 export function ProductSelector({
@@ -61,6 +62,7 @@ export function ProductSelector({
               series_name: series.series_name,
               quantity: item.quantity,
               unit_price: product.tier_price,
+              retail_price: product.retail_price, // 🆕 零售價
             }
           }
         }
@@ -72,6 +74,7 @@ export function ProductSelector({
           series_name: '',
           quantity: item.quantity,
           unit_price: 0,
+          retail_price: 0, // 🆕 零售價
         }
       })
     }
@@ -122,53 +125,17 @@ export function ProductSelector({
     validateSelection()
   }, [selectedProducts, comboDeal.id])
 
-  // 處理商品選擇（各選模式）
-  const handleToggleProduct = (
-    productId: string,
-    productName: string,
-    seriesId: string,
-    seriesName: string,
-    unitPrice: number,
-    requiredQuantity: number
-  ) => {
-    setSelectedProducts((prev) => {
-      const existingIndex = prev.findIndex((p) => p.product_id === productId)
+  // 🔧 處理商品選擇（各選模式 - 已改為數量選擇模式）
+  // 此函式已棄用，各選模式現在使用 handleQuantityChange
 
-      if (existingIndex >= 0) {
-        // 已選擇，移除
-        return prev.filter((p) => p.product_id !== productId)
-      } else {
-        // 未選擇，檢查該系列是否已達上限
-        const seriesCount = prev.filter((p) => p.series_id === seriesId).length
-
-        if (seriesCount >= requiredQuantity) {
-          // 達到上限，不允許再選（可以考慮替換最舊的選擇）
-          return prev
-        }
-
-        // 新增選擇
-        return [
-          ...prev,
-          {
-            product_id: productId,
-            product_name: productName,
-            series_id: seriesId,
-            series_name: seriesName,
-            quantity: 1,
-            unit_price: unitPrice,
-          },
-        ]
-      }
-    })
-  }
-
-  // 處理數量變更（任選模式）
+  // 🔧 處理數量變更（任選模式 & 各選模式）
   const handleQuantityChange = (
     productId: string,
     productName: string,
     seriesId: string,
     seriesName: string,
     unitPrice: number,
+    retailPrice: number, // 🆕 零售價
     delta: number
   ) => {
     setSelectedProducts((prev) => {
@@ -202,6 +169,7 @@ export function ProductSelector({
               series_name: seriesName,
               quantity: delta,
               unit_price: unitPrice,
+              retail_price: retailPrice, // 🆕 零售價
             },
           ]
         }
@@ -227,12 +195,13 @@ export function ProductSelector({
     0
   )
 
-  // 渲染各選模式的系列
+  // 🔧 渲染各選模式的系列（改為數量選擇模式）
   const renderEachModeSeries = () => {
     return comboDeal.series.map((series) => {
-      const seriesSelectedCount = selectedProducts.filter(
-        (p) => p.series_id === series.series_id
-      ).length
+      // 🔧 計算該系列已選擇的商品數量總和（而非商品個數）
+      const seriesSelectedCount = selectedProducts
+        .filter((p) => p.series_id === series.series_id)
+        .reduce((sum, p) => sum + p.quantity, 0)
       const requiredQuantity = series.required_quantity || 0
 
       return (
@@ -241,20 +210,26 @@ export function ProductSelector({
           <div className="mb-4 rounded-none border-2 md:border-3 border-black bg-yellow-50 p-4 shadow-neo-sm">
             <h3 className="text-lg md:text-xl font-black text-foreground mb-2">
               {series.series_name}
+              {/* 🆕 顯示可選數量提示 */}
+              <span className="ml-2 text-base md:text-lg font-semibold text-gray-600">
+                (需選 {requiredQuantity} 件)
+              </span>
             </h3>
             <p className="text-sm md:text-base text-gray-700">
-              需選擇 <span className="font-bold">{requiredQuantity}</span> 個商品
               {seriesSelectedCount > 0 && (
                 <span
                   className={cn(
-                    'ml-2 font-bold',
+                    'font-bold',
                     seriesSelectedCount === requiredQuantity
                       ? 'text-green-600'
                       : 'text-orange-600'
                   )}
                 >
-                  （已選 {seriesSelectedCount} 個）
+                  已選 {seriesSelectedCount} 件
                 </span>
+              )}
+              {seriesSelectedCount === 0 && (
+                <span className="text-gray-500">尚未選擇</span>
               )}
             </p>
           </div>
@@ -267,9 +242,9 @@ export function ProductSelector({
           ) : (
             <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
               {series.products.map((product) => {
-                const isSelected = isProductSelected(product.product_id)
-                const canSelect =
-                  !isSelected && seriesSelectedCount < requiredQuantity
+                const quantity = getProductQuantity(product.product_id)
+                // 🔧 檢查該系列是否還能再選（基於數量總和）
+                const canIncrease = seriesSelectedCount < requiredQuantity || quantity > 0
 
                 return (
                   <div
@@ -323,59 +298,72 @@ export function ProductSelector({
                         </span>
                       </p>
 
-                      {/* 選擇狀態或選擇按鈕 */}
-                      {isSelected ? (
+                      {/* 🔧 數量選擇器（各選模式改為數量選擇） */}
+                      <div className="flex items-center gap-2">
                         <button
                           onClick={() =>
-                            handleToggleProduct(
+                            handleQuantityChange(
                               product.product_id,
                               product.product_name,
                               series.series_id,
                               series.series_name,
                               product.tier_price,
-                              requiredQuantity
+                              product.retail_price,
+                              -1
                             )
                           }
+                          disabled={quantity === 0}
                           className={cn(
-                            'w-full rounded-none bg-green-500 text-white font-bold transition-all',
+                            'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
                             designTokens.neoBrutalism.border.full,
                             'border-black',
-                            designTokens.neoBrutalism.shadow.mobile,
-                            'px-4 py-2 md:py-3 text-sm md:text-base',
-                            'flex items-center justify-center gap-2'
+                            quantity > 0
+                              ? 'bg-red-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                              : 'bg-gray-200 opacity-30 cursor-not-allowed'
                           )}
                         >
-                          <Check className="w-4 h-4 md:w-5 md:h-5" strokeWidth={3} />
-                          已選擇
+                          <Minus className="w-5 h-5 md:w-6 md:h-6" strokeWidth={3} />
                         </button>
-                      ) : (
+
+                        <div className="flex-1 text-center">
+                          <span className="text-xl md:text-2xl font-black">
+                            {quantity}
+                          </span>
+                        </div>
+
                         <button
                           onClick={() =>
-                            canSelect &&
-                            handleToggleProduct(
+                            handleQuantityChange(
                               product.product_id,
                               product.product_name,
                               series.series_id,
                               series.series_name,
                               product.tier_price,
-                              requiredQuantity
+                              product.retail_price,
+                              1
                             )
                           }
-                          disabled={!canSelect}
+                          disabled={!canIncrease}
                           className={cn(
-                            'w-full rounded-none font-bold transition-all',
+                            'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
                             designTokens.neoBrutalism.border.full,
                             'border-black',
-                            canSelect
-                              ? 'bg-white shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                              : 'bg-gray-200 text-gray-500 cursor-not-allowed',
-                            'px-4 py-2 md:py-3 text-sm md:text-base'
+                            canIncrease
+                              ? 'bg-green-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                              : 'bg-gray-200 opacity-30 cursor-not-allowed'
                           )}
                         >
-                          選擇此商品
+                          <Plus className="w-5 h-5 md:w-6 md:h-6" strokeWidth={3} />
                         </button>
-                      )}
+                      </div>
                     </div>
+
+                    {/* 庫存狀態 */}
+                    {product.stock !== undefined && product.stock <= 0 && (
+                      <p className="text-xs text-gray-500 mt-1 text-center">
+                        庫存不足
+                      </p>
+                    )}
                   </div>
                 )
               })}
@@ -396,11 +384,11 @@ export function ProductSelector({
         {/* 任選規則說明 */}
         <div className="mb-4 rounded-none border-2 md:border-3 border-black bg-yellow-50 p-4 shadow-neo-sm">
           <h3 className="text-lg md:text-xl font-black text-foreground mb-2">
-            任選 {requiredQuantity} 個商品
+            任選 {requiredQuantity} 件商品
           </h3>
           <p className="text-sm md:text-base text-gray-700">
             從以下所有系列中任意選擇商品，總數量達到{' '}
-            <span className="font-bold">{requiredQuantity}</span> 個即可享受優惠
+            <span className="font-bold">{requiredQuantity}</span> 件即可享受優惠
             {totalSelectedCount > 0 && (
               <span
                 className={cn(
@@ -410,7 +398,7 @@ export function ProductSelector({
                     : 'text-orange-600'
                 )}
               >
-                （已選 {totalSelectedCount} 個）
+                （已選 {totalSelectedCount} 件）
               </span>
             )}
           </p>
@@ -495,6 +483,7 @@ export function ProductSelector({
                                 series.series_id,
                                 series.series_name,
                                 product.tier_price,
+                                product.retail_price, // 🆕 零售價
                                 -1
                               )
                             }
@@ -525,6 +514,7 @@ export function ProductSelector({
                                 series.series_id,
                                 series.series_name,
                                 product.tier_price,
+                                product.retail_price, // 🆕 零售價
                                 1
                               )
                             }

@@ -130,10 +130,10 @@ export function PriceSummary({
   return (
     <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 md:border-t-3 border-black p-4 md:p-6 shadow-neo z-10">
       <div className="container mx-auto max-w-2xl">
-        {/* 價格明細 */}
+        {/* 🆕 價格明細（完整折扣明細） */}
         {selectedProducts.length > 0 && (
           <div className="mb-4 space-y-2">
-            {/* 商品清單 */}
+            {/* 商品清單（顯示零售價） */}
             <div className="space-y-1 mb-3">
               {selectedProducts.map((product) => (
                 <div
@@ -144,7 +144,7 @@ export function PriceSummary({
                     {product.product_name} × {product.quantity}
                   </span>
                   <span className="flex-shrink-0">
-                    ${(product.unit_price * product.quantity).toFixed(0)}
+                    ${((product as any).retail_price ? (product as any).retail_price * product.quantity : product.unit_price * product.quantity).toFixed(0)}
                   </span>
                 </div>
               ))}
@@ -153,28 +153,36 @@ export function PriceSummary({
             {/* 分隔線 */}
             <div className="border-t-2 border-gray-300 pt-2" />
 
-            {/* 原價 */}
+            {/* 🆕 零售價總計 */}
             <div className="flex justify-between text-sm md:text-base">
               <span className="font-semibold text-gray-700">小計</span>
               <span className="font-semibold text-gray-700">
-                ${priceInfo.originalPrice.toFixed(0)}
+                ${priceInfo.retailPrice.toFixed(0)}
               </span>
             </div>
 
-            {/* 組合優惠折扣 */}
+            {/* 🆕 會員折扣（若有） */}
+            {priceInfo.memberDiscount > 0 && (
+              <div className="flex justify-between text-sm md:text-base text-blue-600 font-bold">
+                <span>會員專屬折扣</span>
+                <span>-${priceInfo.memberDiscount.toFixed(0)}</span>
+              </div>
+            )}
+
+            {/* 🆕 組合優惠折扣 */}
             <div className="flex justify-between text-sm md:text-base text-green-600 font-bold">
               <span>組合優惠折扣</span>
-              <span>-${priceInfo.discountAmount.toFixed(0)}</span>
+              <span>-${priceInfo.comboDealDiscount.toFixed(0)}</span>
             </div>
 
             {/* 分隔線 */}
             <div className="border-t-2 border-black pt-2" />
 
-            {/* 優惠後總價 */}
+            {/* 🆕 最終價格 */}
             <div className="flex justify-between text-lg md:text-2xl font-black">
               <span className="text-foreground">總計</span>
               <span className="text-red-600">
-                ${priceInfo.discountedPrice.toFixed(0)}
+                ${priceInfo.finalPrice.toFixed(0)}
               </span>
             </div>
           </div>
@@ -210,7 +218,7 @@ export function PriceSummary({
               <ButtonIcon className="w-5 h-5 md:w-6 md:h-6" />
               {buttonText}
               {selectedProducts.length > 0 &&
-                ` - $${priceInfo.discountedPrice.toFixed(0)}`}
+                ` - $${priceInfo.finalPrice.toFixed(0)}`}
             </>
           )}
         </button>
