@@ -217,24 +217,38 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                 <>
                   {order.combo_deal_items.map((comboDealItem) => {
                     const snapshot = comboDealItem.combo_deal_snapshot
+
+                    // 生成折扣說明文字
+                    const discountText = snapshot.discount_type === 'fixed'
+                      ? `折扣 ${formatCurrency(snapshot.discount_value)}`
+                      : `${Math.round(snapshot.discount_value / 10)} 折`
+
                     return (
                       <div
                         key={comboDealItem.id}
                         className="rounded-none bg-yellow-50 border-2 border-yellow-400 p-3 md:p-4 mb-3 md:mb-4 last:mb-0"
                       >
                         {/* 組合優惠標題 */}
-                        <div className="flex items-center gap-2 mb-2">
-                          <Package className="w-5 h-5 text-yellow-700 flex-shrink-0" />
-                          <h3 className={cn(
-                            designTokens.typography.body.large,
-                            "font-bold text-yellow-900"
-                          )}>
-                            📦 {snapshot.name}
-                          </h3>
+                        <div className="flex items-start gap-2 mb-3">
+                          <Package className="w-5 h-5 text-yellow-700 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <h3 className={cn(
+                              designTokens.typography.body.large,
+                              "font-bold text-yellow-900"
+                            )}>
+                              📦 {snapshot.name}
+                            </h3>
+                            <p className={cn(
+                              designTokens.typography.caption,
+                              "text-yellow-700 mt-1"
+                            )}>
+                              ({discountText})
+                            </p>
+                          </div>
                         </div>
 
                         {/* 商品清單 */}
-                        <div className="space-y-2 mb-3 ml-7">
+                        <div className="space-y-2 ml-7">
                           {snapshot.series.flatMap(series =>
                             series.products.map((product, idx) => (
                               <div key={`${series.series_id}-${idx}`} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
@@ -262,24 +276,6 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                               </div>
                             ))
                           )}
-                        </div>
-
-                        {/* 價格資訊 */}
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 ml-7">
-                          <div className={cn(
-                            designTokens.typography.caption,
-                            "text-gray-600"
-                          )}>
-                            原價: <span className="line-through">{formatCurrency(comboDealItem.original_price)}</span>
-                            {' '}→ 折扣 {formatCurrency(comboDealItem.discount_amount)}
-                          </div>
-                          <div className="text-left sm:text-right">
-                            <p className={cn(
-                              "text-lg md:text-xl font-bold text-green-600"
-                            )}>
-                              {formatCurrency(comboDealItem.discounted_price)}
-                            </p>
-                          </div>
                         </div>
                       </div>
                     )

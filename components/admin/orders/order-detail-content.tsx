@@ -269,6 +269,71 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
             )}
 
             <div className="divide-y-2 divide-black">
+              {/* 🆕 Feature 021: 組合優惠項目 */}
+              {order.combo_deal_items && order.combo_deal_items.length > 0 && (
+                <>
+                  {order.combo_deal_items.map((comboDealItem) => {
+                    const snapshot = comboDealItem.combo_deal_snapshot
+
+                    // 生成折扣說明文字
+                    const discountText = snapshot.discount_type === 'fixed'
+                      ? `折扣 ${formatAmount(snapshot.discount_value)}`
+                      : `${Math.round(snapshot.discount_value / 10)} 折`
+
+                    return (
+                      <div key={comboDealItem.id} className="bg-yellow-50 p-3 md:p-4">
+                        {/* 組合優惠標題 */}
+                        <div className="flex items-start gap-2 mb-3">
+                          <Package className="w-5 h-5 text-yellow-700 flex-shrink-0 mt-1" />
+                          <div className="flex-1">
+                            <h3 className={cn(designTokens.typography.body.large, "font-bold text-yellow-900")}>
+                              📦 {snapshot.name}
+                            </h3>
+                            <p className={cn(designTokens.typography.caption, "text-yellow-700")}>
+                              ({discountText})
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* 商品清單 */}
+                        <div className="space-y-2 ml-7 mb-3">
+                          {snapshot.series.flatMap(series =>
+                            series.products.map((product, idx) => (
+                              <div key={`${series.series_id}-${idx}`} className="grid grid-cols-12 gap-2">
+                                <div className="col-span-6 text-sm">
+                                  <span className="text-yellow-800 font-bold">【{series.series_name}】</span>
+                                  <span className="text-gray-900">{product.product_name}</span>
+                                </div>
+                                <div className="col-span-2 text-right text-sm text-gray-600">
+                                  {formatAmount(product.unit_price)}
+                                </div>
+                                <div className="col-span-2 text-center text-sm text-gray-600">
+                                  × {product.quantity}
+                                </div>
+                                <div className="col-span-2 text-right text-sm text-gray-900 font-semibold">
+                                  {formatAmount(product.unit_price * product.quantity)}
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+
+                        {/* 組合優惠價格總計 */}
+                        <div className="ml-7 pt-2 border-t-2 border-yellow-300 grid grid-cols-12 gap-2">
+                          <div className="col-span-6 text-sm text-gray-600">組合優惠小計</div>
+                          <div className="col-span-2"></div>
+                          <div className="col-span-2"></div>
+                          <div className="col-span-2 text-right text-base font-bold text-green-600">
+                            {formatAmount(comboDealItem.discounted_price)}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </>
+              )}
+
+              {/* 一般商品項目 */}
               {order.items.map(item => (
                 <div key={item.id} className="grid grid-cols-12 gap-2 md:gap-4 p-3 md:p-4">
                   <div className={cn('col-span-12 md:col-span-6 font-bold', designTokens.typography.body.base)}>
@@ -332,6 +397,27 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                         )}
                       >
                         {fee.amount >= 0 ? '+' : ''} {formatAmount(fee.amount)}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {/* 組合優惠折扣 (Feature 021) */}
+              {order.combo_deal_items && order.combo_deal_items.length > 0 && (
+                <>
+                  {order.combo_deal_items.map((comboDealItem) => (
+                    <div key={comboDealItem.id} className="grid grid-cols-12 gap-2 md:gap-4 bg-orange-50 p-3 md:p-4">
+                      <div className={cn('col-span-6 md:col-span-8 text-right font-bold text-orange-700', designTokens.typography.body.base)}>
+                        🎁 組合優惠折扣 - {comboDealItem.combo_deal_snapshot.name}
+                      </div>
+                      <div
+                        className={cn(
+                          'col-span-6 md:col-span-4 text-right font-bold text-orange-700',
+                          designTokens.typography.body.large
+                        )}
+                      >
+                        - {formatAmount(comboDealItem.discount_amount)}
                       </div>
                     </div>
                   ))}
