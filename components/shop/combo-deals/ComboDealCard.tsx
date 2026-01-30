@@ -50,9 +50,9 @@ export function ComboDealCard({ deal }: ComboDealCardProps) {
         designTokens.neoBrutalism.shadow.full,
         designTokens.neoBrutalism.hover
       )}>
-        {/* 海報圖片 (16:9 比例) */}
+        {/* 海報圖片 (正方形比例，與系列卡片一致) */}
         <div className={cn(
-          "relative aspect-[16/9] overflow-hidden",
+          "relative aspect-square overflow-hidden",
           designTokens.neoBrutalism.border.mobile,
           "md:border-b-3",
           "border-b-black"
