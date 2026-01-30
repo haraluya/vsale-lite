@@ -57,6 +57,16 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
   const [endDate, setEndDate] = useState(
     comboDeal?.end_date ? new Date(comboDeal.end_date).toISOString().slice(0, 10) : ''
   )
+  // 🆕 無限期狀態（預設為 true）
+  const [isUnlimitedPeriod, setIsUnlimitedPeriod] = useState(() => {
+    // 如果是編輯模式且結束日期是 2099 年，視為無限期
+    if (comboDeal?.end_date) {
+      const endYear = new Date(comboDeal.end_date).getFullYear()
+      return endYear >= 2099
+    }
+    // 新建模式預設無限期
+    return true
+  })
 
   // Series selection
   const [selectedSeries, setSelectedSeries] = useState<SelectedSeries[]>(
@@ -117,7 +127,8 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
         discount_type: discountType,
         discount_value: parseFloat(discountValue),
         start_date: new Date(startDate),
-        end_date: new Date(endDate),
+        // 🆕 無限期：如果勾選無限期，結束日期設為 2099-12-31
+        end_date: isUnlimitedPeriod ? new Date('2099-12-31') : new Date(endDate),
         series: selectedSeries.map((s) => ({
           series_id: s.series_id,
           required_quantity: comboMode === 'each' ? s.required_quantity : undefined,
@@ -375,6 +386,23 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
 
       {/* 活動期間 */}
       <FormSection variant="warning" title="活動期間">
+        {/* 🆕 無限期選項 */}
+        <div className="mb-4">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={isUnlimitedPeriod}
+              onChange={(e) => setIsUnlimitedPeriod(e.target.checked)}
+              className="h-5 w-5"
+              disabled={loading}
+            />
+            <span className="font-bold text-lg">無限期（推薦）</span>
+          </label>
+          <p className="mt-1 text-sm text-gray-600">
+            勾選後，組合優惠將永久有效，不會過期
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* 開始日期 */}
           <div>
@@ -397,21 +425,35 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
           {/* 結束日期 */}
           <div>
             <label htmlFor="end_date" className={`${designTokens.typography.label} mb-2 block`}>
-              結束日期 <span className="text-red-600">*</span>
+              結束日期 {!isUnlimitedPeriod && <span className="text-red-600">*</span>}
             </label>
             <input
               type="date"
               id="end_date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className={designTokens.input.base}
-              required
+              className={`${designTokens.input.base} ${isUnlimitedPeriod ? 'opacity-50 bg-gray-100' : ''}`}
+              required={!isUnlimitedPeriod}
+              disabled={loading || isUnlimitedPeriod}
             />
-            {fieldErrors.end_date && (
-              <p className="mt-1 text-sm text-red-600">{fieldErrors.end_date[0]}</p>
+            {isUnlimitedPeriod ? (
+              <p className="mt-1 text-sm text-gray-600">已設定為無限期</p>
+            ) : (
+              fieldErrors.end_date && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.end_date[0]}</p>
+              )
             )}
           </div>
         </div>
+
+        {/* 日期範圍提示 */}
+        {!isUnlimitedPeriod && (
+          <div className="mt-4 rounded-none border-2 border-orange-500 bg-orange-50 p-4">
+            <p className="text-sm font-bold text-orange-800">
+              ⚠️ 重要：組合優惠過期後將無法使用！建議設定較長期限或選擇「無限期」
+            </p>
+          </div>
+        )}
       </FormSection>
 
       {/* T033: 等級選擇器 */}
