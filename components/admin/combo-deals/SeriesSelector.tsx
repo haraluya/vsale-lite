@@ -140,12 +140,19 @@ export function SeriesSelector({
 
     // 按分類分組
     const grouped = new Map<string, Series[]>()
+    const uncategorizedSeries: Series[] = []
+
     unselectedSeries.forEach((series) => {
-      const categoryId = series.category_id || 'uncategorized'
-      if (!grouped.has(categoryId)) {
-        grouped.set(categoryId, [])
+      if (!series.category_id) {
+        // 未分類的系列
+        uncategorizedSeries.push(series)
+      } else {
+        // 有分類的系列
+        if (!grouped.has(series.category_id)) {
+          grouped.set(series.category_id, [])
+        }
+        grouped.get(series.category_id)!.push(series)
       }
-      grouped.get(categoryId)!.push(series)
     })
 
     // 按分類的 sort_order 排序
@@ -154,7 +161,7 @@ export function SeriesSelector({
       .sort((a, b) => a.sort_order - b.sort_order)
       .filter((c) => grouped.has(c.id))
 
-    return { grouped, sortedCategories }
+    return { grouped, sortedCategories, uncategorizedSeries }
   }
 
   return (
@@ -248,9 +255,9 @@ export function SeriesSelector({
             已達最大系列數量 (5 個)
           </p>
         ) : (() => {
-          const { grouped, sortedCategories } = groupSeriesByCategory()
+          const { grouped, sortedCategories, uncategorizedSeries } = groupSeriesByCategory()
 
-          if (sortedCategories.length === 0) {
+          if (sortedCategories.length === 0 && uncategorizedSeries.length === 0) {
             return (
               <p className="text-sm text-gray-600 py-4 text-center border-2 border-dashed border-gray-300 rounded-none">
                 沒有可用的系列，請先建立系列
@@ -260,6 +267,7 @@ export function SeriesSelector({
 
           return (
             <div className="space-y-4">
+              {/* 已分類的系列 */}
               {sortedCategories.map((category) => {
                 const seriesInCategory = grouped.get(category.id) || []
                 if (seriesInCategory.length === 0) return null
@@ -291,6 +299,31 @@ export function SeriesSelector({
                   </div>
                 )
               })}
+
+              {/* 未分類的系列 */}
+              {uncategorizedSeries.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-gray-300">
+                    未分類
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                    {uncategorizedSeries.map((series) => (
+                      <button
+                        key={series.id}
+                        type="button"
+                        onClick={() => handleAddSeries(series.id)}
+                        disabled={disabled}
+                        className="p-3 border-2 border-black rounded-none bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
+                      >
+                        <span className="font-bold text-sm">{series.name}</span>
+                        {series.code && (
+                          <span className="block text-xs text-gray-600 mt-1">{series.code}</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )
         })()}
