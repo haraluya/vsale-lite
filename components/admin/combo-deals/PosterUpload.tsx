@@ -3,7 +3,7 @@
 /**
  * 組合優惠海報上傳元件
  * Feature: 021-combo-deals (T026-T028)
- * 支援 16:9 比例驗證、預覽、Supabase Storage 上傳
+ * 支援預覽、Supabase Storage 上傳
  */
 
 import { useState } from 'react'
@@ -18,62 +18,6 @@ interface PosterUploadProps {
   currentUrl?: string
   onUploadComplete: (url: string) => void
   disabled?: boolean
-}
-
-/**
- * T027: 圖片比例驗證函式
- *
- * 驗證圖片是否符合 16:9 比例（容差 ±5%）
- *
- * @param file 圖片檔案
- * @returns 驗證結果與圖片尺寸
- */
-async function validateImageAspectRatio(file: File): Promise<{
-  valid: boolean
-  width: number
-  height: number
-  aspectRatio: number
-  message?: string
-}> {
-  return new Promise((resolve) => {
-    const img = new window.Image()
-    const url = URL.createObjectURL(file)
-
-    img.onload = () => {
-      URL.revokeObjectURL(url)
-
-      const width = img.width
-      const height = img.height
-      const aspectRatio = width / height
-      const targetRatio = 16 / 9 // 1.7778
-      const tolerance = 0.05 // 5% 容差
-
-      const valid = Math.abs(aspectRatio - targetRatio) / targetRatio <= tolerance
-
-      resolve({
-        valid,
-        width,
-        height,
-        aspectRatio,
-        message: valid
-          ? undefined
-          : `圖片比例為 ${aspectRatio.toFixed(2)} (${width}×${height}px)，必須為 16:9 (1.78)`,
-      })
-    }
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url)
-      resolve({
-        valid: false,
-        width: 0,
-        height: 0,
-        aspectRatio: 0,
-        message: '無法讀取圖片尺寸',
-      })
-    }
-
-    img.src = url
-  })
 }
 
 export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }: PosterUploadProps) {
@@ -114,19 +58,7 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
       return
     }
 
-    // 3. 驗證圖片比例（16:9）
-    const validation = await validateImageAspectRatio(file)
-
-    if (!validation.valid) {
-      await alert({
-        title: '圖片比例不符',
-        message: validation.message || '圖片比例必須為 16:9',
-        variant: 'error',
-      })
-      return
-    }
-
-    // 4. 建立預覽
+    // 3. 建立預覽
     const reader = new FileReader()
     reader.onloadend = () => {
       setPreviewUrl(reader.result as string)
@@ -290,7 +222,7 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
       )}
 
       <p className="mt-2 text-xs text-gray-500">
-        必須為 16:9 比例（容差 ±5%） | 支援格式：JPG, PNG, WebP | 最大 3MB
+        建議尺寸：16:9 比例（例如 1920×1080 像素） | 支援格式：JPG, PNG, WebP | 最大 3MB
       </p>
     </div>
   )
