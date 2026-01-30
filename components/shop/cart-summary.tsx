@@ -74,7 +74,7 @@ export function CartSummary({
   // 🔧 計算零售價總計（用於顯示）
   const retailPriceTotal = totalAmount + comboMemberDiscount
 
-  // 計算運費
+  // 計算運費（優化：並行查詢）
   useEffect(() => {
     async function fetchShippingFee() {
       const supabase = createClient()
@@ -89,37 +89,50 @@ export function CartSummary({
         return
       }
 
-      // 呼叫 calculate_shipping_fee RPC
-      const { data, error } = await supabase.rpc('calculate_shipping_fee', {
-        p_user_id: user.id,
-        p_subtotal: totalAmount, // 依原始商品金額計算（不含優惠券折扣）
-      })
+      try {
+        // 🚀 優化：並行執行 RPC 和查詢，減少總等待時間
+        const [shippingResult, profileResult] = await Promise.all([
+          // 查詢 1: 呼叫 calculate_shipping_fee RPC
+          supabase.rpc('calculate_shipping_fee', {
+            p_user_id: user.id,
+            p_subtotal: totalAmount, // 依原始商品金額計算（不含優惠券折扣）
+          }),
+          // 查詢 2: 同時取得用戶等級資訊（含免運門檻）
+          supabase
+            .from('profiles')
+            .select(`
+              tier_id,
+              tiers!inner (
+                free_shipping_threshold
+              )
+            `)
+            .eq('id', user.id)
+            .single(),
+        ])
 
-      if (error) {
-        console.error('計算運費失敗:', error)
+        // 處理運費結果
+        if (shippingResult.error) {
+          console.error('計算運費失敗:', shippingResult.error)
+          setShippingFee(0)
+        } else {
+          setShippingFee(shippingResult.data ?? 0)
+        }
+
+        // 處理免運門檻結果
+        if (profileResult.data?.tiers) {
+          setFreeShippingThreshold(
+            (profileResult.data.tiers as any).free_shipping_threshold ?? null
+          )
+        } else {
+          setFreeShippingThreshold(null)
+        }
+      } catch (error) {
+        console.error('取得運費資訊失敗:', error)
         setShippingFee(0)
-      } else {
-        setShippingFee(data ?? 0)
+        setFreeShippingThreshold(null)
+      } finally {
+        setIsLoadingShipping(false)
       }
-
-      // 取得用戶等級的免運門檻（用於顯示「再購 XX 即可免運」提示）
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('tier_id')
-        .eq('id', user.id)
-        .single()
-
-      if (profileData?.tier_id) {
-        const { data: tierData } = await supabase
-          .from('tiers')
-          .select('free_shipping_threshold')
-          .eq('id', profileData.tier_id)
-          .single()
-
-        setFreeShippingThreshold(tierData?.free_shipping_threshold ?? null)
-      }
-
-      setIsLoadingShipping(false)
     }
 
     if (!isEmpty) {
