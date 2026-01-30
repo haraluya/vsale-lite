@@ -17,13 +17,13 @@
 
 import { useEffect, useState } from 'react'
 import { useCartStore } from '@/stores/cart'
-import { getCartItemsWithPrices } from '@/lib/actions/cart'
+import { getCartItemsWithPrices, getComboDealProductDetails } from '@/lib/actions/cart'
 import { validateCoupon } from '@/lib/actions/coupons'
 import { CartItem } from '@/components/shop/cart-item'
 import { CartSummary } from '@/components/shop/cart-summary'
 import { CouponSelector } from '@/components/shop/coupons/CouponSelector'
 import { ComboDealCartItem } from '@/components/shop/combo-deals/ComboDealCartItem' // 🆕 Feature 021
-import type { CartItemWithProduct } from '@/types'
+import type { CartItemWithProduct, ProductDetailInfo } from '@/types'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { designTokens } from '@/lib/design-tokens'
@@ -41,6 +41,7 @@ export function CartContent() {
     comboDeals, // 🆕 Feature 021: 組合優惠項目
   } = useCartStore()
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
+  const [comboDealProductDetails, setComboDealProductDetails] = useState<Map<string, ProductDetailInfo>>(new Map())
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCouponSelector, setShowCouponSelector] = useState(false)
@@ -82,6 +83,24 @@ export function CartContent() {
 
     loadCartItems()
   }, [items, removeInvalidItems])
+
+  // 🆕 載入組合優惠商品詳細資訊
+  useEffect(() => {
+    async function loadComboDealProducts() {
+      if (comboDeals.length === 0) {
+        setComboDealProductDetails(new Map())
+        return
+      }
+
+      const result = await getComboDealProductDetails(comboDeals)
+
+      if (result.success && result.data) {
+        setComboDealProductDetails(result.data)
+      }
+    }
+
+    loadComboDealProducts()
+  }, [comboDeals])
 
   // 自動驗證已套用的優惠券（頁面載入時 + 購物車商品變更時）
   useEffect(() => {
@@ -235,9 +254,13 @@ export function CartContent() {
               "lg:col-span-2",
               "space-y-3 md:space-y-4"
             )}>
-              {/* 🆕 Feature 021: 組合優惠項目 */}
+              {/* 🆕 Feature 021: 組合優惠項目（先渲染，在上方） */}
               {comboDeals.map((item) => (
-                <ComboDealCartItem key={item.id} item={item} />
+                <ComboDealCartItem
+                  key={item.id}
+                  item={item}
+                  productDetails={comboDealProductDetails}
+                />
               ))}
 
               {/* 一般商品項目 */}

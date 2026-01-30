@@ -13,19 +13,21 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/stores/cart'
-import { getCartItemsWithPrices, validateCartBeforeCheckout } from '@/lib/actions/cart'
+import { getCartItemsWithPrices, getComboDealProductDetails, validateCartBeforeCheckout } from '@/lib/actions/cart'
 import { createOrder } from '@/lib/actions/orders'
-import type { CartItemWithProduct } from '@/types'
+import type { CartItemWithProduct, ProductDetailInfo } from '@/types'
 import { formatCurrency, cn } from '@/lib/utils'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { designTokens } from '@/lib/design-tokens'
+import { Package } from 'lucide-react'
 
 export function CheckoutContent() {
   const router = useRouter()
   const { items, comboDeals, clearCart, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
 
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
+  const [comboDealProductDetails, setComboDealProductDetails] = useState<Map<string, ProductDetailInfo>>(new Map())
   const [notes, setNotes] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -33,20 +35,26 @@ export function CheckoutContent() {
 
   useEffect(() => {
     async function loadCartItems() {
-      if (items.length === 0) {
+      if (items.length === 0 && comboDeals.length === 0) {
         setCartItemsWithPrices([])
+        setComboDealProductDetails(new Map())
         setIsLoading(false)
         return
       }
 
       setIsLoading(true)
-      const result = await getCartItemsWithPrices(items)
 
-      if (result.success && result.data) {
-        setCartItemsWithPrices(result.data)
+      // 並行查詢普通商品和組合優惠商品
+      const [normalItemsResult, comboDealDetailsResult] = await Promise.all([
+        items.length > 0 ? getCartItemsWithPrices(items) : Promise.resolve({ success: true as const, data: [] as CartItemWithProduct[] }),
+        comboDeals.length > 0 ? getComboDealProductDetails(comboDeals) : Promise.resolve({ success: true as const, data: new Map<string, ProductDetailInfo>() })
+      ])
+
+      if (normalItemsResult.success && normalItemsResult.data) {
+        setCartItemsWithPrices(normalItemsResult.data)
 
         // 檢查是否有無效商品（在 localStorage 中但未返回的商品）
-        const validProductIds = result.data.map(item => item.productId)
+        const validProductIds = normalItemsResult.data.map(item => item.productId)
         const invalidProductIds = items
           .map(item => item.productId)
           .filter(id => !validProductIds.includes(id))
@@ -59,20 +67,28 @@ export function CheckoutContent() {
             { duration: 5000 }
           )
         }
-      } else {
-        setError(result.message || '載入購物車商品時發生錯誤')
+      } else if (!normalItemsResult.success) {
+        setError('message' in normalItemsResult ? normalItemsResult.message : '載入購物車商品時發生錯誤')
       }
+
+      if (comboDealDetailsResult.success && comboDealDetailsResult.data) {
+        setComboDealProductDetails(comboDealDetailsResult.data)
+      }
+
       setIsLoading(false)
     }
 
     loadCartItems()
-  }, [items, removeInvalidItems])
+  }, [items, comboDeals, removeInvalidItems])
 
   // 計算總金額
-  const totalAmount = cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)
-  const finalAmount = totalAmount - couponDiscount
+  const normalItemsTotal = cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)
+  const comboDealOriginalTotal = comboDeals.reduce((sum, deal) => sum + deal.original_price, 0)
+  const totalAmount = normalItemsTotal + comboDealOriginalTotal
+  const comboDealTotalDiscount = comboDeals.reduce((sum, deal) => sum + deal.discount_amount, 0)
+  const finalAmount = totalAmount - comboDealTotalDiscount - couponDiscount
   const totalItems = getTotalItems()
-  const isEmpty = items.length === 0
+  const isEmpty = items.length === 0 && comboDeals.length === 0
 
   // 送出訂單
   async function handleSubmitOrder() {
@@ -229,12 +245,87 @@ export function CheckoutContent() {
               "mb-3 md:mb-4"
             )}>訂單商品</h2>
             <div className={designTokens.spacing.card.gap}>
+              {/* 組合優惠項目（先渲染，在上方） */}
+              {comboDeals.map((deal) => (
+                <div
+                  key={deal.id}
+                  className={cn(
+                    "rounded-none bg-yellow-50 border-2 border-yellow-400 p-3 md:p-4 mb-3 md:mb-4"
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Package className="w-5 h-5 text-yellow-700 flex-shrink-0" />
+                    <h3 className={cn("font-bold text-yellow-900", designTokens.typography.body.large)}>
+                      📦 {deal.combo_deal_name}
+                    </h3>
+                  </div>
+
+                  {/* 商品明細 */}
+                  <div className="space-y-2 mb-3 ml-7">
+                    {deal.selected_products.map((product, index) => {
+                      const detail = comboDealProductDetails.get(product.product_id)
+                      return (
+                        <div
+                          key={`${product.product_id}-${index}`}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-sm"
+                        >
+                          <div className="flex-1">
+                            {detail?.series_name && (
+                              <span className={cn(
+                                "inline-block rounded-none bg-yellow-100 border border-yellow-400 px-2 py-0.5 mr-2",
+                                "text-xs font-bold text-yellow-800"
+                              )}>
+                                【{detail.series_name}】
+                              </span>
+                            )}
+                            <span className="text-gray-900">
+                              {detail?.product_name || product.product_id}
+                            </span>
+                          </div>
+                          <div className="text-gray-600 whitespace-nowrap sm:text-right">
+                            {detail?.unit_price ? (
+                              <>NT$ {detail.unit_price.toLocaleString()} × {product.quantity}</>
+                            ) : (
+                              <>× {product.quantity}</>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+
+                  {/* 價格資訊 */}
+                  <div className="border-t-2 border-yellow-300 pt-2 ml-7 space-y-1 text-sm">
+                    <div className="flex justify-between text-gray-600">
+                      <span>原價</span>
+                      <span className="line-through">NT$ {deal.original_price.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-green-600 font-semibold">
+                      <span>組合優惠折扣</span>
+                      <span>- NT$ {deal.discount_amount.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between font-bold pt-1 border-t border-yellow-300">
+                      <span>優惠價</span>
+                      <span className="text-green-600 text-lg">NT$ {deal.discounted_price.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* 普通商品項目 */}
               {cartItemsWithPrices.map((item) => (
                 <div
                   key={item.productId}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
+                  className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
                 >
                   <div className="flex-1">
+                    {/* 系列名稱標籤 */}
+                    <div className={cn(
+                      "inline-block rounded-none bg-yellow-100 border-2 border-yellow-400 px-2 py-1 mb-1",
+                      "text-xs font-bold text-yellow-800"
+                    )}>
+                      【{item.seriesName}】
+                    </div>
                     <h3 className={cn(
                       "font-bold",
                       designTokens.typography.body.large
@@ -263,12 +354,47 @@ export function CheckoutContent() {
               "border-t-black"
             )}>
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className={designTokens.typography.body.large}>商品總額</p>
+                {/* 普通商品總額 */}
+                {normalItemsTotal > 0 && (
+                  <div className="flex items-center justify-between text-gray-700">
+                    <p className={designTokens.typography.body.base}>普通商品總額</p>
+                    <p className="text-base font-semibold">
+                      {formatCurrency(normalItemsTotal)}
+                    </p>
+                  </div>
+                )}
+
+                {/* 組合優惠原價 */}
+                {comboDeals.length > 0 && (
+                  <div className="flex items-center justify-between text-gray-700">
+                    <p className={designTokens.typography.body.base}>組合優惠原價</p>
+                    <p className="text-base font-semibold">
+                      {formatCurrency(comboDealOriginalTotal)}
+                    </p>
+                  </div>
+                )}
+
+                {/* 商品總額（小計） */}
+                <div className={cn(
+                  "flex items-center justify-between pt-2 border-t border-gray-300"
+                )}>
+                  <p className={cn(designTokens.typography.body.large, "font-semibold")}>商品總額</p>
                   <p className="text-lg font-bold">
                     {formatCurrency(totalAmount)}
                   </p>
                 </div>
+
+                {/* 組合優惠折扣（分項顯示） */}
+                {comboDeals.map((deal) => (
+                  <div key={deal.id} className="flex items-center justify-between text-green-600">
+                    <p className={cn(designTokens.typography.body.base, "truncate mr-2")}>
+                      組合優惠折扣 - {deal.combo_deal_name}
+                    </p>
+                    <p className="text-base font-bold whitespace-nowrap">
+                      -{formatCurrency(deal.discount_amount)}
+                    </p>
+                  </div>
+                ))}
 
                 {/* 優惠券折扣 */}
                 {appliedCoupon && couponDiscount > 0 && (
@@ -276,12 +402,19 @@ export function CheckoutContent() {
                     <p className={designTokens.typography.body.base}>
                       優惠券折扣 ({appliedCoupon.code_normalized})
                     </p>
-                    <p className="text-lg font-bold">
+                    <p className="text-base font-bold">
                       -{formatCurrency(couponDiscount)}
                     </p>
                   </div>
                 )}
 
+                {/* 運費提示 */}
+                <div className="flex items-center justify-between text-gray-600 text-sm pt-2 border-t border-gray-200">
+                  <p>運費</p>
+                  <p>（訂單送出後計算）</p>
+                </div>
+
+                {/* 最終總額 */}
                 <div className={cn(
                   "flex items-center justify-between pt-2",
                   designTokens.neoBrutalism.border.mobile,

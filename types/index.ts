@@ -216,11 +216,23 @@ export type CartItem = {
 export type CartItemWithProduct = {
   productId: string
   productName: string
+  seriesName: string    // 🆕 Feature 021 Enhancement: 系列名稱（購物車顯示用）
   imageUrl: string | null
   quantity: number
   price: number | null  // 當前用戶等級價格
   subtotal: number
   series_id?: string    // 系列 ID（優惠券系列限制驗證需要）
+}
+
+// 🆕 Feature 021: 組合優惠商品詳細資訊 (購物車與結帳頁面顯示用)
+export type ProductDetailInfo = {
+  product_id: string
+  product_name: string
+  product_code: string | null
+  series_id: string
+  series_name: string
+  unit_price: number      // 用戶等級價格
+  image_url: string | null
 }
 
 // 訂單狀態

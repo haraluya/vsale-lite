@@ -2,7 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
-import type { ActionResult, CartItemWithProduct } from '@/types'
+import type { ActionResult, CartItemWithProduct, ProductDetailInfo } from '@/types'
+import type { ComboDealCartItem } from '@/stores/cart'
 import { revalidatePath } from 'next/cache'
 
 /**
@@ -115,7 +116,7 @@ export async function getCartItemsWithPrices(
 
     const productIds = cartItems.map(item => item.productId)
 
-    // 批次查詢商品與價格（LEFT JOIN tier_prices，以支援使用零售價格）
+    // 批次查詢商品與價格（LEFT JOIN tier_prices 和 series）
     const { data: products, error } = await supabase
       .from('products')
       .select(`
@@ -125,6 +126,7 @@ export async function getCartItemsWithPrices(
         retail_price,
         status,
         series_id,
+        series:series_id(name),
         tier_prices!left(price)
       `)
       .in('id', productIds)
@@ -146,10 +148,12 @@ export async function getCartItemsWithPrices(
       const tierPrice = (product.tier_prices as any)?.[0]?.price
       const price = tierPrice ?? product.retail_price ?? null
       const quantity = cartItem?.quantity || 1
+      const seriesData = product.series as any
 
       return {
         productId: product.id,
         productName: product.name,
+        seriesName: seriesData?.name || '未分類', // 系列名稱（購物車顯示用）
         imageUrl: product.image_url,
         quantity,
         price,
@@ -277,6 +281,101 @@ export async function validateCartBeforeCheckout(
     return {
       success: false,
       message: '驗證購物車時發生錯誤',
+    }
+  }
+}
+
+/**
+ * 🆕 Feature 021 Enhancement: 取得組合優惠商品詳細資訊
+ * - 批次查詢組合優惠中所有商品的完整資訊
+ * - 包含系列名稱、商品名稱、商品編號、等級價格、圖片
+ * - 返回 Map<product_id, ProductDetailInfo> 格式，方便快速查找
+ */
+export async function getComboDealProductDetails(
+  comboDeals: ComboDealCartItem[]
+): Promise<ActionResult<Map<string, ProductDetailInfo>>> {
+  try {
+    if (comboDeals.length === 0) {
+      return { success: true, data: new Map() }
+    }
+
+    const supabase = await createClient()
+    const { userId, tierId, role } = await checkAuth()
+
+    // 管理員無法使用購物車
+    if (role === 'admin') {
+      return {
+        success: false,
+        message: '管理員帳號無法使用購物車功能',
+      }
+    }
+
+    // 收集所有組合優惠中的商品 ID
+    const productIds = new Set<string>()
+    comboDeals.forEach(deal => {
+      deal.selected_products.forEach(product => {
+        productIds.add(product.product_id)
+      })
+    })
+
+    if (productIds.size === 0) {
+      return { success: true, data: new Map() }
+    }
+
+    // 批次查詢商品資訊（JOIN series 和 tier_prices）
+    const { data: products, error } = await supabase
+      .from('products')
+      .select(`
+        id,
+        name,
+        code,
+        image_url,
+        retail_price,
+        status,
+        series_id,
+        series:series_id(name),
+        tier_prices!left(price)
+      `)
+      .in('id', Array.from(productIds))
+      .eq('tier_prices.tier_id', tierId!)
+      .eq('status', 'active')
+
+    if (error) {
+      console.error('getComboDealProductDetails error:', error)
+      return {
+        success: false,
+        message: '查詢組合優惠商品時發生錯誤',
+      }
+    }
+
+    // 建立 Map 以便快速查找
+    const productDetailsMap = new Map<string, ProductDetailInfo>()
+
+    products.forEach(product => {
+      const seriesData = product.series as any
+      const tierPrice = (product.tier_prices as any)?.[0]?.price
+      const unitPrice = tierPrice ?? product.retail_price ?? 0
+
+      productDetailsMap.set(product.id, {
+        product_id: product.id,
+        product_name: product.name,
+        product_code: product.code,
+        series_id: product.series_id,
+        series_name: seriesData?.name || '未分類',
+        unit_price: unitPrice,
+        image_url: product.image_url,
+      })
+    })
+
+    return {
+      success: true,
+      data: productDetailsMap,
+    }
+  } catch (error) {
+    console.error('getComboDealProductDetails error:', error)
+    return {
+      success: false,
+      message: '查詢組合優惠商品時發生錯誤',
     }
   }
 }

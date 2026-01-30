@@ -32,10 +32,21 @@ export function Navbar({ user }: NavbarProps) {
   const alert = useAlert()
   const [loading, setLoading] = useState(false)
 
-  // 即時訂閱購物車狀態變化，自動更新數量
-  const cartItemsCount = useCartStore(state =>
-    state.items.reduce((total, item) => total + item.quantity, 0)
-  )
+  // 即時訂閱購物車狀態變化，自動更新數量（包含組合優惠內的商品）
+  const cartItemsCount = useCartStore(state => {
+    // 普通商品數量
+    const normalItemsCount = state.items.reduce(
+      (total, item) => total + item.quantity,
+      0
+    )
+    // 組合優惠商品數量
+    const comboDealItemsCount = state.comboDeals.reduce(
+      (sum, deal) =>
+        sum + deal.selected_products.reduce((s, p) => s + p.quantity, 0),
+      0
+    )
+    return normalItemsCount + comboDealItemsCount
+  })
 
   const handleLogout = async () => {
     const confirmed = await confirm({

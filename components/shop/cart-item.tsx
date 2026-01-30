@@ -122,6 +122,16 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
         {/* 商品資訊 */}
         <div className="flex flex-1 flex-col justify-between gap-2 md:gap-0">
           <div>
+            {/* 系列名稱標籤 */}
+            <div className={cn(
+              "inline-block rounded-none bg-yellow-100 px-2 py-1 mb-1",
+              designTokens.neoBrutalism.border.mobile,
+              "border-yellow-400",
+              "text-xs font-bold text-yellow-800"
+            )}>
+              【{item.seriesName}】
+            </div>
+
             <h3 className={cn(
               "line-clamp-2 font-bold",
               designTokens.typography.body.large
