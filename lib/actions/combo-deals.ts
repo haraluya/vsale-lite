@@ -520,13 +520,15 @@ export async function getComboDealDetail(
     // 6. 組裝回傳資料
     const result: ComboDealWithDetails = {
       ...comboDeal,
-      series: (seriesData || []).map((s: any) => ({
-        series_id: s.series_id,
-        series_name: s.series?.name || '',
-        required_quantity: s.required_quantity,
-        display_order: s.display_order,
-        products: [], // 管理員編輯頁面不需要商品列表
-      })),
+      series: (seriesData || [])
+        .filter((s: any) => s.series && s.series.status === 'active') // 過濾無效系列
+        .map((s: any) => ({
+          series_id: s.series_id,
+          series_name: s.series?.name || '',
+          required_quantity: s.required_quantity,
+          display_order: s.display_order,
+          products: [], // 管理員編輯頁面不需要商品列表
+        })),
       tiers: (tiersData || []).map((t: any) => ({
         tier_id: t.tier_id,
         tier_name: t.tiers?.name || '',
@@ -916,6 +918,7 @@ export async function getActiveComboDealsByTier(): Promise<
       start_date: string
       end_date: string
       series_count: number
+      mix_match_total_quantity?: number
     }>
   >
 > {
@@ -999,7 +1002,20 @@ export async function getActiveComboDealsByTier(): Promise<
       })
     }
 
-    // 6. 組裝回傳資料
+    // 6. 查詢任選模式的總數量配置
+    const { data: mixMatchConfigs, error: mixMatchError } = await supabase
+      .from('combo_deal_mix_match_config')
+      .select('combo_deal_id, total_quantity')
+      .in('combo_deal_id', comboDealIds)
+
+    const mixMatchQuantityMap = new Map<string, number>()
+    if (!mixMatchError && mixMatchConfigs) {
+      mixMatchConfigs.forEach((config) => {
+        mixMatchQuantityMap.set(config.combo_deal_id, config.total_quantity)
+      })
+    }
+
+    // 7. 組裝回傳資料
     const items = (comboDeals || []).map((cd) => ({
       id: cd.id,
       name: cd.name,
@@ -1010,6 +1026,7 @@ export async function getActiveComboDealsByTier(): Promise<
       start_date: cd.start_date,
       end_date: cd.end_date,
       series_count: seriesCountMap.get(cd.id) || 0,
+      mix_match_total_quantity: cd.combo_mode === 'mix_match' ? mixMatchQuantityMap.get(cd.id) : undefined,
     }))
 
     return {
@@ -1119,9 +1136,14 @@ export async function getComboDealDetailForClient(
       }
     }
 
+    // 過濾掉無效的系列（series 為 null 或 status 不是 active）
+    const validSeriesData = (seriesData || []).filter(
+      (s: any) => s.series && s.series.status === 'active'
+    )
+
     // 6. 查詢每個系列的商品（僅 active 且有價格的商品）
     const seriesWithProducts = await Promise.all(
-      (seriesData || []).map(async (s: any) => {
+      validSeriesData.map(async (s: any) => {
         const { data: products, error: productsError } = await supabase
           .from('products')
           .select(`
@@ -1326,7 +1348,8 @@ export async function validateComboDealSelection(
         display_order,
         series:series_id (
           id,
-          name
+          name,
+          status
         )
       `)
       .eq('combo_deal_id', comboDealId)
@@ -1339,6 +1362,11 @@ export async function validateComboDealSelection(
         message: '查詢系列關聯失敗',
       }
     }
+
+    // 過濾掉無效的系列
+    const validSeriesData = seriesData.filter(
+      (s: any) => s.series && s.series.status === 'active'
+    )
 
     // 7. 查詢每個商品的系列
     const productIds = selectedProducts.map((p) => p.product_id)
@@ -1364,7 +1392,7 @@ export async function validateComboDealSelection(
     // 8. 驗證組合條件
     if (comboDeal.combo_mode === 'each') {
       // 各選模式：檢查每個系列是否滿足數量
-      const validationDetails = seriesData.map((s: any) => {
+      const validationDetails = validSeriesData.map((s: any) => {
         const selectedInSeries = selectedProducts
           .filter((p) => productToSeriesMap.get(p.product_id) === s.series_id)
           .reduce((sum, p) => sum + p.quantity, 0)
@@ -1462,6 +1490,124 @@ export async function validateComboDealSelection(
         error instanceof Error
           ? error.message
           : '驗證組合優惠選擇時發生未知錯誤',
+    }
+  }
+}
+
+/**
+ * 取得參與有效組合優惠的系列 ID（客戶端）
+ *
+ * 用於前台商品頁面的「優惠活動」特殊分類篩選
+ * 回傳所有參與符合使用者等級的有效組合優惠的系列 ID
+ *
+ * @returns ActionResult 包含系列 ID 陣列
+ */
+export async function getPromotionSeriesIds(): Promise<ActionResult<string[]>> {
+  try {
+    // 1. 驗證使用者已登入
+    const auth = await checkAuth()
+
+    // 2. 取得使用者等級
+    const supabase = await createClient()
+
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('tier_id')
+      .eq('id', auth.userId)
+      .single()
+
+    if (profileError || !profile || !profile.tier_id) {
+      console.error('查詢使用者等級失敗:', profileError)
+      return {
+        success: false,
+        message: '查詢使用者等級失敗',
+      }
+    }
+
+    // 3. 查詢符合條件的組合優惠 ID（透過 combo_deal_tiers）
+    const { data: comboDealTiers, error: tiersError } = await supabase
+      .from('combo_deal_tiers')
+      .select('combo_deal_id')
+      .eq('tier_id', profile.tier_id)
+
+    if (tiersError) {
+      console.error('查詢組合優惠等級限制失敗:', tiersError)
+      return {
+        success: false,
+        message: '查詢組合優惠失敗',
+      }
+    }
+
+    // 若無符合等級的組合優惠，直接回傳空陣列
+    if (!comboDealTiers || comboDealTiers.length === 0) {
+      return {
+        success: true,
+        data: [],
+      }
+    }
+
+    const comboDealIds = comboDealTiers.map((item) => item.combo_deal_id)
+
+    // 4. 篩選出有效的組合優惠（status = active 且在活動期間內）
+    const now = new Date().toISOString()
+
+    const { data: activeComboDeals, error: comboDealsError } = await supabase
+      .from('combo_deals')
+      .select('id')
+      .in('id', comboDealIds)
+      .eq('status', 'active')
+      .lte('start_date', now)
+      .gte('end_date', now)
+
+    if (comboDealsError) {
+      console.error('查詢有效組合優惠失敗:', comboDealsError)
+      return {
+        success: false,
+        message: '查詢有效組合優惠失敗',
+      }
+    }
+
+    // 若無有效的組合優惠，直接回傳空陣列
+    if (!activeComboDeals || activeComboDeals.length === 0) {
+      return {
+        success: true,
+        data: [],
+      }
+    }
+
+    const activeComboDealIds = activeComboDeals.map((cd) => cd.id)
+
+    // 5. 查詢這些組合優惠關聯的系列 ID
+    const { data: seriesRelations, error: seriesError } = await supabase
+      .from('combo_deal_series')
+      .select('series_id')
+      .in('combo_deal_id', activeComboDealIds)
+
+    if (seriesError) {
+      console.error('查詢組合優惠系列關聯失敗:', seriesError)
+      return {
+        success: false,
+        message: '查詢組合優惠系列關聯失敗',
+      }
+    }
+
+    // 6. 提取唯一的系列 ID
+    const seriesIds = Array.from(
+      new Set((seriesRelations || []).map((sr) => sr.series_id))
+    )
+
+    return {
+      success: true,
+      data: seriesIds,
+    }
+  } catch (error) {
+    console.error('getPromotionSeriesIds error:', error)
+    return {
+      success: false,
+      message:
+        error instanceof Error
+          ? error.message
+          : '查詢優惠活動系列時發生未知錯誤',
     }
   }
 }
