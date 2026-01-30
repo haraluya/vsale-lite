@@ -206,9 +206,11 @@ export const useCartStore = create<CartState>()(
       },
 
       // 🆕 Feature 009: 清空購物車（含優惠券）
+      // 🔧 Feature 021: 同時清空組合優惠項目
       clearCartWithCoupon: () => {
         set({
           items: [],
+          comboDeals: [],
           appliedCoupon: null,
           couponDiscount: 0,
         })

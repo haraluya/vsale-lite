@@ -117,6 +117,7 @@ export async function getCartItemsWithPrices(
     const productIds = cartItems.map(item => item.productId)
 
     // 批次查詢商品與價格（LEFT JOIN tier_prices 和 series）
+    // ⚠️ 修復: 不在 SQL 層過濾 tier_id，避免過濾掉沒有等級價格的商品
     const { data: products, error } = await supabase
       .from('products')
       .select(`
@@ -127,10 +128,9 @@ export async function getCartItemsWithPrices(
         status,
         series_id,
         series:series_id(name),
-        tier_prices!left(price)
+        tier_prices!left(price, tier_id)
       `)
       .in('id', productIds)
-      .eq('tier_prices.tier_id', tierId!)
       .eq('status', 'active')
 
     if (error) {
@@ -143,9 +143,14 @@ export async function getCartItemsWithPrices(
 
     // 合併數量資訊並計算小計
     // 若沒有等級價格，則使用零售價格 (retail_price)
+    // ⚠️ 修復: 在應用層過濾正確的等級價格
     const itemsWithPrices: CartItemWithProduct[] = products.map(product => {
       const cartItem = cartItems.find(item => item.productId === product.id)
-      const tierPrice = (product.tier_prices as any)?.[0]?.price
+
+      // 從所有 tier_prices 中找到符合當前等級的價格
+      const tierPrices = product.tier_prices as any[] | undefined
+      const tierPrice = tierPrices?.find(tp => tp.tier_id === tierId)?.price
+
       const price = tierPrice ?? product.retail_price ?? null
       const quantity = cartItem?.quantity || 1
       const seriesData = product.series as any
@@ -323,6 +328,7 @@ export async function getComboDealProductDetails(
     }
 
     // 批次查詢商品資訊（JOIN series 和 tier_prices）
+    // ⚠️ 修復: 不在 SQL 層過濾 tier_id，避免過濾掉沒有等級價格的商品
     const { data: products, error } = await supabase
       .from('products')
       .select(`
@@ -334,10 +340,9 @@ export async function getComboDealProductDetails(
         status,
         series_id,
         series:series_id(name),
-        tier_prices!left(price)
+        tier_prices!left(price, tier_id)
       `)
       .in('id', Array.from(productIds))
-      .eq('tier_prices.tier_id', tierId!)
       .eq('status', 'active')
 
     if (error) {
@@ -349,11 +354,16 @@ export async function getComboDealProductDetails(
     }
 
     // 建立 Map 以便快速查找
+    // ⚠️ 修復: 在應用層過濾正確的等級價格
     const productDetailsMap = new Map<string, ProductDetailInfo>()
 
     products.forEach(product => {
       const seriesData = product.series as any
-      const tierPrice = (product.tier_prices as any)?.[0]?.price
+
+      // 從所有 tier_prices 中找到符合當前等級的價格
+      const tierPrices = product.tier_prices as any[] | undefined
+      const tierPrice = tierPrices?.find(tp => tp.tier_id === tierId)?.price
+
       const unitPrice = tierPrice ?? product.retail_price ?? 0
 
       productDetailsMap.set(product.id, {

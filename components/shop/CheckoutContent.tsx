@@ -24,7 +24,7 @@ import { Package } from 'lucide-react'
 
 export function CheckoutContent() {
   const router = useRouter()
-  const { items, comboDeals, clearCart, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
+  const { items, comboDeals, clearCartWithCoupon, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
 
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
   const [comboDealProductDetails, setComboDealProductDetails] = useState<Map<string, ProductDetailInfo>>(new Map())
@@ -129,8 +129,8 @@ export function CheckoutContent() {
         return
       }
 
-      // 3. 清空購物車
-      clearCart()
+      // 3. 清空購物車（包含一般商品、組合優惠、優惠券）
+      clearCartWithCoupon()
 
       // 4. 導向訂單詳情頁面 (顯示成功訊息)
       router.push(`/store/orders/${result.data?.orderId}?success=true`)
