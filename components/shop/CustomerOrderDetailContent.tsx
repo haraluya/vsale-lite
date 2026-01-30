@@ -234,14 +234,31 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                         </div>
 
                         {/* 商品清單 */}
-                        <div className="space-y-1 mb-2 ml-7">
+                        <div className="space-y-2 mb-3 ml-7">
                           {snapshot.series.flatMap(series =>
                             series.products.map((product, idx) => (
-                              <div key={`${series.series_id}-${idx}`} className={cn(
-                                designTokens.typography.caption,
-                                "text-gray-700"
-                              )}>
-                                • {product.product_name} × {product.quantity} ({formatCurrency(product.unit_price)})
+                              <div key={`${series.series_id}-${idx}`} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                                <div className="flex-1">
+                                  {/* 系列名稱標籤 */}
+                                  <span className={cn(
+                                    "inline-block rounded-none bg-yellow-100 border border-yellow-400 px-2 py-0.5 mr-2",
+                                    "text-xs font-bold text-yellow-800"
+                                  )}>
+                                    【{series.series_name}】
+                                  </span>
+                                  <span className={cn(
+                                    designTokens.typography.caption,
+                                    "text-gray-900"
+                                  )}>
+                                    {product.product_name}
+                                  </span>
+                                </div>
+                                <div className={cn(
+                                  designTokens.typography.caption,
+                                  "text-gray-600 whitespace-nowrap sm:text-right"
+                                )}>
+                                  {formatCurrency(product.unit_price)} × {product.quantity}
+                                </div>
                               </div>
                             ))
                           )}
@@ -274,9 +291,18 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
               {order.items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
+                  className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
                 >
                   <div className="flex-1">
+                    {/* 系列名稱標籤 */}
+                    {item.series?.name && (
+                      <div className={cn(
+                        "inline-block rounded-none bg-blue-100 border-2 border-blue-400 px-2 py-1 mb-2",
+                        "text-xs font-bold text-blue-800"
+                      )}>
+                        【{item.series.name}】
+                      </div>
+                    )}
                     <h3 className={cn(
                       designTokens.typography.body.large,
                       "font-bold"
@@ -285,10 +311,10 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                       designTokens.typography.caption,
                       "text-gray-600"
                     )}>
-                      單價: {formatCurrency(item.deal_price)} × {item.quantity}
+                      {formatCurrency(item.deal_price)} × {item.quantity}
                     </p>
                   </div>
-                  <div className="text-left sm:text-right">
+                  <div className="text-left sm:text-right flex-shrink-0">
                     <p className={cn(
                       "text-lg md:text-xl font-bold text-green-600"
                     )}>
@@ -299,19 +325,81 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
               ))}
             </div>
 
-            {/* 總計、運費、自訂費用與優惠券 */}
+            {/* 訂單摘要 */}
             <div className={cn(
               "mt-4 md:mt-6 pt-3 md:pt-4",
               designTokens.neoBrutalism.border.mobile,
               "md:border-t-3",
-              "border-t-black"
+              "border-t-black",
+              "space-y-3"
             )}>
-              {/* 運費 */}
-              {order.shipping_fee !== undefined && order.shipping_fee !== null && (
-                <div className="mb-3 flex items-center justify-between">
+              {/* 商品小計 */}
+              <div className="flex items-center justify-between">
+                <p className={cn(
+                  designTokens.typography.body.base,
+                  "text-gray-700"
+                )}>
+                  商品小計
+                </p>
+                <p className={cn(
+                  designTokens.typography.body.large,
+                  "font-semibold text-gray-900"
+                )}>
+                  {formatCurrency(
+                    order.items.reduce((sum, item) => sum + item.subtotal, 0) +
+                    (order.combo_deal_items?.reduce((sum, item) => sum + item.original_price, 0) || 0)
+                  )}
+                </p>
+              </div>
+
+              {/* 組合優惠折扣（分項顯示） */}
+              {order.combo_deal_items && order.combo_deal_items.length > 0 && (
+                <>
+                  {order.combo_deal_items.map((comboDealItem) => (
+                    <div key={comboDealItem.id} className="flex items-center justify-between text-orange-600">
+                      <p className={cn(
+                        designTokens.typography.body.base,
+                        "flex items-center gap-2 truncate mr-2"
+                      )}>
+                        <span>🎁</span>
+                        <span className="truncate">{comboDealItem.combo_deal_snapshot.name}</span>
+                      </p>
+                      <p className={cn(
+                        designTokens.typography.body.large,
+                        "font-bold whitespace-nowrap"
+                      )}>
+                        -{formatCurrency(comboDealItem.discount_amount)}
+                      </p>
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {/* 優惠券折扣 */}
+              {order.coupon && (
+                <div className="flex items-center justify-between text-orange-600">
                   <p className={cn(
                     designTokens.typography.body.base,
-                    "font-bold flex items-center gap-2"
+                    "flex items-center gap-2"
+                  )}>
+                    <span>🎫</span>
+                    <span>優惠券 ({order.coupon.coupon_code})</span>
+                  </p>
+                  <p className={cn(
+                    designTokens.typography.body.large,
+                    "font-bold"
+                  )}>
+                    -{formatCurrency(order.coupon.discount_amount)}
+                  </p>
+                </div>
+              )}
+
+              {/* 運費 */}
+              {order.shipping_fee !== undefined && order.shipping_fee !== null && (
+                <div className="flex items-center justify-between">
+                  <p className={cn(
+                    designTokens.typography.body.base,
+                    "flex items-center gap-2"
                   )}>
                     <span>🚚</span>
                     <span>運費</span>
@@ -319,21 +407,21 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                   <p className={cn(
                     designTokens.typography.body.large,
                     "font-bold",
-                    order.shipping_fee === 0 ? 'text-green-600' : ''
+                    order.shipping_fee === 0 ? 'text-green-600' : 'text-gray-900'
                   )}>
-                    {order.shipping_fee === 0 ? '免運' : `+ ${formatCurrency(order.shipping_fee)}`}
+                    {order.shipping_fee === 0 ? '免運' : formatCurrency(order.shipping_fee)}
                   </p>
                 </div>
               )}
 
               {/* 自訂費用 */}
               {order.custom_fees && order.custom_fees.length > 0 && (
-                <div className="mb-3 space-y-2">
+                <>
                   {order.custom_fees.map((fee) => (
                     <div key={fee.id} className="flex items-center justify-between">
                       <p className={cn(
                         designTokens.typography.body.base,
-                        "font-bold flex items-center gap-2"
+                        "flex items-center gap-2"
                       )}>
                         <span>💵</span>
                         <span>{fee.fee_name}</span>
@@ -341,44 +429,22 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                       <p className={cn(
                         designTokens.typography.body.large,
                         "font-bold",
-                        fee.amount < 0 ? 'text-red-600' : ''
+                        fee.amount < 0 ? 'text-red-600' : 'text-gray-900'
                       )}>
-                        {fee.amount >= 0 ? '+' : ''} {formatCurrency(fee.amount)}
+                        {fee.amount >= 0 ? '+' : ''}{formatCurrency(Math.abs(fee.amount))}
                       </p>
                     </div>
                   ))}
-                </div>
+                </>
               )}
 
-              {/* 優惠券折扣 */}
-              {order.coupon && (
-                <div className="mb-3 space-y-2">
-                  <div className="flex items-center justify-between text-orange-600">
-                    <p className={cn(
-                      designTokens.typography.body.base,
-                      "font-bold flex items-center gap-2"
-                    )}>
-                      <span>🎫</span>
-                      <span>優惠券折扣 ({order.coupon.coupon_code})</span>
-                    </p>
-                    <p className={cn(
-                      designTokens.typography.body.large,
-                      "font-bold"
-                    )}>
-                      - {formatCurrency(order.coupon.discount_amount)}
-                    </p>
-                  </div>
-                  <p className={cn(
-                    designTokens.typography.caption,
-                    "text-gray-500 pl-8"
-                  )}>
-                    {order.coupon.discount_type === 'fixed'
-                      ? `現金折扣 NT$ ${order.coupon.discount_value}`
-                      : `百分比折扣 ${order.coupon.discount_value}%`}
-                  </p>
-                </div>
-              )}
-              <div className="flex items-center justify-between">
+              {/* 訂單總金額 */}
+              <div className={cn(
+                "flex items-center justify-between pt-3",
+                designTokens.neoBrutalism.border.mobile,
+                "md:border-t-2",
+                "border-t-gray-300"
+              )}>
                 <p className={cn(
                   designTokens.typography.h3
                 )}>訂單總金額</p>
