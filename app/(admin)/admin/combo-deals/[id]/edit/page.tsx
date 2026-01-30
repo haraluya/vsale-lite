@@ -7,7 +7,7 @@
 
 import { notFound } from 'next/navigation'
 import { getComboDealDetail } from '@/lib/actions/combo-deals'
-import { getActiveSeries } from '@/lib/actions/shop'
+import { getSeries } from '@/lib/actions/series'
 import { getTiers } from '@/lib/actions/tiers'
 import { getCategories } from '@/lib/actions/categories'
 import { ComboDealForm } from '@/components/admin/combo-deals/ComboDealForm'
@@ -29,8 +29,8 @@ export default async function EditComboDealPage({ params }: { params: Promise<{ 
 
   const comboDeal = result.data
 
-  // 載入系列資料
-  const seriesResult = await getActiveSeries()
+  // 載入系列資料（包含所有系列，不限於有分類的）
+  const seriesResult = await getSeries()
   const series = seriesResult.success && seriesResult.data ? seriesResult.data : []
 
   // 載入等級資料
