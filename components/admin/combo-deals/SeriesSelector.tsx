@@ -157,7 +157,6 @@ export function SeriesSelector({
 
     // 按分類的 sort_order 排序
     const sortedCategories = categories
-      .filter((c) => c.status === 'active')
       .sort((a, b) => a.sort_order - b.sort_order)
       .filter((c) => grouped.has(c.id))
 

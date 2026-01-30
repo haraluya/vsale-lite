@@ -38,8 +38,7 @@ export default async function EditComboDealPage({ params }: { params: Promise<{ 
   const tiers = tiersResult.success && tiersResult.data ? tiersResult.data : []
 
   // 載入分類資料
-  const categoriesResult = await getCategories()
-  const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : []
+  const categories = await getCategories()
 
   return (
     <div>
