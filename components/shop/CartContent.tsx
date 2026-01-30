@@ -278,6 +278,7 @@ export function CartContent() {
                 couponDiscount={couponDiscount}
                 couponCode={appliedCoupon?.code_normalized}
                 comboDeals={comboDeals} // 🆕 Feature 021: 傳入組合優惠項目
+                comboDealProductDetails={comboDealProductDetails} // 🆕 組合優惠商品詳情（計算會員折扣）
                 onOpenCouponSelector={() => setShowCouponSelector(true)}
               />
             </div>

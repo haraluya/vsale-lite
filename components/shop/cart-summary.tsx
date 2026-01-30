@@ -27,6 +27,7 @@ import {
   formatFreeShippingMessage,
 } from '@/lib/utils/shipping-calculator'
 import type { ComboDealCartItem } from '@/stores/cart'
+import type { ProductDetailInfo } from '@/types'
 
 interface CartSummaryProps {
   totalAmount: number
@@ -35,6 +36,7 @@ interface CartSummaryProps {
   couponDiscount?: number
   couponCode?: string
   comboDeals?: ComboDealCartItem[] // 🆕 Feature 021: 組合優惠項目
+  comboDealProductDetails?: Map<string, ProductDetailInfo> // 🆕 組合優惠商品詳情（計算會員折扣）
   onOpenCouponSelector?: () => void
 }
 
@@ -45,17 +47,32 @@ export function CartSummary({
   couponDiscount = 0,
   couponCode,
   comboDeals = [], // 🆕 Feature 021
+  comboDealProductDetails, // 🆕 組合優惠商品詳情
   onOpenCouponSelector,
 }: CartSummaryProps) {
   const [shippingFee, setShippingFee] = useState<number | null>(null)
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null)
   const [isLoadingShipping, setIsLoadingShipping] = useState(true)
 
-  // 🆕 Feature 021: 計算組合優惠總折扣
+  // 🔧 計算組合優惠的會員折扣（零售價 - 等級價格）
+  const comboMemberDiscount = comboDeals.reduce((sum, item) => {
+    const retailTotal = item.selected_products.reduce((productSum, product) => {
+      const detail = comboDealProductDetails?.get(product.product_id)
+      const retailPrice = detail?.retail_price || detail?.unit_price || 0
+      return productSum + retailPrice * product.quantity
+    }, 0)
+    const tierTotal = item.original_price
+    return sum + (retailTotal - tierTotal)
+  }, 0)
+
+  // 🔧 計算組合優惠總折扣
   const totalComboDiscount = comboDeals.reduce(
     (sum, item) => sum + item.discount_amount,
     0
   )
+
+  // 🔧 計算零售價總計（用於顯示）
+  const retailPriceTotal = totalAmount + comboMemberDiscount
 
   // 計算運費
   useEffect(() => {
@@ -118,8 +135,8 @@ export function CartSummary({
   const freeShippingGap = calculateFreeShippingGap(totalAmount, freeShippingThreshold)
   const freeShippingMessage = formatFreeShippingMessage(freeShippingGap)
 
-  // 🆕 Feature 021: 計算最終總金額（含組合優惠折扣）
-  const finalAmount = totalAmount - totalComboDiscount - couponDiscount + (shippingFee ?? 0)
+  // 🔧 計算最終總金額（零售價 - 會員折扣 - 組合折扣 - 優惠券折扣 + 運費）
+  const finalAmount = retailPriceTotal - comboMemberDiscount - totalComboDiscount - couponDiscount + (shippingFee ?? 0)
 
   return (
     <div className="sticky top-24 rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
@@ -132,16 +149,28 @@ export function CartSummary({
           <span className="text-xl font-bold">{totalItems} 件</span>
         </div>
 
-        {/* 商品總金額 */}
+        {/* 🔧 商品金額（零售價總計） */}
         <div className="flex items-center justify-between pb-2">
           <span className="text-gray-600">商品金額</span>
           <span className="text-lg font-bold">
-            NT$ {totalAmount.toLocaleString()}
+            NT$ {retailPriceTotal.toLocaleString()}
           </span>
         </div>
 
-        {/* 🆕 Feature 021: 組合優惠折扣 */}
-        {comboDeals.map((item) => (
+        {/* 🆕 會員專屬折扣（若有） */}
+        {comboMemberDiscount > 0 && (
+          <div className="flex items-center justify-between pb-2">
+            <span className="text-sm text-blue-600 font-bold">
+              會員專屬折扣
+            </span>
+            <span className="text-lg font-bold text-blue-600">
+              - NT$ {comboMemberDiscount.toLocaleString()}
+            </span>
+          </div>
+        )}
+
+        {/* 🔧 組合優惠折扣（若有） */}
+        {comboDeals.length > 0 && comboDeals.map((item) => (
           <div key={item.id} className="flex items-center justify-between pb-2">
             <span className="text-sm text-green-600 font-bold flex items-center gap-1">
               <Package className="inline w-4 h-4" />
