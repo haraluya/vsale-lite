@@ -334,35 +334,40 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               )}
 
               {/* 一般商品項目 */}
-              {order.items.map(item => (
-                <div key={item.id} className="grid grid-cols-12 gap-2 md:gap-4 p-3 md:p-4">
-                  <div className={cn('col-span-12 md:col-span-6 font-bold', designTokens.typography.body.base)}>
-                    {item.series?.name && (
-                      <span className="text-purple-700">【{item.series.name}】</span>
-                    )}
-                    {item.product_name_snapshot}
+              {order.items.map(item => {
+                // 優先使用系列名稱快照，如果沒有才使用 JOIN 結果（向後相容）
+                const seriesName = item.series_name_snapshot || item.series?.name
+
+                return (
+                  <div key={item.id} className="grid grid-cols-12 gap-2 md:gap-4 p-3 md:p-4">
+                    <div className={cn('col-span-12 md:col-span-6 font-bold', designTokens.typography.body.base)}>
+                      {seriesName && (
+                        <span className="text-purple-700">【{seriesName}】</span>
+                      )}
+                      {item.product_name_snapshot}
+                    </div>
+                    <div
+                      className={cn(
+                        'col-span-4 md:col-span-2 text-left md:text-right',
+                        designTokens.typography.body.base
+                      )}
+                    >
+                      {formatAmount(item.deal_price)}
+                    </div>
+                    <div className={cn('col-span-4 md:col-span-2 text-center', designTokens.typography.body.base)}>
+                      × {item.quantity}
+                    </div>
+                    <div
+                      className={cn(
+                        'col-span-4 md:col-span-2 text-right font-bold',
+                        designTokens.typography.body.base
+                      )}
+                    >
+                      {formatAmount(item.subtotal)}
+                    </div>
                   </div>
-                  <div
-                    className={cn(
-                      'col-span-4 md:col-span-2 text-left md:text-right',
-                      designTokens.typography.body.base
-                    )}
-                  >
-                    {formatAmount(item.deal_price)}
-                  </div>
-                  <div className={cn('col-span-4 md:col-span-2 text-center', designTokens.typography.body.base)}>
-                    × {item.quantity}
-                  </div>
-                  <div
-                    className={cn(
-                      'col-span-4 md:col-span-2 text-right font-bold',
-                      designTokens.typography.body.base
-                    )}
-                  >
-                    {formatAmount(item.subtotal)}
-                  </div>
-                </div>
-              ))}
+                )
+              })}
 
               {/* 運費 (Feature 011) */}
               {order.shipping_fee > 0 && (

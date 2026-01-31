@@ -267,12 +267,13 @@ export type OrderItem = {
   order_id: string
   product_id: string | null  // 可為 NULL（商品刪除時自動設為 NULL）
   series_id_snapshot: string | null  // 系列 ID 快照（用於優惠券驗證）
+  series_name_snapshot: string | null  // 🆕 系列名稱快照（用於訂單顯示，避免依賴 JOIN）
   product_name_snapshot: string  // 商品名稱快照
   deal_price: number  // 成交價格
   quantity: number
   subtotal: number
   created_at: string
-  // 🆕 JOIN 查詢時包含系列資訊（可選）
+  // 🆕 JOIN 查詢時包含系列資訊（可選，已棄用，優先使用 series_name_snapshot）
   series?: {
     name: string
   } | null

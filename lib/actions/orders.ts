@@ -133,7 +133,8 @@ export async function createOrder(
         series_id,
         status,
         retail_price,
-        tier_prices(price, tier_id)
+        tier_prices(price, tier_id),
+        series:series_id(name)
       `)
       .in('id', productIds)
       .eq('status', 'active')
@@ -158,6 +159,7 @@ export async function createOrder(
     const orderItemsData: Array<{
       product_id: string
       series_id_snapshot: string | null
+      series_name_snapshot: string | null
       product_name_snapshot: string
       deal_price: number
       quantity: number
@@ -193,6 +195,7 @@ export async function createOrder(
       orderItemsData.push({
         product_id: product.id,
         series_id_snapshot: (product as any).series_id || null,
+        series_name_snapshot: (product as any).series?.name || null,  // 🆕 系列名稱快照
         product_name_snapshot: product.name,
         deal_price: price,
         quantity: item.quantity,
@@ -700,7 +703,7 @@ export async function getOrderById(
         .eq('id', orderId)
         .single(),
 
-      // 查詢訂單明細（JOIN series 表取得系列名稱）
+      // 查詢訂單明細（包含系列名稱快照，JOIN series 僅用於舊訂單向後相容）
       supabase
         .from('order_items')
         .select('*, series:series_id_snapshot(name)')
@@ -813,11 +816,14 @@ export async function getOrderById(
         order_id: item.order_id,
         product_id: item.product_id,
         series_id_snapshot: item.series_id_snapshot,
+        series_name_snapshot: item.series_name_snapshot,  // 🆕 系列名稱快照
         product_name_snapshot: item.product_name_snapshot,
         deal_price: item.deal_price,
         quantity: item.quantity,
         subtotal: item.subtotal,
         created_at: item.created_at,
+        // 🆕 向後相容：舊訂單使用 JOIN 結果
+        series: item.series || null,
       })),
       timelines: (orderTimelines || []).map((timeline: any) => {
         const actor = actorMap.get(timeline.actor_id)

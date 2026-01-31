@@ -284,25 +284,29 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
               )}
 
               {/* 一般商品項目 */}
-              {order.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
-                >
-                  <div className="flex-1">
-                    {/* 系列名稱標籤 */}
-                    {item.series?.name && (
-                      <div className={cn(
-                        "inline-block rounded-none bg-blue-100 border-2 border-blue-400 px-2 py-1 mb-2",
-                        "text-xs font-bold text-blue-800"
-                      )}>
-                        【{item.series.name}】
-                      </div>
-                    )}
-                    <h3 className={cn(
-                      designTokens.typography.body.large,
-                      "font-bold"
-                    )}>{item.product_name_snapshot}</h3>
+              {order.items.map((item) => {
+                // 優先使用系列名稱快照，如果沒有才使用 JOIN 結果（向後相容）
+                const seriesName = item.series_name_snapshot || item.series?.name
+
+                return (
+                  <div
+                    key={item.id}
+                    className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
+                  >
+                    <div className="flex-1">
+                      {/* 系列名稱標籤 */}
+                      {seriesName && (
+                        <div className={cn(
+                          "inline-block rounded-none bg-blue-100 border-2 border-blue-400 px-2 py-1 mb-2",
+                          "text-xs font-bold text-blue-800"
+                        )}>
+                          【{seriesName}】
+                        </div>
+                      )}
+                      <h3 className={cn(
+                        designTokens.typography.body.large,
+                        "font-bold"
+                      )}>{item.product_name_snapshot}</h3>
                     <p className={cn(
                       designTokens.typography.caption,
                       "text-gray-600"
@@ -310,15 +314,16 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                       {formatCurrency(item.deal_price)} × {item.quantity}
                     </p>
                   </div>
-                  <div className="text-left sm:text-right flex-shrink-0">
-                    <p className={cn(
-                      "text-lg md:text-xl font-bold text-green-600"
-                    )}>
-                      {formatCurrency(item.subtotal)}
-                    </p>
+                    <div className="text-left sm:text-right flex-shrink-0">
+                      <p className={cn(
+                        "text-lg md:text-xl font-bold text-green-600"
+                      )}>
+                        {formatCurrency(item.subtotal)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
 
             {/* 訂單摘要 */}
