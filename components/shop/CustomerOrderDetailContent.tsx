@@ -294,19 +294,21 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
                     className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
                   >
                     <div className="flex-1">
-                      {/* 系列名稱標籤 */}
-                      {seriesName && (
-                        <div className={cn(
-                          "inline-block rounded-none bg-blue-100 border-2 border-blue-400 px-2 py-1 mb-2",
-                          "text-xs font-bold text-blue-800"
-                        )}>
-                          【{seriesName}】
-                        </div>
-                      )}
+                      {/* 系列名稱與商品名稱在同一行 */}
                       <h3 className={cn(
                         designTokens.typography.body.large,
                         "font-bold"
-                      )}>{item.product_name_snapshot}</h3>
+                      )}>
+                        {seriesName && (
+                          <span className={cn(
+                            "inline-block rounded-none bg-blue-100 border-2 border-blue-400 px-2 py-1 mr-2",
+                            "text-xs font-bold text-blue-800"
+                          )}>
+                            【{seriesName}】
+                          </span>
+                        )}
+                        {item.product_name_snapshot}
+                      </h3>
                     <p className={cn(
                       designTokens.typography.caption,
                       "text-gray-600"
