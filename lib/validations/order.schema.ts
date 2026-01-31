@@ -123,6 +123,7 @@ export const orderModificationsSchema = z.object({
       item_id: z.string().uuid().optional(),  // 修改/移除時必填
       product_id: z.string().uuid().optional(),  // 新增時必填
       product_name: z.string().optional(),
+      series_name: z.string().nullable().optional(),  // 🆕 系列名稱（用於時間軸顯示）
       old_price: z.number().optional(),
       new_price: z.number().positive('單價必須大於 0').optional(),
       old_quantity: z.number().optional(),

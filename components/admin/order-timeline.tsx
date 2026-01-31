@@ -97,18 +97,23 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
     // 商品變更
     if (modifications.items && modifications.items.length > 0) {
       modifications.items.forEach((item: any) => {
+        // 🆕 優先使用系列名稱，向後相容舊記錄
+        const productDisplay = item.series_name
+          ? `【${item.series_name}】${item.product_name}`
+          : item.product_name
+
         switch (item.type) {
           case 'price_changed':
-            changes.push(`• 商品「${item.product_name}」單價: ${item.old_price} → ${item.new_price}`)
+            changes.push(`• 商品「${productDisplay}」單價: ${item.old_price} → ${item.new_price}`)
             break
           case 'quantity_changed':
-            changes.push(`• 商品「${item.product_name}」數量: ${item.old_quantity} → ${item.new_quantity}`)
+            changes.push(`• 商品「${productDisplay}」數量: ${item.old_quantity} → ${item.new_quantity}`)
             break
           case 'removed':
-            changes.push(`• 移除商品「${item.product_name}」`)
+            changes.push(`• 移除商品「${productDisplay}」`)
             break
           case 'added':
-            changes.push(`• 新增商品「${item.product_name}」(單價 ${item.new_price}, 數量 ${item.new_quantity})`)
+            changes.push(`• 新增商品「${productDisplay}」(單價 ${item.new_price}, 數量 ${item.new_quantity})`)
             break
         }
       })

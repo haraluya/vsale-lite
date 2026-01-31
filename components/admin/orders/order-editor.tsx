@@ -21,6 +21,7 @@ interface EditedItem {
   id: string
   product_id: string | null
   series_id_snapshot: string | null
+  series_name_snapshot: string | null  // 🆕 系列名稱快照
   product_name_snapshot: string
   deal_price: number
   quantity: number
@@ -28,6 +29,10 @@ interface EditedItem {
   original_price: number
   original_quantity: number
   is_removed: boolean
+  // 🆕 向後相容：舊訂單使用 JOIN 結果
+  series?: {
+    name: string
+  } | null
 }
 
 interface EditedFee {
@@ -226,6 +231,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           type: 'removed',
           item_id: item.id,
           product_name: item.product_name_snapshot,
+          series_name: item.series_name_snapshot || item.series?.name || null,  // 🆕 系列名稱
         })
       } else {
         // 價格變更
@@ -234,6 +240,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             type: 'price_changed',
             item_id: item.id,
             product_name: item.product_name_snapshot,
+            series_name: item.series_name_snapshot || item.series?.name || null,  // 🆕 系列名稱
             old_price: item.original_price,
             new_price: item.deal_price,
           })
@@ -245,6 +252,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             type: 'quantity_changed',
             item_id: item.id,
             product_name: item.product_name_snapshot,
+            series_name: item.series_name_snapshot || item.series?.name || null,  // 🆕 系列名稱
             old_quantity: item.original_quantity,
             new_quantity: item.quantity,
           })
@@ -431,6 +439,9 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
               <div className="flex justify-between items-start">
                 <div className="font-bold text-lg">
                   {item.is_removed && <span className="line-through">🗑️ </span>}
+                  {(item.series_name_snapshot || item.series?.name) && (
+                    <span className="text-purple-700">【{item.series_name_snapshot || item.series?.name}】</span>
+                  )}
                   {item.product_name_snapshot}
                 </div>
                 <Button
