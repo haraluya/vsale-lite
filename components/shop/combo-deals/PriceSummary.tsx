@@ -141,7 +141,7 @@ export function PriceSummary({
                     {product.product_name} × {product.quantity}
                   </span>
                   <span className="flex-shrink-0">
-                    ${(product.retail_price ? product.retail_price * product.quantity : product.unit_price * product.quantity).toFixed(0)}
+                    ${(product.unit_price * product.quantity).toFixed(0)}
                   </span>
                 </div>
               ))}
@@ -150,21 +150,13 @@ export function PriceSummary({
             {/* 分隔線 */}
             <div className="border-t-2 border-gray-300 pt-2" />
 
-            {/* 🆕 零售價總計 */}
+            {/* 🆕 顯示小計（使用等級價格總和，與商品卡片一致） */}
             <div className="flex justify-between text-sm md:text-base">
               <span className="font-semibold text-gray-700">小計</span>
               <span className="font-semibold text-gray-700">
-                ${priceInfo.retailPrice.toFixed(0)}
+                ${priceInfo.tierPrice.toFixed(0)}
               </span>
             </div>
-
-            {/* 🆕 會員折扣（若有） */}
-            {priceInfo.memberDiscount > 0 && (
-              <div className="flex justify-between text-sm md:text-base text-blue-600 font-bold">
-                <span>會員專屬折扣</span>
-                <span>-${priceInfo.memberDiscount.toFixed(0)}</span>
-              </div>
-            )}
 
             {/* 🆕 組合優惠折扣 */}
             <div className="flex justify-between text-sm md:text-base text-green-600 font-bold">

@@ -244,7 +244,7 @@ export function ProductSelector({
               {series.products.map((product) => {
                 const quantity = getProductQuantity(product.product_id)
                 // 🔧 檢查該系列是否還能再選（基於數量總和）
-                const canIncrease = seriesSelectedCount < requiredQuantity || quantity > 0
+                const canIncrease = seriesSelectedCount < requiredQuantity
 
                 return (
                   <div
@@ -419,7 +419,7 @@ export function ProductSelector({
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
                 {series.products.map((product) => {
                   const quantity = getProductQuantity(product.product_id)
-                  const canIncrease = !isLimitReached || quantity > 0
+                  const canIncrease = !isLimitReached
 
                   return (
                     <div

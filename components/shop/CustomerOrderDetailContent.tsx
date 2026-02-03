@@ -25,6 +25,7 @@ import Link from 'next/link'
 import { toast } from 'sonner'
 import { designTokens } from '@/lib/design-tokens'
 import { Package } from 'lucide-react'  // 🆕 Feature 021
+import { SplitPanelLayout } from '@/components/shop/order-detail-layouts/SplitPanelLayout' // 🆕 使用分屏式佈局
 
 interface Props {
   orderId: string
@@ -182,409 +183,67 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
           </Link>
         </div>
 
-        {/* 訂單標題 */}
+        {/* 使用分屏式佈局 */}
+        <SplitPanelLayout order={order} />
+
+        {/* 訂單狀態說明 */}
         <div className={cn(
-          "flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-4",
-          designTokens.spacing.section.marginBottom
+          "rounded-none bg-gray-50",
+          "border-2 border-gray-300",
+          "p-3 md:p-4"
         )}>
-          <div>
-            <h1 className={designTokens.typography.h1}>{order.order_number}</h1>
-            <p className={cn(
-              designTokens.typography.body.base,
-              "mt-2 text-gray-600"
-            )}>{formatDateTW(order.created_at)}</p>
-          </div>
-          <OrderStatusBadge status={order.status} size="lg" />
+          <h3 className={cn(
+            designTokens.typography.body.large,
+            "font-bold mb-2"
+          )}>訂單狀態說明</h3>
+          <ul className={cn(
+            "space-y-1",
+            designTokens.typography.caption,
+            "text-gray-600"
+          )}>
+            <li>⏳ <strong>待確認</strong>: 訂單已送出,等待管理員確認</li>
+            <li>✅ <strong>已確認</strong>: 訂單已確認,準備出貨</li>
+            <li>🚚 <strong>出貨中</strong>: 訂單已出貨,運送中</li>
+            <li>🎉 <strong>已完成</strong>: 訂單已完成</li>
+            <li>❌ <strong>已取消</strong>: 訂單已取消</li>
+          </ul>
         </div>
 
-        {/* 訂單內容 */}
-        <div className={designTokens.spacing.page.gap}>
-          {/* 商品明細 */}
-          <div className={cn(
-            "rounded-none bg-white",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.spacing.card.padding
-          )}>
-            <h2 className={cn(
-              designTokens.typography.h2,
-              "mb-4"
-            )}>訂單商品</h2>
-            <div className={designTokens.spacing.card.gap}>
-              {/* 🆕 Feature 021: 組合優惠項目 */}
-              {order.combo_deal_items && order.combo_deal_items.length > 0 && (
-                <>
-                  {order.combo_deal_items.map((comboDealItem) => {
-                    const snapshot = comboDealItem.combo_deal_snapshot
+        {/* 訂單留言與操作歷史 */}
+        <div className={cn(
+          "rounded-none bg-white",
+          designTokens.neoBrutalism.border.full,
+          "border-black",
+          designTokens.neoBrutalism.shadow.full,
+          designTokens.spacing.card.padding
+        )}>
+          <h2 className={cn(
+            designTokens.typography.h2,
+            "mb-4 md:mb-6"
+          )}>訂單溝通</h2>
 
-                    // 生成折扣說明文字
-                    const discountText = snapshot.discount_type === 'fixed'
-                      ? `折扣 ${formatCurrency(snapshot.discount_value)}`
-                      : `${Math.round(snapshot.discount_value / 10)} 折`
-
-                    return (
-                      <div
-                        key={comboDealItem.id}
-                        className="rounded-none bg-yellow-50 border-2 border-yellow-400 p-3 md:p-4 mb-3 md:mb-4 last:mb-0"
-                      >
-                        {/* 組合優惠標題 */}
-                        <div className="flex items-start gap-2 mb-3">
-                          <Package className="w-5 h-5 text-yellow-700 flex-shrink-0 mt-0.5" />
-                          <div className="flex-1">
-                            <h3 className={cn(
-                              designTokens.typography.body.large,
-                              "font-bold text-yellow-900"
-                            )}>
-                              📦 {snapshot.name}
-                            </h3>
-                            <p className={cn(
-                              designTokens.typography.caption,
-                              "text-yellow-700 mt-1"
-                            )}>
-                              ({discountText})
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* 商品清單 */}
-                        <div className="space-y-2 ml-7">
-                          {snapshot.series.flatMap(series =>
-                            series.products.map((product, idx) => (
-                              <div key={`${series.series_id}-${idx}`} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
-                                <div className="flex-1">
-                                  {/* 系列名稱標籤 */}
-                                  <span className={cn(
-                                    "inline-block rounded-none bg-yellow-100 border border-yellow-400 px-2 py-0.5 mr-2",
-                                    "text-xs font-bold text-yellow-800"
-                                  )}>
-                                    【{series.series_name}】
-                                  </span>
-                                  <span className={cn(
-                                    designTokens.typography.caption,
-                                    "text-gray-900"
-                                  )}>
-                                    {product.product_name}
-                                  </span>
-                                </div>
-                                <div className={cn(
-                                  designTokens.typography.caption,
-                                  "text-gray-600 whitespace-nowrap sm:text-right"
-                                )}>
-                                  {formatCurrency(product.unit_price)} × {product.quantity}
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </>
-              )}
-
-              {/* 一般商品項目 */}
-              {order.items.map((item) => {
-                // 優先使用系列名稱快照，如果沒有才使用 JOIN 結果（向後相容）
-                const seriesName = item.series_name_snapshot || item.series?.name
-
-                return (
-                  <div
-                    key={item.id}
-                    className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 border-b-2 border-gray-200 pb-3 md:pb-4 last:border-b-0 last:pb-0"
-                  >
-                    <div className="flex-1">
-                      {/* 系列名稱與商品名稱在同一行 */}
-                      <h3 className={cn(
-                        designTokens.typography.body.large,
-                        "font-bold"
-                      )}>
-                        {seriesName && (
-                          <span className={cn(
-                            "inline-block rounded-none bg-blue-100 border-2 border-blue-400 px-2 py-1 mr-2",
-                            "text-xs font-bold text-blue-800"
-                          )}>
-                            【{seriesName}】
-                          </span>
-                        )}
-                        {item.product_name_snapshot}
-                      </h3>
-                    <p className={cn(
-                      designTokens.typography.caption,
-                      "text-gray-600"
-                    )}>
-                      {formatCurrency(item.deal_price)} × {item.quantity}
-                    </p>
-                  </div>
-                    <div className="text-left sm:text-right flex-shrink-0">
-                      <p className={cn(
-                        "text-lg md:text-xl font-bold text-green-600"
-                      )}>
-                        {formatCurrency(item.subtotal)}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {/* 訂單摘要 */}
-            <div className={cn(
-              "mt-4 md:mt-6 pt-3 md:pt-4",
-              designTokens.neoBrutalism.border.mobile,
-              "md:border-t-3",
-              "border-t-black",
-              "space-y-3"
-            )}>
-              {/* 商品小計 */}
-              <div className="flex items-center justify-between">
-                <p className={cn(
-                  designTokens.typography.body.base,
-                  "text-gray-700"
-                )}>
-                  商品小計
-                </p>
-                <p className={cn(
-                  designTokens.typography.body.large,
-                  "font-semibold text-gray-900"
-                )}>
-                  {formatCurrency(
-                    order.items.reduce((sum, item) => sum + item.subtotal, 0) +
-                    (order.combo_deal_items?.reduce((sum, item) => sum + item.original_price, 0) || 0)
-                  )}
-                </p>
-              </div>
-
-              {/* 組合優惠折扣（分項顯示） */}
-              {order.combo_deal_items && order.combo_deal_items.length > 0 && (
-                <>
-                  {order.combo_deal_items.map((comboDealItem) => (
-                    <div key={comboDealItem.id} className="flex items-center justify-between text-orange-600">
-                      <p className={cn(
-                        designTokens.typography.body.base,
-                        "flex items-center gap-2 truncate mr-2"
-                      )}>
-                        <span>🎁</span>
-                        <span className="truncate">{comboDealItem.combo_deal_snapshot.name}</span>
-                      </p>
-                      <p className={cn(
-                        designTokens.typography.body.large,
-                        "font-bold whitespace-nowrap"
-                      )}>
-                        -{formatCurrency(comboDealItem.discount_amount)}
-                      </p>
-                    </div>
-                  ))}
-                </>
-              )}
-
-              {/* 優惠券折扣 */}
-              {order.coupon && (
-                <div className="flex items-center justify-between text-orange-600">
-                  <p className={cn(
-                    designTokens.typography.body.base,
-                    "flex items-center gap-2"
-                  )}>
-                    <span>🎫</span>
-                    <span>優惠券 ({order.coupon.coupon_code})</span>
-                  </p>
-                  <p className={cn(
-                    designTokens.typography.body.large,
-                    "font-bold"
-                  )}>
-                    -{formatCurrency(order.coupon.discount_amount)}
-                  </p>
-                </div>
-              )}
-
-              {/* 運費 */}
-              {order.shipping_fee !== undefined && order.shipping_fee !== null && (
-                <div className="flex items-center justify-between">
-                  <p className={cn(
-                    designTokens.typography.body.base,
-                    "flex items-center gap-2"
-                  )}>
-                    <span>🚚</span>
-                    <span>運費</span>
-                  </p>
-                  <p className={cn(
-                    designTokens.typography.body.large,
-                    "font-bold",
-                    order.shipping_fee === 0 ? 'text-green-600' : 'text-gray-900'
-                  )}>
-                    {order.shipping_fee === 0 ? '免運' : formatCurrency(order.shipping_fee)}
-                  </p>
-                </div>
-              )}
-
-              {/* 自訂費用 */}
-              {order.custom_fees && order.custom_fees.length > 0 && (
-                <>
-                  {order.custom_fees.map((fee) => (
-                    <div key={fee.id} className="flex items-center justify-between">
-                      <p className={cn(
-                        designTokens.typography.body.base,
-                        "flex items-center gap-2"
-                      )}>
-                        <span>💵</span>
-                        <span>{fee.fee_name}</span>
-                      </p>
-                      <p className={cn(
-                        designTokens.typography.body.large,
-                        "font-bold",
-                        fee.amount < 0 ? 'text-red-600' : 'text-gray-900'
-                      )}>
-                        {fee.amount >= 0 ? '+' : ''}{formatCurrency(Math.abs(fee.amount))}
-                      </p>
-                    </div>
-                  ))}
-                </>
-              )}
-
-              {/* 訂單總金額 */}
-              <div className={cn(
-                "flex items-center justify-between pt-3",
-                designTokens.neoBrutalism.border.mobile,
-                "md:border-t-2",
-                "border-t-gray-300"
-              )}>
-                <p className={cn(
-                  designTokens.typography.h3
-                )}>訂單總金額</p>
-                <p className={cn(
-                  "text-2xl md:text-3xl font-bold text-green-600"
-                )}>
-                  {formatCurrency(order.total_amount)}
-                </p>
-              </div>
-            </div>
+          {/* 時間軸與留言顯示 */}
+          <div className="mb-4 md:mb-6">
+            <OrderTimeline timelines={timelines} />
           </div>
 
-          {/* 訂單備註 */}
-          {order.notes && (
+          {/* 留言輸入框 */}
+          {order.status !== 'cancelled' && order.status !== 'completed' && (
             <div className={cn(
-              "rounded-none bg-white",
-              designTokens.neoBrutalism.border.full,
-              "border-black",
-              designTokens.neoBrutalism.shadow.full,
-              designTokens.spacing.card.padding
+              "mt-4 md:mt-6 rounded-none bg-gray-50",
+              "border-2 border-gray-300",
+              "p-3 md:p-4"
             )}>
-              <h2 className={cn(
-                designTokens.typography.h2,
-                "mb-4"
-              )}>訂單備註</h2>
-              <p className={cn(
-                designTokens.typography.body.base,
-                "text-gray-800"
-              )}>{order.notes}</p>
+              <h3 className={cn(
+                designTokens.typography.caption,
+                "font-bold mb-3 text-gray-700"
+              )}>新增留言</h3>
+              <CommentInput
+                onSubmit={handleSubmitComment}
+                placeholder="與管理員溝通訂單相關問題..."
+              />
             </div>
           )}
-
-          {/* 訂單資訊 */}
-          <div className={cn(
-            "rounded-none bg-white",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.spacing.card.padding
-          )}>
-            <h2 className={cn(
-              designTokens.typography.h2,
-              "mb-4"
-            )}>訂單資訊</h2>
-            <dl className={cn(
-              designTokens.spacing.card.gap,
-              designTokens.typography.body.base
-            )}>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-                <dt className="font-bold">訂單編號:</dt>
-                <dd className="text-gray-800">{order.order_number}</dd>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-                <dt className="font-bold">訂單狀態:</dt>
-                <dd>
-                  <OrderStatusBadge status={order.status} size="sm" />
-                </dd>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-                <dt className="font-bold">建立時間:</dt>
-                <dd className="text-gray-800">{formatDateTW(order.created_at)}</dd>
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
-                <dt className="font-bold">商品數量:</dt>
-                <dd className="text-gray-800">
-                  {order.items.reduce((sum, item) => sum + item.quantity, 0)} 件
-                </dd>
-              </div>
-              {/* 送貨地址 */}
-              {order.user.address && (
-                <div className="flex flex-col border-t-2 border-gray-200 pt-3 mt-3 gap-1">
-                  <dt className="font-bold">送貨地址:</dt>
-                  <dd className="text-gray-800">{order.user.address}</dd>
-                </div>
-              )}
-            </dl>
-          </div>
-
-          {/* 狀態說明 */}
-          <div className={cn(
-            "rounded-none bg-gray-50",
-            "border-2 border-gray-300",
-            "p-3 md:p-4"
-          )}>
-            <h3 className={cn(
-              designTokens.typography.body.large,
-              "font-bold mb-2"
-            )}>訂單狀態說明</h3>
-            <ul className={cn(
-              "space-y-1",
-              designTokens.typography.caption,
-              "text-gray-600"
-            )}>
-              <li>⏳ <strong>待確認</strong>: 訂單已送出,等待管理員確認</li>
-              <li>✅ <strong>已確認</strong>: 訂單已確認,準備出貨</li>
-              <li>🚚 <strong>出貨中</strong>: 訂單已出貨,運送中</li>
-              <li>🎉 <strong>已完成</strong>: 訂單已完成</li>
-              <li>❌ <strong>已取消</strong>: 訂單已取消</li>
-            </ul>
-          </div>
-
-          {/* 訂單留言與操作歷史 */}
-          <div className={cn(
-            "rounded-none bg-white",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.spacing.card.padding
-          )}>
-            <h2 className={cn(
-              designTokens.typography.h2,
-              "mb-4 md:mb-6"
-            )}>訂單溝通</h2>
-
-            {/* 時間軸與留言顯示 */}
-            <div className="mb-4 md:mb-6">
-              <OrderTimeline timelines={timelines} />
-            </div>
-
-            {/* 留言輸入框 */}
-            {order.status !== 'cancelled' && order.status !== 'completed' && (
-              <div className={cn(
-                "mt-4 md:mt-6 rounded-none bg-gray-50",
-                "border-2 border-gray-300",
-                "p-3 md:p-4"
-              )}>
-                <h3 className={cn(
-                  designTokens.typography.caption,
-                  "font-bold mb-3 text-gray-700"
-                )}>新增留言</h3>
-                <CommentInput
-                  onSubmit={handleSubmitComment}
-                  placeholder="與管理員溝通訂單相關問題..."
-                />
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </div>
