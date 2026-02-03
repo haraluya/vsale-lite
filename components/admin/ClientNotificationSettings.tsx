@@ -12,6 +12,7 @@ import {
   deleteNotificationTemplate,
   setDefaultTemplate,
 } from '@/lib/actions/notification-templates'
+import { getSetting } from '@/lib/actions/system'
 import { Pencil, Trash2, Star, Plus } from 'lucide-react'
 
 export function ClientNotificationSettings() {
@@ -27,6 +28,7 @@ export function ClientNotificationSettings() {
   const [isChanged, setIsChanged] = useState(false)
   const [loading, setLoading] = useState(false)
   const [pageLoading, setPageLoading] = useState(true)
+  const [companyName, setCompanyName] = useState('您的公司名稱')
 
   // 載入範本列表
   const loadTemplates = async () => {
@@ -43,6 +45,17 @@ export function ClientNotificationSettings() {
     }
     setPageLoading(false)
   }
+
+  // 載入公司名稱
+  useEffect(() => {
+    const loadSettings = async () => {
+      const companyNameResult = await getSetting('company_name')
+      if (companyNameResult.success && companyNameResult.data) {
+        setCompanyName(companyNameResult.data)
+      }
+    }
+    loadSettings()
+  }, [])
 
   useEffect(() => {
     loadTemplates()
@@ -289,10 +302,9 @@ export function ClientNotificationSettings() {
               key={template.id}
               className={`
                 rounded-none border-2 p-4 cursor-pointer transition-all
-                ${
-                  selectedTemplateId === template.id
-                    ? 'border-black bg-yellow-50 shadow-neo-sm'
-                    : 'border-gray-300 bg-white hover:border-gray-400'
+                ${selectedTemplateId === template.id
+                  ? 'border-black bg-yellow-50 shadow-neo-sm'
+                  : 'border-gray-300 bg-white hover:border-gray-400'
                 }
               `}
               onClick={() => handleSelectTemplate(template)}
@@ -413,7 +425,7 @@ export function ClientNotificationSettings() {
           </p>
           <div className="bg-white border-2 border-gray-400 p-4 font-mono text-sm whitespace-pre-wrap break-words">
             {editingTemplate
-              .replace(/\{公司名稱\}/g, 'DEVAPE快速下單系統')
+              .replace(/\{公司名稱\}/g, companyName)
               .replace(/\{客戶名稱\}/g, '王小明')
               .replace(/\{前台網址\}/g, 'https://example.com/login')
               .replace(/\{登入電話\}/g, '0912345678')

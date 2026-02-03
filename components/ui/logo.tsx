@@ -25,12 +25,14 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
       .then((res) => res.json())
       .then((data) => {
         const settings = data.settings || []
-        const logoSetting = settings.find((s: any) => s.key === 'logo_url')
+        // 根據 variant 選擇對應的設定鍵值
+        const settingKey = variant === 'icon' ? 'logo_icon_url' : 'logo_url'
+        const logoSetting = settings.find((s: any) => s.key === settingKey)
         // 僅當有有效的 URL 時才更新（非空字串且不是純空白）
         if (logoSetting?.value && typeof logoSetting.value === 'string' && logoSetting.value.trim()) {
           setLogoUrl(logoSetting.value)
         } else {
-          // 如果 logo_url 為空，使用對應的預設 Logo
+          // 如果設定為空，使用對應的預設 Logo
           setLogoUrl(defaultLogoUrl)
         }
       })
@@ -39,7 +41,7 @@ export function Logo({ variant = 'full', className = '', href = '/store' }: Logo
         // 載入失敗時使用預設 Logo
         setLogoUrl(defaultLogoUrl)
       })
-  }, [defaultLogoUrl])
+  }, [defaultLogoUrl, variant])
 
   const logoAlt = 'Vsale'
   const width = variant === 'full' ? 200 : 60
