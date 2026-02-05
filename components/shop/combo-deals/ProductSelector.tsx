@@ -533,10 +533,10 @@ export function ProductSelector({
                         </div>
                       </div>
 
-                      {/* 庫存狀態 */}
-                      {product.stock !== undefined && product.stock <= 0 && (
-                        <p className="text-xs text-gray-500 mt-1 text-center">
-                          庫存不足
+                      {/* 庫存狀態（根據 stock_status 判斷，支援負庫存銷售） */}
+                      {product.stock_status === 'out_of_stock' && (
+                        <p className="text-xs text-red-600 mt-1 text-center font-bold">
+                          暫時缺貨
                         </p>
                       )}
                     </div>
