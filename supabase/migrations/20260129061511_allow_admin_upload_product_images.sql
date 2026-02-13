@@ -13,10 +13,11 @@
  */
 
 -- ============================================
--- Storage Policies for Products Bucket
+-- Storage Policies for Products Bucket（使用冪等性語法）
 -- ============================================
 
 -- 1️⃣ 允許管理員上傳商品圖片
+DROP POLICY IF EXISTS "管理員可上傳商品圖片" ON storage.objects;
 CREATE POLICY "管理員可上傳商品圖片"
   ON storage.objects
   FOR INSERT
@@ -29,6 +30,7 @@ CREATE POLICY "管理員可上傳商品圖片"
   );
 
 -- 2️⃣ 允許管理員刪除商品圖片
+DROP POLICY IF EXISTS "管理員可刪除商品圖片" ON storage.objects;
 CREATE POLICY "管理員可刪除商品圖片"
   ON storage.objects
   FOR DELETE
@@ -41,6 +43,7 @@ CREATE POLICY "管理員可刪除商品圖片"
   );
 
 -- 3️⃣ 允許管理員更新商品圖片（覆寫）
+DROP POLICY IF EXISTS "管理員可更新商品圖片" ON storage.objects;
 CREATE POLICY "管理員可更新商品圖片"
   ON storage.objects
   FOR UPDATE

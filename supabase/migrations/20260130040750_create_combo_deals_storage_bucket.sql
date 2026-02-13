@@ -15,15 +15,17 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
--- 2. 建立 Storage RLS 策略
+-- 2. 建立 Storage RLS 策略（使用冪等性語法）
 
 -- 允許公開讀取
+DROP POLICY IF EXISTS "Allow public read access to combo-deals" ON storage.objects;
 CREATE POLICY "Allow public read access to combo-deals"
   ON storage.objects FOR SELECT
   TO public
   USING (bucket_id = 'combo-deals');
 
 -- 允許管理員上傳
+DROP POLICY IF EXISTS "Allow admin to upload combo-deals images" ON storage.objects;
 CREATE POLICY "Allow admin to upload combo-deals images"
   ON storage.objects FOR INSERT
   TO authenticated
@@ -37,6 +39,7 @@ CREATE POLICY "Allow admin to upload combo-deals images"
   );
 
 -- 允許管理員更新
+DROP POLICY IF EXISTS "Allow admin to update combo-deals images" ON storage.objects;
 CREATE POLICY "Allow admin to update combo-deals images"
   ON storage.objects FOR UPDATE
   TO authenticated
@@ -50,6 +53,7 @@ CREATE POLICY "Allow admin to update combo-deals images"
   );
 
 -- 允許管理員刪除
+DROP POLICY IF EXISTS "Allow admin to delete combo-deals images" ON storage.objects;
 CREATE POLICY "Allow admin to delete combo-deals images"
   ON storage.objects FOR DELETE
   TO authenticated

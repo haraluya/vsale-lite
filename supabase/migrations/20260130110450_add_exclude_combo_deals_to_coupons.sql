@@ -4,11 +4,21 @@
 -- Feature: 優惠券系統增強 - 支援「排除組合優惠」模式
 -- =====================================================
 
--- 新增欄位：exclude_combo_deals
+-- 新增欄位：exclude_combo_deals（使用冪等性語法）
 -- 用途：標記優惠券是否排除組合優惠（僅適用於普通商品訂單）
 -- 預設值：false（向後相容）
-ALTER TABLE coupons
-ADD COLUMN exclude_combo_deals BOOLEAN NOT NULL DEFAULT false;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'coupons'
+    AND column_name = 'exclude_combo_deals'
+  ) THEN
+    ALTER TABLE coupons
+    ADD COLUMN exclude_combo_deals BOOLEAN NOT NULL DEFAULT false;
+  END IF;
+END $$;
 
 -- 欄位註解
 COMMENT ON COLUMN coupons.exclude_combo_deals IS '是否排除組合優惠（true = 優惠券僅適用於普通商品訂單，不可用於包含組合優惠的訂單）';
