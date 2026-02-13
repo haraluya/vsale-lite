@@ -922,8 +922,8 @@ export async function markAsShipping(
       }
     }
 
-    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
-    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+    // ✅ 修正：支援 JSON 物件或 TABLE 陣列兩種回傳格式
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : data
 
     if (!result || !result.success) {
       return {
@@ -989,8 +989,8 @@ export async function updateOrderStatus(
       }
     }
 
-    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
-    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+    // ✅ 修正：支援 JSON 物件或 TABLE 陣列兩種回傳格式
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : data
 
     if (!result || !result.success) {
       return {
@@ -1064,8 +1064,8 @@ export async function revertShippingToPending(
       }
     }
 
-    // PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
-    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+    // ✅ 修正：支援 JSON 物件或 TABLE 陣列兩種回傳格式
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : data
 
     if (!result || !result.success) {
       return {
@@ -1128,13 +1128,13 @@ export async function cancelOrder(
       }
     }
 
-    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
-    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+    // ✅ 修正：支援 JSON 物件或 TABLE 陣列兩種回傳格式
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : data
 
     if (!result || !result.success) {
       return {
         success: false,
-        message: result?.message || '取消訂單失敗',
+        message: result?.message || result?.error || '取消訂單失敗',
       }
     }
 
@@ -1376,8 +1376,8 @@ export async function deleteOrder(
       }
     }
 
-    // ✅ 修正：PostgreSQL 函數回傳 TABLE 時，Supabase 會返回陣列
-    const result = Array.isArray(data) && data.length > 0 ? data[0] : null
+    // ✅ 修正：支援 JSON 物件或 TABLE 陣列兩種回傳格式
+    const result = Array.isArray(data) && data.length > 0 ? data[0] : data
 
     if (!result || !result.success) {
       return {
