@@ -96,8 +96,8 @@ export function CheckoutContent() {
     setIsSubmitting(true)
 
     try {
-      // 1. 驗證購物車
-      const validation = await validateCartBeforeCheckout(items)
+      // 1. 驗證購物車（含組合優惠）
+      const validation = await validateCartBeforeCheckout(items, comboDeals)
 
       if (!validation.success || !validation.data?.isValid) {
         const message = validation.success && validation.data?.message

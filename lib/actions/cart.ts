@@ -184,20 +184,34 @@ export async function getCartItemsWithPrices(
  * 驗證購物車在結帳前的狀態
  * - 檢查所有商品仍然可用
  * - 檢查所有價格仍然有效
+ * - 🆕 支援組合優惠驗證
  * - 回傳無效的商品列表
  */
 export async function validateCartBeforeCheckout(
-  cartItems: { productId: string; quantity: number }[]
+  cartItems: { productId: string; quantity: number }[],
+  comboDealItems: ComboDealCartItem[] = []
 ): Promise<ActionResult<{
   isValid: boolean
   invalidItems: string[]
   message?: string
 }>> {
   try {
-    if (cartItems.length === 0) {
+    // 🆕 修復：檢查普通商品和組合優惠是否都為空
+    if (cartItems.length === 0 && comboDealItems.length === 0) {
       return {
         success: false,
         message: '購物車是空的',
+      }
+    }
+
+    // 🆕 如果只有組合優惠，直接通過驗證（組合優惠在 createOrder 中驗證）
+    if (cartItems.length === 0 && comboDealItems.length > 0) {
+      return {
+        success: true,
+        data: {
+          isValid: true,
+          invalidItems: [],
+        },
       }
     }
 
