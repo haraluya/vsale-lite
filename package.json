@@ -35,6 +35,7 @@
     "site3:check-data": "node scripts/check-site3-data.js",
     "site3:migrate": "node scripts/migrate-to-site3-smart.js",
     "site3:migrate-from-mumbai": "node scripts/migrate-mumbai-to-singapore.js",
+    "site4:create-admin": "node scripts/create-site4-admin.js",
     "migrate:cloudinary": "tsx scripts/migrate-to-cloudinary.ts",
     "migrate:cloudinary:site2": "tsx scripts/migrate-to-cloudinary-site2.ts",
     "migrate:cloudinary:site3": "tsx scripts/migrate-to-cloudinary-site3.ts",

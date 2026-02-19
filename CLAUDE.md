@@ -42,6 +42,7 @@
 - **站點 1 (主站)**: `qwovavytryvgchcowjof` - 生產環境主要站點（新加坡）
 - **站點 2**: `rdyvmgomjdglflrcfijs` - 第二營運站點（新加坡）
 - **站點 3**: `dewhcpfzrzewgknaqzwy` - 第三營運站點（孟買）
+- **站點 4 (vsale-vincent)**: `tlgdbvhsnlelwymrircy` - 第四營運站點（新加坡，空白站點）
 
 ### 快速指令（站點 2）
 

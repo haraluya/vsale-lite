@@ -358,17 +358,59 @@ supabase link --project-ref dewhcpfzrzewgknaqzwy
 
 ---
 
+---
+
+## 站點 4 - vsale-vincent
+
+### Vercel 部署
+- **專案名稱**: vsale-vincent
+- **URL**: https://vsale-vincent.vercel.app
+- **Vercel 帳號**: （與主站相同）
+
+### Supabase 資料庫
+- **專案 ID**: `tlgdbvhsnlelwymrircy`
+- **區域**: AWS ap-southeast-1 (Singapore)
+- **Dashboard**: https://supabase.com/dashboard/project/tlgdbvhsnlelwymrircy
+
+#### 連線資訊
+- **API URL**: `https://tlgdbvhsnlelwymrircy.supabase.co`
+- **Pooler Host**: `aws-0-ap-southeast-1.pooler.supabase.com`
+- **Port**: `6543` (Transaction Pooler) / `5432` (Direct)
+- **Database**: `postgres`
+- **Database User**: `postgres.tlgdbvhsnlelwymrircy`
+- **Database Password**: `atmknD7Fe304HQfm`
+
+#### Supabase API Keys
+- **Anon Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZ2RidmhzbmxlbHd5bXJpcmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MDY3MDUsImV4cCI6MjA4NjQ4MjcwNX0.W98V6e-hxWWN-5nQq-pU3eMUhRZ8qWE76sbm8chN_LI`
+- **Service Role Key**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZ2RidmhzbmxlbHd5bXJpcmN5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDkwNjcwNSwiZXhwIjoyMDg2NDgyNzA1fQ.BjJKmsuUWKIc7HodaoWySvA5clmsRbRUFE4HZIQnvlc`
+
+### 環境變數（Vercel）
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://tlgdbvhsnlelwymrircy.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZ2RidmhzbmxlbHd5bXJpcmN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MDY3MDUsImV4cCI6MjA4NjQ4MjcwNX0.W98V6e-hxWWN-5nQq-pU3eMUhRZ8qWE76sbm8chN_LI
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsZ2RidmhzbmxlbHd5bXJpcmN5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDkwNjcwNSwiZXhwIjoyMDg2NDgyNzA1fQ.BjJKmsuUWKIc7HodaoWySvA5clmsRbRUFE4HZIQnvlc
+```
+
+### Admin 帳號
+- **Username**: `admin`
+- **初始密碼**: `123456`
+- **Email**: `admin@vsale-vincent.local`（系統內建）
+
+---
+
 ## 快速參考
 
 ### Supabase Dashboard URLs
 - **主站**: https://supabase.com/dashboard/project/qwovavytryvgchcowjof
 - **Site 2**: https://supabase.com/dashboard/project/rdyvmgomjdglflrcfijs
 - **Site 3**: https://supabase.com/dashboard/project/dewhcpfzrzewgknaqzwy
+- **Site 4**: https://supabase.com/dashboard/project/tlgdbvhsnlelwymrircy
 
 ### Vercel Dashboard URLs
 - **主站**: https://vercel.com/dashboard （搜尋 vsale-lite）
 - **Site 2**: https://vercel.com/dashboard （搜尋 vsale-site2）
 - **Site 3**: https://vercel.com/dashboard （搜尋 vsale-site3）
+- **Site 4**: https://vercel.com/dashboard （搜尋 vsale-vincent）
 
 ### GitHub Repository
 - **URL**: https://github.com/haraluya/vsale-lite

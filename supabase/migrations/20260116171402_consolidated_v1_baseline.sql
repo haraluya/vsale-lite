@@ -1,3 +1,5 @@
+-- 設定 search_path 包含 extensions schema
+SET search_path TO public, extensions;
 -- ==================================================
 -- Vsale-lite Database Schema Consolidated Baseline
 -- ==================================================
@@ -2245,13 +2247,13 @@ CREATE INDEX "idx_order_timelines_order_id" ON "public"."order_timelines" USING 
 
 CREATE INDEX "idx_orders_created_at" ON "public"."orders" USING "btree" ("created_at" DESC);
 
+-- 
+-- 
+-- CREATE INDEX "idx_orders_number_pattern" ON "public"."orders" USING "gin" ("order_number" gin_trgm_ops);
+-- 
+-- 
 
-
-CREATE INDEX "idx_orders_number_pattern" ON "public"."orders" USING "gin" ("order_number" "public"."gin_trgm_ops");
-
-
-
-COMMENT ON INDEX "public"."idx_orders_number_pattern" IS '加速訂單編號模糊搜尋（ILIKE 查詢）';
+-- COMMENT ON INDEX "public"."idx_orders_number_pattern" IS '加速訂單編號模糊搜尋（ILIKE 查詢）';
 
 
 
