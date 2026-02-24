@@ -1094,9 +1094,15 @@ export async function revertShippingToPending(
 }
 
 /**
- * 取消訂單並回補庫存 (US3 - 管理員)
- * - 僅能取消 pending 或 confirmed 狀態的訂單
- * - 若訂單已確認，會自動回補庫存
+ * 取消訂單並回補庫存
+ *
+ * 權限規則：
+ * - 客戶：僅能取消自己的 pending 狀態訂單
+ * - 管理員：可取消任何 pending 或 shipping 狀態訂單
+ *
+ * 功能：
+ * - 若訂單已出貨 (shipping)，會自動回補庫存（含組合優惠商品）
+ * - 自動退還已使用的優惠券
  * - 呼叫 PostgreSQL Function 確保原子性操作
  * - 自動記錄操作歷史
  */
@@ -1107,13 +1113,9 @@ export async function cancelOrder(
     const supabase = await createClient()
     const { userId, role } = await checkAuth()
 
-    // 僅管理員可取消訂單
-    if (role !== 'admin') {
-      return {
-        success: false,
-        message: '僅管理員可執行此操作',
-      }
-    }
+    // 權限檢查已移至 PostgreSQL Function 層
+    // - 客戶只能取消自己的 pending 訂單
+    // - 管理員可取消任何 pending 或 shipping 訂單
 
     // 呼叫 PostgreSQL Function 進行原子性操作
     const { data, error } = await supabase.rpc('cancel_order_and_restore_stock', {

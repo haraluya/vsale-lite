@@ -26,6 +26,7 @@ import { toast } from 'sonner'
 import { designTokens } from '@/lib/design-tokens'
 import { Package } from 'lucide-react'  // 🆕 Feature 021
 import { SplitPanelLayout } from '@/components/shop/order-detail-layouts/SplitPanelLayout' // 🆕 使用分屏式佈局
+import { CustomerOrderCancelButton } from '@/components/shop/customer-order-cancel-button' // 🆕 客戶取消訂單按鈕
 
 interface Props {
   orderId: string
@@ -170,8 +171,11 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
           </div>
         )}
 
-        {/* 返回按鈕 */}
-        <div className={designTokens.spacing.section.marginBottom}>
+        {/* 返回按鈕與操作區 */}
+        <div className={cn(
+          "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4",
+          designTokens.spacing.section.marginBottom
+        )}>
           <Link
             href="/store/orders"
             className={cn(
@@ -181,6 +185,13 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
           >
             ← 返回訂單列表
           </Link>
+
+          {/* 取消訂單按鈕（僅 pending 狀態顯示） */}
+          <CustomerOrderCancelButton
+            orderId={order.id}
+            currentStatus={order.status}
+            orderNumber={order.order_number}
+          />
         </div>
 
         {/* 使用分屏式佈局 */}
