@@ -17,7 +17,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShoppingCart, Plus } from 'lucide-react'
+import { ShoppingCart, Plus, Minus } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
 import { validateCartItem } from '@/lib/actions/cart'
 import type { ProductWithPrice } from '@/types'
@@ -38,6 +38,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
   const alert = useAlert()
   const [isAdding, setIsAdding] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [quantity, setQuantity] = useState(1)
   const imageUrl = product.image_url
 
   // ⭐ 優化：預先產生優化後的圖片 URL（300px, WebP, 80% 品質）
@@ -120,7 +121,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       return
     }
 
-    addItem(product.id, 1)
+    addItem(product.id, quantity)
+    setQuantity(1)  // 重置數量為 1
     setIsAdding(false)
   }
 
@@ -263,45 +265,127 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           </div>
         )}
 
-        {/* 加入購物車按鈕 */}
-        <button
-          onClick={handleAddToCart}
-          disabled={isAdding || !product.user_price || stockConfig.disabled}
-          className={cn(
-            "mt-1.5 md:mt-3 w-full rounded-none font-bold transition-all",
-            stockConfig.bgColor,
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.neoBrutalism.hover,
-            "px-2 py-2 md:px-4 md:py-3",
-            "min-h-[44px]",  // WCAG 2.1 AA
-            "text-sm md:text-base",
-            "disabled:cursor-not-allowed disabled:bg-gray-200 disabled:opacity-50",
-            "disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
-          )}
-        >
-          {isAdding ? (
-            '加入中...'
-          ) : isOutOfStock ? (
-            '缺貨'
-          ) : !product.user_price ? (
-            product.retail_price ? '會員價未設定' : '價格未設定'
-          ) : !mounted || cartQuantity === 0 ? (
-            // SSR 時與首次渲染時統一顯示 Plus 圖示
-            <span className="flex items-center justify-center gap-1.5">
-              <Plus className="h-4 w-4 md:h-5 md:w-5" />
-              <span>加入購物車{stockConfig.suffix}</span>
-            </span>
-          ) : (
-            // 客戶端 hydration 完成且購物車有商品時顯示 ShoppingCart 圖示
-            <span className="flex items-center justify-center gap-1.5">
-              <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">再加一件 ({cartQuantity}){stockConfig.suffix}</span>
-              <span className="sm:hidden">+1 ({cartQuantity}){stockConfig.suffix}</span>
-            </span>
-          )}
-        </button>
+        {/* 數量選擇器 + 加入購物車按鈕 */}
+        <div className="flex items-stretch gap-2 mt-1.5 md:mt-3">
+          {/* 數量選擇器 */}
+          <div className="flex items-center gap-1">
+            {/* 減少按鈕 */}
+            <button
+              onClick={() => setQuantity(Math.max(1, quantity - 1))}
+              disabled={quantity <= 1 || isAdding || !product.user_price || stockConfig.disabled}
+              className={cn(
+                "rounded-none bg-white transition-all hover:bg-gray-100",
+                "border-2 border-black",
+                "p-1.5 md:p-2",
+                "min-h-[44px] min-w-[44px]",
+                "active:translate-x-[1px] active:translate-y-[1px]",
+                "disabled:cursor-not-allowed disabled:opacity-50"
+              )}
+              aria-label="減少數量"
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+
+            {/* 數量輸入框 */}
+            <input
+              type="number"
+              min="1"
+              max="999"
+              value={quantity}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10)
+                if (!isNaN(val) && val >= 1 && val <= 999) {
+                  setQuantity(val)
+                }
+              }}
+              onBlur={(e) => {
+                // 失焦時驗證，如果無效則重置為 1
+                const val = parseInt(e.target.value, 10)
+                if (isNaN(val) || val < 1) {
+                  setQuantity(1)
+                } else if (val > 999) {
+                  setQuantity(999)
+                }
+              }}
+              disabled={isAdding || !product.user_price || stockConfig.disabled}
+              className={cn(
+                "w-12 md:w-16 text-center font-bold rounded-none",
+                "border-2 border-black",
+                "px-1 py-1.5 md:py-2",
+                "min-h-[44px]",
+                "focus:outline-none focus:ring-2 focus:ring-blue-500",
+                "text-sm md:text-base",
+                "disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50"
+              )}
+              aria-label="商品數量"
+            />
+
+            {/* 增加按鈕 */}
+            <button
+              onClick={() => setQuantity(Math.min(999, quantity + 1))}
+              disabled={quantity >= 999 || isAdding || !product.user_price || stockConfig.disabled}
+              className={cn(
+                "rounded-none bg-white transition-all hover:bg-gray-100",
+                "border-2 border-black",
+                "p-1.5 md:p-2",
+                "min-h-[44px] min-w-[44px]",
+                "active:translate-x-[1px] active:translate-y-[1px]",
+                "disabled:cursor-not-allowed disabled:opacity-50"
+              )}
+              aria-label="增加數量"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* 加入購物車按鈕 */}
+          <button
+            onClick={handleAddToCart}
+            disabled={isAdding || !product.user_price || stockConfig.disabled}
+            className={cn(
+              "flex-1 rounded-none font-bold transition-all",
+              stockConfig.bgColor,
+              designTokens.neoBrutalism.border.full,
+              "border-black",
+              designTokens.neoBrutalism.shadow.full,
+              designTokens.neoBrutalism.hover,
+              "px-2 py-2 md:px-4 md:py-3",
+              "min-h-[44px]",
+              "text-sm md:text-base",
+              "disabled:cursor-not-allowed disabled:bg-gray-200 disabled:opacity-50",
+              "disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
+            )}
+          >
+            {isAdding ? (
+              '加入中...'
+            ) : isOutOfStock ? (
+              '缺貨'
+            ) : !product.user_price ? (
+              product.retail_price ? '會員價未設定' : '價格未設定'
+            ) : !mounted || cartQuantity === 0 ? (
+              <span className="flex items-center justify-center gap-1.5">
+                <Plus className="h-4 w-4 md:h-5 md:w-5" />
+                <span className="hidden sm:inline">加入購物車{stockConfig.suffix}</span>
+                <span className="sm:hidden">加入{stockConfig.suffix}</span>
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-1.5">
+                <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
+                {quantity === 1 ? (
+                  <>
+                    <span className="hidden sm:inline">再加一件 ({cartQuantity}){stockConfig.suffix}</span>
+                    <span className="sm:hidden">+1 ({cartQuantity}){stockConfig.suffix}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="hidden sm:inline">加入 {quantity} 件 ({cartQuantity}){stockConfig.suffix}</span>
+                    <span className="sm:hidden">+{quantity} ({cartQuantity}){stockConfig.suffix}</span>
+                  </>
+                )}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* 圖片彈窗 */}
