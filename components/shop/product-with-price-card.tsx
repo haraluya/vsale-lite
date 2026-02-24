@@ -17,7 +17,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ShoppingCart, Plus, Minus } from 'lucide-react'
+import { ShoppingCart, Plus } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
 import { validateCartItem } from '@/lib/actions/cart'
 import type { ProductWithPrice } from '@/types'
@@ -265,78 +265,41 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
           </div>
         )}
 
-        {/* 數量選擇器 + 加入購物車按鈕 */}
+        {/* 數量輸入框 + 加入購物車按鈕 */}
         <div className="flex items-stretch gap-2 mt-1.5 md:mt-3">
-          {/* 數量選擇器 */}
-          <div className="flex items-center gap-1">
-            {/* 減少按鈕 */}
-            <button
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              disabled={quantity <= 1 || isAdding || !product.user_price || stockConfig.disabled}
-              className={cn(
-                "rounded-none bg-white transition-all hover:bg-gray-100",
-                "border-2 border-black",
-                "p-1.5 md:p-2",
-                "min-h-[44px] min-w-[44px]",
-                "active:translate-x-[1px] active:translate-y-[1px]",
-                "disabled:cursor-not-allowed disabled:opacity-50"
-              )}
-              aria-label="減少數量"
-            >
-              <Minus className="h-4 w-4" />
-            </button>
-
-            {/* 數量輸入框 */}
-            <input
-              type="number"
-              min="1"
-              max="999"
-              value={quantity}
-              onChange={(e) => {
-                const val = parseInt(e.target.value, 10)
-                if (!isNaN(val) && val >= 1 && val <= 999) {
-                  setQuantity(val)
-                }
-              }}
-              onBlur={(e) => {
-                // 失焦時驗證，如果無效則重置為 1
-                const val = parseInt(e.target.value, 10)
-                if (isNaN(val) || val < 1) {
-                  setQuantity(1)
-                } else if (val > 999) {
-                  setQuantity(999)
-                }
-              }}
-              disabled={isAdding || !product.user_price || stockConfig.disabled}
-              className={cn(
-                "w-12 md:w-16 text-center font-bold rounded-none",
-                "border-2 border-black",
-                "px-1 py-1.5 md:py-2",
-                "min-h-[44px]",
-                "focus:outline-none focus:ring-2 focus:ring-blue-500",
-                "text-sm md:text-base",
-                "disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50"
-              )}
-              aria-label="商品數量"
-            />
-
-            {/* 增加按鈕 */}
-            <button
-              onClick={() => setQuantity(Math.min(999, quantity + 1))}
-              disabled={quantity >= 999 || isAdding || !product.user_price || stockConfig.disabled}
-              className={cn(
-                "rounded-none bg-white transition-all hover:bg-gray-100",
-                "border-2 border-black",
-                "p-1.5 md:p-2",
-                "min-h-[44px] min-w-[44px]",
-                "active:translate-x-[1px] active:translate-y-[1px]",
-                "disabled:cursor-not-allowed disabled:opacity-50"
-              )}
-              aria-label="增加數量"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
+          {/* 數量輸入框 */}
+          <input
+            type="number"
+            min="1"
+            max="999"
+            value={quantity}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10)
+              if (!isNaN(val) && val >= 1 && val <= 999) {
+                setQuantity(val)
+              }
+            }}
+            onBlur={(e) => {
+              // 失焦時驗證，如果無效則重置為 1
+              const val = parseInt(e.target.value, 10)
+              if (isNaN(val) || val < 1) {
+                setQuantity(1)
+              } else if (val > 999) {
+                setQuantity(999)
+              }
+            }}
+            disabled={isAdding || !product.user_price || stockConfig.disabled}
+            className={cn(
+              "w-14 md:w-16 text-center font-bold rounded-none",
+              "border-2 border-black",
+              "px-2 py-1.5 md:py-2",
+              "min-h-[44px]",
+              "focus:outline-none focus:ring-2 focus:ring-blue-500",
+              "text-sm md:text-base",
+              "disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50"
+            )}
+            aria-label="商品數量"
+          />
 
           {/* 加入購物車按鈕 */}
           <button
