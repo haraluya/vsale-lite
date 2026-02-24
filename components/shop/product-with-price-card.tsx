@@ -328,22 +328,15 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             ) : !mounted || cartQuantity === 0 ? (
               <span className="flex items-center justify-center gap-1.5">
                 <Plus className="h-4 w-4 md:h-5 md:w-5" />
-                <span className="hidden sm:inline">加入購物車{stockConfig.suffix}</span>
-                <span className="sm:hidden">加入{stockConfig.suffix}</span>
+                <span>加入{stockConfig.suffix}</span>
               </span>
             ) : (
               <span className="flex items-center justify-center gap-1.5">
                 <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
                 {quantity === 1 ? (
-                  <>
-                    <span className="hidden sm:inline">再加一件 ({cartQuantity}){stockConfig.suffix}</span>
-                    <span className="sm:hidden">+1 ({cartQuantity}){stockConfig.suffix}</span>
-                  </>
+                  <span>+1 ({cartQuantity}){stockConfig.suffix}</span>
                 ) : (
-                  <>
-                    <span className="hidden sm:inline">加入 {quantity} 件 ({cartQuantity}){stockConfig.suffix}</span>
-                    <span className="sm:hidden">+{quantity} ({cartQuantity}){stockConfig.suffix}</span>
-                  </>
+                  <span>+{quantity} ({cartQuantity}){stockConfig.suffix}</span>
                 )}
               </span>
             )}
