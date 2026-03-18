@@ -25,7 +25,7 @@ async function CouponsPageContent() {
     <div className="space-y-6">
       {/* 頁面標題 */}
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-orange-400 border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo">
+        <div className="p-3 bg-orange-400 border-theme shadow-neo-sm">
           <Ticket className="w-6 h-6 md:w-8 md:h-8" />
         </div>
         <div>
@@ -44,7 +44,7 @@ async function CouponsPageContent() {
         </h2>
 
         {unusedCoupons.length === 0 ? (
-          <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-surface p-8 text-center">
+          <div className="border-theme shadow-neo-sm bg-surface p-8 text-center">
             <p className="text-text-secondary mb-2">您目前沒有可使用的優惠券</p>
             <p className="text-sm text-text-secondary">試試輸入優惠券代碼來領取優惠券！</p>
           </div>

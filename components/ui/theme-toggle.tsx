@@ -15,9 +15,10 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     <button
       onClick={toggleTheme}
       className={cn(
-        'flex items-center justify-center rounded-none border-2 md:border-3 font-bold transition-all',
-        'bg-surface shadow-neo-sm md:shadow-neo',
-        'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        'flex items-center justify-center rounded-theme-sm border-theme font-medium transition-all duration-200',
+        'bg-surface shadow-neo-sm',
+        'hover:-translate-y-0.5 hover:shadow-theme-hover',
+        'active:scale-[0.98] active:translate-y-0',
         'min-h-[44px] min-w-[44px] p-2',
         className
       )}

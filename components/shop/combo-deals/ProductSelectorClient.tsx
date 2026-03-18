@@ -80,11 +80,11 @@ export function ProductSelectorClient({
     return (
       <div
         className={cn(
-          'rounded-none bg-error-bg',
-          designTokens.neoBrutalism.border.full,
+          'rounded-theme-sm bg-error-bg',
+          designTokens.cleanCommerce.border.full,
           'border-red-600',
           'p-6 text-center',
-          designTokens.neoBrutalism.shadow.mobile
+          designTokens.cleanCommerce.shadow.base
         )}
       >
         <AlertCircle className="mx-auto mb-3 h-12 w-12 text-error" />
@@ -93,11 +93,11 @@ export function ProductSelectorClient({
         <Link
           href="/store/cart"
           className={cn(
-            'mt-4 inline-block rounded-none bg-blue-400 font-bold transition-all',
-            designTokens.neoBrutalism.border.full,
-            'border-black',
-            designTokens.neoBrutalism.shadow.mobile,
-            designTokens.neoBrutalism.hover,
+            'mt-4 inline-block rounded-theme-sm bg-blue-400 font-bold transition-all',
+            designTokens.cleanCommerce.border.full,
+            'border-border',
+            designTokens.cleanCommerce.shadow.base,
+            designTokens.cleanCommerce.hover,
             'px-6 py-3'
           )}
         >

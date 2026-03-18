@@ -4,6 +4,8 @@ import { AuditLog } from '@/types'
 import { formatDistanceToNow } from 'date-fns'
 import { zhTW } from 'date-fns/locale'
 import { ActionTypeBadge } from './ActionTypeBadge'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface AuditLogListProps {
   logs: AuditLog[]
@@ -12,8 +14,8 @@ interface AuditLogListProps {
 export function AuditLogList({ logs }: AuditLogListProps) {
   if (logs.length === 0) {
     return (
-      <div className="rounded-none border-3 border-gray-300 bg-gray-50 p-12 text-center">
-        <p className="text-lg font-bold text-gray-500">尚無操作記錄</p>
+      <div className={cn("rounded-theme-sm border-border bg-gray-50 p-12 text-center", designTokens.cleanCommerce.border.full)}>
+        <p className={cn("font-bold text-gray-500", designTokens.typography.h3)}>尚無操作記錄</p>
       </div>
     )
   }
@@ -23,7 +25,11 @@ export function AuditLogList({ logs }: AuditLogListProps) {
       {logs.map((log) => (
         <div
           key={log.id}
-          className="rounded-none border-2 md:border-3 border-black bg-white p-3 md:p-4 shadow-neo-sm md:shadow-neo hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+          className={cn(
+            "rounded-theme-sm bg-white transition-all",
+            getThemeClasses({ hover: true }),
+            designTokens.spacing.card.padding
+          )}
         >
           {/* 手機版：垂直堆疊布局 */}
           <div className="flex flex-col gap-3 md:hidden">
@@ -54,7 +60,7 @@ export function AuditLogList({ logs }: AuditLogListProps) {
 
             {/* 變更內容 */}
             {log.old_values && log.new_values && (
-              <div className="text-xs bg-gray-50 p-2 rounded-none border-2 border-gray-300">
+              <div className="text-xs bg-gray-50 p-2 rounded-theme-sm border border-border">
                 <p className="font-bold mb-1">變更內容：</p>
                 {Object.keys(log.new_values).map((key) => (
                   <p key={key} className="break-all">

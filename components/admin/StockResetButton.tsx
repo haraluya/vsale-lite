@@ -64,7 +64,7 @@ export function StockResetButton() {
   }
 
   return (
-    <div className="rounded-none border-2 md:border-3 border-yellow-500 bg-yellow-50 p-6 shadow-neo-sm md:shadow-neo">
+    <div className="rounded-theme-sm border-theme border-yellow-500 bg-yellow-50 p-6 shadow-neo-sm">
       <h3 className="text-lg font-black mb-2">⚠️ 危險操作</h3>
       <p className="text-sm text-gray-700 mb-4">
         此功能會將所有商品的庫存歸零，適用於盤點後重新建立庫存數據的情境。

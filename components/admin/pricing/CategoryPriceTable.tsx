@@ -18,6 +18,8 @@ import { batchSetTierPrices } from '@/lib/actions/tier-prices'
 import type { Category, ProductWithAllTierPrices } from '@/types'
 import { Button } from '@/components/ui/button'
 import { useAlert } from '@/lib/contexts/dialog-context'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface CategoryPriceTableProps {
   category: Category
@@ -159,34 +161,37 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
     <div className="space-y-4">
       {/* 錯誤訊息 */}
       {error && (
-        <div className="rounded-none border-2 border-red-600 bg-red-50 p-4">
+        <div className="rounded-theme-sm border border-red-600 bg-red-50 p-4">
           <p className="font-bold text-red-800">{error}</p>
         </div>
       )}
 
       {/* 分類資訊 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo">
-        <h3 className="text-lg font-bold">{category.name}</h3>
-        {category.description && <p className="mt-1 text-sm text-gray-600">{category.description}</p>}
-        <p className="mt-2 text-sm font-medium">
+      <div className={cn("rounded-theme-sm bg-white", getThemeClasses(), designTokens.spacing.card.padding)}>
+        <h3 className={designTokens.typography.h3}>{category.name}</h3>
+        {category.description && <p className={cn("mt-1 text-gray-600", designTokens.typography.caption)}>{category.description}</p>}
+        <p className={cn("mt-2 font-medium", designTokens.typography.caption)}>
           共 {products.length} 個商品 × {tiers.length} 個等級
         </p>
       </div>
 
       {/* 價格表格 */}
       <form onSubmit={handleSubmit}>
-        <div className="overflow-x-auto rounded-none border-2 md:border-3 border-black bg-white shadow-neo">
+        <p className="lg:hidden text-center py-2 text-xs text-gray-500">
+          ← 左右滑動查看更多等級 →
+        </p>
+        <div className={cn("overflow-x-auto rounded-theme-sm bg-white", getThemeClasses())}>
           <table className="w-full">
             <thead className="bg-gray-100">
               <tr>
-                <th className="sticky left-0 z-10 border-b-2 border-r-2 border-black bg-gray-100 px-4 py-3 text-left font-bold">
+                <th className="sticky left-0 z-10 border-b-2 border-r-2 bg-gray-100 px-4 py-3 text-left font-bold">
                   系列 / 商品名稱
                 </th>
                 {tiers.map((tier) => (
-                  <th key={tier.tier_id} className="border-b-2 border-black px-3 py-2 text-left font-bold">
+                  <th key={tier.tier_id} className="border-b px-3 py-2 text-left font-bold">
                     {tier.tier_name}
                     {tier.is_protected && (
-                      <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
+                      <span className="ml-2 rounded-theme-sm border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
                         自動
                       </span>
                     )}
@@ -203,7 +208,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                     className={`border-b border-gray-200 hover:bg-opacity-70 ${seriesColorClass}`}
                   >
                     {/* 商品資訊 */}
-                    <td className={`sticky left-0 z-10 border-r-2 border-black px-4 py-3 ${seriesColorClass}`}>
+                    <td className={`sticky left-0 z-10 border-r-2 px-4 py-3 ${seriesColorClass}`}>
                     <div className="font-bold">{product.name}</div>
                     <div className="text-sm text-gray-600">{product.series?.name || '未分類'}</div>
                   </td>
@@ -215,14 +220,14 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                     const isRetail = tier.is_protected
 
                     return (
-                      <td key={tier.tier_id} className="border-black px-4 py-3">
+                      <td key={tier.tier_id} className="px-4 py-3">
                         {isRetail ? (
                           // 零售等級：顯示零售價格（禁用編輯）
                           <input
                             type="text"
                             value={product.retail_price ? `$${Math.round(product.retail_price)}` : 'N/A'}
                             disabled
-                            className="w-28 rounded-none border-2 border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
+                            className="w-28 rounded-theme-sm border border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
                           />
                         ) : (
                           // 其他等級：可編輯價格
@@ -234,7 +239,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                               value={currentPrice ?? ''}
                               onChange={(e) => handlePriceChange(product.id, tier.tier_id, e.target.value)}
                               placeholder="未設定"
-                              className="w-28 rounded-none border-2 border-gray-300 bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-28 rounded-theme-sm border border-border bg-white px-3 py-1 text-sm focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                             {/* 折扣率顯示 */}
                             {currentPrice && product.retail_price && (

@@ -28,10 +28,10 @@ export default function Error({
     <div className="flex min-h-screen items-center justify-center bg-surface-secondary p-4">
       <div
         className={cn(
-          'max-w-md rounded-none bg-surface p-6',
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full
+          'max-w-md rounded-theme-sm bg-surface p-6',
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full
         )}
       >
         <h2 className={cn('mb-4', designTokens.typography.h2)}>
@@ -45,11 +45,11 @@ export default function Error({
           <button
             onClick={reset}
             className={cn(
-              'rounded-none bg-black px-6 py-3 font-bold text-white transition-all',
-              designTokens.neoBrutalism.border.full,
-              'border-black',
-              designTokens.neoBrutalism.shadow.full,
-              designTokens.neoBrutalism.hover
+              'rounded-theme-sm bg-black px-6 py-3 font-bold text-white transition-all',
+              designTokens.cleanCommerce.border.full,
+              'border-border',
+              designTokens.cleanCommerce.shadow.full,
+              designTokens.cleanCommerce.hover
             )}
           >
             重新嘗試
@@ -57,11 +57,11 @@ export default function Error({
           <Link
             href="/admin/dashboard"
             className={cn(
-              'rounded-none bg-surface px-6 py-3 text-center font-bold transition-all',
-              designTokens.neoBrutalism.border.full,
-              'border-black',
-              designTokens.neoBrutalism.shadow.full,
-              designTokens.neoBrutalism.hover
+              'rounded-theme-sm bg-surface px-6 py-3 text-center font-bold transition-all',
+              designTokens.cleanCommerce.border.full,
+              'border-border',
+              designTokens.cleanCommerce.shadow.full,
+              designTokens.cleanCommerce.hover
             )}
           >
             返回管理首頁
@@ -69,7 +69,7 @@ export default function Error({
         </div>
 
         {process.env.NODE_ENV === 'development' && error.digest && (
-          <div className="mt-4 rounded-none border-2 border-gray-300 bg-surface-secondary p-3">
+          <div className="mt-4 rounded-theme-sm border border-border bg-surface-secondary p-3">
             <p className="text-xs text-text-secondary">錯誤 ID: {error.digest}</p>
           </div>
         )}

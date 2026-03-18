@@ -79,12 +79,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <Link
           href="/store"
           className={cn(
-            "inline-flex items-center gap-2 rounded-none bg-surface font-bold transition-all",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.mobile,
+            "inline-flex items-center gap-2 rounded-theme-sm bg-surface font-bold transition-all",
+            designTokens.cleanCommerce.border.full,
+            "border-border",
+            designTokens.cleanCommerce.shadow.base,
             "md:shadow-neo",
-            designTokens.neoBrutalism.hover,
+            designTokens.cleanCommerce.hover,
             "px-3 py-2 md:px-4",
             "min-h-[44px]",
             designTokens.spacing.section.marginBottom
@@ -100,16 +100,16 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         )}>
           {/* 商品圖片 */}
           <div className={cn(
-            "rounded-none bg-surface",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
+            "rounded-theme-sm bg-surface",
+            designTokens.cleanCommerce.border.full,
+            "border-border",
+            designTokens.cleanCommerce.shadow.full,
             designTokens.spacing.card.padding
           )}>
             <div className={cn(
-              "aspect-square overflow-hidden rounded-none bg-surface-secondary",
-              designTokens.neoBrutalism.border.mobile,
-              "border-black"
+              "aspect-square overflow-hidden rounded-theme-sm bg-surface-secondary",
+              designTokens.cleanCommerce.border.base,
+              "border-border"
             )}>
               {imageUrl ? (
                 <Image
@@ -132,10 +132,10 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           {/* 商品資訊 */}
           <div className={designTokens.spacing.card.gap}>
             <div className={cn(
-              "rounded-none bg-surface",
-              designTokens.neoBrutalism.border.full,
-              "border-black",
-              designTokens.neoBrutalism.shadow.full,
+              "rounded-theme-sm bg-surface",
+              designTokens.cleanCommerce.border.full,
+              "border-border",
+              designTokens.cleanCommerce.shadow.full,
               designTokens.spacing.card.padding
             )}>
               <h1 className={cn(
@@ -146,9 +146,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <div className={designTokens.spacing.card.gap}>
                 {/* 商品編號 */}
                 <div className={cn(
-                  "rounded-none bg-surface-secondary",
-                  designTokens.neoBrutalism.border.mobile,
-                  "border-black",
+                  "rounded-theme-sm bg-surface-secondary",
+                  designTokens.cleanCommerce.border.base,
+                  "border-border",
                   "p-2.5 md:p-3"
                 )}>
                   <p className={cn(
@@ -164,9 +164,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 {/* 系列 */}
                 {product.series_name && (
                   <div className={cn(
-                    "rounded-none bg-surface-secondary",
-                    designTokens.neoBrutalism.border.mobile,
-                    "border-black",
+                    "rounded-theme-sm bg-surface-secondary",
+                    designTokens.cleanCommerce.border.base,
+                    "border-border",
                     "p-2.5 md:p-3"
                   )}>
                     <p className={cn(
@@ -179,9 +179,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
                 {/* 單位 */}
                 <div className={cn(
-                  "rounded-none bg-surface-secondary",
-                  designTokens.neoBrutalism.border.mobile,
-                  "border-black",
+                  "rounded-theme-sm bg-surface-secondary",
+                  designTokens.cleanCommerce.border.base,
+                  "border-border",
                   "p-2.5 md:p-3"
                 )}>
                   <p className={cn(
@@ -193,9 +193,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
                 {/* 庫存狀態 - 僅顯示狀態標籤，不顯示實際數量 */}
                 <div className={cn(
-                  "rounded-none bg-surface-secondary",
-                  designTokens.neoBrutalism.border.mobile,
-                  "border-black",
+                  "rounded-theme-sm bg-surface-secondary",
+                  designTokens.cleanCommerce.border.base,
+                  "border-border",
                   "p-3 md:p-4"
                 )}>
                   <p className={cn(
@@ -210,16 +210,16 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {/* 商品描述 */}
             {product.description && (
               <div className={cn(
-                "rounded-none bg-gradient-to-br from-blue-50 to-purple-50",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.full,
+                "rounded-theme-sm bg-gradient-to-br from-blue-50 to-purple-50",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.full,
                 designTokens.spacing.card.padding
               )}>
                 <div className="flex items-center gap-2 mb-3 md:mb-4">
                   <div className={cn(
-                    "rounded-none bg-blue-400",
-                    "border-2 border-black",
+                    "rounded-theme-sm bg-blue-400",
+                    "border",
                     "w-1 h-6 md:h-7"
                   )} />
                   <h2 className={cn(
@@ -232,8 +232,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   designTokens.typography.body.base
                 )}>{product.description}</p>
                 <div className={cn(
-                  "mt-3 rounded-none bg-surface/70",
-                  "border-2 border-black",
+                  "mt-3 rounded-theme-sm bg-surface/70",
+                  "border",
                   "px-3 py-2"
                 )}>
                   <p className="text-xs text-text-secondary">
@@ -245,8 +245,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
             {/* 提示訊息 */}
             <div className={cn(
-              "rounded-none bg-info-bg",
-              "border-2 border-blue-600",
+              "rounded-theme-sm bg-info-bg",
+              "border border-blue-600",
               "p-3 md:p-4"
             )}>
               <p className={cn(

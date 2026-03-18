@@ -10,7 +10,7 @@ import Link from 'next/link'
 import { ArrowLeft, Users, TrendingUp, Calendar, Tag } from 'lucide-react'
 import { getCouponById, getCouponUsers, getCouponStats } from '@/lib/actions/coupons'
 import { CouponForm } from '@/components/admin/coupons/CouponForm'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { generatePageMetadata } from '@/lib/metadata'
 
@@ -89,9 +89,9 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
         href="/admin/coupons"
         className={cn(
           'inline-flex items-center gap-2 bg-surface font-bold transition-all',
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.mobile,
-          designTokens.neoBrutalism.hover,
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.base,
+          designTokens.cleanCommerce.hover,
           designTokens.button.md
         )}
       >
@@ -109,7 +109,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
 
       {/* 統計資訊卡片 */}
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="border-2 md:border-3 border-black bg-blue-100 p-4 shadow-neo">
+        <div className="border-theme bg-blue-100 p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
             <Users className="h-5 w-5 text-blue-600" />
             <p className="text-sm font-bold text-blue-600">發放張數</p>
@@ -120,7 +120,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
           </p>
         </div>
 
-        <div className="border-2 md:border-3 border-black bg-green-100 p-4 shadow-neo">
+        <div className="border-theme bg-green-100 p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="h-5 w-5 text-success" />
             <p className="text-sm font-bold text-success">使用張數</p>
@@ -131,7 +131,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
           </p>
         </div>
 
-        <div className="border-2 md:border-3 border-black bg-orange-100 p-4 shadow-neo">
+        <div className="border-theme bg-orange-100 p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="h-5 w-5 text-orange-600" />
             <p className="text-sm font-bold text-orange-600">總折扣金額</p>
@@ -141,14 +141,14 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
       </div>
 
       {/* 優惠券表單 */}
-      <div className="border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
+      <div className="border-theme bg-surface p-6 shadow-neo">
         <h2 className="text-2xl font-black mb-4">編輯優惠券</h2>
         <CouponForm mode="edit" coupon={coupon} />
       </div>
 
       {/* 領取用戶列表 */}
-      <div className="border-2 md:border-3 border-black bg-surface shadow-neo">
-        <div className="border-b-2 md:border-b-3 border-black bg-yellow-300 p-4">
+      <div className="border-theme bg-surface shadow-neo">
+        <div className="border-b bg-yellow-300 p-4">
           <h2 className="text-2xl font-black flex items-center gap-2">
             <Users className="h-6 w-6" />
             領取用戶名單 ({total} 位用戶)
@@ -178,10 +178,10 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
                     <div className="flex flex-col md:items-end gap-2">
                       {/* 領取統計 */}
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded border-2 border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-success">
+                        <span className="inline-flex items-center gap-1 rounded border border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-success">
                           已使用 {user.total_used} 張
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded border-2 border-gray-400 bg-surface-secondary px-2 py-1 text-xs font-bold text-text-secondary">
+                        <span className="inline-flex items-center gap-1 rounded border border-gray-400 bg-surface-secondary px-2 py-1 text-xs font-bold text-text-secondary">
                           未使用 {user.total_unused} 張
                         </span>
                       </div>
@@ -203,7 +203,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
 
             {/* 分頁控制 */}
             {totalPages > 1 && (
-              <div className="border-t-2 md:border-t-3 border-black p-4 flex items-center justify-between">
+              <div className="border-t p-4 flex items-center justify-between">
                 <div className="text-sm text-text-secondary">
                   共 {totalPages} 頁
                 </div>
@@ -213,9 +213,9 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
                       href={`/admin/coupons/${id}?page=${page - 1}`}
                       className={cn(
                         'px-4 py-2 bg-surface font-bold transition-all',
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover
                       )}
                     >
                       上一頁
@@ -229,9 +229,9 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
                       href={`/admin/coupons/${id}?page=${page + 1}`}
                       className={cn(
                         'px-4 py-2 bg-surface font-bold transition-all',
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover
                       )}
                     >
                       下一頁

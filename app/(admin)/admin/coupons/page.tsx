@@ -14,7 +14,7 @@ import { Plus } from 'lucide-react'
 import { getCoupons } from '@/lib/actions/coupons'
 import { CouponList } from '@/components/admin/coupons/CouponList'
 import { CouponFilters } from '@/components/admin/coupons/CouponFilters'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { generatePageMetadata } from '@/lib/metadata'
 
@@ -60,19 +60,19 @@ async function CouponsContent({ searchParams }: PageProps) {
     <>
       {/* 統計資訊 */}
       <div className="mb-6 grid gap-4 md:grid-cols-4">
-        <div className="border-2 md:border-3 border-black bg-surface p-4 shadow-neo">
+        <div className="border-theme bg-surface p-4 shadow-neo">
           <p className="text-sm text-text-secondary">總優惠券數</p>
           <p className="text-3xl font-black">{allCoupons.length}</p>
         </div>
-        <div className="border-2 md:border-3 border-black bg-green-100 p-4 shadow-neo">
+        <div className="border-theme bg-green-100 p-4 shadow-neo">
           <p className="text-sm text-text-secondary">有效中</p>
           <p className="text-3xl font-black">{activeCoupons.length}</p>
         </div>
-        <div className="border-2 md:border-3 border-black bg-orange-100 p-4 shadow-neo">
+        <div className="border-theme bg-orange-100 p-4 shadow-neo">
           <p className="text-sm text-text-secondary">已過期</p>
           <p className="text-3xl font-black">{expiredCoupons.length}</p>
         </div>
-        <div className="border-2 md:border-3 border-black bg-red-100 p-4 shadow-neo">
+        <div className="border-theme bg-red-100 p-4 shadow-neo">
           <p className="text-sm text-text-secondary">已刪除</p>
           <p className="text-3xl font-black">{deletedCoupons.length}</p>
         </div>
@@ -90,9 +90,9 @@ async function CouponsContent({ searchParams }: PageProps) {
             showArchived
               ? 'bg-surface text-foreground'
               : 'bg-gray-400 text-white',
-            designTokens.neoBrutalism.border.full,
-            designTokens.neoBrutalism.shadow.mobile,
-            designTokens.neoBrutalism.hover,
+            designTokens.cleanCommerce.border.full,
+            designTokens.cleanCommerce.shadow.base,
+            designTokens.cleanCommerce.hover,
             designTokens.button.md
           )}
         >
@@ -129,9 +129,9 @@ export default function CouponsPage({ searchParams }: PageProps) {
           href="/admin/coupons/new"
           className={cn(
             'inline-flex items-center gap-2 bg-green-400 font-black text-black transition-all',
-            designTokens.neoBrutalism.border.full,
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.neoBrutalism.hover,
+            designTokens.cleanCommerce.border.full,
+            designTokens.cleanCommerce.shadow.full,
+            designTokens.cleanCommerce.hover,
             designTokens.button.md
           )}
         >
@@ -143,7 +143,7 @@ export default function CouponsPage({ searchParams }: PageProps) {
       {/* 優惠券內容（使用 Suspense） */}
       <Suspense
         fallback={
-          <div className="border-2 md:border-3 border-black bg-surface p-12 text-center shadow-neo">
+          <div className="border-theme bg-surface p-12 text-center shadow-neo">
             <p className="text-text-secondary">載入中...</p>
           </div>
         }

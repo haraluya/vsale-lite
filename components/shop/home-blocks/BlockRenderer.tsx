@@ -76,7 +76,7 @@ export function BlockRenderer({ block }: BlockRendererProps) {
           designTokens.container.default,
           'px-4 md:px-6 lg:px-8'
         )}>
-          <div className="p-6 bg-error-bg border-2 border-red-600 rounded-none">
+          <div className="p-6 bg-error-bg border border-red-600 rounded-theme-sm">
             <p className="text-error font-bold">
               錯誤：未知的區塊類型「{block.block_type}」
             </p>

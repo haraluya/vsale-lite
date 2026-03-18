@@ -50,7 +50,7 @@ export default async function ComboDealDetailPage({
   if (!result.success || !result.data) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="rounded-none border-3 border-red-600 bg-error-bg p-6 text-center">
+        <div className="rounded-theme-sm border border-red-600 bg-error-bg p-6 text-center">
           <p className="text-lg font-semibold text-error">載入失敗</p>
           <p className="mt-2 text-sm text-error">
             {result.message || '組合優惠不存在或您無權訪問'}
@@ -86,7 +86,7 @@ export default async function ComboDealDetailPage({
       )}>
         {/* 🆕 Phase 7: 編輯模式標示 */}
         {editMode && (
-          <div className="mb-4 rounded-none border-2 md:border-3 border-blue-600 bg-info-bg p-4 shadow-neo-sm">
+          <div className="mb-4 rounded-theme-sm border-theme border-blue-600 bg-info-bg p-4 shadow-neo-sm">
             <p className="text-sm md:text-base font-bold text-blue-800">
               ✏️ 編輯模式：您正在編輯購物車中的組合優惠
             </p>
@@ -96,7 +96,7 @@ export default async function ComboDealDetailPage({
         {/* 海報與基本資訊 */}
         <div className="mb-6 md:mb-8">
           {/* 海報圖片 (16:9) */}
-          <div className="relative w-full aspect-[16/9] rounded-none border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo overflow-hidden mb-4">
+          <div className="relative w-full aspect-[16/9] rounded-theme-sm border-theme shadow-neo-sm overflow-hidden mb-4">
             <Image
               src={comboDeal.poster_url}
               alt={comboDeal.name}
@@ -107,7 +107,7 @@ export default async function ComboDealDetailPage({
             />
 
             {/* 折扣標籤（絕對定位在海報右上角） */}
-            <div className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 border-2 md:border-3 border-black shadow-neo">
+            <div className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 border-theme shadow-neo">
               <span className="text-base md:text-xl font-black">
                 {discountLabel}
               </span>
@@ -115,13 +115,13 @@ export default async function ComboDealDetailPage({
           </div>
 
           {/* 組合優惠名稱與資訊 */}
-          <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 md:p-6 shadow-neo-sm md:shadow-neo">
+          <div className="rounded-theme-sm border-theme bg-surface p-4 md:p-6 shadow-neo-sm">
             <h1 className="text-2xl md:text-3xl font-black text-foreground mb-3">
               {comboDeal.name}
             </h1>
 
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="inline-block px-3 py-1 bg-yellow-100 border-2 border-yellow-600 text-yellow-800 text-sm md:text-base font-bold">
+              <span className="inline-block px-3 py-1 bg-yellow-100 border border-yellow-600 text-yellow-800 text-sm md:text-base font-bold">
                 {modeText}
               </span>
               <span className="text-sm md:text-base text-text-secondary">

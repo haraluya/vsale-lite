@@ -66,10 +66,10 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
     return (
       <div
         className={cn(
-          'w-full h-64 md:h-96 rounded-none bg-surface-secondary',
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
+          'w-full h-64 md:h-96 rounded-theme-sm bg-surface-secondary',
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full,
           'flex items-center justify-center text-text-secondary'
         )}
       >
@@ -85,10 +85,10 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
       {/* 圖片容器 */}
       <div
         className={cn(
-          'relative w-full aspect-[16/9] rounded-none bg-surface-secondary overflow-hidden',
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
+          'relative w-full aspect-[16/9] rounded-theme-sm bg-surface-secondary overflow-hidden',
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full,
           (currentImage?.series_id || (currentImage as any)?.combo_deal_id) && 'cursor-pointer' // 🆕 Feature 021: 支援組合優惠
         )}
         onClick={handleImageClick}
@@ -126,7 +126,7 @@ function ImageCarouselComponent({ config, blockUpdatedAt }: ImageCarouselProps) 
                 }}
                 className={cn(
                   'w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all',
-                  'border-2 border-white shadow-lg', // 白色邊框 + 陰影確保可見性
+                  'border border-white shadow-lg', // 白色邊框 + 陰影確保可見性
                   currentIndex === index
                     ? 'bg-white scale-125'
                     : 'bg-black/50 hover:bg-black/70',

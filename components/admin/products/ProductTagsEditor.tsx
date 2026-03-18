@@ -139,9 +139,9 @@ export function ProductTagsEditor({
           onClick={() => handleRemoveTag(tag)}
           disabled={isUpdating}
           className={cn(
-            "group inline-flex items-center gap-1 rounded-none border-2 border-black px-2 py-0.5 font-bold",
-            "transition-all shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
-            "hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none",
+            "group inline-flex items-center gap-1 rounded-theme-sm border px-2 py-0.5 font-bold",
+            "transition-all shadow-neo-sm",
+            "hover:-translate-y-0.5 hover:shadow-theme-hover",
             "disabled:opacity-50 disabled:cursor-not-allowed",
             designTokens.typography.caption,
             tag.toLowerCase().includes('熱銷') || tag.toLowerCase().includes('hot')
@@ -167,9 +167,9 @@ export function ProductTagsEditor({
           onClick={() => setShowAddForm(true)}
           disabled={isUpdating}
           className={cn(
-            "inline-flex items-center gap-1 rounded-none border-2 border-dashed border-gray-400 bg-white px-2 py-0.5 font-bold",
-            "transition-all shadow-[1px_1px_0px_0px_rgba(0,0,0,0.2)]",
-            "hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none hover:border-black",
+            "inline-flex items-center gap-1 rounded-theme-sm border border-dashed border-gray-400 bg-white px-2 py-0.5 font-bold",
+            "transition-all shadow-neo-sm",
+            "hover:-translate-y-0.5 hover:shadow-theme-hover hover:border-primary",
             "disabled:opacity-50 disabled:cursor-not-allowed",
             designTokens.typography.caption,
             "text-gray-600"
@@ -194,7 +194,7 @@ export function ProductTagsEditor({
               }}
               disabled={isUpdating}
               className={cn(
-                "rounded-none border-2 border-black px-2 py-0.5 font-bold",
+                "rounded-theme-sm border px-2 py-0.5 font-bold",
                 designTokens.typography.caption,
                 "disabled:opacity-50"
               )}
@@ -219,7 +219,7 @@ export function ProductTagsEditor({
             disabled={isUpdating}
             placeholder="新標籤"
             className={cn(
-              "w-24 rounded-none border-2 border-black px-2 py-0.5",
+              "w-24 rounded-theme-sm border px-2 py-0.5",
               designTokens.typography.caption,
               "disabled:opacity-50"
             )}
@@ -240,9 +240,9 @@ export function ProductTagsEditor({
             onClick={handleAddTag}
             disabled={isUpdating}
             className={cn(
-              "rounded-none border-2 border-black bg-green-400 px-2 py-0.5 font-bold",
-              "shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
-              "hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none",
+              "rounded-theme-sm border bg-green-400 px-2 py-0.5 font-bold",
+              "shadow-neo-sm",
+              "hover:-translate-y-0.5 hover:shadow-theme-hover",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               designTokens.typography.caption
             )}
@@ -258,9 +258,9 @@ export function ProductTagsEditor({
             }}
             disabled={isUpdating}
             className={cn(
-              "rounded-none border-2 border-black bg-gray-200 px-2 py-0.5 font-bold",
-              "shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]",
-              "hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none",
+              "rounded-theme-sm border bg-gray-200 px-2 py-0.5 font-bold",
+              "shadow-neo-sm",
+              "hover:-translate-y-0.5 hover:shadow-theme-hover",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               designTokens.typography.caption
             )}

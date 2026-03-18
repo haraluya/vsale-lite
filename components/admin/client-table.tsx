@@ -2,8 +2,6 @@
 
 import { Client } from '@/types'
 import { Button } from '@/components/ui/button'
-import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { Label } from '@/components/ui/label'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
@@ -12,10 +10,10 @@ import { deleteClient } from '@/lib/actions/clients'
 import { getSetting } from '@/lib/actions/system'
 import { removeWwwFromUrl } from '@/lib/utils/template-helpers'
 import { useHighlightKeyword } from './client-filter'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn, getTierColor } from '@/lib/utils'
 import { formatDateTW } from '@/lib/date-utils'
-import { useAlert } from '@/lib/contexts/dialog-context'
+import { useAlert, useConfirm } from '@/lib/contexts/dialog-context'
 import { useNotificationTemplate } from '@/lib/hooks/use-notification-template'
 
 type ClientTableProps = {
@@ -33,8 +31,7 @@ export function ClientTable({
 }: ClientTableProps) {
   const router = useRouter()
   const alert = useAlert()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
+  const confirm = useConfirm()
   const [isDeleting, setIsDeleting] = useState(false)
   const [copiedClientId, setCopiedClientId] = useState<string | null>(null)
   const [companyName, setCompanyName] = useState('您的公司名稱')
@@ -70,17 +67,20 @@ export function ClientTable({
     router.push(`/admin/clients?${params.toString()}`)
   }
 
-  const handleDeleteClick = (client: Client) => {
-    setClientToDelete(client)
-    setDeleteDialogOpen(true)
-  }
+  const handleDelete = async (client: Client) => {
+    const confirmed = await confirm({
+      title: '刪除客戶',
+      description: `確定要刪除客戶「${client.display_name || client.phone}」嗎？此操作無法復原。`,
+      variant: 'danger',
+      confirmText: '刪除',
+      cancelText: '取消',
+    })
 
-  const handleDeleteConfirm = async () => {
-    if (!clientToDelete) return
+    if (!confirmed) return
 
     setIsDeleting(true)
     try {
-      const result = await deleteClient(clientToDelete.id)
+      const result = await deleteClient(client.id)
 
       if (result.success) {
         await alert({
@@ -104,8 +104,6 @@ export function ClientTable({
       })
     } finally {
       setIsDeleting(false)
-      setDeleteDialogOpen(false)
-      setClientToDelete(null)
     }
   }
 
@@ -156,7 +154,7 @@ export function ClientTable({
       )}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="border-b-2 md:border-b-3 border-black bg-gray-50">
+            <thead className="border-b bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-bold w-[140px]">
                   手機號碼
@@ -206,7 +204,7 @@ export function ClientTable({
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span className={cn(
-                          "inline-block rounded-none border-2 border-black px-3 py-1 text-sm font-bold",
+                          "inline-block rounded-theme-sm border px-3 py-1 text-sm font-bold",
                           client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
                         )}>
                           {client.tier_name || '未設定'}
@@ -220,7 +218,7 @@ export function ClientTable({
                               size="sm"
                               variant="secondary"
                               onClick={() => setTemplateMenuOpen(templateMenuOpen === client.id ? null : client.id)}
-                              className="border-2 border-black bg-green-100 hover:bg-green-200 whitespace-nowrap"
+                              className="border bg-green-100 hover:bg-green-200 whitespace-nowrap"
                               title="複製登入資訊（不含密碼）"
                             >
                               {copiedClientId === client.id ? (
@@ -238,7 +236,7 @@ export function ClientTable({
 
                             {/* 範本選單 */}
                             {templateMenuOpen === client.id && templates.length > 0 && (
-                              <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-none border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                              <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-theme-sm border bg-white shadow-neo">
                                 {templates.map((template) => (
                                   <button
                                     key={template.id}
@@ -270,9 +268,9 @@ export function ClientTable({
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={() => handleDeleteClick(client)}
+                            onClick={() => handleDelete(client)}
                             disabled={isDeleting}
-                            className="border-2 border-black bg-red-500 text-white hover:bg-red-600 whitespace-nowrap"
+                            className="border bg-red-500 text-white hover:bg-red-600 whitespace-nowrap"
                           >
                             <Trash2 className="h-4 w-4 mr-1" />
                             刪除
@@ -292,9 +290,9 @@ export function ClientTable({
       <div className="lg:hidden space-y-3 md:space-y-4">
         {clients.length === 0 ? (
           <div className={cn(
-            "rounded-none bg-white p-8 text-center text-gray-500",
-            designTokens.neoBrutalism.border.full,
-            designTokens.neoBrutalism.shadow.full
+            "rounded-theme-sm bg-white p-8 text-center text-gray-500",
+            designTokens.cleanCommerce.border.full,
+            designTokens.cleanCommerce.shadow.full
           )}>
             {searchKeyword || total === 0
               ? '查無符合條件的客戶'
@@ -306,9 +304,9 @@ export function ClientTable({
               <div
                 key={client.id}
                 className={cn(
-                  "rounded-none bg-white",
-                  designTokens.neoBrutalism.border.full,
-                  designTokens.neoBrutalism.shadow.full,
+                  "rounded-theme-sm bg-white",
+                  designTokens.cleanCommerce.border.full,
+                  designTokens.cleanCommerce.shadow.full,
                   designTokens.spacing.card.padding,
                   designTokens.spacing.card.gap
                 )}
@@ -324,7 +322,7 @@ export function ClientTable({
                     </div>
                   </div>
                   <span className={cn(
-                    "inline-block rounded-none border-2 border-black px-2 py-1 text-sm font-bold whitespace-nowrap",
+                    "inline-block rounded-theme-sm border px-2 py-1 text-sm font-bold whitespace-nowrap",
                     client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
                   )}>
                     {client.tier_name || '未設定'}
@@ -348,7 +346,7 @@ export function ClientTable({
                       size="sm"
                       variant="secondary"
                       onClick={() => setTemplateMenuOpen(templateMenuOpen === client.id ? null : client.id)}
-                      className="w-full border-2 border-black bg-green-100 hover:bg-green-200"
+                      className="w-full border bg-green-100 hover:bg-green-200"
                     >
                       {copiedClientId === client.id ? (
                         <>
@@ -365,7 +363,7 @@ export function ClientTable({
 
                     {/* 範本選單 */}
                     {templateMenuOpen === client.id && templates.length > 0 && (
-                      <div className="absolute bottom-full left-0 mb-1 z-50 w-full rounded-none border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <div className="absolute bottom-full left-0 mb-1 z-50 w-full rounded-theme-sm border bg-white shadow-neo">
                         {templates.map((template) => (
                           <button
                             key={template.id}
@@ -397,9 +395,9 @@ export function ClientTable({
                   <Button
                     size="sm"
                     variant="secondary"
-                    onClick={() => handleDeleteClick(client)}
+                    onClick={() => handleDelete(client)}
                     disabled={isDeleting}
-                    className="col-span-2 border-2 border-black bg-red-500 text-white hover:bg-red-600"
+                    className="col-span-2 border bg-red-500 text-white hover:bg-red-600"
                   >
                     <Trash2 className="h-3 w-3 mr-1" />
                     刪除
@@ -438,20 +436,6 @@ export function ClientTable({
         </div>
       )}
 
-      {/* 刪除確認對話框 */}
-      <ConfirmDialog
-        isOpen={deleteDialogOpen}
-        onClose={() => {
-          setDeleteDialogOpen(false)
-          setClientToDelete(null)
-        }}
-        onConfirm={handleDeleteConfirm}
-        title="刪除客戶"
-        description={`確定要刪除客戶「${clientToDelete?.display_name || clientToDelete?.phone}」嗎？此操作無法復原。`}
-        confirmText="刪除"
-        cancelText="取消"
-        variant="danger"
-      />
     </div>
   )
 }

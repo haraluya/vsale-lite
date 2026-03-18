@@ -136,19 +136,19 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
   return (
     <div className={cn(
-      "group rounded-none bg-surface",
-      designTokens.neoBrutalism.border.full,
-      "border-black",
-      designTokens.neoBrutalism.shadow.full,
+      "group rounded-theme-sm bg-surface",
+      designTokens.cleanCommerce.border.full,
+      "border-border",
+      designTokens.cleanCommerce.shadow.full,
       "p-2 md:p-4"
     )}>
       {/* 商品圖片 */}
       <div
         className={cn(
-          "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary",
+          "mb-2 md:mb-4 aspect-square overflow-hidden rounded-theme-sm bg-surface-secondary",
           "relative",  // 新增：支援絕對定位
-          designTokens.neoBrutalism.border.mobile,
-          "border-black",
+          designTokens.cleanCommerce.border.base,
+          "border-border",
           imageUrl && "cursor-pointer",
           !imageUrl && "opacity-50"
         )}
@@ -179,9 +179,9 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         {/* 商品名稱標籤（左下角） */}
         <div className="absolute left-2 bottom-2 z-10 max-w-[70%]">
           <div className={cn(
-            "inline-block rounded-none bg-yellow-300",
-            designTokens.neoBrutalism.border.mobile,
-            "border-black",
+            "inline-block rounded-theme-sm bg-yellow-300",
+            designTokens.cleanCommerce.border.base,
+            "border-border",
             "shadow-neo-sm",
             "px-2 py-1.5 md:px-3 md:py-2",
             "pointer-events-none"
@@ -198,8 +198,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         {/* 商品簡介（一行 + fadeout 效果） */}
         {product.description && (
           <div className={cn(
-            "rounded-none bg-surface-secondary relative",
-            designTokens.neoBrutalism.border.mobile,
+            "rounded-theme-sm bg-surface-secondary relative",
+            designTokens.cleanCommerce.border.base,
             "border-gray-400",
             "p-2"
           )}>
@@ -213,9 +213,9 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         {/* 價格顯示 */}
         {displayPrice ? (
           <div className={cn(
-            "rounded-none bg-info-bg",
-            designTokens.neoBrutalism.border.mobile,
-            "border-black",
+            "rounded-theme-sm bg-info-bg",
+            designTokens.cleanCommerce.border.base,
+            "border-border",
             "p-2 md:p-3"
           )}>
             {/* 判斷是否有價格差異 */}
@@ -255,8 +255,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         ) : (
           // 沒有任何價格：顯示「價格未設定」
           <div className={cn(
-            "rounded-none bg-surface-secondary",
-            "border-2 border-gray-400",
+            "rounded-theme-sm bg-surface-secondary",
+            "border border-gray-400",
             "p-2 md:p-3"
           )}>
             <p className="text-center font-bold text-text-secondary text-xs">
@@ -290,8 +290,8 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             }}
             disabled={isAdding || !product.user_price || stockConfig.disabled}
             className={cn(
-              "w-14 md:w-16 text-center font-bold rounded-none",
-              "border-2 border-black",
+              "w-14 md:w-16 text-center font-bold rounded-theme-sm",
+              "border",
               "px-2 py-1.5 md:py-2",
               "min-h-[44px]",
               "focus:outline-none focus:ring-2 focus:ring-blue-500",
@@ -306,12 +306,12 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             onClick={handleAddToCart}
             disabled={isAdding || !product.user_price || stockConfig.disabled}
             className={cn(
-              "flex-1 rounded-none font-bold transition-all",
+              "flex-1 rounded-theme-sm font-bold transition-all",
               stockConfig.bgColor,
-              designTokens.neoBrutalism.border.full,
-              "border-black",
-              designTokens.neoBrutalism.shadow.full,
-              designTokens.neoBrutalism.hover,
+              designTokens.cleanCommerce.border.full,
+              "border-border",
+              designTokens.cleanCommerce.shadow.full,
+              designTokens.cleanCommerce.hover,
               "px-2 py-2 md:px-4 md:py-3",
               "min-h-[44px]",
               "text-sm md:text-base",

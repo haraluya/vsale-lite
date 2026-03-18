@@ -41,7 +41,7 @@ export function CategoryBadge({ categoryName, size = 'sm' }: CategoryBadgeProps)
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-none border-2 font-bold whitespace-nowrap',
+        'inline-flex items-center rounded-theme-sm border font-bold whitespace-nowrap',
         colors.bg,
         colors.text,
         colors.border,

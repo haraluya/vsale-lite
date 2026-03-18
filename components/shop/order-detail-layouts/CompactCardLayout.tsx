@@ -23,7 +23,7 @@ export function CompactCardLayout({ order }: Props) {
   return (
     <div className="space-y-4">
       {/* 訂單標題區 - 緊湊型 */}
-      <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
+      <div className="rounded-theme-sm border bg-surface shadow-neo p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl md:text-3xl font-black truncate">{order.order_number}</h1>
@@ -34,7 +34,7 @@ export function CompactCardLayout({ order }: Props) {
       </div>
 
       {/* 商品區 - 緊湑表格式 */}
-      <div className="rounded-none border-3 border-black bg-surface shadow-neo overflow-hidden">
+      <div className="rounded-theme-sm border bg-surface shadow-neo overflow-hidden">
         <div className="bg-black text-white px-5 py-3">
           <h2 className="text-lg md:text-xl font-black flex items-center gap-2">
             <Package className="w-5 h-5" />
@@ -55,7 +55,7 @@ export function CompactCardLayout({ order }: Props) {
                 return (
                   <div
                     key={comboDealItem.id}
-                    className="border-2 border-yellow-500 bg-yellow-50 p-4"
+                    className="border border-yellow-500 bg-yellow-50 p-4"
                   >
                     {/* 組合優惠標題 - 單行緊湊 */}
                     <div className="flex items-center justify-between mb-3">
@@ -104,7 +104,7 @@ export function CompactCardLayout({ order }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       {seriesName && (
-                        <span className="inline-block bg-blue-100 border-2 border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900 shrink-0">
+                        <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900 shrink-0">
                           {seriesName}
                         </span>
                       )}
@@ -129,7 +129,7 @@ export function CompactCardLayout({ order }: Props) {
       </div>
 
       {/* 金額摘要區 - 緊湊網格 */}
-      <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
+      <div className="rounded-theme-sm border bg-surface shadow-neo p-5">
         <div className="space-y-2">
           {/* 商品小計 */}
           <div className="flex items-center justify-between py-1.5">
@@ -202,7 +202,7 @@ export function CompactCardLayout({ order }: Props) {
           )}
 
           {/* 總金額 - 強調顯示 */}
-          <div className="flex items-center justify-between pt-3 mt-2 border-t-3 border-black">
+          <div className="flex items-center justify-between pt-3 mt-2 border-t">
             <span className="text-lg md:text-xl font-black">訂單總金額</span>
             <span className="text-2xl md:text-3xl font-black text-success">
               {formatCurrency(order.total_amount)}
@@ -212,7 +212,7 @@ export function CompactCardLayout({ order }: Props) {
       </div>
 
       {/* 訂單資訊 - 網格佈局 */}
-      <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
+      <div className="rounded-theme-sm border bg-surface shadow-neo p-5">
         <h2 className="text-lg md:text-xl font-black mb-4 flex items-center gap-2">
           <FileText className="w-5 h-5" />
           訂單資訊
@@ -250,7 +250,7 @@ export function CompactCardLayout({ order }: Props) {
 
       {/* 訂單備註 */}
       {order.notes && (
-        <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
+        <div className="rounded-theme-sm border bg-surface shadow-neo p-5">
           <h2 className="text-lg md:text-xl font-black mb-3">訂單備註</h2>
           <p className="text-sm text-foreground">{order.notes}</p>
         </div>

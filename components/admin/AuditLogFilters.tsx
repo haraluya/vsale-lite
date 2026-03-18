@@ -21,7 +21,7 @@ export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
     : currentFilters.action_type
 
   return (
-    <form className="rounded-none border-2 md:border-3 border-black bg-surface shadow-neo">
+    <form className="rounded-theme-sm border-theme bg-surface shadow-neo">
       {/* 標題區（手機可點擊展開） */}
       <button
         type="button"
@@ -38,7 +38,7 @@ export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
       </button>
 
       {/* 篩選表單（手機版可摺疊，桌面版永遠顯示） */}
-      <div className={`${isExpanded ? 'block' : 'hidden'} md:block border-t-2 border-black p-4 space-y-4`}>
+      <div className={`${isExpanded ? 'block' : 'hidden'} md:block border-t p-4 space-y-4`}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* 操作類型篩選 */}
           <div>
@@ -46,7 +46,7 @@ export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
             <select
               name="action_type"
               defaultValue={cleanAction || ''} // 使用清理後的值
-              className="w-full rounded-none border-2 border-black px-3 py-2 font-bold text-sm"
+              className="w-full rounded-theme-sm border px-3 py-2 font-bold text-sm"
             >
               <option value="">全部</option>
               <option value="created">建立</option>
@@ -64,7 +64,7 @@ export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
               type="date"
               name="date_from"
               defaultValue={currentFilters.date_from}
-              className="w-full rounded-none border-2 border-black px-3 py-2 font-bold text-sm"
+              className="w-full rounded-theme-sm border px-3 py-2 font-bold text-sm"
             />
           </div>
 
@@ -75,7 +75,7 @@ export function AuditLogFilters({ currentFilters }: AuditLogFiltersProps) {
               type="date"
               name="date_to"
               defaultValue={currentFilters.date_to}
-              className="w-full rounded-none border-2 border-black px-3 py-2 font-bold text-sm"
+              className="w-full rounded-theme-sm border px-3 py-2 font-bold text-sm"
             />
           </div>
         </div>

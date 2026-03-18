@@ -19,7 +19,7 @@ import { Input } from '@/components/ui/input'
 import { CategoryBadge } from './CategoryBadge'
 import { SortableHeader } from './SortableHeader'
 import { SeriesThumbnail } from './SeriesThumbnail'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Series, Category } from '@/types'
 import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
@@ -112,9 +112,9 @@ export function SeriesTable({
 
           <select
             className={cn(
-              'rounded-none border-2 md:border-3 border-black font-bold',
+              'rounded-theme-sm border-theme font-bold',
               'px-3 py-2 md:px-4 md:py-2',
-              designTokens.neoBrutalism.shadow.mobile,
+              designTokens.cleanCommerce.shadow.base,
               designTokens.typography.body.base
             )}
             value={categoryFilter}
@@ -144,7 +144,7 @@ export function SeriesTable({
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b-2 md:border-b-3 border-black">
+              <tr className="border-b">
                 <th className={cn('px-4 py-3 text-left font-bold', designTokens.typography.body.base)}>縮圖</th>
                 <th className={cn('px-4 py-3 text-left', designTokens.typography.body.base)}>
                   <SortableHeader label="系列代碼" sortKey="code" />
@@ -196,9 +196,9 @@ export function SeriesTable({
                       <button
                         onClick={() => handleToggleStatus(s.id, s.status)}
                         className={cn(
-                          'rounded-none border-2 border-black px-2 py-1 font-bold transition-all',
-                          'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
-                          'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
+                          'rounded-theme-sm border px-2 py-1 font-bold transition-all',
+                          'shadow-neo-sm',
+                          'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-neo-sm',
                           designTokens.typography.caption,
                           s.status === 'active'
                             ? 'bg-green-100 text-green-800'
@@ -215,14 +215,14 @@ export function SeriesTable({
                       <div className="flex justify-end gap-2">
                         <Link
                           href={`/admin/series/${s.id}`}
-                          className="rounded-none border-2 border-black bg-blue-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                          className="rounded-theme-sm border bg-blue-100 p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                           title="編輯"
                         >
                           <Edit className="h-4 w-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(s.id, s.name)}
-                          className="rounded-none border-2 border-black bg-red-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                          className="rounded-theme-sm border bg-red-100 p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                           title="刪除"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -249,8 +249,8 @@ export function SeriesTable({
               <div
                 key={s.id}
                 className={cn(
-                  'rounded-none bg-white',
-                  getNeoBrutalismClasses(),
+                  'rounded-theme-sm bg-white',
+                  getThemeClasses(),
                   designTokens.spacing.card.padding
                 )}
               >
@@ -283,9 +283,9 @@ export function SeriesTable({
                   <button
                     onClick={() => handleToggleStatus(s.id, s.status)}
                     className={cn(
-                      'rounded-none border-2 border-black px-2 py-1 font-bold transition-all',
-                      'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
-                      'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
+                      'rounded-theme-sm border px-2 py-1 font-bold transition-all',
+                      'shadow-neo-sm',
+                      'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-neo-sm',
                       designTokens.typography.caption,
                       s.status === 'active'
                         ? 'bg-green-100 text-green-800'
@@ -303,7 +303,7 @@ export function SeriesTable({
                     href={`/admin/series/${s.id}`}
                     className={cn(
                       'flex-1 inline-flex items-center justify-center gap-2 bg-blue-100 font-bold transition-all',
-                      getNeoBrutalismClasses({ active: true }),
+                      getThemeClasses({ active: true }),
                       designTokens.button.md
                     )}
                   >
@@ -314,7 +314,7 @@ export function SeriesTable({
                     onClick={() => handleDelete(s.id, s.name)}
                     className={cn(
                       'flex-1 inline-flex items-center justify-center gap-2 bg-red-100 font-bold transition-all',
-                      getNeoBrutalismClasses({ active: true }),
+                      getThemeClasses({ active: true }),
                       designTokens.button.md
                     )}
                   >

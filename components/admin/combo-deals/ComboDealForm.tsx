@@ -230,7 +230,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* 各選模式 */}
             <label
-              className={`p-4 border-2 md:border-3 border-black rounded-none cursor-pointer transition ${
+              className={`p-4 border-theme rounded-theme-sm cursor-pointer transition ${
                 comboMode === 'each'
                   ? 'bg-purple-100 shadow-neo'
                   : 'bg-white hover:bg-gray-50'
@@ -252,7 +252,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
 
             {/* 任選模式 */}
             <label
-              className={`p-4 border-2 md:border-3 border-black rounded-none cursor-pointer transition ${
+              className={`p-4 border-theme rounded-theme-sm cursor-pointer transition ${
                 comboMode === 'mix_match'
                   ? 'bg-purple-100 shadow-neo'
                   : 'bg-white hover:bg-gray-50'
@@ -322,7 +322,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label
-                className={`p-3 border-2 border-black rounded-none cursor-pointer ${
+                className={`p-3 border rounded-theme-sm cursor-pointer ${
                   discountType === 'fixed' ? 'bg-green-100' : 'bg-white'
                 }`}
               >
@@ -338,7 +338,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
               </label>
 
               <label
-                className={`p-3 border-2 border-black rounded-none cursor-pointer ${
+                className={`p-3 border rounded-theme-sm cursor-pointer ${
                   discountType === 'percentage' ? 'bg-green-100' : 'bg-white'
                 }`}
               >
@@ -448,7 +448,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
 
         {/* 日期範圍提示 */}
         {!isUnlimitedPeriod && (
-          <div className="mt-4 rounded-none border-2 border-orange-500 bg-orange-50 p-4">
+          <div className="mt-4 rounded-theme-sm border border-orange-500 bg-orange-50 p-4">
             <p className="text-sm font-bold text-orange-800">
               ⚠️ 重要：組合優惠過期後將無法使用！建議設定較長期限或選擇「無限期」
             </p>
@@ -466,7 +466,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
             {tiers.map((tier) => (
               <label
                 key={tier.id}
-                className={`p-3 border-2 border-black rounded-none cursor-pointer transition ${
+                className={`p-3 border rounded-theme-sm cursor-pointer transition ${
                   selectedTierIds.includes(tier.id)
                     ? 'bg-blue-100 shadow-neo-sm'
                     : 'bg-white hover:bg-gray-50'

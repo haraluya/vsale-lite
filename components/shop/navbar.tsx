@@ -1,6 +1,6 @@
 /**
  * Navbar Component
- * 前台導航列元件
+ * 前台導航列元件 — Clean Commerce 風格
  * - 手機版：僅 Logo + 主題切換
  * - 桌面版：完整功能按鈕
  */
@@ -11,6 +11,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { CurrentUser } from '@/types'
 import { LogOut, ShoppingCart, Package, Ticket, Gift } from 'lucide-react'
+import { logout } from '@/lib/actions/auth'
 import { useCartStore } from '@/stores/cart'
 import { Logo } from '@/components/ui/logo'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -52,8 +53,7 @@ export function Navbar({ user }: NavbarProps) {
     setLoading(true)
 
     try {
-      const authLogout = await import('@/lib/actions/auth').then(m => m.logout)
-      await authLogout()
+      await logout()
     } catch (error) {
       if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
         return
@@ -68,14 +68,19 @@ export function Navbar({ user }: NavbarProps) {
     }
   }
 
+  const navBtnClass = cn(
+    "flex items-center gap-2 rounded-theme-sm border-theme font-medium transition-all duration-200",
+    "shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover",
+    "active:scale-[0.98] active:translate-y-0",
+    "px-3 py-2 md:px-4",
+    "min-h-[44px] min-w-[44px]"
+  )
+
   return (
     <nav
       className={cn(
         "fixed top-0 left-0 right-0 z-50 bg-surface w-full",
-        designTokens.neoBrutalism.border.mobile,
-        "md:border-b-3",
-        designTokens.neoBrutalism.shadow.mobile,
-        "md:shadow-neo"
+        "border-b shadow-neo-sm"
       )}
       style={{ paddingTop: 'var(--safe-area-top)' }}
     >
@@ -97,19 +102,11 @@ export function Navbar({ user }: NavbarProps) {
           </div>
 
           {/* 桌面版：完整功能按鈕 */}
-          <div className="hidden md:flex items-center gap-2 md:gap-4">
+          <div className="hidden md:flex items-center gap-2 md:gap-3">
             {/* 優惠活動按鈕 */}
             <Link
               href="/store/promotions"
-              className={cn(
-                "flex items-center gap-2 rounded-none font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                designTokens.neoBrutalism.shadow.mobile,
-                "md:shadow-neo",
-                designTokens.neoBrutalism.hover,
-                "px-3 py-2 md:px-4",
-                "min-h-[44px] min-w-[44px]"
-              )}
+              className={navBtnClass}
               style={{ backgroundColor: 'var(--color-nav-promotions)' }}
             >
               <Gift className="h-4 w-4 md:h-5 md:w-5" />
@@ -119,15 +116,7 @@ export function Navbar({ user }: NavbarProps) {
             {/* 我的訂單按鈕 */}
             <Link
               href="/store/orders"
-              className={cn(
-                "flex items-center gap-2 rounded-none font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                designTokens.neoBrutalism.shadow.mobile,
-                "md:shadow-neo",
-                designTokens.neoBrutalism.hover,
-                "px-3 py-2 md:px-4",
-                "min-h-[44px] min-w-[44px]"
-              )}
+              className={navBtnClass}
               style={{ backgroundColor: 'var(--color-nav-orders)' }}
             >
               <Package className="h-4 w-4 md:h-5 md:w-5" />
@@ -137,15 +126,7 @@ export function Navbar({ user }: NavbarProps) {
             {/* 優惠券按鈕 */}
             <Link
               href="/store/coupons"
-              className={cn(
-                "flex items-center gap-2 rounded-none font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                designTokens.neoBrutalism.shadow.mobile,
-                "md:shadow-neo",
-                designTokens.neoBrutalism.hover,
-                "px-3 py-2 md:px-4",
-                "min-h-[44px] min-w-[44px]"
-              )}
+              className={navBtnClass}
               style={{ backgroundColor: 'var(--color-nav-coupons)' }}
             >
               <Ticket className="h-4 w-4 md:h-5 md:w-5" />
@@ -155,25 +136,13 @@ export function Navbar({ user }: NavbarProps) {
             {/* 購物車按鈕 */}
             <Link
               href="/store/cart"
-              className={cn(
-                "relative flex items-center gap-2 rounded-none font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                designTokens.neoBrutalism.shadow.mobile,
-                "md:shadow-neo",
-                designTokens.neoBrutalism.hover,
-                "px-3 py-2 md:px-4",
-                "min-h-[44px] min-w-[44px]"
-              )}
+              className={cn(navBtnClass, "relative")}
               style={{ backgroundColor: 'var(--color-nav-cart)' }}
             >
               <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
               <span className="hidden sm:inline">購物車</span>
               {cartItemsCount > 0 && (
-                <span className={cn(
-                  "absolute -right-2 -top-2 flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-error font-bold text-text-inverse",
-                  designTokens.neoBrutalism.border.mobile,
-                  "text-xs"
-                )}>
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-error font-semibold text-text-inverse border text-xs">
                   {cartItemsCount > 99 ? '99+' : cartItemsCount}
                 </span>
               )}
@@ -187,15 +156,8 @@ export function Navbar({ user }: NavbarProps) {
               onClick={handleLogout}
               disabled={loading}
               className={cn(
-                "flex items-center gap-2 rounded-none font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                designTokens.neoBrutalism.shadow.mobile,
-                "md:shadow-neo",
-                designTokens.neoBrutalism.hover,
-                "px-3 py-2 md:px-4",
-                "min-h-[44px] min-w-[44px]",
-                "disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0",
-                "disabled:hover:shadow-neo-sm md:disabled:hover:shadow-neo"
+                navBtnClass,
+                "disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
               )}
               style={{ backgroundColor: 'var(--color-nav-logout)' }}
             >

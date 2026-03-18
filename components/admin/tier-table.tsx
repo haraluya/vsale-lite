@@ -26,8 +26,93 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { toast } from 'sonner'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
+
+function SortableTierCard({
+  tier,
+  onDelete,
+  loading,
+}: {
+  tier: Tier
+  onDelete: (id: string, name: string) => void
+  loading: string | null
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: tier.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "rounded-theme-sm bg-white",
+        getThemeClasses(),
+        designTokens.spacing.card.padding
+      )}
+    >
+      {/* 拖曳手把 + 等級名稱 */}
+      <div className="flex items-start gap-3 mb-3">
+        <button
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing touch-none p-1 hover:bg-gray-100 rounded min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
+        >
+          <GripVertical className="h-5 w-5 text-gray-400" />
+        </button>
+        <div className="flex-1">
+          <h3 className={cn(designTokens.typography.h3, "mb-1")}>{tier.name}</h3>
+        </div>
+      </div>
+
+      {/* 建立時間 */}
+      <div className="mb-3 pb-3 border-b border-gray-200">
+        <span className={cn(designTokens.typography.caption, "text-gray-500")}>
+          建立於 {formatDateTW(tier.created_at)}
+        </span>
+      </div>
+
+      {/* 操作按鈕 */}
+      <div className="flex gap-2">
+        <Link
+          href={`/admin/tiers/${tier.id}/edit`}
+          className={cn(
+            "flex-1 inline-flex items-center justify-center gap-2 bg-white font-bold transition-all",
+            getThemeClasses({ active: true }),
+            designTokens.button.md
+          )}
+        >
+          <Edit className="h-4 w-4" />
+          編輯
+        </Link>
+        <button
+          onClick={() => onDelete(tier.id, tier.name)}
+          disabled={loading === tier.id}
+          className={cn(
+            "flex-1 inline-flex items-center justify-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50",
+            getThemeClasses({ active: true }),
+            designTokens.button.md
+          )}
+        >
+          <Trash2 className="h-4 w-4" />
+          {loading === tier.id ? '刪除中...' : '刪除'}
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: string, name: string) => void; loading: string | null }) {
   const {
@@ -46,7 +131,7 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
   }
 
   return (
-    <tr ref={setNodeRef} style={style} className="border-b-2 md:border-b-3 border-black last:border-b-0 bg-white">
+    <tr ref={setNodeRef} style={style} className="border-b last:border-b-0 bg-white">
       <td className={cn("px-3 py-3 md:px-4 md:py-4")}>
         <button
           {...attributes}
@@ -66,9 +151,9 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
             href={`/admin/tiers/${tier.id}/edit`}
             className={cn(
               "inline-flex items-center gap-2 bg-white font-bold transition-all",
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.mobile,
-              designTokens.neoBrutalism.hover,
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.base,
+              designTokens.cleanCommerce.hover,
               designTokens.button.sm
             )}
           >
@@ -80,9 +165,9 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
             disabled={loading === tier.id}
             className={cn(
               "inline-flex items-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50",
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.mobile,
-              designTokens.neoBrutalism.hover,
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.base,
+              designTokens.cleanCommerce.hover,
               designTokens.button.sm
             )}
           >
@@ -183,14 +268,15 @@ export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
           <p className={cn("font-bold", designTokens.typography.body.base)}>正在儲存排序...</p>
         </div>
       )}
-      <div className="card-neo overflow-hidden p-0">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        {/* 桌面版: 完整表格 */}
+        <div className="hidden lg:block card-neo overflow-hidden p-0">
           <table className="w-full">
-            <thead className="border-b-2 md:border-b-3 border-black bg-gray-100">
+            <thead className="border-b bg-gray-100">
               <tr>
                 <th className={cn("px-3 py-3 text-left font-bold w-16 md:px-4 md:py-4", designTokens.typography.body.base)}>拖曳</th>
                 <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>等級名稱</th>
@@ -214,8 +300,25 @@ export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
               </SortableContext>
             </tbody>
           </table>
-        </DndContext>
-      </div>
+        </div>
+
+        {/* 手機版: 卡片視圖 */}
+        <div className="lg:hidden space-y-3 md:space-y-4">
+          <SortableContext
+            items={tiers.map(t => t.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {tiers.map((tier) => (
+              <SortableTierCard
+                key={tier.id}
+                tier={tier}
+                onDelete={handleDelete}
+                loading={loading}
+              />
+            ))}
+          </SortableContext>
+        </div>
+      </DndContext>
       <div className={cn(
         "card-neo bg-blue-50 border-blue-500",
         designTokens.spacing.card.padding

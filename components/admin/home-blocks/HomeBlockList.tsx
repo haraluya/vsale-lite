@@ -177,12 +177,12 @@ export function HomeBlockList() {
       <button
         onClick={handleAdd}
         className={`
-          flex items-center justify-center gap-2 w-full py-3 rounded-none
+          flex items-center justify-center gap-2 w-full py-3 rounded-theme-sm
           bg-green-500 text-white font-medium
-          ${designTokens.neoBrutalism.border.full}
-          ${designTokens.neoBrutalism.shadow.full}
-          border-black
-          hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+          ${designTokens.cleanCommerce.border.full}
+          ${designTokens.cleanCommerce.shadow.full}
+         
+          hover:-translate-y-0.5 hover:shadow-theme-hover
           transition-all
         `}
       >
@@ -194,9 +194,9 @@ export function HomeBlockList() {
       {blocks.length === 0 ? (
         <div
           className={`
-            flex flex-col items-center justify-center py-12 rounded-none bg-gray-50
-            ${designTokens.neoBrutalism.border.full}
-            border-black border-dashed
+            flex flex-col items-center justify-center py-12 rounded-theme-sm bg-gray-50
+            ${designTokens.cleanCommerce.border.full}
+            border-dashed
           `}
         >
           <p className="text-gray-600 mb-4">

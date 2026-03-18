@@ -97,8 +97,8 @@ export function CustomerOrdersContent() {
         {/* 錯誤訊息 */}
         {error && (
           <div className={cn(
-            "rounded-none bg-red-100",
-            designTokens.neoBrutalism.border.full,
+            "rounded-theme-sm bg-red-100",
+            designTokens.cleanCommerce.border.full,
             "border-red-600",
             "p-4",
             designTokens.spacing.section.marginBottom
@@ -117,17 +117,17 @@ export function CustomerOrdersContent() {
               key={option.value}
               onClick={() => setStatusFilter(option.value)}
               className={cn(
-                "rounded-none font-bold transition-all",
+                "rounded-theme-sm font-bold transition-all",
                 "px-3 py-2 md:px-4",
                 "min-h-[44px]",
                 designTokens.typography.body.base,
                 statusFilter === option.value ? [
-                  designTokens.neoBrutalism.border.full,
-                  "border-black bg-green-400",
-                  designTokens.neoBrutalism.shadow.full
+                  designTokens.cleanCommerce.border.full,
+                  "bg-green-400",
+                  designTokens.cleanCommerce.shadow.full
                 ] : [
-                  "border-2 border-gray-400 bg-surface",
-                  "hover:border-black hover:shadow-neo-sm md:hover:shadow-neo"
+                  "border border-gray-400 bg-surface",
+                  "hover:hover:shadow-neo-sm md:hover:shadow-neo"
                 ]
               )}
             >
@@ -158,11 +158,11 @@ export function CustomerOrdersContent() {
               <Link
                 href="/store"
                 className={cn(
-                  "rounded-none bg-green-400 font-bold transition-all",
-                  designTokens.neoBrutalism.border.full,
-                  "border-black",
-                  designTokens.neoBrutalism.shadow.full,
-                  designTokens.neoBrutalism.hover,
+                  "rounded-theme-sm bg-green-400 font-bold transition-all",
+                  designTokens.cleanCommerce.border.full,
+                  "border-border",
+                  designTokens.cleanCommerce.shadow.full,
+                  designTokens.cleanCommerce.hover,
                   "px-6 py-3 md:px-8 md:py-4",
                   designTokens.typography.body.large
                 )}
@@ -185,8 +185,8 @@ export function CustomerOrdersContent() {
         {/* 訂單統計 */}
         {orders.length > 0 && (
           <div className={cn(
-            "mt-6 md:mt-8 rounded-none bg-surface text-center",
-            "border-2 border-gray-300",
+            "mt-6 md:mt-8 rounded-theme-sm bg-surface text-center",
+            "border border-border",
             "p-3 md:p-4"
           )}>
             <p className={cn(

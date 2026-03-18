@@ -1,6 +1,6 @@
 /**
  * Vsale-lite 響應式設計 Token 系統
- * 統一定義所有設計變數,確保一致性
+ * Clean Commerce 主題 — 使用 CSS 變數實現多主題相容
  */
 
 export const designTokens = {
@@ -28,9 +28,9 @@ export const designTokens = {
   },
 
   typography: {
-    h1: 'text-2xl md:text-3xl lg:text-4xl font-bold',
-    h2: 'text-xl md:text-2xl lg:text-3xl font-bold',
-    h3: 'text-lg md:text-xl font-bold',
+    h1: 'text-2xl md:text-3xl lg:text-4xl font-semibold',
+    h2: 'text-xl md:text-2xl lg:text-3xl font-semibold',
+    h3: 'text-lg md:text-xl font-semibold',
     body: {
       base: 'text-sm md:text-base',
       large: 'text-base md:text-lg',
@@ -39,19 +39,23 @@ export const designTokens = {
     label: 'text-xs md:text-sm font-medium',
   },
 
-  neoBrutalism: {
+  /** 主題感知樣式 — 透過 CSS 變數驅動，自動適應當前主題 */
+  cleanCommerce: {
     border: {
-      mobile: 'border-2',
-      desktop: 'md:border-3',
-      full: 'border-2 md:border-3',
+      base: 'border-theme',
+      full: 'border-theme',
     },
     shadow: {
-      mobile: 'shadow-neo-sm',
-      desktop: 'md:shadow-neo',
-      full: 'shadow-neo-sm md:shadow-neo',
+      base: 'shadow-neo-sm',
+      full: 'shadow-neo-sm',
     },
-    active: 'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-    hover: 'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+    radius: {
+      base: 'rounded-theme',
+      sm: 'rounded-theme-sm',
+      lg: 'rounded-theme-lg',
+    },
+    hover: 'hover:-translate-y-0.5 hover:shadow-neo-lg transition-all duration-200',
+    active: 'active:scale-[0.98] active:shadow-neo-sm transition-all duration-150',
   },
 
   button: {
@@ -89,24 +93,37 @@ export const designTokens = {
   },
 } as const
 
-export function getNeoBrutalismClasses(options?: {
+/**
+ * 取得主題感知的基礎樣式類別
+ * 透過 CSS 變數自動適應當前主題（Clean Commerce / Neo-Brutalism / 等）
+ */
+export function getThemeClasses(options?: {
   hover?: boolean
   active?: boolean
 }) {
   const classes: string[] = [
-    designTokens.neoBrutalism.border.full,
-    designTokens.neoBrutalism.shadow.full,
+    designTokens.cleanCommerce.border.full,
+    designTokens.cleanCommerce.shadow.full,
+    designTokens.cleanCommerce.radius.base,
   ]
 
   if (options?.hover) {
-    classes.push(designTokens.neoBrutalism.hover as string)
+    classes.push(designTokens.cleanCommerce.hover)
   }
 
   if (options?.active) {
-    classes.push(designTokens.neoBrutalism.active as string)
+    classes.push(designTokens.cleanCommerce.active)
   }
 
   return classes.join(' ')
+}
+
+/** @deprecated 使用 getThemeClasses 替代 */
+export function getNeoBrutalismClasses(options?: {
+  hover?: boolean
+  active?: boolean
+}) {
+  return getThemeClasses(options)
 }
 
 export function getPageContainerClasses(

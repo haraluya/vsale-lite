@@ -137,7 +137,7 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
             {tags.map(tag => (
               <div
                 key={tag}
-                className="group relative inline-flex items-center gap-1 rounded-none border-2 border-black bg-white px-3 py-1 shadow-neo"
+                className="group relative inline-flex items-center gap-1 rounded-theme-sm border bg-white px-3 py-1 shadow-neo"
               >
                 <TagBadge tag={tag} size="sm" className="border-0" />
                 <button
@@ -172,12 +172,12 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
               onFocus={() => setShowSuggestions(inputValue.length > 0)}
               placeholder="輸入標籤名稱 (2-8 字元)..."
               disabled={isLoading}
-              className="w-full rounded-none border-2 border-black px-4 py-2 shadow-neo-sm md:shadow-neo focus:outline-none focus:ring-2 focus:ring-black disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-theme-sm border px-4 py-2 shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black disabled:cursor-not-allowed disabled:opacity-50"
             />
             <button
               onClick={() => handleAddTag(inputValue)}
               disabled={isLoading || !inputValue.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-none border-2 border-black bg-green-400 p-2 shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-theme-sm border bg-green-400 p-2 shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -185,7 +185,7 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
 
           {/* 建議標籤 */}
           {showSuggestions && suggestedTags.length > 0 && (
-            <div className="absolute z-10 mt-2 w-full rounded-none border-2 border-black bg-white shadow-neo">
+            <div className="absolute z-10 mt-2 w-full rounded-theme-sm border bg-white shadow-neo">
               <div className="p-2">
                 <p className="mb-2 text-xs font-bold text-gray-600">常用標籤</p>
                 <div className="space-y-1">
@@ -193,7 +193,7 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
                     <button
                       key={tag}
                       onClick={() => handleAddTag(tag)}
-                      className="flex w-full items-center gap-2 rounded-none border-2 border-transparent px-3 py-2 text-left hover:border-black hover:bg-gray-50"
+                      className="flex w-full items-center gap-2 rounded-theme-sm border border-transparent px-3 py-2 text-left hover:hover:bg-gray-50"
                     >
                       <TagIcon className="h-4 w-4 text-gray-400" />
                       <span className="font-medium">{tag}</span>

@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { Edit, Trash2, Calendar, Tag } from 'lucide-react'
 import { deleteCoupon } from '@/lib/actions/coupons'
 import type { Coupon } from '@/specs/009-coupon-system/contracts/coupons'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -76,7 +76,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
 
     if (coupon.status === 'inactive') {
       return (
-        <span className="inline-flex items-center gap-1 rounded border-2 border-gray-400 bg-gray-100 px-2 py-1 text-xs font-bold text-gray-600">
+        <span className="inline-flex items-center gap-1 rounded border border-gray-400 bg-gray-100 px-2 py-1 text-xs font-bold text-gray-600">
           停用
         </span>
       )
@@ -84,7 +84,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
 
     if (coupon.status === 'deleted') {
       return (
-        <span className="inline-flex items-center gap-1 rounded border-2 border-red-400 bg-red-100 px-2 py-1 text-xs font-bold text-red-600">
+        <span className="inline-flex items-center gap-1 rounded border border-red-400 bg-red-100 px-2 py-1 text-xs font-bold text-red-600">
           已刪除
         </span>
       )
@@ -92,7 +92,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
 
     if (now < validFrom) {
       return (
-        <span className="inline-flex items-center gap-1 rounded border-2 border-blue-400 bg-blue-100 px-2 py-1 text-xs font-bold text-blue-600">
+        <span className="inline-flex items-center gap-1 rounded border border-blue-400 bg-blue-100 px-2 py-1 text-xs font-bold text-blue-600">
           未開始
         </span>
       )
@@ -100,14 +100,14 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
 
     if (now > validUntil) {
       return (
-        <span className="inline-flex items-center gap-1 rounded border-2 border-orange-400 bg-orange-100 px-2 py-1 text-xs font-bold text-orange-600">
+        <span className="inline-flex items-center gap-1 rounded border border-orange-400 bg-orange-100 px-2 py-1 text-xs font-bold text-orange-600">
           已過期
         </span>
       )
     }
 
     return (
-      <span className="inline-flex items-center gap-1 rounded border-2 border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-green-600">
+      <span className="inline-flex items-center gap-1 rounded border border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-green-600">
         ✓ 有效
       </span>
     )
@@ -134,7 +134,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
 
   if (filteredCoupons.length === 0) {
     return (
-      <div className="border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
+      <div className="border-theme bg-white p-12 text-center shadow-neo">
         <p className="text-gray-500">
           {showArchived ? '目前沒有已刪除或已過期的優惠券' : '目前沒有有效的優惠券'}
         </p>
@@ -145,10 +145,10 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
   return (
     <>
       {/* 桌面版表格 */}
-      <div className="hidden md:block overflow-x-auto border-2 md:border-3 border-black shadow-neo">
+      <div className="hidden md:block overflow-x-auto border-theme shadow-neo">
         <table className="w-full">
           <thead>
-            <tr className="border-b-2 md:border-b-3 border-black bg-yellow-300">
+            <tr className="border-b bg-yellow-300">
               <th className={cn('px-6 py-4 text-left font-black', designTokens.typography.body.base)}>
                 優惠券代碼
               </th>
@@ -174,7 +174,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
           </thead>
           <tbody>
             {filteredCoupons.map((coupon) => (
-              <tr key={coupon.id} className="border-b-2 md:border-b-3 border-black last:border-b-0 bg-white">
+              <tr key={coupon.id} className="border-b last:border-b-0 bg-white">
                 <td className={cn('px-6 py-4 font-mono font-bold', designTokens.typography.body.base)}>
                   {coupon.code_normalized}
                 </td>
@@ -202,9 +202,9 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
                       href={`/admin/coupons/${coupon.id}`}
                       className={cn(
                         'inline-flex items-center gap-2 bg-white font-bold transition-all',
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover,
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover,
                         designTokens.button.sm
                       )}
                     >
@@ -216,9 +216,9 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
                       disabled={loading === coupon.id}
                       className={cn(
                         'inline-flex items-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50',
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover,
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover,
                         designTokens.button.sm
                       )}
                     >
@@ -238,7 +238,7 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
         {filteredCoupons.map((coupon) => (
           <div
             key={coupon.id}
-            className="border-2 md:border-3 border-black bg-white p-4 shadow-neo"
+            className="border-theme bg-white p-4 shadow-neo"
           >
             {/* 優惠券代碼與狀態 */}
             <div className="mb-3 flex items-center justify-between">
@@ -286,9 +286,9 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
                 href={`/admin/coupons/${coupon.id}`}
                 className={cn(
                   'flex-1 inline-flex items-center justify-center gap-2 bg-white font-bold transition-all',
-                  designTokens.neoBrutalism.border.full,
-                  designTokens.neoBrutalism.shadow.mobile,
-                  designTokens.neoBrutalism.hover,
+                  designTokens.cleanCommerce.border.full,
+                  designTokens.cleanCommerce.shadow.base,
+                  designTokens.cleanCommerce.hover,
                   designTokens.button.sm
                 )}
               >
@@ -300,9 +300,9 @@ export function CouponList({ coupons, showArchived = false }: CouponListProps) {
                 disabled={loading === coupon.id}
                 className={cn(
                   'flex-1 inline-flex items-center justify-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50',
-                  designTokens.neoBrutalism.border.full,
-                  designTokens.neoBrutalism.shadow.mobile,
-                  designTokens.neoBrutalism.hover,
+                  designTokens.cleanCommerce.border.full,
+                  designTokens.cleanCommerce.shadow.base,
+                  designTokens.cleanCommerce.hover,
                   designTokens.button.sm
                 )}
               >

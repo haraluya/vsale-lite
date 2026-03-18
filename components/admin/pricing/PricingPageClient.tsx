@@ -53,33 +53,33 @@ export function PricingPageClient({
       </div>
 
       {/* 標籤切換 */}
-      <div className="mb-6 flex gap-2 rounded-none border-2 md:border-3 border-black bg-white p-2 shadow-neo">
+      <div className="mb-6 flex gap-2 rounded-theme-sm border-theme bg-white p-2 shadow-neo">
         <button
           onClick={() => setMode('series')}
-          className={`flex-1 rounded-none border-2 border-black px-6 py-3 font-bold transition-all ${
+          className={`flex-1 rounded-theme-sm border px-6 py-3 font-bold transition-all ${
             mode === 'series'
-              ? 'bg-blue-400 shadow-neo-sm md:shadow-neo translate-x-0 translate-y-0'
-              : 'bg-white hover:translate-x-[2px] hover:translate-y-[2px]'
+              ? 'bg-blue-400 shadow-neo-sm translate-x-0 translate-y-0'
+              : 'bg-white hover:-translate-y-0.5 hover:shadow-theme-hover'
           }`}
         >
           選擇系列
         </button>
         <button
           onClick={() => setMode('category')}
-          className={`flex-1 rounded-none border-2 border-black px-6 py-3 font-bold transition-all ${
+          className={`flex-1 rounded-theme-sm border px-6 py-3 font-bold transition-all ${
             mode === 'category'
-              ? 'bg-green-400 shadow-neo-sm md:shadow-neo translate-x-0 translate-y-0'
-              : 'bg-white hover:translate-x-[2px] hover:translate-y-[2px]'
+              ? 'bg-green-400 shadow-neo-sm translate-x-0 translate-y-0'
+              : 'bg-white hover:-translate-y-0.5 hover:shadow-theme-hover'
           }`}
         >
           選擇分類
         </button>
         <button
           onClick={() => setMode('quotation')}
-          className={`flex-1 rounded-none border-2 border-black px-6 py-3 font-bold transition-all ${
+          className={`flex-1 rounded-theme-sm border px-6 py-3 font-bold transition-all ${
             mode === 'quotation'
-              ? 'bg-purple-400 shadow-neo-sm md:shadow-neo translate-x-0 translate-y-0'
-              : 'bg-white hover:translate-x-[2px] hover:translate-y-[2px]'
+              ? 'bg-purple-400 shadow-neo-sm translate-x-0 translate-y-0'
+              : 'bg-white hover:-translate-y-0.5 hover:shadow-theme-hover'
           }`}
         >
           報價
@@ -96,11 +96,11 @@ export function PricingPageClient({
           {selectedSeries && seriesProducts.length > 0 ? (
             <SeriesPriceTable series={selectedSeries} products={seriesProducts} />
           ) : selectedSeriesId && selectedSeries ? (
-            <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
+            <div className="rounded-theme-sm border-theme bg-white p-12 text-center shadow-neo">
               <p className="text-lg text-gray-500">此系列尚無商品</p>
             </div>
           ) : (
-            <div className="rounded-none border-2 md:border-3 border-black bg-blue-50 p-8 text-center shadow-neo">
+            <div className="rounded-theme-sm border-theme bg-blue-50 p-8 text-center shadow-neo">
               <p className="text-lg font-bold">請選擇系列</p>
               <p className="mt-4 text-sm text-gray-600">
                 選擇系列後,可批量設定該系列所有商品在各會員等級的價格
@@ -123,11 +123,11 @@ export function PricingPageClient({
           {selectedCategory && categoryProducts.length > 0 ? (
             <CategoryPriceTable category={selectedCategory} products={categoryProducts} />
           ) : selectedCategoryId && selectedCategory ? (
-            <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
+            <div className="rounded-theme-sm border-theme bg-white p-12 text-center shadow-neo">
               <p className="text-lg text-gray-500">此分類尚無商品</p>
             </div>
           ) : (
-            <div className="rounded-none border-2 md:border-3 border-black bg-green-50 p-8 text-center shadow-neo">
+            <div className="rounded-theme-sm border-theme bg-green-50 p-8 text-center shadow-neo">
               <p className="text-lg font-bold">請選擇分類</p>
               <p className="mt-4 text-sm text-gray-600">
                 選擇分類後,可批量設定該分類所有商品在各會員等級的價格

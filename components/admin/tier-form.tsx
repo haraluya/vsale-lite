@@ -86,7 +86,7 @@ export function TierForm({ tier, mode }: TierFormProps) {
           />
 
           {chargeShipping && (
-            <div className="ml-6 space-y-4 border-l-2 border-gray-300 pl-4">
+            <div className="ml-6 space-y-4 border-l-2 border-border pl-4">
               <div>
                 <Label htmlFor="shipping_fee">基本運費 (元) *</Label>
                 <Input

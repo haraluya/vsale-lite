@@ -181,11 +181,11 @@ export function CheckoutContent() {
             <Link
               href="/store"
               className={cn(
-                "rounded-none bg-green-400 font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.full,
-                designTokens.neoBrutalism.hover,
+                "rounded-theme-sm bg-green-400 font-bold transition-all",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.full,
+                designTokens.cleanCommerce.hover,
                 "px-6 py-3 md:px-8 md:py-4",
                 "min-h-[44px]",
                 designTokens.typography.body.large
@@ -220,8 +220,8 @@ export function CheckoutContent() {
         {/* 錯誤訊息 */}
         {error && (
           <div className={cn(
-            "rounded-none bg-red-100",
-            designTokens.neoBrutalism.border.full,
+            "rounded-theme-sm bg-red-100",
+            designTokens.cleanCommerce.border.full,
             "border-red-600",
             "p-3 md:p-4",
             designTokens.spacing.section.marginBottom
@@ -234,10 +234,10 @@ export function CheckoutContent() {
         <div className={designTokens.spacing.page.gap}>
           {/* 商品列表 */}
           <div className={cn(
-            "rounded-none bg-surface",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
+            "rounded-theme-sm bg-surface",
+            designTokens.cleanCommerce.border.full,
+            "border-border",
+            designTokens.cleanCommerce.shadow.full,
             designTokens.spacing.card.padding
           )}>
             <h2 className={cn(
@@ -250,7 +250,7 @@ export function CheckoutContent() {
                 <div
                   key={deal.id}
                   className={cn(
-                    "rounded-none bg-yellow-50 border-2 border-yellow-400 p-3 md:p-4 mb-3 md:mb-4"
+                    "rounded-theme-sm bg-yellow-50 border border-yellow-400 p-3 md:p-4 mb-3 md:mb-4"
                   )}
                 >
                   <div className="flex items-center gap-2 mb-3">
@@ -272,7 +272,7 @@ export function CheckoutContent() {
                           <div className="flex-1">
                             {detail?.series_name && (
                               <span className={cn(
-                                "inline-block rounded-none bg-yellow-100 border border-yellow-400 px-2 py-0.5 mr-2",
+                                "inline-block rounded-theme-sm bg-yellow-100 border border-yellow-400 px-2 py-0.5 mr-2",
                                 "text-xs font-bold text-yellow-800"
                               )}>
                                 【{detail.series_name}】
@@ -321,7 +321,7 @@ export function CheckoutContent() {
                   <div className="flex-1">
                     {/* 系列名稱標籤 */}
                     <div className={cn(
-                      "inline-block rounded-none bg-yellow-100 border-2 border-yellow-400 px-2 py-1 mb-1",
+                      "inline-block rounded-theme-sm bg-yellow-100 border border-yellow-400 px-2 py-1 mb-1",
                       "text-xs font-bold text-yellow-800"
                     )}>
                       【{item.seriesName}】
@@ -349,8 +349,8 @@ export function CheckoutContent() {
             {/* 總計 */}
             <div className={cn(
               "mt-4 md:mt-6 pt-3 md:pt-4",
-              designTokens.neoBrutalism.border.mobile,
-              "md:border-t-3",
+              designTokens.cleanCommerce.border.base,
+              "md:border-t",
               "border-t-black"
             )}>
               <div className="space-y-2">
@@ -376,7 +376,7 @@ export function CheckoutContent() {
 
                 {/* 商品總額（小計） */}
                 <div className={cn(
-                  "flex items-center justify-between pt-2 border-t border-gray-300"
+                  "flex items-center justify-between pt-2 border-t border-border"
                 )}>
                   <p className={cn(designTokens.typography.body.large, "font-semibold")}>商品總額</p>
                   <p className="text-lg font-bold">
@@ -417,7 +417,7 @@ export function CheckoutContent() {
                 {/* 最終總額 */}
                 <div className={cn(
                   "flex items-center justify-between pt-2",
-                  designTokens.neoBrutalism.border.mobile,
+                  designTokens.cleanCommerce.border.base,
                   "md:border-t-2",
                   "border-t-gray-300"
                 )}>
@@ -432,10 +432,10 @@ export function CheckoutContent() {
 
           {/* 訂單備註 */}
           <div className={cn(
-            "rounded-none bg-surface",
-            designTokens.neoBrutalism.border.full,
-            "border-black",
-            designTokens.neoBrutalism.shadow.full,
+            "rounded-theme-sm bg-surface",
+            designTokens.cleanCommerce.border.full,
+            "border-border",
+            designTokens.cleanCommerce.shadow.full,
             designTokens.spacing.card.padding
           )}>
             <h2 className={cn(
@@ -449,9 +449,9 @@ export function CheckoutContent() {
               rows={4}
               placeholder="例如: 請盡快出貨、包裝需求等..."
               className={cn(
-                "w-full rounded-none",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
+                "w-full rounded-theme-sm",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
                 "p-3 md:p-4",
                 designTokens.typography.body.base,
                 "focus:outline-none focus:ring-2 focus:ring-green-400"
@@ -471,11 +471,11 @@ export function CheckoutContent() {
             <Link
               href="/store/cart"
               className={cn(
-                "flex-1 rounded-none bg-gray-200 text-center font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.full,
-                designTokens.neoBrutalism.hover,
+                "flex-1 rounded-theme-sm bg-gray-200 text-center font-bold transition-all",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.full,
+                designTokens.cleanCommerce.hover,
                 "px-4 py-3 md:px-6 md:py-4",
                 "min-h-[44px]",
                 designTokens.typography.body.large
@@ -487,11 +487,11 @@ export function CheckoutContent() {
               onClick={handleSubmitOrder}
               disabled={isSubmitting || isEmpty}
               className={cn(
-                "flex-1 rounded-none bg-green-400 font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.full,
-                designTokens.neoBrutalism.hover,
+                "flex-1 rounded-theme-sm bg-green-400 font-bold transition-all",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.full,
+                designTokens.cleanCommerce.hover,
                 "px-4 py-3 md:px-6 md:py-4",
                 "min-h-[44px]",
                 designTokens.typography.body.large,
@@ -505,8 +505,8 @@ export function CheckoutContent() {
 
           {/* 提示訊息 */}
           <div className={cn(
-            "rounded-none bg-surface-secondary",
-            "border-2 border-gray-300",
+            "rounded-theme-sm bg-surface-secondary",
+            "border border-border",
             "p-3 md:p-4"
           )}>
             <p className={cn(

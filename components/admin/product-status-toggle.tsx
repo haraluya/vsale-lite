@@ -66,9 +66,9 @@ export function ProductStatusToggle({
       onClick={handleToggle}
       disabled={isPending}
       className={cn(
-        'rounded-none border-2 border-black px-2 py-1 font-bold transition-all',
-        'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
-        'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
+        'rounded-theme-sm border px-2 py-1 font-bold transition-all',
+        'shadow-neo-sm',
+        'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-neo-sm',
         'disabled:opacity-70 disabled:cursor-not-allowed',
         designTokens.typography.caption,
         optimisticStatus === 'active'

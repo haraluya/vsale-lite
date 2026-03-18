@@ -91,10 +91,10 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
       )}>
         {/* 系列標題與返回按鈕 */}
         <div className={cn(
-          "rounded-none bg-surface",
-          designTokens.neoBrutalism.border.full,
-          "border-black",
-          designTokens.neoBrutalism.shadow.full,
+          "rounded-theme-sm bg-surface",
+          designTokens.cleanCommerce.border.full,
+          "border-border",
+          designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding,
           designTokens.spacing.section.marginBottom
         )}>
@@ -103,12 +103,12 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
             <Link
               href="/store/products"
               className={cn(
-                "inline-flex items-center gap-2 rounded-none bg-surface-secondary font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.mobile,
+                "inline-flex items-center gap-2 rounded-theme-sm bg-surface-secondary font-bold transition-all",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.base,
                 "md:shadow-neo",
-                designTokens.neoBrutalism.hover,
+                designTokens.cleanCommerce.hover,
                 "px-3 py-2 md:px-4",
                 "min-h-[44px]"
               )}

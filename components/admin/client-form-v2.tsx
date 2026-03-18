@@ -107,7 +107,7 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
       </div>
 
       {/* 🆕 Feature 007: 常用地址 */}
-      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
+      <div className="bg-yellow-50 p-4 rounded-theme-sm border-theme">
         <Label htmlFor="address">常用地址</Label>
         <Textarea
           id="address"
@@ -122,7 +122,7 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
       </div>
 
       {/* 🆕 Feature 007: 管理員備註 */}
-      <div className="bg-yellow-50 p-4 rounded-none border-2 md:border-3 border-black">
+      <div className="bg-yellow-50 p-4 rounded-theme-sm border-theme">
         <Label htmlFor="admin_notes">管理員備註</Label>
         <Textarea
           id="admin_notes"
@@ -139,7 +139,7 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
       </div>
 
       {error && (
-        <div className="rounded-none border-2 md:border-3 border-red-500 bg-red-50 p-4">
+        <div className="rounded-theme-sm border-theme border-red-500 bg-red-50 p-4">
           <p className="text-sm text-red-700">{error}</p>
         </div>
       )}

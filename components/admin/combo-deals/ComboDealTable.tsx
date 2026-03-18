@@ -17,6 +17,8 @@ import { deleteComboDeal, toggleComboDealStatus } from '@/lib/actions/combo-deal
 import { useConfirm } from '@/lib/contexts/dialog-context'
 import { Button } from '@/components/ui/button'
 import { formatDate } from '@/lib/utils/format'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface ComboDealItem {
   id: string
@@ -125,7 +127,7 @@ export function ComboDealTable({
   const getStatusBadge = (status: string) => {
     const badges = {
       active: 'bg-green-100 text-green-800 border-green-300',
-      inactive: 'bg-gray-100 text-gray-800 border-gray-300',
+      inactive: 'bg-gray-100 text-gray-800 border-border',
       ended: 'bg-red-100 text-red-800 border-red-300',
     }
     const labels = {
@@ -135,7 +137,7 @@ export function ComboDealTable({
     }
     return (
       <span
-        className={`inline-block rounded-none border px-2 py-1 text-xs font-semibold ${badges[status as keyof typeof badges]}`}
+        className={`inline-block rounded-theme-sm border px-2 py-1 text-xs font-semibold ${badges[status as keyof typeof badges]}`}
       >
         {labels[status as keyof typeof labels]}
       </span>
@@ -152,9 +154,9 @@ export function ComboDealTable({
   return (
     <div>
       {/* Desktop Table */}
-      <div className="hidden md:block overflow-x-auto">
+      <div className={cn("hidden lg:block card-neo overflow-hidden p-0")}>
         <table className="w-full">
-          <thead className="border-b-2 border-black bg-gray-50">
+          <thead className="border-b bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left text-sm font-bold">海報</th>
               <th className="px-4 py-3 text-left text-sm font-bold">名稱</th>
@@ -178,7 +180,7 @@ export function ComboDealTable({
                     alt={item.name}
                     width={80}
                     height={45}
-                    className="rounded-none border border-black object-cover"
+                    className="rounded-theme-sm border object-cover"
                   />
                 </td>
                 <td className="px-4 py-3">
@@ -244,11 +246,15 @@ export function ComboDealTable({
       </div>
 
       {/* Mobile Cards */}
-      <div className="md:hidden space-y-4 p-4">
+      <div className="lg:hidden space-y-3 md:space-y-4">
         {items.map((item) => (
           <div
             key={item.id}
-            className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm"
+            className={cn(
+              "rounded-theme-sm bg-white",
+              getThemeClasses(),
+              designTokens.spacing.card.padding
+            )}
           >
             <div className="mb-3">
               <Image
@@ -256,7 +262,7 @@ export function ComboDealTable({
                 alt={item.name}
                 width={640}
                 height={360}
-                className="w-full rounded-none border border-black object-cover aspect-[16/9]"
+                className="w-full rounded-theme-sm border object-cover aspect-[16/9]"
               />
             </div>
             <div className="mb-2 flex items-start justify-between">
@@ -312,8 +318,8 @@ export function ComboDealTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between border-t-2 border-black px-4 py-3">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between border-t px-4 py-3">
+          <div className={cn("text-gray-600", designTokens.typography.caption)}>
             第 {page} / {totalPages} 頁
           </div>
           <div className="flex gap-2">

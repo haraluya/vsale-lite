@@ -68,10 +68,10 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
         <button
           onClick={onClose}
           className={cn(
-            "absolute -right-4 -top-4 z-10 rounded-none bg-surface transition-all",
-            designTokens.neoBrutalism.border.full,
-            designTokens.neoBrutalism.shadow.full,
-            designTokens.neoBrutalism.hover,
+            "absolute -right-4 -top-4 z-10 rounded-theme-sm bg-surface transition-all",
+            designTokens.cleanCommerce.border.full,
+            designTokens.cleanCommerce.shadow.full,
+            designTokens.cleanCommerce.hover,
             "p-3",
             "min-h-[44px] min-w-[44px]"
           )}
@@ -82,9 +82,9 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
 
         {/* 圖片 */}
         <div className={cn(
-          "relative rounded-none bg-surface",
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full,
+          "relative rounded-theme-sm bg-surface",
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full,
           "overflow-hidden",
           "min-h-[300px] flex items-center justify-center"
         )}>
@@ -111,14 +111,14 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
 
         {/* 商品資訊 */}
         <div className={cn(
-          "mt-4 rounded-none bg-surface",
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full,
+          "mt-4 rounded-theme-sm bg-surface",
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full,
           "overflow-hidden"
         )}>
           <div className={cn(
             "bg-warning",
-            "border-b-2 md:border-b-3",
+            "border-b",
             "px-4 py-3"
           )}>
             <p className={cn(
@@ -133,8 +133,8 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
             <div className="px-4 py-3">
               <div className="flex items-center gap-2 mb-2">
                 <div className={cn(
-                  "rounded-none bg-info",
-                  "border-2",
+                  "rounded-theme-sm bg-info",
+                  "border",
                   "w-1 h-4"
                 )} />
                 <p className="font-bold text-sm text-text-secondary">商品簡介</p>

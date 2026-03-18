@@ -27,7 +27,7 @@ export function CategorySelector({ categories, selectedCategoryId }: CategorySel
   }
 
   return (
-    <div className="rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
+    <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
       <div className="mb-4">
         <h2 className="text-xl font-bold">選擇分類 (批量設定)</h2>
         <p className="mt-1 text-sm text-text-secondary">選擇分類後可批量設定該分類所有商品的價格</p>
@@ -36,7 +36,7 @@ export function CategorySelector({ categories, selectedCategoryId }: CategorySel
       <select
         value={selectedCategoryId || ''}
         onChange={handleChange}
-        className="w-full rounded-none border-2 md:border-3 border-black bg-surface px-4 py-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-black"
+        className="w-full rounded-theme-sm border-theme bg-surface px-4 py-3 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover focus:outline-none focus:ring-2 focus:ring-black"
       >
         <option value="">請選擇分類...</option>
         {categories

@@ -112,7 +112,7 @@ export function NumberInputSort({ initialBlocks }: NumberInputSortProps) {
   return (
     <div>
       {/* 說明 */}
-      <div className="mb-4 rounded-none border-2 border-blue-600 bg-blue-50 p-3">
+      <div className="mb-4 rounded-theme-sm border border-blue-600 bg-blue-50 p-3">
         <p className="text-sm text-blue-800">
           💡 <strong>操作方式：</strong>
           在每個項目旁的輸入框輸入想要的順序號碼（1 = 第一位，2 = 第二位，依此類推）。
@@ -125,7 +125,7 @@ export function NumberInputSort({ initialBlocks }: NumberInputSortProps) {
         {displayBlocks.map((block) => (
           <div
             key={block.id}
-            className="flex items-center gap-3 rounded-none border-2 border-black bg-white p-4 shadow-neo-sm"
+            className="flex items-center gap-3 rounded-theme-sm border bg-white p-4 shadow-neo-sm"
           >
             {/* 順序輸入框 */}
             <div className="flex-shrink-0">
@@ -135,12 +135,12 @@ export function NumberInputSort({ initialBlocks }: NumberInputSortProps) {
                 max={blocks.length}
                 value={block.newOrder}
                 onChange={(e) => handleOrderChange(block.id, e.target.value)}
-                className="h-10 w-16 rounded-none border-2 border-black bg-yellow-300 text-center text-lg font-bold focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="h-10 w-16 rounded-theme-sm border bg-yellow-300 text-center text-lg font-bold focus:outline-none focus:ring-2 focus:ring-yellow-500"
               />
             </div>
 
             {/* 圖示 */}
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none border-2 border-black bg-gray-100">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-theme-sm border bg-gray-100">
               {getIcon(block.type)}
             </div>
 
@@ -155,7 +155,7 @@ export function NumberInputSort({ initialBlocks }: NumberInputSortProps) {
 
       {/* 錯誤訊息 */}
       {errors.length > 0 && (
-        <div className="mt-4 rounded-none border-2 border-red-600 bg-red-50 p-3">
+        <div className="mt-4 rounded-theme-sm border border-red-600 bg-red-50 p-3">
           <div className="flex items-start gap-2">
             <AlertCircle className="h-5 w-5 flex-shrink-0 text-red-600" />
             <div className="flex-1">
@@ -175,9 +175,9 @@ export function NumberInputSort({ initialBlocks }: NumberInputSortProps) {
         <button
           onClick={handleSave}
           disabled={!hasChanges}
-          className={`flex items-center gap-2 rounded-none border-3 border-black px-6 py-3 font-bold transition-all ${
+          className={`flex items-center gap-2 rounded-theme-sm border px-6 py-3 font-bold transition-all ${
             hasChanges
-              ? 'bg-green-400 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              ? 'bg-green-400 hover:-translate-y-0.5 hover:shadow-theme-hover'
               : 'cursor-not-allowed bg-gray-300 text-gray-500'
           }`}
         >
@@ -187,9 +187,9 @@ export function NumberInputSort({ initialBlocks }: NumberInputSortProps) {
         <button
           onClick={handleReset}
           disabled={!hasChanges}
-          className={`rounded-none border-3 border-black px-6 py-3 font-bold transition-all ${
+          className={`rounded-theme-sm border px-6 py-3 font-bold transition-all ${
             hasChanges
-              ? 'bg-gray-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              ? 'bg-gray-200 hover:-translate-y-0.5 hover:shadow-theme-hover'
               : 'cursor-not-allowed bg-gray-300 text-gray-500'
           }`}
         >

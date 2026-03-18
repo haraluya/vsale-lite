@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 function OrderTableRowSkeleton() {
   return (
-    <div className="border-b-2 border-black p-4 flex justify-between items-center">
+    <div className="border-b p-4 flex justify-between items-center">
       <div className="flex-1">
         <Skeleton className="h-4 w-32 mb-2" />
         <Skeleton className="h-3 w-24" />
@@ -36,9 +36,9 @@ export default function AdminOrdersLoading() {
       </div>
 
       {/* 表格骨架（桌面版） */}
-      <div className="hidden md:block border-2 border-black bg-surface shadow-neo">
+      <div className="hidden md:block border bg-surface shadow-neo">
         {/* 表頭骨架 */}
-        <div className="border-b-2 border-black p-4 bg-surface-secondary flex justify-between">
+        <div className="border-b p-4 bg-surface-secondary flex justify-between">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-4 w-20" />
@@ -54,7 +54,7 @@ export default function AdminOrdersLoading() {
       {/* 卡片骨架（手機版） */}
       <div className="md:hidden grid gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="border-2 border-black p-4 bg-surface shadow-neo-sm">
+          <div key={i} className="border p-4 bg-surface shadow-neo-sm">
             <Skeleton className="h-6 w-32 mb-2" />
             <Skeleton className="h-4 w-40 mb-2" />
             <Skeleton className="h-6 w-20 mb-4" />

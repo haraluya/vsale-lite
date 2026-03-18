@@ -77,10 +77,10 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
       {announcements.map((announcement) => (
         <div
           key={announcement.id}
-          className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo"
+          className="rounded-theme-sm border-theme bg-surface p-4 shadow-neo"
         >
           {/* 圖片預覽 */}
-          <div className="relative mb-4 aspect-video overflow-hidden rounded-none border-2 border-black bg-surface-secondary">
+          <div className="relative mb-4 aspect-video overflow-hidden rounded-theme-sm border bg-surface-secondary">
             {announcement.image_url ? (
               <Image
                 src={announcement.image_url}
@@ -98,7 +98,7 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
             <div className="absolute left-2 top-2">
               <button
                 onClick={() => handleToggleActive(announcement)}
-                className={`rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${
+                className={`rounded-theme-sm border px-2 py-1 text-xs font-bold ${
                   announcement.is_active
                     ? 'bg-green-400 text-foreground'
                     : 'bg-gray-300 text-text-secondary'
@@ -124,7 +124,7 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
             <div className="flex gap-2 pt-2">
               <Link
                 href={`/admin/announcements/${announcement.id}/edit`}
-                className="flex flex-1 items-center justify-center gap-2 rounded-none border-2 border-black bg-blue-400 px-3 py-2 text-sm font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                className="flex flex-1 items-center justify-center gap-2 rounded-theme-sm border bg-blue-400 px-3 py-2 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
               >
                 <Edit className="h-4 w-4" />
                 編輯
@@ -133,7 +133,7 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
               <button
                 onClick={() => handleDelete(announcement.id, announcement.title)}
                 disabled={deletingId === announcement.id}
-                className="flex flex-1 items-center justify-center gap-2 rounded-none border-2 border-black bg-red-400 px-3 py-2 text-sm font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-2 rounded-theme-sm border bg-red-400 px-3 py-2 text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <Trash2 className="h-4 w-4" />
                 {deletingId === announcement.id ? '刪除中...' : '刪除'}

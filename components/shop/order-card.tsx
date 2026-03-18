@@ -32,7 +32,7 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
       href={showCustomerInfo ? `/admin/orders/${order.id}` : `/store/orders/${order.id}`}
       className="block"
     >
-      <div className="group rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+      <div className="group rounded-theme-sm border-theme bg-surface p-6 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover">
         {/* 訂單編號與狀態 */}
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
@@ -44,7 +44,7 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
 
         {/* 客戶資訊 (管理員檢視) */}
         {showCustomerInfo && (
-          <div className="mb-4 rounded-none border-2 border-gray-300 bg-surface-secondary p-3">
+          <div className="mb-4 rounded-theme-sm border border-border bg-surface-secondary p-3">
             <p className="text-sm">
               <span className="font-bold">客戶:</span> {order.user_name}
             </p>
@@ -67,7 +67,7 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
 
         {/* 備註 */}
         {order.notes && (
-          <div className="rounded-none border-2 border-gray-300 bg-surface-secondary p-3">
+          <div className="rounded-theme-sm border border-border bg-surface-secondary p-3">
             <p className="text-sm">
               <span className="font-bold">備註:</span> {order.notes}
             </p>

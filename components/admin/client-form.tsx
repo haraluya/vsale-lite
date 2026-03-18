@@ -109,7 +109,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
 
     return (
       <div className="space-y-6">
-        <div className="rounded-none border-2 md:border-3 border-green-500 bg-green-50 p-6">
+        <div className="rounded-theme-sm border-theme border-green-500 bg-green-50 p-6">
           <h3 className="text-lg font-bold text-green-700 mb-4">
             ✅ 客戶建立成功!
           </h3>
@@ -124,7 +124,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
                   id="template-select"
                   value={selectedTemplateId || ''}
                   onChange={(e) => setSelectedTemplateId(e.target.value)}
-                  className="w-full rounded-none border-2 border-black px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                  className="w-full rounded-theme-sm border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
                   disabled={templateLoading}
                 >
                   {templates.map((tmpl) => (
@@ -140,7 +140,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
               <p className="text-sm font-medium text-gray-700 mb-2">
                 請將以下登入資訊提供給客戶:
               </p>
-              <div className="bg-white border-2 border-green-500 p-4 space-y-3">
+              <div className="bg-white border border-green-500 p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">客戶名稱:</span>
                   <span className="font-bold text-lg">

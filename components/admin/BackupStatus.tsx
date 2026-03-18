@@ -31,7 +31,7 @@ export function BackupStatus() {
 
   if (loading) {
     return (
-      <div className="rounded-none border-2 border-black bg-gray-50 p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+      <div className="rounded-theme-sm border bg-gray-50 p-4 shadow-neo-sm md:border md:shadow-neo">
         <p className="text-sm text-gray-600">載入備份狀態中...</p>
       </div>
     )
@@ -39,7 +39,7 @@ export function BackupStatus() {
 
   if (!settings) {
     return (
-      <div className="rounded-none border-2 border-black bg-red-50 p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+      <div className="rounded-theme-sm border bg-red-50 p-4 shadow-neo-sm md:border md:shadow-neo">
         <div className="flex items-start gap-3">
           <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
           <div>
@@ -59,7 +59,7 @@ export function BackupStatus() {
     <div className="grid gap-4 md:grid-cols-2">
       {/* 自動備份停用警告 */}
       {!settings.backup_enabled && (
-        <div className="rounded-none border-2 border-black bg-yellow-50 p-4 shadow-neo-sm md:border-3 md:col-span-2 md:shadow-neo">
+        <div className="rounded-theme-sm border bg-yellow-50 p-4 shadow-neo-sm md:border md:col-span-2 md:shadow-neo">
           <div className="flex items-start gap-3">
             <AlertTriangle className="h-5 w-5 shrink-0 text-yellow-600" />
             <div>
@@ -74,7 +74,7 @@ export function BackupStatus() {
 
       {/* 上次成功備份 */}
       {hasLastSuccess ? (
-        <div className="rounded-none border-2 border-black bg-green-50 p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+        <div className="rounded-theme-sm border bg-green-50 p-4 shadow-neo-sm md:border md:shadow-neo">
           <div className="flex items-start gap-3">
             <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600" />
             <div className="min-w-0 flex-1">
@@ -86,7 +86,7 @@ export function BackupStatus() {
           </div>
         </div>
       ) : (
-        <div className="rounded-none border-2 border-black bg-gray-50 p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+        <div className="rounded-theme-sm border bg-gray-50 p-4 shadow-neo-sm md:border md:shadow-neo">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 shrink-0 text-gray-600" />
             <div>
@@ -99,7 +99,7 @@ export function BackupStatus() {
 
       {/* 上次失敗錯誤 */}
       {hasLastError && (
-        <div className="rounded-none border-2 border-black bg-red-50 p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+        <div className="rounded-theme-sm border bg-red-50 p-4 shadow-neo-sm md:border md:shadow-neo">
           <div className="flex items-start gap-3">
             <AlertCircle className="h-5 w-5 shrink-0 text-red-600" />
             <div className="min-w-0 flex-1">

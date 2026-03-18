@@ -156,13 +156,13 @@ export function ProductDisplay({ config, initialProducts, initialTierName }: Pro
             'absolute left-0 top-1/2 -translate-y-1/2 z-10',
             'w-8 h-8 md:w-10 md:h-10', // 縮小尺寸
             'bg-white/90 backdrop-blur-sm', // 半透明背景
-            'border-2 border-black',
-            'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]', // 縮小陰影
-            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
-            'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+            'border',
+            'shadow-neo-sm', // 縮小陰影
+            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-neo-sm',
+            'active:scale-[0.98]',
             'transition-all duration-100',
             'flex items-center justify-center',
-            'rounded-none'
+            'rounded-theme-sm'
           )}
           aria-label="向左滑動"
         >
@@ -179,13 +179,13 @@ export function ProductDisplay({ config, initialProducts, initialTierName }: Pro
             'absolute right-0 top-1/2 -translate-y-1/2 z-10',
             'w-8 h-8 md:w-10 md:h-10', // 縮小尺寸
             'bg-white/90 backdrop-blur-sm', // 半透明背景
-            'border-2 border-black',
-            'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]', // 縮小陰影
-            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
-            'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+            'border',
+            'shadow-neo-sm', // 縮小陰影
+            'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-neo-sm',
+            'active:scale-[0.98]',
             'transition-all duration-100',
             'flex items-center justify-center',
-            'rounded-none'
+            'rounded-theme-sm'
           )}
           aria-label="向右滑動"
         >

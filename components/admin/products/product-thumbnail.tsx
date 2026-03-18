@@ -99,10 +99,10 @@ export function ProductThumbnail({
         onClick={handleClick}
         disabled={uploading}
         className={cn(
-          "relative w-12 h-12 rounded-none border-2 md:border-3 border-black overflow-hidden",
-          "transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] md:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
-          "hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
-          "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] md:disabled:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]",
+          "relative w-12 h-12 rounded-theme-sm border-theme overflow-hidden",
+          "transition-all shadow-neo-sm shadow-neo-sm",
+          "hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-neo-sm md:hover:shadow-neo-sm",
+          "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm md:disabled:hover:shadow-neo-sm",
           currentImageUrl ? "bg-gray-100" : "bg-blue-50"
         )}
         title={uploading ? "上傳中..." : "點擊上傳商品圖片"}
@@ -118,7 +118,7 @@ export function ProductThumbnail({
         ) : (
           <div className="flex items-center justify-center w-full h-full">
             {uploading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+              <div className="animate-spin rounded-full h-5 w-5 border-b"></div>
             ) : (
               <ImageIcon className="h-5 w-5 text-gray-400" />
             )}
@@ -137,7 +137,7 @@ export function ProductThumbnail({
 
       {/* 上傳圖示覆蓋層 */}
       {!uploading && (
-        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border border-black bg-blue-400 flex items-center justify-center">
+        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full border bg-blue-400 flex items-center justify-center">
           <Upload className="h-2.5 w-2.5 text-white" />
         </div>
       )}

@@ -54,9 +54,9 @@ export function FormSection({
   return (
     <div
       className={cn(
-        'rounded-none p-4 md:p-6',
-        'border-2 md:border-3',
-        'shadow-neo-sm md:shadow-neo',
+        'rounded-theme p-4 md:p-6',
+        'border-theme',
+        'shadow-neo-sm',
         styles.bg,
         styles.border,
         className
@@ -65,7 +65,7 @@ export function FormSection({
       {title && (
         <h3
           className={cn(
-            'mb-4 text-lg md:text-xl font-bold',
+            'mb-4 text-lg md:text-xl font-semibold',
             styles.title
           )}
         >

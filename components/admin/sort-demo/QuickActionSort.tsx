@@ -90,7 +90,7 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
   return (
     <div>
       {/* 說明 */}
-      <div className="mb-4 rounded-none border-2 border-blue-600 bg-blue-50 p-3">
+      <div className="mb-4 rounded-theme-sm border border-blue-600 bg-blue-50 p-3">
         <p className="text-sm text-blue-800">
           💡 <strong>操作方式：</strong>
           使用四個按鈕快速調整：「移到頂部」、「上移」、「下移」、「移到底部」。
@@ -107,15 +107,15 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
           return (
             <div
               key={block.id}
-              className="flex items-center gap-3 rounded-none border-2 border-black bg-white p-4 shadow-neo-sm"
+              className="flex items-center gap-3 rounded-theme-sm border bg-white p-4 shadow-neo-sm"
             >
               {/* 順序號碼 */}
-              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-none border-2 border-black bg-yellow-300 font-bold">
+              <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-theme-sm border bg-yellow-300 font-bold">
                 {index + 1}
               </div>
 
               {/* 圖示 */}
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none border-2 border-black bg-gray-100">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-theme-sm border bg-gray-100">
                 {getIcon(block.type)}
               </div>
 
@@ -132,10 +132,10 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
                   onClick={() => moveToTop(block.id)}
                   disabled={isFirst}
                   title="移到頂部"
-                  className={`rounded-none border-2 border-black p-2 transition-all ${
+                  className={`rounded-theme-sm border p-2 transition-all ${
                     isFirst
                       ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-                      : 'bg-blue-400 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'
+                      : 'bg-blue-400 hover:-translate-y-0.5 hover:shadow-theme-hover'
                   }`}
                 >
                   <ChevronsUp className="h-4 w-4" />
@@ -146,10 +146,10 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
                   onClick={() => moveUp(block.id)}
                   disabled={isFirst}
                   title="上移"
-                  className={`rounded-none border-2 border-black p-2 transition-all ${
+                  className={`rounded-theme-sm border p-2 transition-all ${
                     isFirst
                       ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-                      : 'bg-green-400 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'
+                      : 'bg-green-400 hover:-translate-y-0.5 hover:shadow-theme-hover'
                   }`}
                 >
                   <ChevronUp className="h-4 w-4" />
@@ -160,10 +160,10 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
                   onClick={() => moveDown(block.id)}
                   disabled={isLast}
                   title="下移"
-                  className={`rounded-none border-2 border-black p-2 transition-all ${
+                  className={`rounded-theme-sm border p-2 transition-all ${
                     isLast
                       ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-                      : 'bg-yellow-400 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'
+                      : 'bg-yellow-400 hover:-translate-y-0.5 hover:shadow-theme-hover'
                   }`}
                 >
                   <ChevronDown className="h-4 w-4" />
@@ -174,10 +174,10 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
                   onClick={() => moveToBottom(block.id)}
                   disabled={isLast}
                   title="移到底部"
-                  className={`rounded-none border-2 border-black p-2 transition-all ${
+                  className={`rounded-theme-sm border p-2 transition-all ${
                     isLast
                       ? 'cursor-not-allowed bg-gray-200 text-gray-400'
-                      : 'bg-orange-400 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none'
+                      : 'bg-orange-400 hover:-translate-y-0.5 hover:shadow-theme-hover'
                   }`}
                 >
                   <ChevronsDown className="h-4 w-4" />
@@ -190,7 +190,7 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
 
       {/* 操作記錄 */}
       {lastAction && (
-        <div className="mt-4 rounded-none border-2 border-green-600 bg-green-50 p-3">
+        <div className="mt-4 rounded-theme-sm border border-green-600 bg-green-50 p-3">
           <p className="text-sm font-bold text-green-800">✅ {lastAction}</p>
         </div>
       )}
@@ -199,14 +199,14 @@ export function QuickActionSort({ initialBlocks }: QuickActionSortProps) {
       <div className="mt-6">
         <button
           onClick={handleReset}
-          className="rounded-none border-3 border-black bg-gray-200 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="rounded-theme-sm border bg-gray-200 px-6 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
         >
           重置為初始順序
         </button>
       </div>
 
       {/* 當前順序預覽 */}
-      <div className="mt-6 rounded-none border-2 border-gray-600 bg-gray-50 p-4">
+      <div className="mt-6 rounded-theme-sm border border-gray-600 bg-gray-50 p-4">
         <h4 className="mb-2 font-bold text-gray-800">目前順序：</h4>
         <ol className="list-inside list-decimal space-y-1 text-sm text-gray-700">
           {blocks.map((block) => (

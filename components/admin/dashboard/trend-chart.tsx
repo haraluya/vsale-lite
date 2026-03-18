@@ -1,6 +1,6 @@
 import { getDashboardStats } from '@/lib/actions/dashboard'
 import { DashboardTrendCard } from '@/components/admin/dashboard-card'
-import { OrderTrendChart } from '@/components/admin/order-trend-chart'
+import { LazyTrendChart } from '@/components/admin/dashboard/lazy-trend-chart'
 import { cn } from '@/lib/utils'
 import { designTokens } from '@/lib/design-tokens'
 
@@ -25,7 +25,7 @@ export async function TrendChart() {
 
   return (
     <DashboardTrendCard title="近 7 日訂單趨勢" subtitle="訂單數與營收變化趨勢">
-      <OrderTrendChart data={stats.orderTrend} />
+      <LazyTrendChart data={stats.orderTrend} />
     </DashboardTrendCard>
   )
 }

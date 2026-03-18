@@ -121,10 +121,10 @@ export function LogoUploader({
   }
 
   // 如果有預覽檔案，顯示藍色邊框
-  const borderColor = previewFile ? 'border-blue-500' : 'border-black'
+  const borderColor = previewFile ? 'border-blue-500' : 'border-border'
 
   return (
-    <div className={`rounded-none border-2 md:border-3 ${borderColor} bg-white p-4 shadow-neo`}>
+    <div className={`rounded-theme-sm border-theme ${borderColor} bg-white p-4 shadow-neo`}>
       <h3 className="text-lg font-black mb-4">
         {logoTypeLabels[logoType]}
         {previewFile && <span className="ml-2 text-xs text-blue-600">(待確認)</span>}
@@ -133,7 +133,7 @@ export function LogoUploader({
       {/* 當前 Logo 或預覽 */}
       {(currentUrl || previewUrl) && (
         <div className="mb-4">
-          <div className="rounded-none border-2 border-gray-300 p-4 bg-gray-50">
+          <div className="rounded-theme-sm border border-border p-4 bg-gray-50">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl || currentUrl || ''}

@@ -81,20 +81,20 @@ export function TierPriceTable({ product, tiersWithPrices }: TierPriceTableProps
     <div className="space-y-4">
       {/* 錯誤訊息 */}
       {error && (
-        <div className="rounded-none border-2 border-error bg-error-bg p-4">
+        <div className="rounded-theme-sm border border-error bg-error-bg p-4">
           <p className="font-bold text-error">{error}</p>
         </div>
       )}
 
       {/* 成功訊息 */}
       {success && (
-        <div className="rounded-none border-2 border-green-600 bg-success-bg p-4">
+        <div className="rounded-theme-sm border border-green-600 bg-success-bg p-4">
           <p className="font-bold text-green-800">價格設定成功!</p>
         </div>
       )}
 
       {/* 商品資訊 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-surface p-4 shadow-neo">
         <h3 className="text-lg font-bold">{product.name}</h3>
         <p className="text-sm text-text-secondary">商品編號: {product.code}</p>
         {product.retail_price !== null && (
@@ -106,20 +106,20 @@ export function TierPriceTable({ product, tiersWithPrices }: TierPriceTableProps
 
       {/* 等級價格表格 */}
       <form onSubmit={handleSubmit}>
-        <div className="overflow-hidden rounded-none border-2 md:border-3 border-black bg-surface shadow-neo">
+        <div className="overflow-hidden rounded-theme-sm border-theme bg-surface shadow-neo">
           <table className="w-full">
             <thead className="bg-surface-secondary">
               <tr>
-                <th className="border-b-2 border-black px-4 py-3 text-left font-bold">
+                <th className="border-b px-4 py-3 text-left font-bold">
                   會員等級
                 </th>
-                <th className="border-b-2 border-black px-4 py-3 text-left font-bold">
+                <th className="border-b px-4 py-3 text-left font-bold">
                   等級順序
                 </th>
-                <th className="border-b-2 border-black px-4 py-3 text-left font-bold">
+                <th className="border-b px-4 py-3 text-left font-bold">
                   等級價格 (元)
                 </th>
-                <th className="border-b-2 border-black px-4 py-3 text-left font-bold">
+                <th className="border-b px-4 py-3 text-left font-bold">
                   折扣率
                 </th>
               </tr>
@@ -146,12 +146,12 @@ export function TierPriceTable({ product, tiersWithPrices }: TierPriceTableProps
                         value={currentPrice ?? ''}
                         onChange={(e) => handlePriceChange(tier.tier_id, e.target.value)}
                         placeholder="未設定"
-                        className="w-32 rounded-none border-2 border-gray-300 px-3 py-1 focus:border-blue-500 focus:outline-none"
+                        className="w-32 rounded-theme-sm border border-border px-3 py-1 focus:border-blue-500 focus:outline-none"
                       />
                     </td>
                     <td className="px-4 py-3">
                       {discount > 0 ? (
-                        <span className="inline-block rounded-none border border-green-600 bg-green-100 px-2 py-1 text-xs font-bold text-success">
+                        <span className="inline-block rounded-theme-sm border border-green-600 bg-green-100 px-2 py-1 text-xs font-bold text-success">
                           省 {discount}%
                         </span>
                       ) : currentPrice === null ? (

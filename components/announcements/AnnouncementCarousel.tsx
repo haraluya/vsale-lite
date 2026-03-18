@@ -59,7 +59,7 @@ export function AnnouncementCarousel({ announcements }: AnnouncementCarouselProp
   const current = announcements[currentIndex]
 
   return (
-    <div className="relative aspect-[16/9] w-full max-w-full overflow-hidden rounded-none border-2 md:border-3 border-black bg-surface-secondary shadow-neo-sm md:shadow-neo">
+    <div className="relative aspect-[16/9] w-full max-w-full overflow-hidden rounded-theme-sm border-theme bg-surface-secondary shadow-neo-sm">
       {/* 廣告圖片 */}
       {current.series_id ? (
         <Link href={`/store/series/${current.series_id}`} className="block h-full w-full">
@@ -86,14 +86,14 @@ export function AnnouncementCarousel({ announcements }: AnnouncementCarouselProp
         <>
           <button
             onClick={handlePrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-none border-2 border-black bg-surface p-2 shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[calc(-50%+2px)] hover:shadow-none"
+            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-theme-sm border bg-surface p-2 shadow-neo transition-all hover:-translate-y-0.5 hover:translate-y-[calc(-50%+2px)] hover:shadow-none"
             aria-label="上一張"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
           <button
             onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-none border-2 border-black bg-surface p-2 shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[calc(-50%+2px)] hover:shadow-none"
+            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-theme-sm border bg-surface p-2 shadow-neo transition-all hover:-translate-y-0.5 hover:translate-y-[calc(-50%+2px)] hover:shadow-none"
             aria-label="下一張"
           >
             <ChevronRight className="h-6 w-6" />
@@ -108,7 +108,7 @@ export function AnnouncementCarousel({ announcements }: AnnouncementCarouselProp
             <button
               key={index}
               onClick={() => handleIndicatorClick(index)}
-              className={`h-3 w-3 rounded-full border-2 border-black transition-colors ${
+              className={`h-3 w-3 rounded-full border transition-colors ${
                 index === currentIndex ? 'bg-black' : 'bg-surface'
               }`}
               aria-label={`跳轉至第 ${index + 1} 張廣告`}
@@ -118,7 +118,7 @@ export function AnnouncementCarousel({ announcements }: AnnouncementCarouselProp
       )}
 
       {/* 廣告標題（左上角） */}
-      <div className="absolute left-4 top-4 rounded-none border-2 border-black bg-surface px-4 py-2 shadow-neo">
+      <div className="absolute left-4 top-4 rounded-theme-sm border bg-surface px-4 py-2 shadow-neo">
         <p className="text-sm font-bold">{current.title}</p>
       </div>
     </div>

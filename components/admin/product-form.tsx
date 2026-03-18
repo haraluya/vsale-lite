@@ -148,7 +148,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                 <button
                   type="button"
                   onClick={() => setProductNames([...productNames, ''])}
-                  className="flex items-center gap-1 rounded-none border-2 border-black bg-green-300 px-3 py-1 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                  className="flex items-center gap-1 rounded-theme-sm border bg-green-300 px-3 py-1 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                 >
                   <span className="text-lg">+</span> 批次新增
                 </button>
@@ -192,7 +192,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                           const newNames = productNames.filter((_, i) => i !== index)
                           setProductNames(newNames)
                         }}
-                        className="rounded-none border-2 border-black bg-red-300 px-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                        className="rounded-theme-sm border bg-red-300 px-3 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -219,7 +219,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
               name="series_id"
               value={formData.series_id}
               onChange={(e) => setFormData({ ...formData, series_id: e.target.value })}
-              className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded-theme-sm border-theme px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="">請選擇系列</option>
               {series.map((s) => (
@@ -245,7 +245,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="輸入商品描述..."
               rows={4}
-              className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full rounded-theme-sm border-theme px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
             />
             <ErrorInline message={state?.errors?.description?.[0]} />
           </div>
@@ -307,7 +307,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                     stock_status: e.target.value as 'sufficient' | 'low' | 'out_of_stock',
                   })
                 }
-                className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full rounded-theme-sm border-theme px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
               >
                 <option value="sufficient">充足</option>
                 <option value="low">緊張</option>
@@ -349,7 +349,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                 name="status"
                 value={formData.status}
                 onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
-                className="w-full rounded-none border-2 md:border-3 border-black px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className="w-full rounded-theme-sm border-theme px-4 py-2 font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
               >
                 <option value="active">啟用</option>
                 <option value="inactive">停用</option>
@@ -417,7 +417,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             type="button"
             onClick={handleCancel}
             disabled={isPending}
-            className="flex-1 rounded-none border-2 md:border-3 border-black bg-gray-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-theme-sm border-theme bg-gray-100 px-6 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="mr-2 inline-block h-5 w-5" />
             取消

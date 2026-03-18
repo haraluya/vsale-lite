@@ -58,7 +58,7 @@ export function OrderCommentSection({ orderId, initialTimelines }: OrderCommentS
       <OrderTimeline timelines={timelines} />
 
       {/* 管理員留言輸入 */}
-      <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-4">
+      <div className="rounded-theme-sm border border-border bg-gray-50 p-4">
         <h3 className="mb-3 text-sm font-bold text-gray-700">管理員留言</h3>
         <CommentInput
           onSubmit={handleSubmitComment}

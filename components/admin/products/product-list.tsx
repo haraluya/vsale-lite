@@ -59,9 +59,9 @@ export async function ProductList({
     return (
       <div
         className={cn(
-          'rounded-none bg-white',
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full,
+          'rounded-theme-sm bg-white',
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding
         )}
       >

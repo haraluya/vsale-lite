@@ -33,9 +33,9 @@ export async function OrderList({ status, search, page, limit }: OrderListProps)
     return (
       <div
         className={cn(
-          'rounded-none bg-red-100 text-center',
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full,
+          'rounded-theme-sm bg-red-100 text-center',
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding
         )}
       >

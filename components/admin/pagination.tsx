@@ -77,7 +77,7 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
         <select
           value={pageSize}
           onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
-          className="rounded-none border-2 border-black px-3 py-1 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-black"
+          className="rounded-theme-sm border px-3 py-1 text-sm font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
         >
           <option value="20">20 筆</option>
           <option value="50">50 筆</option>
@@ -96,7 +96,7 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
         <button
           onClick={() => router.push(createPageUrl(currentPage - 1))}
           disabled={currentPage === 1}
-          className="rounded-none border-2 border-black bg-white p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+          className="rounded-theme-sm border bg-white p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
           aria-label="上一頁"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -119,7 +119,7 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
             <button
               key={pageNumber}
               onClick={() => router.push(createPageUrl(pageNumber))}
-              className={`min-w-[2.5rem] rounded-none border-2 border-black px-3 py-1 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none ${
+              className={`min-w-[2.5rem] rounded-theme-sm border px-3 py-1 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover ${
                 isActive
                   ? 'bg-black text-white'
                   : 'bg-white text-black hover:bg-gray-100'
@@ -134,7 +134,7 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
         <button
           onClick={() => router.push(createPageUrl(currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="rounded-none border-2 border-black bg-white p-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+          className="rounded-theme-sm border bg-white p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
           aria-label="下一頁"
         >
           <ChevronRight className="h-4 w-4" />

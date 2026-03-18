@@ -29,7 +29,7 @@ export default async function NewAnnouncementPage() {
       <div className="flex items-center gap-4">
         <Link
           href="/admin/announcements"
-          className="rounded-none border-2 border-black bg-surface p-2 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="rounded-theme-sm border bg-surface p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
@@ -40,7 +40,7 @@ export default async function NewAnnouncementPage() {
       </div>
 
       {/* Form */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
         <AnnouncementForm series={series} />
       </div>
     </div>

@@ -67,7 +67,7 @@ export function OrderDeleteButton({
       <button
         onClick={() => setShowDialog(true)}
         disabled={isPending}
-        className="rounded-none border-2 md:border-3 border-black bg-red-400 px-6 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
+        className="rounded-theme-sm border-theme bg-red-400 px-6 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
       >
         <span className="flex items-center gap-2">
           <Trash2 className="h-5 w-5" />
@@ -87,7 +87,7 @@ export function OrderDeleteButton({
           }}
         >
           <div
-            className="w-full max-w-md rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo"
+            className="w-full max-w-md rounded-theme-sm border-theme bg-white p-6 shadow-neo"
             onClick={(e) => {
               e.stopPropagation() // 防止事件冒泡到背景
             }}
@@ -107,7 +107,7 @@ export function OrderDeleteButton({
                 onClick={() => setShowDialog(false)}
                 disabled={isPending}
                 type="button"
-                className="flex-1 rounded-none border-2 md:border-3 border-black bg-gray-200 px-4 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                className="flex-1 rounded-theme-sm border-theme bg-gray-200 px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:opacity-50"
               >
                 返回
               </button>
@@ -115,7 +115,7 @@ export function OrderDeleteButton({
                 onClick={handleDelete}
                 disabled={isPending}
                 type="button"
-                className="flex-1 rounded-none border-2 md:border-3 border-black bg-red-400 px-4 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                className="flex-1 rounded-theme-sm border-theme bg-red-400 px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:opacity-50"
               >
                 {isPending ? '刪除中...' : '確認刪除'}
               </button>

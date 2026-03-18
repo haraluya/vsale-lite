@@ -108,9 +108,9 @@ export function ProductStockStatusToggle({
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
         className={cn(
-          'rounded-none border-2 border-black px-2 py-1 font-bold transition-all',
-          'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
-          'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]',
+          'rounded-theme-sm border px-2 py-1 font-bold transition-all',
+          'shadow-neo-sm',
+          'hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-neo-sm',
           'disabled:opacity-70 disabled:cursor-not-allowed',
           designTokens.typography.caption,
           currentConfig.color
@@ -126,8 +126,8 @@ export function ProductStockStatusToggle({
         <div
           className={cn(
             'absolute left-0 top-full mt-1 z-50',
-            'rounded-none border-2 border-black bg-surface',
-            'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+            'rounded-theme-sm border bg-surface',
+            'shadow-neo',
             'min-w-[100px]'
           )}
         >
@@ -141,7 +141,7 @@ export function ProductStockStatusToggle({
                 onClick={() => handleSelectStatus(status)}
                 className={cn(
                   'w-full px-3 py-2 text-left font-bold transition-colors',
-                  'border-b-2 border-black last:border-b-0',
+                  'border-b last:border-b-0',
                   'hover:bg-gray-100',
                   isSelected && 'bg-surface-secondary',
                   designTokens.typography.caption,

@@ -217,10 +217,10 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
         <button
           onClick={() => setActiveTab(activeTab === 'series' ? null : 'series')}
           className={`
-            rounded-none border-2 border-black px-4 py-2 font-bold text-sm
+            rounded-theme-sm border px-4 py-2 font-bold text-sm
             transition-all shadow-neo-sm
             ${activeTab === 'series'
-              ? 'bg-blue-400 translate-x-[2px] translate-y-[2px] shadow-none'
+              ? 'bg-blue-400 -translate-y-0.5 shadow-theme-hover shadow-none'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
             }
           `}
@@ -230,10 +230,10 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
         <button
           onClick={() => setActiveTab(activeTab === 'tags' ? null : 'tags')}
           className={`
-            rounded-none border-2 border-black px-4 py-2 font-bold text-sm
+            rounded-theme-sm border px-4 py-2 font-bold text-sm
             transition-all shadow-neo-sm
             ${activeTab === 'tags'
-              ? 'bg-blue-400 translate-x-[2px] translate-y-[2px] shadow-none'
+              ? 'bg-blue-400 -translate-y-0.5 shadow-theme-hover shadow-none'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
             }
           `}
@@ -252,12 +252,12 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                   key={s.id}
                   onClick={() => handleToggleSeries(s.id)}
                   className="
-                    rounded-none border-2 border-black
+                    rounded-theme-sm border
                     px-3 py-1.5
                     text-sm font-bold
                     shadow-neo
                     transition-transform
-                    hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+                    hover:-translate-y-0.5 hover:shadow-theme-hover
                   "
                   style={{
                     backgroundColor: color,
@@ -272,7 +272,7 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
 
             {/* 已選中的系列（獨立群組） */}
             {selectedSeries.length > 0 && (
-              <div className="flex flex-col gap-2 rounded-none border-2 border-black bg-gray-50 p-3">
+              <div className="flex flex-col gap-2 rounded-theme-sm border bg-gray-50 p-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase text-gray-700">
                     已選擇 {selectedSeries.length} 個系列
@@ -281,13 +281,13 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                     onClick={handleClearAll}
                     className="
                       flex items-center gap-1
-                      rounded-none border-2 border-black
+                      rounded-theme-sm border
                       bg-red-500
                       px-2 py-1
                       text-xs font-bold text-black
                       shadow-neo-sm
                       transition-transform
-                      hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+                      hover:-translate-y-0.5 hover:shadow-theme-hover
                     "
                   >
                     <X className="h-3 w-3" />
@@ -307,12 +307,12 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                         key={s.id}
                         onClick={() => handleToggleSeries(s.id)}
                         className="
-                          rounded-none border-2 border-black
+                          rounded-theme-sm border
                           px-3 py-1.5
                           text-sm font-bold
                           shadow-neo-sm
                           transition-transform
-                          hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+                          hover:-translate-y-0.5 hover:shadow-theme-hover
                         "
                         style={{
                           backgroundColor: categoryColor,
@@ -348,13 +348,13 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                       key={tag}
                       onClick={() => handleToggleTag(tag)}
                       className="
-                        rounded-none border-2 border-black
+                        rounded-theme-sm border
                         bg-white
                         px-3 py-1.5
                         text-sm font-bold
                         shadow-neo
                         transition-transform
-                        hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+                        hover:-translate-y-0.5 hover:shadow-theme-hover
                       "
                       style={{ opacity: 0.7 }}
                     >
@@ -365,7 +365,7 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
 
                 {/* 已選中的標籤（獨立群組） */}
                 {selectedTagsList.length > 0 && (
-                  <div className="flex flex-col gap-2 rounded-none border-2 border-black bg-gray-50 p-3">
+                  <div className="flex flex-col gap-2 rounded-theme-sm border bg-gray-50 p-3">
                     <div className="flex items-center justify-between">
                       <h4 className="text-xs font-bold uppercase text-gray-700">
                         已選擇 {selectedTagsList.length} 個標籤
@@ -374,13 +374,13 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                         onClick={handleClearAllTags}
                         className="
                           flex items-center gap-1
-                          rounded-none border-2 border-black
+                          rounded-theme-sm border
                           bg-red-500
                           px-2 py-1
                           text-xs font-bold text-black
                           shadow-neo-sm
                           transition-transform
-                          hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+                          hover:-translate-y-0.5 hover:shadow-theme-hover
                         "
                       >
                         <X className="h-3 w-3" />
@@ -393,13 +393,13 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
                           key={tag}
                           onClick={() => handleToggleTag(tag)}
                           className="
-                            rounded-none border-2 border-black
+                            rounded-theme-sm border
                             bg-blue-300
                             px-3 py-1.5
                             text-sm font-bold
                             shadow-neo-sm
                             transition-transform
-                            hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+                            hover:-translate-y-0.5 hover:shadow-theme-hover
                           "
                         >
                           <span className="flex items-center gap-1.5">

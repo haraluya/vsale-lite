@@ -49,7 +49,7 @@ export function StockStatus({ status, size = 'md' }: StockStatusProps) {
   return (
     <span
       className={`
-        inline-block rounded-none border-2 font-bold
+        inline-block rounded-theme-sm border font-bold
         ${config.bgColor} ${config.borderColor} ${config.textColor}
         ${sizeClass}
       `}

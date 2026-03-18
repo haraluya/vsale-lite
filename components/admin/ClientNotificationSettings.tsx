@@ -266,7 +266,7 @@ export function ClientNotificationSettings() {
 
   if (pageLoading) {
     return (
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo-sm md:shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo-sm">
         <p className="text-sm text-gray-600">載入中...</p>
       </div>
     )
@@ -277,7 +277,7 @@ export function ClientNotificationSettings() {
   return (
     <div className="space-y-6">
       {/* 範本列表 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 md:p-6 shadow-neo-sm md:shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-white p-4 md:p-6 shadow-neo-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-black">範本管理</h3>
@@ -301,10 +301,10 @@ export function ClientNotificationSettings() {
             <div
               key={template.id}
               className={`
-                rounded-none border-2 p-4 cursor-pointer transition-all
+                rounded-theme-sm border p-4 cursor-pointer transition-all
                 ${selectedTemplateId === template.id
-                  ? 'border-black bg-yellow-50 shadow-neo-sm'
-                  : 'border-gray-300 bg-white hover:border-gray-400'
+                  ? 'bg-yellow-50 shadow-neo-sm'
+                  : 'border-border bg-white hover:border-gray-400'
                 }
               `}
               onClick={() => handleSelectTemplate(template)}
@@ -371,7 +371,7 @@ export function ClientNotificationSettings() {
 
       {/* 範本編輯器 */}
       {selectedTemplate && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 md:p-6 shadow-neo-sm md:shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-white p-4 md:p-6 shadow-neo-sm">
           <Label htmlFor="template" className="text-lg font-black mb-2 block">
             編輯範本：{selectedTemplate.name}
           </Label>
@@ -379,19 +379,19 @@ export function ClientNotificationSettings() {
             支援以下變數（將自動替換為實際值）：
           </p>
           <div className="flex flex-wrap gap-2 mb-4">
-            <code className="px-2 py-1 bg-gray-100 rounded border border-gray-300 text-xs md:text-sm">
+            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
               {'{公司名稱}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-gray-300 text-xs md:text-sm">
+            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
               {'{客戶名稱}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-gray-300 text-xs md:text-sm">
+            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
               {'{前台網址}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-gray-300 text-xs md:text-sm">
+            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
               {'{登入電話}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-gray-300 text-xs md:text-sm">
+            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
               {'{登入密碼}'}
             </code>
           </div>
@@ -404,7 +404,7 @@ export function ClientNotificationSettings() {
               setIsChanged(e.target.value !== selectedTemplate.template)
             }}
             rows={10}
-            className="w-full rounded-none border-2 border-black px-4 py-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            className="w-full rounded-theme-sm border px-4 py-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-black"
             disabled={loading}
           />
 
@@ -418,12 +418,12 @@ export function ClientNotificationSettings() {
 
       {/* 預覽區塊 */}
       {selectedTemplate && (
-        <div className="rounded-none border-2 md:border-3 border-gray-300 bg-gray-50 p-4 md:p-6">
+        <div className="rounded-theme-sm border-theme border-border bg-gray-50 p-4 md:p-6">
           <h3 className="text-lg font-black mb-3">範本預覽</h3>
           <p className="text-xs text-gray-500 mb-3">
             以下是範本套用變數後的預覽效果
           </p>
-          <div className="bg-white border-2 border-gray-400 p-4 font-mono text-sm whitespace-pre-wrap break-words">
+          <div className="bg-white border border-gray-400 p-4 font-mono text-sm whitespace-pre-wrap break-words">
             {editingTemplate
               .replace(/\{公司名稱\}/g, companyName)
               .replace(/\{客戶名稱\}/g, '王小明')
@@ -435,7 +435,7 @@ export function ClientNotificationSettings() {
       )}
 
       {/* 儲存按鈕 */}
-      <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t-2 md:border-t-3 border-black">
+      <div className="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t">
         <Button
           type="button"
           variant="outline"

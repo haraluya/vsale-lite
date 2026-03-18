@@ -23,7 +23,7 @@ import { ProductTagsEditor } from '@/components/admin/products/ProductTagsEditor
 import { ProductStatusToggle } from '@/components/admin/product-status-toggle'
 import { ProductStockStatusToggle } from '@/components/admin/product-stock-status-toggle'
 import { TagBadgeList } from '@/components/ui/tag-badge'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Product, Series } from '@/types'
 import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
@@ -313,7 +313,7 @@ export function ProductTableWithTags({
         {/* Batch Actions */}
         {selectedProductIds.length > 0 && (
           <div className={cn(
-            "mb-4 rounded-none border-2 border-blue-500 bg-blue-50",
+            "mb-4 rounded-theme-sm border border-blue-500 bg-blue-50",
             designTokens.spacing.card.padding
           )}>
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -327,10 +327,10 @@ export function ProductTableWithTags({
                     <button
                       onClick={handleEnterBatchEdit}
                       className={cn(
-                        "flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-none bg-green-400 font-bold",
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover,
+                        "flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-theme-sm bg-green-400 font-bold",
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover,
                         designTokens.button.md
                       )}
                     >
@@ -340,10 +340,10 @@ export function ProductTableWithTags({
                     <button
                       onClick={() => setShowBatchTags(!showBatchTags)}
                       className={cn(
-                        "flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-none bg-yellow-400 font-bold",
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover,
+                        "flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-theme-sm bg-yellow-400 font-bold",
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover,
                         designTokens.button.md
                       )}
                     >
@@ -353,10 +353,10 @@ export function ProductTableWithTags({
                     <button
                       onClick={() => setSelectedProductIds([])}
                       className={cn(
-                        "flex-1 md:flex-none rounded-none bg-gray-200 font-bold",
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover,
+                        "flex-1 md:flex-none rounded-theme-sm bg-gray-200 font-bold",
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover,
                         designTokens.button.md
                       )}
                     >
@@ -368,10 +368,10 @@ export function ProductTableWithTags({
                     <button
                       onClick={handleSaveBatchEdit}
                       className={cn(
-                        "flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-none bg-green-400 font-bold",
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover,
+                        "flex-1 md:flex-none inline-flex items-center justify-center gap-2 rounded-theme-sm bg-green-400 font-bold",
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover,
                         designTokens.button.md
                       )}
                     >
@@ -381,10 +381,10 @@ export function ProductTableWithTags({
                     <button
                       onClick={handleCancelBatchEdit}
                       className={cn(
-                        "flex-1 md:flex-none rounded-none bg-gray-200 font-bold",
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.mobile,
-                        designTokens.neoBrutalism.hover,
+                        "flex-1 md:flex-none rounded-theme-sm bg-gray-200 font-bold",
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.base,
+                        designTokens.cleanCommerce.hover,
                         designTokens.button.md
                       )}
                     >
@@ -401,14 +401,14 @@ export function ProductTableWithTags({
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b-2 md:border-b-3 border-black">
+              <tr className="border-b">
                 {/* 勾選框 */}
                 <th className="px-4 py-3">
                   <input
                     type="checkbox"
                     checked={selectedProductIds.length === products.length && products.length > 0}
                     onChange={toggleAllSelection}
-                    className="h-5 w-5 rounded border-2 border-black"
+                    className="h-5 w-5 rounded border"
                   />
                 </th>
                 {/* 縮圖 */}
@@ -423,12 +423,12 @@ export function ProductTableWithTags({
                         value={quickFillValues.namePrefix}
                         onChange={(e) => setQuickFillValues(prev => ({ ...prev, namePrefix: e.target.value }))}
                         placeholder="前方插入文字"
-                        className="w-32 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
+                        className="w-32 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
                       />
                       <button
                         type="button"
                         onClick={handleQuickFillNamePrefix}
-                        className="rounded-none border border-black bg-blue-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                        className="rounded-theme-sm border bg-blue-400 px-2 py-0.5 text-xs font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover whitespace-nowrap"
                       >
                         帶入
                       </button>
@@ -451,12 +451,12 @@ export function ProductTableWithTags({
                         value={quickFillValues.retail_price}
                         onChange={(e) => setQuickFillValues(prev => ({ ...prev, retail_price: e.target.value }))}
                         placeholder="金額"
-                        className="w-20 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-20 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                       <button
                         type="button"
                         onClick={handleQuickFillRetailPrice}
-                        className="rounded-none border border-black bg-green-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                        className="rounded-theme-sm border bg-green-400 px-2 py-0.5 text-xs font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover whitespace-nowrap"
                       >
                         帶入
                       </button>
@@ -481,12 +481,12 @@ export function ProductTableWithTags({
                         value={quickFillValues.unit}
                         onChange={(e) => setQuickFillValues(prev => ({ ...prev, unit: e.target.value }))}
                         placeholder="單位"
-                        className="w-16 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
+                        className="w-16 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
                       />
                       <button
                         type="button"
                         onClick={handleQuickFillUnit}
-                        className="rounded-none border border-black bg-green-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                        className="rounded-theme-sm border bg-green-400 px-2 py-0.5 text-xs font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover whitespace-nowrap"
                       >
                         帶入
                       </button>
@@ -526,7 +526,7 @@ export function ProductTableWithTags({
                           checked={isSelected}
                           onChange={() => !batchEditMode && toggleProductSelection(product.id)}
                           disabled={batchEditMode}
-                          className="h-5 w-5 rounded border-2 border-black disabled:opacity-50"
+                          className="h-5 w-5 rounded border disabled:opacity-50"
                         />
                       </td>
 
@@ -551,7 +551,7 @@ export function ProductTableWithTags({
                               value={editedData?.name || ''}
                               onChange={(e) => handleUpdateEditedProduct(product.id, 'name', e.target.value)}
                               className={cn(
-                                "w-full rounded-none border-2 border-black px-2 py-1 font-medium",
+                                "w-full rounded-theme-sm border px-2 py-1 font-medium",
                                 designTokens.typography.body.base
                               )}
                               placeholder="商品名稱"
@@ -580,7 +580,7 @@ export function ProductTableWithTags({
                             step="1"
                             value={editedData?.retail_price ?? ''}
                             onChange={(e) => handleUpdateEditedProduct(product.id, 'retail_price', e.target.value ? parseFloat(e.target.value) : null)}
-                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-24 rounded-theme-sm border px-2 py-1 text-right font-mono text-base [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         ) : (
                           <span className={cn("font-mono font-bold text-base text-brand-primary")}>
@@ -607,7 +607,7 @@ export function ProductTableWithTags({
                             type="number"
                             value={editedData?.stock ?? 0}
                             onChange={(e) => handleUpdateEditedProduct(product.id, 'stock', parseInt(e.target.value) || 0)}
-                            className="w-24 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            className="w-24 rounded-theme-sm border px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
                         ) : editingStockId === product.id ? (
                           <div className="flex items-center justify-end gap-2">
@@ -616,21 +616,21 @@ export function ProductTableWithTags({
                               value={stockValue}
                               onChange={(e) => setStockValue(parseInt(e.target.value) || 0)}
                               className={cn(
-                                "w-20 rounded-none border-2 border-black px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
+                                "w-20 rounded-theme-sm border px-2 py-1 text-right font-mono [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none",
                                 designTokens.typography.caption
                               )}
                               autoFocus
                             />
                             <button
                               onClick={() => handleSaveStock(product.id)}
-                              className="rounded-none border-2 border-black bg-green-100 p-1 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                              className="rounded-theme-sm border bg-green-100 p-1 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                               title="儲存"
                             >
                               <Check className="h-4 w-4" />
                             </button>
                             <button
                               onClick={handleCancelEditStock}
-                              className="rounded-none border-2 border-black bg-gray-100 p-1 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                              className="rounded-theme-sm border bg-gray-100 p-1 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                               title="取消"
                             >
                               <X className="h-4 w-4" />
@@ -676,7 +676,7 @@ export function ProductTableWithTags({
                               type="text"
                               value={editedData?.unit || ''}
                               onChange={(e) => handleUpdateEditedProduct(product.id, 'unit', e.target.value)}
-                              className="w-20 rounded-none border-2 border-black px-2 py-1"
+                              className="w-20 rounded-theme-sm border px-2 py-1"
                             />
                           ) : (
                             <span className={cn("text-gray-600", designTokens.typography.caption)}>
@@ -704,14 +704,14 @@ export function ProductTableWithTags({
                           <div className="flex justify-end gap-2">
                             <Link
                               href={`/admin/products/${product.id}/edit`}
-                              className="rounded-none border-2 border-black bg-blue-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                              className="rounded-theme-sm border bg-blue-100 p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                               title="編輯"
                             >
                               <Edit className="h-4 w-4" />
                             </Link>
                             <button
                               onClick={() => handleDelete(product.id, product.name)}
-                              className="rounded-none border-2 border-black bg-red-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                              className="rounded-theme-sm border bg-red-100 p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                               title="刪除"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -740,8 +740,8 @@ export function ProductTableWithTags({
               <div
                 key={product.id}
                 className={cn(
-                  "rounded-none bg-white",
-                  getNeoBrutalismClasses(),
+                  "rounded-theme-sm bg-white",
+                  getThemeClasses(),
                   designTokens.spacing.card.padding
                 )}
               >
@@ -751,7 +751,7 @@ export function ProductTableWithTags({
                     type="checkbox"
                     checked={selectedProductIds.includes(product.id)}
                     onChange={() => toggleProductSelection(product.id)}
-                    className="mt-1 h-5 w-5 min-w-[44px] min-h-[44px] rounded border-2 border-black"
+                    className="mt-1 h-5 w-5 min-w-[44px] min-h-[44px] rounded border"
                   />
                   <ProductThumbnail
                     productId={product.id}
@@ -817,7 +817,7 @@ export function ProductTableWithTags({
                         value={stockValue}
                         onChange={(e) => setStockValue(parseInt(e.target.value) || 0)}
                         className={cn(
-                          "flex-1 rounded-none border-2 border-black px-3 py-2 text-right font-mono",
+                          "flex-1 rounded-theme-sm border px-3 py-2 text-right font-mono",
                           designTokens.typography.body.base
                         )}
                         autoFocus
@@ -825,9 +825,9 @@ export function ProductTableWithTags({
                       <button
                         onClick={() => handleSaveStock(product.id)}
                         className={cn(
-                          "min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-none border-2 border-black bg-green-100",
-                          designTokens.neoBrutalism.shadow.mobile,
-                          designTokens.neoBrutalism.hover
+                          "min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-theme-sm border bg-green-100",
+                          designTokens.cleanCommerce.shadow.base,
+                          designTokens.cleanCommerce.hover
                         )}
                         title="儲存"
                       >
@@ -836,9 +836,9 @@ export function ProductTableWithTags({
                       <button
                         onClick={handleCancelEditStock}
                         className={cn(
-                          "min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-none border-2 border-black bg-gray-100",
-                          designTokens.neoBrutalism.shadow.mobile,
-                          designTokens.neoBrutalism.hover
+                          "min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-theme-sm border bg-gray-100",
+                          designTokens.cleanCommerce.shadow.base,
+                          designTokens.cleanCommerce.hover
                         )}
                         title="取消"
                       >
@@ -849,7 +849,7 @@ export function ProductTableWithTags({
                     <button
                       onClick={() => handleEditStock(product.id, product.stock)}
                       className={cn(
-                        "w-full text-left font-mono font-bold py-2 px-3 rounded-none border-2 border-black hover:bg-gray-50",
+                        "w-full text-left font-mono font-bold py-2 px-3 rounded-theme-sm border hover:bg-gray-50",
                         designTokens.typography.body.base,
                         product.stock < 0
                           ? 'text-orange-600 bg-orange-50'
@@ -869,7 +869,7 @@ export function ProductTableWithTags({
                     href={`/admin/products/${product.id}/edit`}
                     className={cn(
                       "flex-1 inline-flex items-center justify-center gap-2 bg-blue-100 font-bold transition-all",
-                      getNeoBrutalismClasses({ active: true }),
+                      getThemeClasses({ active: true }),
                       designTokens.button.md
                     )}
                   >
@@ -880,7 +880,7 @@ export function ProductTableWithTags({
                     onClick={() => handleDelete(product.id, product.name)}
                     className={cn(
                       "flex-1 inline-flex items-center justify-center gap-2 bg-red-100 font-bold transition-all",
-                      getNeoBrutalismClasses({ active: true }),
+                      getThemeClasses({ active: true }),
                       designTokens.button.md
                     )}
                   >

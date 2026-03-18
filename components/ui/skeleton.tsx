@@ -4,7 +4,7 @@ export function Skeleton({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-none bg-surface-secondary border-2',
+        'animate-shimmer rounded-theme-sm',
         className
       )}
     />

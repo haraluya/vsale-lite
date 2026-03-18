@@ -196,8 +196,8 @@ export function CartContent() {
         {/* 錯誤訊息 */}
         {error && (
           <div className={cn(
-            "rounded-none bg-red-100",
-            designTokens.neoBrutalism.border.full,
+            "rounded-theme-sm bg-red-100",
+            designTokens.cleanCommerce.border.full,
             "border-red-600",
             "p-4",
             designTokens.spacing.section.marginBottom
@@ -231,11 +231,11 @@ export function CartContent() {
             <Link
               href="/store"
               className={cn(
-                "rounded-none bg-green-400 font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.full,
-                designTokens.neoBrutalism.hover,
+                "rounded-theme-sm bg-green-400 font-bold transition-all",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.full,
+                designTokens.cleanCommerce.hover,
                 "px-6 py-3 md:px-8 md:py-4",
                 designTokens.typography.body.large
               )}

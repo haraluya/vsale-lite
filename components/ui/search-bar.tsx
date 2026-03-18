@@ -65,11 +65,11 @@ export function SearchBar({
         placeholder={placeholder}
         className="
           w-full pl-10 pr-10 py-3
-          border-2 md:border-3 rounded-none
+          border-theme rounded-theme-sm
           bg-surface
-          shadow-neo-sm md:shadow-neo
-          focus:outline-none focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none
-          transition-all duration-150
+          shadow-neo-sm
+          focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+          transition-all duration-200
           text-base
           placeholder:text-muted
         "

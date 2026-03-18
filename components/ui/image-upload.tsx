@@ -158,7 +158,7 @@ export function ImageUpload({
 
       {imageUrl ? (
         <div className="relative">
-          <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-none border-2 md:border-3 shadow-neo">
+          <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-theme-sm border-theme shadow-neo">
             <Image
               key={imageKey}
               src={imageUrl}
@@ -195,7 +195,7 @@ export function ImageUpload({
               type="button"
               onClick={handleDelete}
               disabled={uploading}
-              className="rounded-none border-2 md:border-3 bg-error-bg px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-theme-sm border-theme bg-error-bg px-6 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <X className="h-4 w-4" />
             </button>
@@ -204,7 +204,7 @@ export function ImageUpload({
       ) : (
         <div
           onClick={uploading ? undefined : triggerFileInput}
-          className={`flex aspect-square w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-none border-2 md:border-3 border-dashed bg-surface-secondary p-8 shadow-neo transition-colors hover:opacity-80 ${
+          className={`flex aspect-square w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-theme-sm border-theme border-dashed bg-surface-secondary p-8 shadow-neo transition-colors hover:opacity-80 ${
             uploading ? 'cursor-not-allowed opacity-50' : ''
           }`}
         >
@@ -216,7 +216,7 @@ export function ImageUpload({
               </p>
               {progress > 0 && !isCompressing && (
                 <div className="mt-4 w-full max-w-xs">
-                  <div className="h-6 w-full rounded-none border-2 bg-surface shadow-neo-sm overflow-hidden">
+                  <div className="h-6 w-full rounded-theme-sm border bg-surface shadow-neo-sm overflow-hidden">
                     <div
                       className="h-full bg-primary transition-all duration-300"
                       style={{ width: `${progress}%` }}
@@ -240,12 +240,12 @@ export function ImageUpload({
       )}
 
       {error && (
-        <div className="rounded-none border-2 md:border-3 border-error bg-error-bg p-4">
+        <div className="rounded-theme-sm border-theme border-error bg-error-bg p-4">
           <p className="text-sm font-bold text-error">{error}</p>
         </div>
       )}
 
-      <div className="rounded-none border-2 border-info bg-info-bg p-3">
+      <div className="rounded-theme-sm border border-info bg-info-bg p-3">
         <p className="text-sm font-bold">
           📐 建議尺寸：800 × 800 像素（正方形 1:1 比例）
         </p>

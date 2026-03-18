@@ -309,11 +309,11 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
             onChange={(e) => setName(e.target.value)}
             placeholder="例如：春節促銷活動"
             className={`
-              w-full rounded-none bg-white text-foreground
-              ${designTokens.neoBrutalism.border.full}
-              ${designTokens.neoBrutalism.shadow.full}
+              w-full rounded-theme-sm bg-white text-foreground
+              ${designTokens.cleanCommerce.border.full}
+              ${designTokens.cleanCommerce.shadow.full}
               ${designTokens.input.base}
-              border-black
+             
               focus:outline-none focus:ring-2 focus:ring-blue-500
             `}
             required
@@ -336,13 +336,13 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
             type="button"
             onClick={() => setIsActive(!isActive)}
             className={`
-              relative w-12 h-6 rounded-full border-2 border-black transition-colors
+              relative w-12 h-6 rounded-full border transition-colors
               ${isActive ? 'bg-green-500' : 'bg-gray-300'}
             `}
           >
             <div
               className={`
-                absolute top-0.5 left-0.5 w-4 h-4 bg-white border border-black rounded-full transition-transform
+                absolute top-0.5 left-0.5 w-4 h-4 bg-white border rounded-full transition-transform
                 ${isActive ? 'translate-x-6' : 'translate-x-0'}
               `}
             />
@@ -352,7 +352,7 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
 
       {/* 條件式欄位 */}
       {(blockType === 'image_carousel' || blockType === 'image_carousel_portrait') && (
-        <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 rounded">
+        <div className="space-y-4 p-4 border border-dashed border-border rounded">
           <h3 className="font-bold text-lg">
             {blockType === 'image_carousel' ? '圖片輪播設定 (橫向 16:9)' : '海報輪播設定 (直向 4:5)'}
           </h3>
@@ -371,13 +371,13 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
               type="button"
               onClick={() => setAutoPlay(!autoPlay)}
               className={`
-                relative w-12 h-6 rounded-full border-2 border-black transition-colors
+                relative w-12 h-6 rounded-full border transition-colors
                 ${autoPlay ? 'bg-green-500' : 'bg-gray-300'}
               `}
             >
               <div
                 className={`
-                  absolute top-0.5 left-0.5 w-4 h-4 bg-white border border-black rounded-full transition-transform
+                  absolute top-0.5 left-0.5 w-4 h-4 bg-white border rounded-full transition-transform
                   ${autoPlay ? 'translate-x-6' : 'translate-x-0'}
                 `}
               />
@@ -395,9 +395,9 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
               min={1000}
               step={1000}
               className={`
-                w-full rounded-none bg-white text-foreground
-                ${designTokens.neoBrutalism.border.mobile}
-                border-black px-3 py-2
+                w-full rounded-theme-sm bg-white text-foreground
+                ${designTokens.cleanCommerce.border.base}
+                px-3 py-2
                 focus:outline-none focus:ring-2 focus:ring-blue-500
               `}
             />
@@ -409,7 +409,7 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
       )}
 
       {blockType === 'product_display' && (
-        <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 rounded">
+        <div className="space-y-4 p-4 border border-dashed border-border rounded">
           <h3 className="font-bold text-lg">商品展示設定</h3>
 
           <div className="space-y-2">
@@ -435,9 +435,9 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
                 setSelectedSeriesIds(options.map((o) => o.value))
               }}
               className={`
-                w-full rounded-none bg-white text-foreground
-                ${designTokens.neoBrutalism.border.mobile}
-                border-black px-3 py-2 min-h-[120px]
+                w-full rounded-theme-sm bg-white text-foreground
+                ${designTokens.cleanCommerce.border.base}
+                px-3 py-2 min-h-[120px]
                 focus:outline-none focus:ring-2 focus:ring-blue-500
               `}
             >
@@ -475,9 +475,9 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
                 setSelectedTagIds(options.map((o) => o.value))
               }}
               className={`
-                w-full rounded-none bg-white text-foreground
-                ${designTokens.neoBrutalism.border.mobile}
-                border-black px-3 py-2 min-h-[120px]
+                w-full rounded-theme-sm bg-white text-foreground
+                ${designTokens.cleanCommerce.border.base}
+                px-3 py-2 min-h-[120px]
                 focus:outline-none focus:ring-2 focus:ring-blue-500
               `}
             >
@@ -500,9 +500,9 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
               min={1}
               placeholder="不填入則不限制數量"
               className={`
-                w-full rounded-none bg-white text-foreground
-                ${designTokens.neoBrutalism.border.mobile}
-                border-black px-3 py-2
+                w-full rounded-theme-sm bg-white text-foreground
+                ${designTokens.cleanCommerce.border.base}
+                px-3 py-2
                 focus:outline-none focus:ring-2 focus:ring-blue-500
               `}
             />
@@ -514,7 +514,7 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
       )}
 
       {blockType === 'text_block' && (
-        <div className="space-y-4 p-4 border-2 border-dashed border-gray-300 rounded">
+        <div className="space-y-4 p-4 border border-dashed border-border rounded">
           <h3 className="font-bold text-lg">文字區塊設定</h3>
 
           <div className="space-y-2">
@@ -528,9 +528,9 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
               rows={5}
               placeholder="輸入要顯示的文字內容..."
               className={`
-                w-full rounded-none bg-white text-foreground
-                ${designTokens.neoBrutalism.border.mobile}
-                border-black px-3 py-2
+                w-full rounded-theme-sm bg-white text-foreground
+                ${designTokens.cleanCommerce.border.base}
+                px-3 py-2
                 focus:outline-none focus:ring-2 focus:ring-blue-500
               `}
               required
@@ -549,9 +549,9 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
                 value={fontSize}
                 onChange={(e) => setFontSize(e.target.value as any)}
                 className={`
-                  w-full rounded-none bg-white text-foreground
-                  ${designTokens.neoBrutalism.border.mobile}
-                  border-black px-3 py-2
+                  w-full rounded-theme-sm bg-white text-foreground
+                  ${designTokens.cleanCommerce.border.base}
+                  px-3 py-2
                   focus:outline-none focus:ring-2 focus:ring-blue-500
                 `}
               >
@@ -574,9 +574,9 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
                 value={textColor}
                 onChange={(e) => setTextColor(e.target.value)}
                 className={`
-                  w-full h-10 rounded-none bg-white cursor-pointer
-                  ${designTokens.neoBrutalism.border.mobile}
-                  border-black
+                  w-full h-10 rounded-theme-sm bg-white cursor-pointer
+                  ${designTokens.cleanCommerce.border.base}
+                 
                 `}
               />
             </div>
@@ -590,8 +590,8 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
             <div
               className={`
                 p-4 bg-white
-                ${designTokens.neoBrutalism.border.mobile}
-                border-black
+                ${designTokens.cleanCommerce.border.base}
+               
               `}
             >
               <p
@@ -614,12 +614,12 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
           type="submit"
           disabled={isSubmitting}
           className={`
-            flex-1 py-3 rounded-none font-medium
+            flex-1 py-3 rounded-theme-sm font-medium
             bg-green-500 text-white
-            ${designTokens.neoBrutalism.border.full}
-            ${designTokens.neoBrutalism.shadow.full}
-            border-black
-            hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+            ${designTokens.cleanCommerce.border.full}
+            ${designTokens.cleanCommerce.shadow.full}
+           
+            hover:-translate-y-0.5 hover:shadow-theme-hover
             transition-all
             disabled:opacity-50 disabled:cursor-not-allowed
           `}
@@ -640,12 +640,12 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
             onClick={onCancel}
             disabled={isSubmitting}
             className={`
-              px-6 py-3 rounded-none font-medium
+              px-6 py-3 rounded-theme-sm font-medium
               bg-gray-300 text-black
-              ${designTokens.neoBrutalism.border.full}
-              ${designTokens.neoBrutalism.shadow.full}
-              border-black
-              hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+              ${designTokens.cleanCommerce.border.full}
+              ${designTokens.cleanCommerce.shadow.full}
+             
+              hover:-translate-y-0.5 hover:shadow-theme-hover
               transition-all
               disabled:opacity-50 disabled:cursor-not-allowed
             `}
@@ -660,12 +660,12 @@ export function HomeBlockForm({ blockId, initialData, presetType, onSuccess, onC
             onClick={handleDelete}
             disabled={isSubmitting}
             className={`
-              px-6 py-3 rounded-none font-medium
+              px-6 py-3 rounded-theme-sm font-medium
               bg-red-600 text-white
-              ${designTokens.neoBrutalism.border.full}
-              ${designTokens.neoBrutalism.shadow.full}
-              border-black
-              hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+              ${designTokens.cleanCommerce.border.full}
+              ${designTokens.cleanCommerce.shadow.full}
+             
+              hover:-translate-y-0.5 hover:shadow-theme-hover
               transition-all
               disabled:opacity-50 disabled:cursor-not-allowed
             `}

@@ -17,6 +17,8 @@ import { batchSetTierPrices } from '@/lib/actions/tier-prices'
 import type { Series, ProductWithAllTierPrices } from '@/types'
 import { Button } from '@/components/ui/button'
 import { useAlert } from '@/lib/contexts/dialog-context'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
+import { cn } from '@/lib/utils'
 
 interface SeriesPriceTableProps {
   series: Series
@@ -151,40 +153,43 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
     <div className="space-y-4">
       {/* 錯誤訊息 */}
       {error && (
-        <div className="rounded-none border-2 border-red-600 bg-red-50 p-4">
+        <div className="rounded-theme-sm border border-red-600 bg-red-50 p-4">
           <p className="font-bold text-red-800">{error}</p>
         </div>
       )}
 
       {/* 系列資訊 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo">
-        <h3 className="text-lg font-bold">{series.name}</h3>
+      <div className={cn("rounded-theme-sm bg-white", getThemeClasses(), designTokens.spacing.card.padding)}>
+        <h3 className={designTokens.typography.h3}>{series.name}</h3>
         {series.description && (
-          <p className="mt-1 text-sm text-gray-600">{series.description}</p>
+          <p className={cn("mt-1 text-gray-600", designTokens.typography.caption)}>{series.description}</p>
         )}
-        <p className="mt-2 text-sm font-medium">
+        <p className={cn("mt-2 font-medium", designTokens.typography.caption)}>
           共 {products.length} 個商品 × {tiers.length} 個等級
         </p>
       </div>
 
       {/* 價格表格 */}
       <form onSubmit={handleSubmit}>
-        <div className="overflow-x-auto rounded-none border-2 md:border-3 border-black bg-white shadow-neo">
+        <p className="lg:hidden text-center py-2 text-xs text-gray-500">
+          ← 左右滑動查看更多等級 →
+        </p>
+        <div className={cn("overflow-x-auto rounded-theme-sm bg-white", getThemeClasses())}>
           <table className="w-full">
             <thead className="bg-gray-100">
               <tr>
-                <th className="sticky left-0 z-10 border-b-2 border-r-2 border-black bg-gray-100 px-4 py-3 text-left font-bold">
+                <th className="sticky left-0 z-10 border-b-2 border-r-2 bg-gray-100 px-4 py-3 text-left font-bold">
                   商品編號 / 名稱
                 </th>
                 {tiers.map((tier) => (
                   <th
                     key={tier.tier_id}
-                    className="border-b-2 border-black px-3 py-2 text-left font-bold"
+                    className="border-b px-3 py-2 text-left font-bold"
                   >
                     <div className="mb-2">
                       {tier.tier_name}
                       {tier.is_protected && (
-                        <span className="ml-2 rounded-none border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
+                        <span className="ml-2 rounded-theme-sm border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
                           自動
                         </span>
                       )}
@@ -204,12 +209,15 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                             }))
                           }
                           placeholder="金額"
-                          className="w-16 rounded-none border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-16 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                         <button
                           type="button"
                           onClick={() => handleQuickFill(tier.tier_id)}
-                          className="rounded-none border border-black bg-green-400 px-2 py-0.5 text-xs font-bold shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[0.5px] hover:translate-y-[0.5px] hover:shadow-none whitespace-nowrap"
+                          className={cn(
+                            "rounded-theme-sm border bg-green-400 px-2 py-0.5 text-xs font-bold shadow-neo-sm transition-all whitespace-nowrap",
+                            designTokens.cleanCommerce.hover
+                          )}
                         >
                           帶入
                         </button>
@@ -228,7 +236,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                   }`}
                 >
                   {/* 商品資訊 */}
-                  <td className="sticky left-0 z-10 border-r-2 border-black bg-white px-4 py-3">
+                  <td className="sticky left-0 z-10 border-r-2 bg-white px-4 py-3">
                     <div className="font-bold">{product.name}</div>
                     <div className="text-sm text-gray-600">{product.code}</div>
                   </td>
@@ -240,14 +248,14 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                     const isRetail = tier.is_protected
 
                     return (
-                      <td key={tier.tier_id} className="border-black px-4 py-3">
+                      <td key={tier.tier_id} className="px-4 py-3">
                         {isRetail ? (
                           // 零售等級：顯示零售價格（禁用編輯）
                           <input
                             type="text"
                             value={product.retail_price ? `$${Math.round(product.retail_price)}` : 'N/A'}
                             disabled
-                            className="w-28 rounded-none border-2 border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
+                            className="w-28 rounded-theme-sm border border-yellow-300 bg-yellow-50 px-3 py-1 text-sm text-yellow-700 cursor-not-allowed"
                           />
                         ) : (
                           // 其他等級：可編輯價格
@@ -261,7 +269,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                                 handlePriceChange(product.id, tier.tier_id, e.target.value)
                               }
                               placeholder="未設定"
-                              className="w-28 rounded-none border-2 border-gray-300 px-3 py-1 text-sm focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-28 rounded-theme-sm border border-border px-3 py-1 text-sm focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                             {/* 折扣率顯示 */}
                             {currentPrice && product.retail_price && (

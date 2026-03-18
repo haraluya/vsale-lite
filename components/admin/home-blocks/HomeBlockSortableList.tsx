@@ -127,7 +127,7 @@ function SortableCard({
       ref={setNodeRef}
       style={style}
       className={`
-        flex items-center gap-3 rounded-none border-2 border-black bg-white p-4 shadow-neo-sm transition-all
+        flex items-center gap-3 rounded-theme-sm border bg-white p-4 shadow-neo-sm transition-all
         ${isDragging ? 'z-50 rotate-2 opacity-50 shadow-neo' : 'hover:shadow-neo'}
       `}
     >
@@ -141,12 +141,12 @@ function SortableCard({
       </div>
 
       {/* 順序號碼 */}
-      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-none border-2 border-black bg-yellow-300 font-bold">
+      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-theme-sm border bg-yellow-300 font-bold">
         {index + 1}
       </div>
 
       {/* 縮圖或圖示 */}
-      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-none border-2 border-black bg-gray-100 overflow-hidden">
+      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-theme-sm border bg-gray-100 overflow-hidden">
         {thumbnail ? (
           <Image
             src={thumbnail}
@@ -189,9 +189,9 @@ function SortableCard({
           disabled={isFirst}
           title="移到頂部"
           className={`
-            flex items-center justify-center p-2 rounded-none
-            ${designTokens.neoBrutalism.border.mobile}
-            border-black
+            flex items-center justify-center p-2 rounded-theme-sm
+            ${designTokens.cleanCommerce.border.base}
+           
             transition-all
             ${
               isFirst
@@ -208,9 +208,9 @@ function SortableCard({
           disabled={isFirst}
           title="上移"
           className={`
-            flex items-center justify-center p-2 rounded-none
-            ${designTokens.neoBrutalism.border.mobile}
-            border-black
+            flex items-center justify-center p-2 rounded-theme-sm
+            ${designTokens.cleanCommerce.border.base}
+           
             transition-all
             ${
               isFirst
@@ -227,9 +227,9 @@ function SortableCard({
           disabled={isLast}
           title="下移"
           className={`
-            flex items-center justify-center p-2 rounded-none
-            ${designTokens.neoBrutalism.border.mobile}
-            border-black
+            flex items-center justify-center p-2 rounded-theme-sm
+            ${designTokens.cleanCommerce.border.base}
+           
             transition-all
             ${
               isLast
@@ -246,9 +246,9 @@ function SortableCard({
           disabled={isLast}
           title="移到底部"
           className={`
-            flex items-center justify-center p-2 rounded-none
-            ${designTokens.neoBrutalism.border.mobile}
-            border-black
+            flex items-center justify-center p-2 rounded-theme-sm
+            ${designTokens.cleanCommerce.border.base}
+           
             transition-all
             ${
               isLast
@@ -266,10 +266,10 @@ function SortableCard({
         <button
           onClick={() => onEdit(block.id)}
           className={`
-            flex items-center justify-center gap-1 px-3 py-2 rounded-none
+            flex items-center justify-center gap-1 px-3 py-2 rounded-theme-sm
             bg-blue-500 text-white font-medium text-sm
-            ${designTokens.neoBrutalism.border.mobile}
-            border-black
+            ${designTokens.cleanCommerce.border.base}
+           
             hover:translate-x-[1px] hover:translate-y-[1px]
             transition-all
           `}
@@ -281,10 +281,10 @@ function SortableCard({
         <button
           onClick={handleDelete}
           className={`
-            flex items-center justify-center gap-1 px-3 py-2 rounded-none
+            flex items-center justify-center gap-1 px-3 py-2 rounded-theme-sm
             bg-red-600 text-white font-medium text-sm
-            ${designTokens.neoBrutalism.border.mobile}
-            border-black
+            ${designTokens.cleanCommerce.border.base}
+           
             hover:translate-x-[1px] hover:translate-y-[1px]
             transition-all
           `}
@@ -408,7 +408,7 @@ export function HomeBlockSortableList({
   return (
     <div className="space-y-4">
       {/* 使用說明 */}
-      <div className="rounded-none border-2 border-blue-600 bg-blue-50 p-3">
+      <div className="rounded-theme-sm border border-blue-600 bg-blue-50 p-3">
         <p className="text-sm text-blue-800">
           💡 <strong>操作方式：</strong>按住左側的
           <GripVertical className="mx-1 inline h-4 w-4" />
@@ -418,7 +418,7 @@ export function HomeBlockSortableList({
 
       {/* 操作提示 */}
       {hasChanges && (
-        <div className="rounded-none border-2 border-orange-600 bg-orange-50 p-4">
+        <div className="rounded-theme-sm border border-orange-600 bg-orange-50 p-4">
           <p className="text-sm font-bold text-orange-800">
             ⚠️ 你有未儲存的順序變更！請點擊「儲存順序」按鈕來保存變更。
           </p>
@@ -432,14 +432,14 @@ export function HomeBlockSortableList({
             onClick={handleSave}
             disabled={saving}
             className={`
-              flex items-center gap-2 rounded-none px-6 py-3 font-bold
-              ${designTokens.neoBrutalism.border.full}
-              border-black
+              flex items-center gap-2 rounded-theme-sm px-6 py-3 font-bold
+              ${designTokens.cleanCommerce.border.full}
+             
               transition-all
               ${
                 saving
                   ? 'cursor-not-allowed bg-gray-300 text-gray-500'
-                  : 'bg-green-400 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                  : 'bg-green-400 hover:-translate-y-0.5 hover:shadow-theme-hover'
               }
             `}
           >
@@ -450,14 +450,14 @@ export function HomeBlockSortableList({
             onClick={handleReset}
             disabled={saving}
             className={`
-              rounded-none px-6 py-3 font-bold
-              ${designTokens.neoBrutalism.border.full}
-              border-black
+              rounded-theme-sm px-6 py-3 font-bold
+              ${designTokens.cleanCommerce.border.full}
+             
               transition-all
               ${
                 saving
                   ? 'cursor-not-allowed bg-gray-300 text-gray-500'
-                  : 'bg-gray-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                  : 'bg-gray-200 hover:-translate-y-0.5 hover:shadow-theme-hover'
               }
             `}
           >

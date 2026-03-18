@@ -109,9 +109,9 @@ export function ProductFilters({ series }: ProductFiltersProps) {
       {/* Search & Filter */}
       <div
         className={cn(
-          'rounded-none bg-white',
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full,
+          'rounded-theme-sm bg-white',
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding
         )}
       >
@@ -127,9 +127,9 @@ export function ProductFilters({ series }: ProductFiltersProps) {
 
           <select
             className={cn(
-              'rounded-none border-2 border-black bg-white font-bold',
+              'rounded-theme-sm border bg-white font-bold',
               designTokens.input.base,
-              designTokens.neoBrutalism.shadow.mobile
+              designTokens.cleanCommerce.shadow.base
             )}
             value={seriesFilter}
             onChange={(e) => handleSeriesChange(e.target.value)}
@@ -144,9 +144,9 @@ export function ProductFilters({ series }: ProductFiltersProps) {
 
           <select
             className={cn(
-              'rounded-none border-2 border-black bg-white font-bold',
+              'rounded-theme-sm border bg-white font-bold',
               designTokens.input.base,
-              designTokens.neoBrutalism.shadow.mobile
+              designTokens.cleanCommerce.shadow.base
             )}
             value={statusFilter}
             onChange={(e) => handleStatusChange(e.target.value)}

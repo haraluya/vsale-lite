@@ -4,7 +4,7 @@ import { OrderFilters } from '@/components/admin/orders/order-filters'
 import { OrderList } from '@/components/admin/orders/order-list'
 import { OrderListSkeleton } from '@/components/admin/orders/order-list-skeleton'
 import { cn } from '@/lib/utils'
-import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getPageContainerClasses, getThemeClasses } from '@/lib/design-tokens'
 import { generatePageMetadata } from '@/lib/metadata'
 import type { OrderStatus } from '@/types'
 
@@ -49,12 +49,12 @@ export default async function AdminOrdersPage({
       {/* 標題 - 立即顯示 */}
       <div
         className={cn(
-          'flex items-center gap-3 md:gap-4 rounded-none bg-surface',
-          getNeoBrutalismClasses(),
+          'flex items-center gap-3 md:gap-4 rounded-theme-sm bg-surface',
+          getThemeClasses(),
           designTokens.spacing.card.padding
         )}
       >
-        <div className="rounded-none border-2 border-black bg-blue-400 p-2 md:p-3">
+        <div className="rounded-theme-sm border bg-blue-400 p-2 md:p-3">
           <Package className="h-6 w-6 md:h-8 md:w-8" />
         </div>
         <div>

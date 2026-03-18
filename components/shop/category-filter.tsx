@@ -36,17 +36,17 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   }
 
   return (
-    <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo">
+    <div className="rounded-theme-sm border-theme bg-surface p-4 shadow-neo">
       <h3 className="mb-3 text-sm font-bold uppercase text-text-secondary">商品分類</h3>
 
       <div className="flex flex-wrap gap-2">
         {/* 全部按鈕 */}
         <button
           onClick={() => handleCategoryChange('')}
-          className={`rounded-none border-2 border-black px-4 py-2 text-sm font-bold transition-all ${
+          className={`rounded-theme-sm border px-4 py-2 text-sm font-bold transition-all ${
             currentCategoryId === ''
               ? 'bg-black text-white'
-              : 'bg-surface text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              : 'bg-surface text-foreground hover:-translate-y-0.5 hover:shadow-theme-hover'
           }`}
         >
           全部
@@ -57,10 +57,10 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
           <button
             key={category.id}
             onClick={() => handleCategoryChange(category.id)}
-            className={`rounded-none border-2 border-black px-4 py-2 text-sm font-bold transition-all ${
+            className={`rounded-theme-sm border px-4 py-2 text-sm font-bold transition-all ${
               currentCategoryId === category.id
                 ? 'bg-black text-white'
-                : 'bg-surface text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                : 'bg-surface text-foreground hover:-translate-y-0.5 hover:shadow-theme-hover'
             }`}
           >
             {category.name}

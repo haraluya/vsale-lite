@@ -36,10 +36,10 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
         <div
           className={`
             relative w-full max-w-lg bg-white
-            ${designTokens.neoBrutalism.border.full}
-            ${designTokens.neoBrutalism.shadow.full}
-            border-black
-            rounded-none
+            ${designTokens.cleanCommerce.border.full}
+            ${designTokens.cleanCommerce.shadow.full}
+           
+            rounded-theme-sm
             p-6
           `}
           role="dialog"
@@ -49,7 +49,7 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
           {/* 關閉按鈕 */}
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-none"
+            className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-theme-sm"
             aria-label="關閉對話框"
           >
             <X className="h-5 w-5" />
@@ -73,11 +73,11 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
               onClick={() => handleSelect('image_carousel')}
               className={`
                 w-full p-4 text-left bg-green-400 text-black
-                ${designTokens.neoBrutalism.border.full}
-                ${designTokens.neoBrutalism.shadow.full}
-                border-black rounded-none
-                hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
-                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                ${designTokens.cleanCommerce.border.full}
+                ${designTokens.cleanCommerce.shadow.full}
+                rounded-theme-sm
+                hover:-translate-y-0.5 hover:shadow-theme-hover
+                active:scale-[0.98]
                 transition-all duration-150
               `}
             >
@@ -97,11 +97,11 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
               onClick={() => handleSelect('image_carousel_portrait')}
               className={`
                 w-full p-4 text-left bg-purple-400 text-black
-                ${designTokens.neoBrutalism.border.full}
-                ${designTokens.neoBrutalism.shadow.full}
-                border-black rounded-none
-                hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
-                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                ${designTokens.cleanCommerce.border.full}
+                ${designTokens.cleanCommerce.shadow.full}
+                rounded-theme-sm
+                hover:-translate-y-0.5 hover:shadow-theme-hover
+                active:scale-[0.98]
                 transition-all duration-150
               `}
             >
@@ -121,11 +121,11 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
               onClick={() => handleSelect('product_display')}
               className={`
                 w-full p-4 text-left bg-blue-400 text-black
-                ${designTokens.neoBrutalism.border.full}
-                ${designTokens.neoBrutalism.shadow.full}
-                border-black rounded-none
-                hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
-                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                ${designTokens.cleanCommerce.border.full}
+                ${designTokens.cleanCommerce.shadow.full}
+                rounded-theme-sm
+                hover:-translate-y-0.5 hover:shadow-theme-hover
+                active:scale-[0.98]
                 transition-all duration-150
               `}
             >
@@ -145,11 +145,11 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
               onClick={() => handleSelect('text_block')}
               className={`
                 w-full p-4 text-left bg-yellow-400 text-black
-                ${designTokens.neoBrutalism.border.full}
-                ${designTokens.neoBrutalism.shadow.full}
-                border-black rounded-none
-                hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
-                active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+                ${designTokens.cleanCommerce.border.full}
+                ${designTokens.cleanCommerce.shadow.full}
+                rounded-theme-sm
+                hover:-translate-y-0.5 hover:shadow-theme-hover
+                active:scale-[0.98]
                 transition-all duration-150
               `}
             >
@@ -170,11 +170,11 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
             onClick={onClose}
             className={`
               mt-6 w-full p-3 bg-white text-black
-              ${designTokens.neoBrutalism.border.full}
-              ${designTokens.neoBrutalism.shadow.full}
-              border-black rounded-none
-              hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
-              active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+              ${designTokens.cleanCommerce.border.full}
+              ${designTokens.cleanCommerce.shadow.full}
+              rounded-theme-sm
+              hover:-translate-y-0.5 hover:shadow-theme-hover
+              active:scale-[0.98]
               transition-all duration-150
             `}
           >

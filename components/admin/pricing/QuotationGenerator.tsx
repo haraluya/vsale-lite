@@ -193,12 +193,12 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
   return (
     <div className="space-y-6">
       {/* 等級選擇 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
         <label className="mb-3 block font-bold">選擇等級</label>
         <select
           value={selectedTierId}
           onChange={(e) => setSelectedTierId(e.target.value)}
-          className="w-full rounded-none border-2 border-black px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
+          className="w-full rounded-theme-sm border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400"
         >
           <option value="">請選擇等級...</option>
           {tiers.map((tier) => (
@@ -210,7 +210,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
       </div>
 
       {/* 系列多選（依分類分組） */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
         <label className="mb-3 block font-bold">選擇系列 (可複選)</label>
         <div className="space-y-4">
           {sortedCategories.map((categoryName) => (
@@ -220,7 +220,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
                 {groupedSeries[categoryName].map((series) => (
                   <label
                     key={series.id}
-                    className={`flex items-center gap-2 rounded-none border-2 border-black p-3 cursor-pointer transition-all ${
+                    className={`flex items-center gap-2 rounded-theme-sm border p-3 cursor-pointer transition-all ${
                       selectedSeriesIds.has(series.id)
                         ? 'bg-purple-400 shadow-neo-sm'
                         : 'bg-white hover:bg-gray-50'
@@ -245,14 +245,14 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
 
       {/* 報價文字框與按鈕 */}
       {!isLoading && quotationData.length > 0 && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
           <div className="flex items-center justify-between mb-3">
             <label className="font-bold">報價文字</label>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleGenerateQuotation}
                 disabled={!selectedTierId || selectedSeriesIds.size === 0}
-                className="rounded-none border-2 border-black bg-purple-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+                className="rounded-theme-sm border bg-purple-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
               >
                 <FileText className="h-4 w-4" />
                 產生報價
@@ -260,7 +260,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
               <button
                 onClick={handleGenerateQuotationWithRetail}
                 disabled={!selectedTierId || selectedSeriesIds.size === 0}
-                className="rounded-none border-2 border-black bg-blue-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+                className="rounded-theme-sm border bg-blue-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
               >
                 <FileText className="h-4 w-4" />
                 產生報價(含售價)
@@ -268,7 +268,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
               <button
                 onClick={handleCopyToClipboard}
                 disabled={!quotationText}
-                className="rounded-none border-2 border-black bg-green-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+                className="rounded-theme-sm border bg-green-400 px-4 py-2 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
               >
                 <Copy className="h-4 w-4" />
                 複製
@@ -279,9 +279,9 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
             value={quotationText}
             readOnly
             placeholder="點擊「產生報價」按鈕生成報價文字..."
-            className="w-full h-96 rounded-none border-2 border-gray-300 px-4 py-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
+            className="w-full h-96 rounded-theme-sm border border-border px-4 py-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none"
           />
-          <div className="mt-4 rounded-none border-2 border-black bg-blue-50 p-4">
+          <div className="mt-4 rounded-theme-sm border bg-blue-50 p-4">
             <p className="text-sm font-bold text-blue-700">💡 使用提示</p>
             <ul className="mt-2 text-xs text-gray-700 space-y-1">
               <li>1. 選擇等級</li>
@@ -295,14 +295,14 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
 
       {/* 載入中 */}
       {isLoading && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-white p-12 text-center shadow-neo">
           <p className="text-lg text-gray-500">載入中...</p>
         </div>
       )}
 
       {/* 提示訊息 */}
       {!selectedTierId && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-purple-50 p-8 text-center shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-purple-50 p-8 text-center shadow-neo">
           <p className="text-lg font-bold">請選擇等級</p>
           <p className="mt-4 text-sm text-gray-600">選擇等級與系列後,可快速產生文字報價單</p>
         </div>

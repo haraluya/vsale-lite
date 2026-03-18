@@ -18,7 +18,7 @@ import Link from 'next/link'
 import { VirtualOrderRow } from '@/components/admin/orders/virtual-order-row'
 import { OrderCard } from '@/components/admin/orders/order-card'
 import { OrderStatusBadge } from '@/components/shop/order-status-badge'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { formatDateTW, formatAmount } from '@/lib/date-utils'
 import type { OrderWithUser } from '@/types'
@@ -44,13 +44,13 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
       <div className="hidden lg:block">
         <div
           className={cn(
-            'rounded-none bg-white overflow-hidden',
-            designTokens.neoBrutalism.border.full,
-            designTokens.neoBrutalism.shadow.full
+            'rounded-theme-sm bg-white overflow-hidden',
+            designTokens.cleanCommerce.border.full,
+            designTokens.cleanCommerce.shadow.full
           )}
         >
           {/* 表頭（固定） */}
-          <div className="grid grid-cols-6 gap-4 border-b-3 border-black bg-gray-100 p-4 font-bold sticky top-0 z-10">
+          <div className="grid grid-cols-6 gap-4 border-b bg-gray-100 p-4 font-bold sticky top-0 z-10">
             <div>訂單編號</div>
             <div>客戶</div>
             <div>等級</div>
@@ -103,8 +103,8 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
             key={order.id}
             href={`/admin/orders/${order.id}`}
             className={cn(
-              'block rounded-none bg-white',
-              getNeoBrutalismClasses({ active: true }),
+              'block rounded-theme-sm bg-white',
+              getThemeClasses({ active: true }),
               designTokens.spacing.card.padding
             )}
           >
@@ -129,7 +129,7 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
             </div>
 
             {/* 金額 */}
-            <div className="pt-3 border-t-2 border-black">
+            <div className="pt-3 border-t">
               <div className="flex items-center justify-between">
                 <span className="text-sm md:text-base font-medium text-gray-700">訂單金額</span>
                 <span className="font-mono font-bold text-base md:text-lg text-blue-600">

@@ -3,7 +3,7 @@ import { HTMLAttributes, forwardRef } from 'react'
 
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn('card-neo rounded-none', className)} {...props} />
+    <div ref={ref} className={cn('card-neo', className)} {...props} />
   )
 )
 Card.displayName = 'Card'
@@ -19,7 +19,7 @@ const CardTitle = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingEle
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('text-2xl font-bold leading-none tracking-tight', className)}
+      className={cn('text-2xl font-semibold leading-none tracking-tight', className)}
       {...props}
     />
   )

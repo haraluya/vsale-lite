@@ -74,8 +74,8 @@ export function OrderFilters() {
       {/* 搜尋框 */}
       <div
         className={cn(
-          'flex flex-1 items-center gap-2 rounded-none border-2 border-black bg-white',
-          designTokens.neoBrutalism.shadow.full,
+          'flex flex-1 items-center gap-2 rounded-theme-sm border bg-white',
+          designTokens.cleanCommerce.shadow.full,
           designTokens.input.base
         )}
       >
@@ -94,9 +94,9 @@ export function OrderFilters() {
       {/* 狀態快篩按鈕列 */}
       <div
         className={cn(
-          'flex flex-wrap gap-2 rounded-none bg-white',
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full,
+          'flex flex-wrap gap-2 rounded-theme-sm bg-white',
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding
         )}
       >
@@ -107,8 +107,8 @@ export function OrderFilters() {
         {STATUS_OPTIONS.map((option) => {
           const isActive = statusFilter === option.value
           const baseClasses = cn(
-            'rounded-none border-2 border-black px-3 py-1.5 text-sm font-bold transition-all',
-            designTokens.neoBrutalism.hover
+            'rounded-theme-sm border px-3 py-1.5 text-sm font-bold transition-all',
+            designTokens.cleanCommerce.hover
           )
 
           // 根據狀態設定不同顏色
@@ -136,7 +136,7 @@ export function OrderFilters() {
               className={cn(
                 baseClasses,
                 isActive ? activeBgColor : bgColor,
-                isActive && 'shadow-none translate-x-[2px] translate-y-[2px]'
+                isActive && 'shadow-none -translate-y-0.5 shadow-theme-hover'
               )}
             >
               {option.label}

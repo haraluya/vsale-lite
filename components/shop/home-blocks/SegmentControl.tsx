@@ -30,19 +30,19 @@ export function SegmentControl() {
         onClick={() => router.push('/store/home')}
         className={cn(
           // 基礎樣式
-          'rounded-none font-bold transition-all',
+          'rounded-theme-sm font-bold transition-all',
           'px-6 py-2.5 min-h-[44px]', // 確保觸控目標 >= 44px
           designTokens.typography.body.base,
 
           // Neo-Brutalism
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full,
 
           // 啟用狀態
           isHomePage
-            ? 'bg-green-400 translate-x-[2px] translate-y-[2px] shadow-none'
-            : 'bg-surface active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
+            ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+            : 'bg-surface active:scale-[0.98]'
         )}
       >
         首頁
@@ -54,19 +54,19 @@ export function SegmentControl() {
         onClick={() => router.push('/store/products')}
         className={cn(
           // 基礎樣式
-          'rounded-none font-bold transition-all',
+          'rounded-theme-sm font-bold transition-all',
           'px-6 py-2.5 min-h-[44px]', // 確保觸控目標 >= 44px
           designTokens.typography.body.base,
 
           // Neo-Brutalism
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full,
 
           // 啟用狀態
           isProductsPage
-            ? 'bg-green-400 translate-x-[2px] translate-y-[2px] shadow-none'
-            : 'bg-surface active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
+            ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+            : 'bg-surface active:scale-[0.98]'
         )}
       >
         商品

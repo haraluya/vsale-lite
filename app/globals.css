@@ -4,35 +4,37 @@
 
 @layer base {
   :root {
+    /* === Clean Commerce 預設主題 === */
+
     /* 表面色 */
     --color-surface: #FFFFFF;
-    --color-surface-secondary: #F3F4F6;
+    --color-surface-secondary: #F8FAFC;
     --color-surface-elevated: #FFFFFF;
 
-    /* 邊框與陰影 */
-    --color-border: #000000;
-    --shadow-neo: 4px 4px 0px 0px var(--color-border);
-    --shadow-neo-sm: 2px 2px 0px 0px var(--color-border);
-    --shadow-neo-lg: 6px 6px 0px 0px var(--color-border);
+    /* 邊框與陰影 — Clean Commerce: 淡灰邊框 + 柔和陰影 */
+    --color-border: #E2E8F0;
+    --shadow-neo: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+    --shadow-neo-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+    --shadow-neo-lg: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
 
     /* 文字色 */
-    --color-text-primary: #000000;
-    --color-text-secondary: #4B5563;
-    --color-text-muted: #6B7280;
+    --color-text-primary: #0F172A;
+    --color-text-secondary: #475569;
+    --color-text-muted: #94A3B8;
     --color-text-inverse: #FFFFFF;
 
-    /* 品牌色 */
-    --color-primary: #8B5CF6;
-    --color-primary-dark: #7C3AED;
-    --color-primary-light: #EDE9FE;
+    /* 品牌色 — Blue-600 */
+    --color-primary: #2563EB;
+    --color-primary-dark: #1D4ED8;
+    --color-primary-light: #DBEAFE;
 
     /* 功能色 */
     --color-success: #22C55E;
     --color-success-bg: #F0FDF4;
     --color-success-border: #16A34A;
-    --color-warning: #EAB308;
+    --color-warning: #F59E0B;
     --color-warning-bg: #FFFBEB;
-    --color-warning-border: #CA8A04;
+    --color-warning-border: #D97706;
     --color-error: #EF4444;
     --color-error-bg: #FEF2F2;
     --color-error-border: #DC2626;
@@ -45,7 +47,7 @@
     --color-nav-orders: #DBEAFE;
     --color-nav-coupons: #FFEDD5;
     --color-nav-cart: #DCFCE7;
-    --color-nav-logout: #FCA5A5;
+    --color-nav-logout: #FEE2E2;
 
     /* 標籤色系 */
     --color-tag-hot-bg: #FEE2E2;
@@ -54,12 +56,21 @@
     --color-tag-new-bg: #DCFCE7;
     --color-tag-new-border: #16A34A;
     --color-tag-new-text: #14532D;
-    --color-tag-limited-bg: #EDE9FE;
-    --color-tag-limited-border: #7C3AED;
-    --color-tag-limited-text: #3B0764;
-    --color-tag-sale-bg: #FEF9C3;
-    --color-tag-sale-border: #CA8A04;
+    --color-tag-limited-bg: #DBEAFE;
+    --color-tag-limited-border: #2563EB;
+    --color-tag-limited-text: #1E3A5F;
+    --color-tag-sale-bg: #FEF3C7;
+    --color-tag-sale-border: #D97706;
     --color-tag-sale-text: #713F12;
+
+    /* 主題形狀 Token */
+    --theme-border-width: 1px;
+    --theme-radius: 12px;
+    --theme-radius-sm: 8px;
+    --theme-radius-lg: 16px;
+    --theme-shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+    --theme-font-weight-heading: 600;
+    --theme-font-weight-body: 400;
 
     /* 安全區域 */
     --safe-area-top: env(safe-area-inset-top);
@@ -67,20 +78,20 @@
   }
 
   .dark {
-    --color-surface: #1A1A2E;
-    --color-surface-secondary: #16213E;
+    --color-surface: #0F172A;
+    --color-surface-secondary: #1E293B;
     --color-surface-elevated: #1E293B;
-    --color-border: #D1D5DB;
-    --shadow-neo: 4px 4px 0px 0px var(--color-border);
-    --shadow-neo-sm: 2px 2px 0px 0px var(--color-border);
-    --shadow-neo-lg: 6px 6px 0px 0px var(--color-border);
-    --color-text-primary: #F3F4F6;
-    --color-text-secondary: #D1D5DB;
-    --color-text-muted: #9CA3AF;
-    --color-text-inverse: #000000;
-    --color-primary: #A78BFA;
-    --color-primary-dark: #8B5CF6;
-    --color-primary-light: #2E1065;
+    --color-border: #334155;
+    --shadow-neo: 0 1px 3px 0 rgba(0,0,0,0.3), 0 1px 2px -1px rgba(0,0,0,0.3);
+    --shadow-neo-sm: 0 1px 2px 0 rgba(0,0,0,0.2);
+    --shadow-neo-lg: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.3);
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #CBD5E1;
+    --color-text-muted: #64748B;
+    --color-text-inverse: #0F172A;
+    --color-primary: #3B82F6;
+    --color-primary-dark: #2563EB;
+    --color-primary-light: #172554;
     --color-success: #4ADE80;
     --color-success-bg: #052E16;
     --color-success-border: #22C55E;
@@ -104,12 +115,13 @@
     --color-tag-new-bg: #052E16;
     --color-tag-new-border: #4ADE80;
     --color-tag-new-text: #BBF7D0;
-    --color-tag-limited-bg: #2E1065;
-    --color-tag-limited-border: #A78BFA;
-    --color-tag-limited-text: #C4B5FD;
+    --color-tag-limited-bg: #172554;
+    --color-tag-limited-border: #60A5FA;
+    --color-tag-limited-text: #93C5FD;
     --color-tag-sale-bg: #422006;
     --color-tag-sale-border: #FACC15;
     --color-tag-sale-text: #FDE68A;
+    --theme-shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.3);
   }
 
   * {
@@ -146,26 +158,231 @@
   }
 }
 
+/* === 主題變體 — 放在 @layer 外確保不被 Tailwind cascade layer 覆蓋 === */
+
+/* Neo-Brutalism 復古風格 */
+[data-theme="neo-brutalism"] {
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F3F4F6;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #000000;
+  --shadow-neo: 4px 4px 0px 0px var(--color-border);
+  --shadow-neo-sm: 2px 2px 0px 0px var(--color-border);
+  --shadow-neo-lg: 6px 6px 0px 0px var(--color-border);
+  --color-text-primary: #000000;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #6B7280;
+  --color-text-inverse: #FFFFFF;
+  --color-primary: #8B5CF6;
+  --color-primary-dark: #7C3AED;
+  --color-primary-light: #EDE9FE;
+  --color-warning: #EAB308;
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #CA8A04;
+  --color-nav-logout: #FCA5A5;
+  --color-tag-limited-bg: #EDE9FE;
+  --color-tag-limited-border: #7C3AED;
+  --color-tag-limited-text: #3B0764;
+  --color-tag-sale-bg: #FEF9C3;
+  --color-tag-sale-border: #CA8A04;
+  --color-tag-sale-text: #713F12;
+  --theme-border-width: 3px;
+  --theme-radius: 0px;
+  --theme-radius-sm: 0px;
+  --theme-radius-lg: 0px;
+  --theme-shadow-hover: none;
+  --theme-font-weight-heading: 700;
+  --theme-font-weight-body: 500;
+}
+
+/* Clean Commerce 明確選取（與 :root 相同，用於主題切換按鈕標記） */
+[data-theme="clean-commerce"] {
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F8FAFC;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E2E8F0;
+  --shadow-neo: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1);
+  --shadow-neo-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
+  --shadow-neo-lg: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
+  --color-text-inverse: #FFFFFF;
+  --color-primary: #2563EB;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-light: #DBEAFE;
+  --color-success: #22C55E;
+  --color-success-bg: #F0FDF4;
+  --color-success-border: #16A34A;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #D97706;
+  --color-error: #EF4444;
+  --color-error-bg: #FEF2F2;
+  --color-error-border: #DC2626;
+  --color-info: #3B82F6;
+  --color-info-bg: #EFF6FF;
+  --color-info-border: #2563EB;
+  --color-nav-promotions: #FEF9C3;
+  --color-nav-orders: #DBEAFE;
+  --color-nav-coupons: #FFEDD5;
+  --color-nav-cart: #DCFCE7;
+  --color-nav-logout: #FEE2E2;
+  --color-tag-hot-bg: #FEE2E2;
+  --color-tag-hot-border: #DC2626;
+  --color-tag-hot-text: #7F1D1D;
+  --color-tag-new-bg: #DCFCE7;
+  --color-tag-new-border: #16A34A;
+  --color-tag-new-text: #14532D;
+  --color-tag-limited-bg: #DBEAFE;
+  --color-tag-limited-border: #2563EB;
+  --color-tag-limited-text: #1E3A5F;
+  --color-tag-sale-bg: #FEF3C7;
+  --color-tag-sale-border: #D97706;
+  --color-tag-sale-text: #713F12;
+  --theme-border-width: 1px;
+  --theme-radius: 12px;
+  --theme-radius-sm: 8px;
+  --theme-radius-lg: 16px;
+  --theme-shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+  --theme-font-weight-heading: 600;
+  --theme-font-weight-body: 400;
+}
+
+/* Warm Industrial 暖調工業風 */
+[data-theme="warm-industrial"] {
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #FFFBEB;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #D6D3D1;
+  --shadow-neo: 3px 3px 0 rgba(41,37,36,0.4);
+  --shadow-neo-sm: 2px 2px 0 rgba(41,37,36,0.3);
+  --shadow-neo-lg: 4px 4px 0 rgba(41,37,36,0.5);
+  --color-text-primary: #1C1917;
+  --color-text-secondary: #57534E;
+  --color-text-muted: #A8A29E;
+  --color-text-inverse: #FFFFFF;
+  --color-primary: #7C3AED;
+  --color-primary-dark: #6D28D9;
+  --color-primary-light: #EDE9FE;
+  --color-success: #22C55E;
+  --color-success-bg: #F0FDF4;
+  --color-success-border: #16A34A;
+  --color-warning: #EA580C;
+  --color-warning-bg: #FFF7ED;
+  --color-warning-border: #C2410C;
+  --color-error: #EF4444;
+  --color-error-bg: #FEF2F2;
+  --color-error-border: #DC2626;
+  --color-info: #7C3AED;
+  --color-info-bg: #EDE9FE;
+  --color-info-border: #6D28D9;
+  --color-nav-promotions: #FEF9C3;
+  --color-nav-orders: #EDE9FE;
+  --color-nav-coupons: #FFEDD5;
+  --color-nav-cart: #DCFCE7;
+  --color-nav-logout: #FEE2E2;
+  --color-tag-hot-bg: #FEE2E2;
+  --color-tag-hot-border: #DC2626;
+  --color-tag-hot-text: #7F1D1D;
+  --color-tag-new-bg: #DCFCE7;
+  --color-tag-new-border: #16A34A;
+  --color-tag-new-text: #14532D;
+  --color-tag-limited-bg: #EDE9FE;
+  --color-tag-limited-border: #7C3AED;
+  --color-tag-limited-text: #3B0764;
+  --color-tag-sale-bg: #FFF7ED;
+  --color-tag-sale-border: #EA580C;
+  --color-tag-sale-text: #7C2D12;
+  --theme-border-width: 2px;
+  --theme-radius: 2px;
+  --theme-radius-sm: 2px;
+  --theme-radius-lg: 4px;
+  --theme-shadow-hover: 4px 4px 0 rgba(41,37,36,0.5);
+  --theme-font-weight-heading: 700;
+  --theme-font-weight-body: 500;
+}
+
+/* Soft Depth 柔和深度風 */
+[data-theme="soft-depth"] {
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F9FAFB;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --shadow-neo: 0 2px 8px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-neo-sm: 0 1px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+  --shadow-neo-lg: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --color-text-primary: #111827;
+  --color-text-secondary: #4B5563;
+  --color-text-muted: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-primary: #6366F1;
+  --color-primary-dark: #4F46E5;
+  --color-primary-light: #EEF2FF;
+  --color-success: #14B8A6;
+  --color-success-bg: #F0FDFA;
+  --color-success-border: #0D9488;
+  --color-warning: #F59E0B;
+  --color-warning-bg: #FFFBEB;
+  --color-warning-border: #D97706;
+  --color-error: #EF4444;
+  --color-error-bg: #FEF2F2;
+  --color-error-border: #DC2626;
+  --color-info: #6366F1;
+  --color-info-bg: #EEF2FF;
+  --color-info-border: #4F46E5;
+  --color-nav-promotions: #FEF9C3;
+  --color-nav-orders: #EEF2FF;
+  --color-nav-coupons: #F0FDFA;
+  --color-nav-cart: #DCFCE7;
+  --color-nav-logout: #FEE2E2;
+  --color-tag-hot-bg: #FEE2E2;
+  --color-tag-hot-border: #DC2626;
+  --color-tag-hot-text: #7F1D1D;
+  --color-tag-new-bg: #F0FDFA;
+  --color-tag-new-border: #14B8A6;
+  --color-tag-new-text: #134E4A;
+  --color-tag-limited-bg: #EEF2FF;
+  --color-tag-limited-border: #6366F1;
+  --color-tag-limited-text: #312E81;
+  --color-tag-sale-bg: #FEF3C7;
+  --color-tag-sale-border: #D97706;
+  --color-tag-sale-text: #713F12;
+  --theme-border-width: 0px;
+  --theme-radius: 16px;
+  --theme-radius-sm: 12px;
+  --theme-radius-lg: 20px;
+  --theme-shadow-hover: 0 8px 24px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
+  --theme-font-weight-heading: 600;
+  --theme-font-weight-body: 400;
+}
+
 @layer components {
+  /* 主題感知元件類別 — 使用 CSS 變數實現多主題相容 */
   .btn-neo {
-    @apply border-3 bg-primary text-white font-bold px-6 py-3;
+    border-width: var(--theme-border-width);
     border-color: var(--color-border);
+    border-radius: var(--theme-radius-sm);
     box-shadow: var(--shadow-neo);
-    @apply transition-all;
-    @apply active:translate-x-[2px] active:translate-y-[2px] active:shadow-none;
+    font-weight: var(--theme-font-weight-heading);
+    @apply bg-primary text-white px-6 py-3 transition-all;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .card-neo {
-    @apply border-3 p-6;
-    background-color: var(--color-surface);
+    border-width: var(--theme-border-width);
     border-color: var(--color-border);
+    border-radius: var(--theme-radius);
     box-shadow: var(--shadow-neo);
+    background-color: var(--color-surface);
+    @apply p-6;
   }
 
   .input-neo {
-    @apply border-3 px-4 py-2 w-full;
+    border-width: var(--theme-border-width);
     border-color: var(--color-border);
+    border-radius: var(--theme-radius-sm);
+    @apply px-4 py-2 w-full;
     @apply focus:outline-none focus:ring-2 focus:ring-primary;
   }
 }
@@ -179,6 +396,22 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  /* 主題感知圓角 */
+  .rounded-theme {
+    border-radius: var(--theme-radius);
+  }
+  .rounded-theme-sm {
+    border-radius: var(--theme-radius-sm);
+  }
+  .rounded-theme-lg {
+    border-radius: var(--theme-radius-lg);
+  }
+
+  /* 主題感知邊框寬度 */
+  .border-theme {
+    border-width: var(--theme-border-width);
+  }
 }
 
 /* 頁面進場動畫 */
@@ -187,3 +420,56 @@
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-page-enter { animation: fadeIn 0.2s ease-out; }
+
+/* 骨架屏 Shimmer 動畫 — 替代 animate-pulse 更絲滑 */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-secondary) 25%,
+    var(--shimmer-highlight, rgba(255,255,255,0.5)) 50%,
+    var(--color-surface-secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+.dark .animate-shimmer {
+  --shimmer-highlight: rgba(255,255,255,0.08);
+}
+
+/* 骨架屏淡出 → 內容淡入過渡 */
+@keyframes skeletonFadeOut {
+  from { opacity: 1; filter: blur(0); }
+  to { opacity: 0; filter: blur(2px); }
+}
+@keyframes contentFadeIn {
+  from { opacity: 0; transform: translateY(6px); filter: blur(2px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.animate-skeleton-exit { animation: skeletonFadeOut 0.2s ease-out forwards; }
+.animate-content-enter { animation: contentFadeIn 0.3s ease-out forwards; }
+
+/* 列表項目交錯進場 */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-stagger-item {
+  opacity: 0;
+  animation: slideUp 0.3s ease-out forwards;
+}
+.animate-stagger-item:nth-child(1) { animation-delay: 0.02s; }
+.animate-stagger-item:nth-child(2) { animation-delay: 0.04s; }
+.animate-stagger-item:nth-child(3) { animation-delay: 0.06s; }
+.animate-stagger-item:nth-child(4) { animation-delay: 0.08s; }
+.animate-stagger-item:nth-child(5) { animation-delay: 0.10s; }
+.animate-stagger-item:nth-child(6) { animation-delay: 0.12s; }
+.animate-stagger-item:nth-child(7) { animation-delay: 0.14s; }
+.animate-stagger-item:nth-child(8) { animation-delay: 0.16s; }
+.animate-stagger-item:nth-child(9) { animation-delay: 0.18s; }
+.animate-stagger-item:nth-child(10) { animation-delay: 0.20s; }
+.animate-stagger-item:nth-child(11) { animation-delay: 0.22s; }
+.animate-stagger-item:nth-child(12) { animation-delay: 0.24s; }

@@ -96,7 +96,7 @@ export function MemberForm({
 
       {/* 成功訊息 */}
       {state?.message && state.success && (
-        <div className="rounded-none border-2 md:border-3 border-green-600 bg-green-50 p-4">
+        <div className="rounded-theme-sm border-theme border-green-600 bg-green-50 p-4">
           <p className="text-sm font-bold text-green-800">{state.message}</p>
         </div>
       )}

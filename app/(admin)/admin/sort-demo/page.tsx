@@ -53,7 +53,7 @@ export default function SortDemoPage() {
     <div className="min-h-screen bg-surface-secondary p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* 成功提示 */}
-        <div className="mb-6 rounded-none border-3 border-green-600 bg-success-bg p-6">
+        <div className="mb-6 rounded-theme-sm border border-green-600 bg-success-bg p-6">
           <h2 className="mb-2 flex items-center gap-2 text-xl font-bold text-success">
             ✅ 整合版已上線！
           </h2>
@@ -62,7 +62,7 @@ export default function SortDemoPage() {
           </p>
           <a
             href="/admin/announcements"
-            className="inline-block rounded-none border-3 border-black bg-green-400 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+            className="inline-block rounded-theme-sm border bg-green-400 px-6 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
           >
             前往首頁廣告管理 →
           </a>
@@ -79,7 +79,7 @@ export default function SortDemoPage() {
         {/* 三個方案展示 */}
         <div className="space-y-8">
           {/* 方案一：拖曳排序 */}
-          <section className="rounded-lg border-3 border-black bg-surface p-6 shadow-neo">
+          <section className="rounded-lg border bg-surface p-6 shadow-neo">
             <div className="mb-4 flex items-start justify-between">
               <div>
                 <h2 className="mb-1 text-2xl font-bold">
@@ -89,7 +89,7 @@ export default function SortDemoPage() {
                   最直覺的操作方式 - 按住項目拖曳到想要的位置
                 </p>
               </div>
-              <span className="rounded-none border-2 border-green-600 bg-green-100 px-3 py-1 text-sm font-bold text-success">
+              <span className="rounded-theme-sm border border-green-600 bg-green-100 px-3 py-1 text-sm font-bold text-success">
                 推薦
               </span>
             </div>
@@ -97,7 +97,7 @@ export default function SortDemoPage() {
           </section>
 
           {/* 方案二：數字輸入排序 */}
-          <section className="rounded-lg border-3 border-black bg-surface p-6 shadow-neo">
+          <section className="rounded-lg border bg-surface p-6 shadow-neo">
             <div className="mb-4">
               <h2 className="mb-1 text-2xl font-bold">
                 方案二：數字輸入排序 🔢
@@ -110,7 +110,7 @@ export default function SortDemoPage() {
           </section>
 
           {/* 方案三：快速操作排序 */}
-          <section className="rounded-lg border-3 border-black bg-surface p-6 shadow-neo">
+          <section className="rounded-lg border bg-surface p-6 shadow-neo">
             <div className="mb-4">
               <h2 className="mb-1 text-2xl font-bold">
                 方案三：快速操作排序 ⚡
@@ -124,7 +124,7 @@ export default function SortDemoPage() {
         </div>
 
         {/* 說明 */}
-        <div className="mt-8 rounded-lg border-2 border-blue-600 bg-info-bg p-6">
+        <div className="mt-8 rounded-lg border border-blue-600 bg-info-bg p-6">
           <h3 className="mb-3 text-lg font-bold text-blue-900">💡 操作說明</h3>
           <div className="space-y-2 text-sm text-blue-800">
             <p>
@@ -146,7 +146,7 @@ export default function SortDemoPage() {
         <div className="mt-8 text-center">
           <a
             href="/admin/announcements"
-            className="inline-block rounded-none border-3 border-black bg-surface-secondary px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            className="inline-block rounded-theme-sm border bg-surface-secondary px-6 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98]"
           >
             ← 回到首頁廣告管理
           </a>

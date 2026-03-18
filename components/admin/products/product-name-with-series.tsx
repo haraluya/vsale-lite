@@ -27,12 +27,12 @@ export function ProductNameWithSeries({
           inline-flex items-center justify-center
           px-3 py-1.5
           text-sm font-bold
-          border-2 border-black
+          border
           shadow-neo-sm
-          rounded-none
+          rounded-theme-sm
           whitespace-nowrap
           transition-transform
-          hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none
+          hover:-translate-y-0.5 hover:shadow-theme-hover
         "
         style={{
           backgroundColor: seriesColor,

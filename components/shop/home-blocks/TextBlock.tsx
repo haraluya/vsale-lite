@@ -40,10 +40,10 @@ export function TextBlock({ config }: TextBlockProps) {
   return (
     <div
       className={cn(
-        'w-full rounded-none bg-surface',
-        designTokens.neoBrutalism.border.full,
-        'border-black',
-        designTokens.neoBrutalism.shadow.full,
+        'w-full rounded-theme-sm bg-surface',
+        designTokens.cleanCommerce.border.full,
+        'border-border',
+        designTokens.cleanCommerce.shadow.full,
         'p-4 md:p-6'
       )}
     >

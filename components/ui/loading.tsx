@@ -8,16 +8,16 @@ interface LoadingProps {
 
 export function Loading({ message = '載入中...', size = 'md', className }: LoadingProps) {
   const sizeClasses = {
-    sm: 'h-8 w-8 border-2',
-    md: 'h-12 w-12 border-2 md:border-3',
-    lg: 'h-16 w-16 border-4',
+    sm: 'h-8 w-8 border',
+    md: 'h-12 w-12 border',
+    lg: 'h-16 w-16 border',
   }
 
   return (
     <div className={cn('flex flex-col items-center justify-center gap-4 p-8', className)}>
       <div
         className={cn(
-          'animate-spin rounded-none border-t-transparent',
+          'animate-spin rounded-full border-primary border-t-transparent',
           sizeClasses[size]
         )}
         aria-label="載入中"
@@ -39,7 +39,7 @@ export function LoadingSpinner({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'h-4 w-4 animate-spin rounded-none border-2 border-t-transparent',
+        'h-4 w-4 animate-spin rounded-full border border-primary border-t-transparent',
         className
       )}
       aria-label="載入中"

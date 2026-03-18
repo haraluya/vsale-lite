@@ -226,7 +226,7 @@ export function DialogSamplesContent() {
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
         {/* 標題 */}
-        <div className="mb-8 border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+        <div className="mb-8 border-theme bg-white p-6 shadow-neo">
           <h1 className="text-3xl font-bold mb-2">對話框樣本頁面</h1>
           <p className="text-gray-700">
             Phase 0: 設計樣本確認 - 請測試所有對話框變體，確認 Neo-Brutalism 設計風格無誤
@@ -235,7 +235,7 @@ export function DialogSamplesContent() {
 
         {/* 操作結果顯示 */}
         {lastResult && (
-          <div className="mb-8 border-2 md:border-3 border-black bg-blue-50 p-4 shadow-neo-sm">
+          <div className="mb-8 border-theme bg-blue-50 p-4 shadow-neo-sm">
             <p className="text-sm font-bold text-gray-800">上一次操作結果:</p>
             <p className="text-sm text-gray-700 mt-1">{lastResult}</p>
           </div>
@@ -243,8 +243,8 @@ export function DialogSamplesContent() {
 
         <div className="grid gap-8 md:grid-cols-2">
           {/* AlertDialog 區塊 */}
-          <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-            <h2 className="text-xl font-bold mb-4 border-b-2 md:border-b-3 border-black pb-2">AlertDialog 四種變體</h2>
+          <div className="border-theme bg-white p-6 shadow-neo">
+            <h2 className="text-xl font-bold mb-4 border-b pb-2">AlertDialog 四種變體</h2>
             <div className="space-y-3">
               <Button onClick={handleAlertSuccess} variant="success">
                 Success Alert
@@ -262,8 +262,8 @@ export function DialogSamplesContent() {
           </div>
 
           {/* ConfirmDialog 區塊 */}
-          <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-            <h2 className="text-xl font-bold mb-4 border-b-2 md:border-b-3 border-black pb-2">
+          <div className="border-theme bg-white p-6 shadow-neo">
+            <h2 className="text-xl font-bold mb-4 border-b pb-2">
               ConfirmDialog 六種變體
             </h2>
             <div className="space-y-3">
@@ -289,8 +289,8 @@ export function DialogSamplesContent() {
           </div>
 
           {/* PromptDialog 區塊 */}
-          <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-            <h2 className="text-xl font-bold mb-4 border-b-2 md:border-b-3 border-black pb-2">
+          <div className="border-theme bg-white p-6 shadow-neo">
+            <h2 className="text-xl font-bold mb-4 border-b pb-2">
               PromptDialog 輸入對話框
             </h2>
             <div className="space-y-3">
@@ -304,8 +304,8 @@ export function DialogSamplesContent() {
           </div>
 
           {/* Toast 區塊 */}
-          <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
-            <h2 className="text-xl font-bold mb-4 border-b-2 md:border-b-3 border-black pb-2">Toast 通知 (sonner)</h2>
+          <div className="border-theme bg-white p-6 shadow-neo">
+            <h2 className="text-xl font-bold mb-4 border-b pb-2">Toast 通知 (sonner)</h2>
             <div className="space-y-3">
               <Button onClick={handleToastSuccess} variant="success">
                 Success Toast
@@ -324,12 +324,12 @@ export function DialogSamplesContent() {
         </div>
 
         {/* 測試說明 */}
-        <div className="mt-8 border-2 md:border-3 border-black bg-yellow-50 p-6 shadow-neo">
+        <div className="mt-8 border-theme bg-yellow-50 p-6 shadow-neo">
           <h3 className="text-lg font-bold mb-3">測試檢查清單</h3>
           <ul className="space-y-2 text-sm text-gray-800">
             <li>✅ 所有對話框包含 3px 黑邊框</li>
             <li>✅ 對話框陰影為硬陰影（8px_8px_0px_0px_rgba(0,0,0,1)）</li>
-            <li>✅ 按鈕點擊有位移效果（translate-x-[2px] translate-y-[2px]）</li>
+            <li>✅ 按鈕點擊有位移效果（-translate-y-0.5 shadow-theme-hover）</li>
             <li>✅ 按鈕點擊時陰影消失</li>
             <li>✅ 標題欄顏色正確（success 綠、error 紅、warning 黃、info 藍）</li>
             <li>✅ ESC 鍵可關閉對話框</li>
@@ -341,7 +341,7 @@ export function DialogSamplesContent() {
         </div>
 
         {/* 使用者確認區 */}
-        <div className="mt-8 border-2 md:border-3 border-black bg-green-50 p-6 shadow-neo">
+        <div className="mt-8 border-theme bg-green-50 p-6 shadow-neo">
           <h3 className="text-lg font-bold mb-3">確認進入下一階段</h3>
           <p className="text-sm text-gray-800 mb-4">
             若您確認所有對話框設計風格無誤，請明確同意進入後續實作階段（遷移 72 個原生對話框）。
@@ -381,13 +381,13 @@ function Button({
       onClick={onClick}
       className={`
         w-full px-4 py-2
-        border-2 md:border-3 border-black
+        border-theme
         ${variantStyles[variant]}
         ${variant === 'default' ? 'text-gray-800' : 'text-white'}
         font-bold text-sm uppercase
-        shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+        shadow-neo
         transition-all duration-150
-        hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+        hover:-translate-y-0.5 hover:shadow-theme-hover
         focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
       `}
     >

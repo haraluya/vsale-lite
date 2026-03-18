@@ -109,15 +109,15 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
   return (
     <div
       className={`
-        flex flex-col rounded-none bg-white
-        ${designTokens.neoBrutalism.border.full}
-        ${designTokens.neoBrutalism.shadow.full}
-        border-black
+        flex flex-col rounded-theme-sm bg-white
+        ${designTokens.cleanCommerce.border.full}
+        ${designTokens.cleanCommerce.shadow.full}
+       
         overflow-hidden
       `}
     >
       {/* 縮圖 */}
-      <div className="relative w-full h-48 border-b-2 border-black">
+      <div className="relative w-full h-48 border-b">
         {renderThumbnail()}
       </div>
 
@@ -159,10 +159,10 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
             onClick={() => onMoveUp(block.id)}
             disabled={isFirst}
             className={`
-              flex-1 flex items-center justify-center gap-1 py-2 rounded-none
+              flex-1 flex items-center justify-center gap-1 py-2 rounded-theme-sm
               font-medium
-              ${designTokens.neoBrutalism.border.mobile}
-              border-black
+              ${designTokens.cleanCommerce.border.base}
+             
               transition-all
               ${
                 isFirst
@@ -179,10 +179,10 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
             onClick={() => onMoveDown(block.id)}
             disabled={isLast}
             className={`
-              flex-1 flex items-center justify-center gap-1 py-2 rounded-none
+              flex-1 flex items-center justify-center gap-1 py-2 rounded-theme-sm
               font-medium
-              ${designTokens.neoBrutalism.border.mobile}
-              border-black
+              ${designTokens.cleanCommerce.border.base}
+             
               transition-all
               ${
                 isLast
@@ -201,10 +201,10 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
           <button
             onClick={() => onEdit(block.id)}
             className={`
-              flex-1 flex items-center justify-center gap-2 py-2 rounded-none
+              flex-1 flex items-center justify-center gap-2 py-2 rounded-theme-sm
               bg-blue-500 text-white font-medium
-              ${designTokens.neoBrutalism.border.mobile}
-              border-black
+              ${designTokens.cleanCommerce.border.base}
+             
               hover:translate-x-[1px] hover:translate-y-[1px]
               transition-all
             `}
@@ -216,10 +216,10 @@ export function HomeBlockCard({ block, isFirst, isLast, onEdit, onDelete, onMove
           <button
             onClick={handleDelete}
             className={`
-              flex-1 flex items-center justify-center gap-2 py-2 rounded-none
+              flex-1 flex items-center justify-center gap-2 py-2 rounded-theme-sm
               bg-red-600 text-white font-medium
-              ${designTokens.neoBrutalism.border.mobile}
-              border-black
+              ${designTokens.cleanCommerce.border.base}
+             
               hover:translate-x-[1px] hover:translate-y-[1px]
               transition-all
             `}

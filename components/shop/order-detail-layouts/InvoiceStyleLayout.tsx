@@ -22,7 +22,7 @@ export function InvoiceStyleLayout({ order }: Props) {
   return (
     <div className="max-w-4xl mx-auto">
       {/* 發票標題區 */}
-      <div className="rounded-none border-3 border-black bg-surface shadow-neo mb-6">
+      <div className="rounded-theme-sm border bg-surface shadow-neo mb-6">
         <div className="bg-black text-white px-6 md:px-8 py-4 md:py-5">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
@@ -34,7 +34,7 @@ export function InvoiceStyleLayout({ order }: Props) {
         </div>
 
         {/* 訂單資訊 */}
-        <div className="px-6 md:px-8 py-5 border-b-3 border-black">
+        <div className="px-6 md:px-8 py-5 border-b">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
               <div className="font-bold text-xs text-text-secondary mb-1">訂單編號</div>
@@ -65,7 +65,7 @@ export function InvoiceStyleLayout({ order }: Props) {
           {/* 桌面版表格 */}
           <table className="w-full hidden md:table">
             <thead>
-              <tr className="bg-surface-secondary border-b-3 border-black">
+              <tr className="bg-surface-secondary border-b">
                 <th className="px-6 py-3 text-left text-xs font-black uppercase">商品</th>
                 <th className="px-6 py-3 text-right text-xs font-black uppercase w-24">單價</th>
                 <th className="px-6 py-3 text-center text-xs font-black uppercase w-20">數量</th>
@@ -85,7 +85,7 @@ export function InvoiceStyleLayout({ order }: Props) {
                     return (
                       <tr key={comboDealItem.id} className="border-b-2 border-gray-200">
                         <td className="px-6 py-4" colSpan={4}>
-                          <div className="bg-yellow-50 border-2 border-yellow-500 p-4">
+                          <div className="bg-yellow-50 border border-yellow-500 p-4">
                             <div className="flex items-center justify-between mb-3">
                               <span className="font-black text-yellow-900">📦 {snapshot.name}</span>
                               <span className="text-xs font-bold bg-yellow-200 border border-yellow-600 px-2 py-1">
@@ -127,7 +127,7 @@ export function InvoiceStyleLayout({ order }: Props) {
                       <div className="font-bold">{item.product_name_snapshot}</div>
                       {seriesName && (
                         <div className="mt-1">
-                          <span className="inline-block bg-blue-100 border-2 border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
+                          <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
                             {seriesName}
                           </span>
                         </div>
@@ -157,7 +157,7 @@ export function InvoiceStyleLayout({ order }: Props) {
 
                   return (
                     <div key={comboDealItem.id} className="p-5">
-                      <div className="bg-yellow-50 border-2 border-yellow-500 p-4">
+                      <div className="bg-yellow-50 border border-yellow-500 p-4">
                         <div className="flex items-start justify-between mb-3">
                           <span className="font-black text-yellow-900 flex-1">📦 {snapshot.name}</span>
                           <span className="text-xs font-bold bg-yellow-200 border border-yellow-600 px-2 py-1 ml-2">
@@ -198,7 +198,7 @@ export function InvoiceStyleLayout({ order }: Props) {
                     <div className="flex-1">
                       <div className="font-bold mb-1">{item.product_name_snapshot}</div>
                       {seriesName && (
-                        <span className="inline-block bg-blue-100 border-2 border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
+                        <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
                           {seriesName}
                         </span>
                       )}
@@ -217,7 +217,7 @@ export function InvoiceStyleLayout({ order }: Props) {
         </div>
 
         {/* 金額摘要區 */}
-        <div className="px-6 md:px-8 py-5 bg-surface-secondary border-t-3 border-black">
+        <div className="px-6 md:px-8 py-5 bg-surface-secondary border-t">
           <div className="max-w-md ml-auto space-y-2.5">
             {/* 商品小計 */}
             <div className="flex justify-between text-sm">
@@ -281,7 +281,7 @@ export function InvoiceStyleLayout({ order }: Props) {
             )}
 
             {/* 總計 */}
-            <div className="flex justify-between items-center pt-3 border-t-3 border-black">
+            <div className="flex justify-between items-center pt-3 border-t">
               <span className="text-xl font-black">訂單總金額</span>
               <span className="text-3xl font-black text-success">
                 {formatCurrency(order.total_amount)}
@@ -292,7 +292,7 @@ export function InvoiceStyleLayout({ order }: Props) {
 
         {/* 訂單備註 */}
         {order.notes && (
-          <div className="px-6 md:px-8 py-5 border-t-3 border-black bg-yellow-50">
+          <div className="px-6 md:px-8 py-5 border-t bg-yellow-50">
             <div className="font-black text-sm mb-2">訂單備註</div>
             <div className="text-sm text-foreground">{order.notes}</div>
           </div>

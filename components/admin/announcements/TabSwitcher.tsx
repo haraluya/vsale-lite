@@ -21,14 +21,14 @@ export function TabSwitcher() {
       <button
         onClick={() => handleTabChange('home')}
         className={`
-          flex-1 py-3 px-6 rounded-none font-medium
-          ${designTokens.neoBrutalism.border.full}
-          ${designTokens.neoBrutalism.shadow.full}
-          border-black
+          flex-1 py-3 px-6 rounded-theme-sm font-medium
+          ${designTokens.cleanCommerce.border.full}
+          ${designTokens.cleanCommerce.shadow.full}
+         
           transition-all
           ${
             currentTab === 'home'
-              ? 'bg-green-400 translate-x-[2px] translate-y-[2px] shadow-none'
+              ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
           }
         `}
@@ -39,14 +39,14 @@ export function TabSwitcher() {
       <button
         onClick={() => handleTabChange('products')}
         className={`
-          flex-1 py-3 px-6 rounded-none font-medium
-          ${designTokens.neoBrutalism.border.full}
-          ${designTokens.neoBrutalism.shadow.full}
-          border-black
+          flex-1 py-3 px-6 rounded-theme-sm font-medium
+          ${designTokens.cleanCommerce.border.full}
+          ${designTokens.cleanCommerce.shadow.full}
+         
           transition-all
           ${
             currentTab === 'products'
-              ? 'bg-green-400 translate-x-[2px] translate-y-[2px] shadow-none'
+              ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
           }
         `}

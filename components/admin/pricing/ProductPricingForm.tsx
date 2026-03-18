@@ -121,12 +121,12 @@ export function ProductPricingForm() {
   return (
     <div className="space-y-6">
       {/* 商品選擇器 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
         <label className="mb-3 block font-bold">選擇商品（依分類排序）</label>
         <select
           value={selectedProductId}
           onChange={(e) => setSelectedProductId(e.target.value)}
-          className="w-full rounded-none border-2 border-black px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400"
+          className="w-full rounded-theme-sm border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-400"
         >
           <option value="">請選擇商品...</option>
           {categoryList.map((categoryName) => {
@@ -151,16 +151,16 @@ export function ProductPricingForm() {
 
       {/* 載入中 */}
       {isLoading && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-white p-12 text-center shadow-neo">
           <p className="text-lg text-gray-500">載入中...</p>
         </div>
       )}
 
       {/* 價格矩陣表格 */}
       {!isLoading && productData && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
           {/* 商品資訊 */}
-          <div className="mb-6 rounded-none border-2 border-black bg-blue-50 p-4">
+          <div className="mb-6 rounded-theme-sm border bg-blue-50 p-4">
             <h3 className="font-bold">
               {productData.product.code} - {productData.product.name}
             </h3>
@@ -192,7 +192,7 @@ export function ProductPricingForm() {
                         type="number"
                         value={productData.product.retail_price || ''}
                         disabled
-                        className="w-full rounded-none border-2 border-gray-400 bg-gray-100 px-4 py-2 text-gray-500"
+                        className="w-full rounded-theme-sm border border-gray-400 bg-gray-100 px-4 py-2 text-gray-500"
                       />
                       <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
                         <InfoIcon className="h-3 w-3" />
@@ -208,7 +208,7 @@ export function ProductPricingForm() {
                         placeholder="請輸入價格"
                         step="1"
                         min="0"
-                        className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
+                        className="w-full rounded-theme-sm border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
                       />
                     </div>
                   )}
@@ -222,7 +222,7 @@ export function ProductPricingForm() {
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="rounded-none border-2 md:border-3 border-black bg-green-400 px-8 py-3 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-theme-sm border-theme bg-green-400 px-8 py-3 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSaving ? '儲存中...' : '儲存價格'}
             </button>
@@ -232,7 +232,7 @@ export function ProductPricingForm() {
 
       {/* 提示訊息 */}
       {!isLoading && !productData && (
-        <div className="rounded-none border-2 md:border-3 border-black bg-green-50 p-8 text-center shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-green-50 p-8 text-center shadow-neo">
           <p className="text-lg font-bold">請選擇商品</p>
           <p className="mt-4 text-sm text-gray-600">
             選擇商品後,可設定該商品在各會員等級的價格

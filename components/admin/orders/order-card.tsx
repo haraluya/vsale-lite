@@ -10,7 +10,7 @@
 import { memo } from 'react'
 import { PrefetchLink } from '@/components/admin/prefetch-link'
 import { OrderStatusBadge } from '@/components/shop/order-status-badge'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { formatDateTW, formatAmount } from '@/lib/date-utils'
 import type { OrderWithUser } from '@/types'
@@ -29,8 +29,8 @@ export const OrderCard = memo(
       <PrefetchLink
         href={`/admin/orders/${order.id}`}
         className={cn(
-          'block rounded-none bg-white',
-          getNeoBrutalismClasses({ active: true }),
+          'block rounded-theme-sm bg-white',
+          getThemeClasses({ active: true }),
           designTokens.spacing.card.padding,
           designTokens.spacing.card.gap
         )}

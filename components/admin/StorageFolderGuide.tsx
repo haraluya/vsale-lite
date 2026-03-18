@@ -7,7 +7,7 @@
 
 export function StorageFolderGuide() {
   return (
-    <div className="rounded-none border-2 border-black bg-amber-50 p-6 shadow-neo-sm md:border-3 md:shadow-neo">
+    <div className="rounded-theme-sm border bg-amber-50 p-6 shadow-neo-sm md:border md:shadow-neo">
       <h3 className="mb-4 text-xl font-bold">📁 Supabase Storage 圖片資料夾結構</h3>
 
       <div className="space-y-6">
@@ -20,7 +20,7 @@ export function StorageFolderGuide() {
           <p className="mb-2 text-sm text-text-secondary">
             Bucket: <code className="rounded bg-surface px-2 py-1 font-mono text-xs">products</code>
           </p>
-          <pre className="overflow-x-auto rounded-none border-2 border-black bg-surface p-4 text-sm">
+          <pre className="overflow-x-auto rounded-theme-sm border bg-surface p-4 text-sm">
 {`products/
 ├── {product_id_1}/
 │   └── main.{ext}      (商品主圖，ext: jpg/png/webp)
@@ -39,7 +39,7 @@ export function StorageFolderGuide() {
           <p className="mb-2 text-sm text-text-secondary">
             Bucket: <code className="rounded bg-surface px-2 py-1 font-mono text-xs">public</code>
           </p>
-          <pre className="overflow-x-auto rounded-none border-2 border-black bg-surface p-4 text-sm">
+          <pre className="overflow-x-auto rounded-theme-sm border bg-surface p-4 text-sm">
 {`public/
 ├── logo.{ext}          (完整版 Logo 200×60)
 ├── logo-icon.{ext}     (圖示版 Logo 60×60)
@@ -56,7 +56,7 @@ export function StorageFolderGuide() {
           <p className="mb-2 text-sm text-text-secondary">
             Bucket: <code className="rounded bg-surface px-2 py-1 font-mono text-xs">announcements</code>
           </p>
-          <pre className="overflow-x-auto rounded-none border-2 border-black bg-surface p-4 text-sm">
+          <pre className="overflow-x-auto rounded-theme-sm border bg-surface p-4 text-sm">
 {`announcements/
 ├── {announcement_id_1}.{ext}
 ├── {announcement_id_2}.{ext}
@@ -66,7 +66,7 @@ export function StorageFolderGuide() {
       </div>
 
       {/* 手動上傳指引 */}
-      <div className="mt-6 rounded-none border-2 border-blue-600 bg-info-bg p-4">
+      <div className="mt-6 rounded-theme-sm border border-blue-600 bg-info-bg p-4">
         <h4 className="mb-2 font-bold text-blue-900">💡 手動上傳指引</h4>
         <ol className="list-inside list-decimal space-y-1 text-sm text-blue-900">
           <li>前往 Supabase Dashboard → Storage</li>

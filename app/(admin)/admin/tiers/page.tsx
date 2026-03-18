@@ -3,7 +3,7 @@ import { TierTable } from '@/components/admin/tier-table'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getPageContainerClasses, getThemeClasses } from '@/lib/design-tokens'
 import { generatePageMetadata } from '@/lib/metadata'
 
 export async function generateMetadata() {
@@ -24,8 +24,8 @@ export default async function TiersPage() {
         <Link
           href="/admin/tiers/new"
           className={cn(
-            "inline-flex items-center gap-2 rounded-none bg-primary font-bold text-white transition-all",
-            getNeoBrutalismClasses({ hover: true }),
+            "inline-flex items-center gap-2 rounded-theme-sm bg-primary font-bold text-white transition-all",
+            getThemeClasses({ hover: true }),
             designTokens.button.md
           )}
         >

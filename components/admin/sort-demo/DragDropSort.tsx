@@ -54,7 +54,7 @@ function SortableItem({ block, index }: SortableItemProps) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center gap-3 rounded-none border-2 border-black bg-white p-4 shadow-neo-sm transition-all ${
+      className={`flex items-center gap-3 rounded-theme-sm border bg-white p-4 shadow-neo-sm transition-all ${
         isDragging ? 'z-50 rotate-2 opacity-50 shadow-neo' : 'hover:shadow-neo'
       }`}
     >
@@ -68,12 +68,12 @@ function SortableItem({ block, index }: SortableItemProps) {
       </div>
 
       {/* 順序號碼 */}
-      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-none border-2 border-black bg-yellow-300 font-bold">
+      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-theme-sm border bg-yellow-300 font-bold">
         {index + 1}
       </div>
 
       {/* 圖示 */}
-      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none border-2 border-black bg-gray-100">
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-theme-sm border bg-gray-100">
         {getIcon()}
       </div>
 
@@ -136,7 +136,7 @@ export function DragDropSort({ initialBlocks }: DragDropSortProps) {
   return (
     <div>
       {/* 說明 */}
-      <div className="mb-4 rounded-none border-2 border-blue-600 bg-blue-50 p-3">
+      <div className="mb-4 rounded-theme-sm border border-blue-600 bg-blue-50 p-3">
         <p className="text-sm text-blue-800">
           💡 <strong>操作方式：</strong>按住左側的
           <GripVertical className="mx-1 inline h-4 w-4" />
@@ -164,9 +164,9 @@ export function DragDropSort({ initialBlocks }: DragDropSortProps) {
         <button
           onClick={handleSave}
           disabled={!hasChanges}
-          className={`flex items-center gap-2 rounded-none border-3 border-black px-6 py-3 font-bold transition-all ${
+          className={`flex items-center gap-2 rounded-theme-sm border px-6 py-3 font-bold transition-all ${
             hasChanges
-              ? 'bg-green-400 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              ? 'bg-green-400 hover:-translate-y-0.5 hover:shadow-theme-hover'
               : 'cursor-not-allowed bg-gray-300 text-gray-500'
           }`}
         >
@@ -176,9 +176,9 @@ export function DragDropSort({ initialBlocks }: DragDropSortProps) {
         <button
           onClick={handleReset}
           disabled={!hasChanges}
-          className={`rounded-none border-3 border-black px-6 py-3 font-bold transition-all ${
+          className={`rounded-theme-sm border px-6 py-3 font-bold transition-all ${
             hasChanges
-              ? 'bg-gray-200 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              ? 'bg-gray-200 hover:-translate-y-0.5 hover:shadow-theme-hover'
               : 'cursor-not-allowed bg-gray-300 text-gray-500'
           }`}
         >

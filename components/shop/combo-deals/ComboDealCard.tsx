@@ -44,17 +44,17 @@ export function ComboDealCard({ deal }: ComboDealCardProps) {
   return (
     <Link href={`/store/combo-deals/${deal.id}`}>
       <div className={cn(
-        "group h-full rounded-none bg-surface transition-all",
-        designTokens.neoBrutalism.border.full,
-        "border-black",
-        designTokens.neoBrutalism.shadow.full,
-        designTokens.neoBrutalism.hover
+        "group h-full rounded-theme-sm bg-surface transition-all",
+        designTokens.cleanCommerce.border.full,
+        "border-border",
+        designTokens.cleanCommerce.shadow.full,
+        designTokens.cleanCommerce.hover
       )}>
         {/* 海報圖片 (正方形比例，與系列卡片一致) */}
         <div className={cn(
           "relative aspect-square overflow-hidden",
-          designTokens.neoBrutalism.border.mobile,
-          "md:border-b-3",
+          designTokens.cleanCommerce.border.base,
+          "md:border-b",
           "border-b-black"
         )}>
           <Image
@@ -70,9 +70,9 @@ export function ComboDealCard({ deal }: ComboDealCardProps) {
           {/* 組合模式標籤（左下角） */}
           <div className="absolute left-2 bottom-2 z-10">
             <span className={cn(
-              "inline-block rounded-none bg-purple-300 font-bold",
-              designTokens.neoBrutalism.border.mobile,
-              "border-black",
+              "inline-block rounded-theme-sm bg-purple-300 font-bold",
+              designTokens.cleanCommerce.border.base,
+              "border-border",
               "shadow-neo-sm",
               "px-2 py-1.5 md:px-3 md:py-2",
               "text-xs md:text-sm",
@@ -85,9 +85,9 @@ export function ComboDealCard({ deal }: ComboDealCardProps) {
           {/* 折扣標籤（右下角） */}
           <div className="absolute right-2 bottom-2 z-10">
             <span className={cn(
-              "inline-block rounded-none bg-red-500 text-white font-bold transition-all group-hover:bg-red-600",
-              designTokens.neoBrutalism.border.mobile,
-              "border-black",
+              "inline-block rounded-theme-sm bg-red-500 text-white font-bold transition-all group-hover:bg-red-600",
+              designTokens.cleanCommerce.border.base,
+              "border-border",
               "shadow-neo-sm",
               "px-2 py-1.5 md:px-3 md:py-2",
               "text-xs md:text-sm",

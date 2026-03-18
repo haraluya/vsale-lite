@@ -21,10 +21,10 @@ export function CarouselSkeleton() {
     )}>
       <div
         className={cn(
-          'relative w-full aspect-[16/9] rounded-none bg-surface-secondary animate-pulse',
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
+          'relative w-full aspect-[16/9] rounded-theme-sm bg-surface-secondary animate-shimmer',
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full,
         )}
         role="status"
         aria-label="載入輪播圖中"
@@ -58,12 +58,12 @@ export function ProductsSkeleton() {
             <div
               key={index}
               className={cn(
-                "rounded-none bg-surface",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.full,
+                "rounded-theme-sm bg-surface",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.full,
                 "p-2 md:p-4",
-                "animate-pulse"
+                "animate-shimmer"
               )}
               role="status"
               aria-label={`載入商品 ${index + 1}`}
@@ -71,33 +71,33 @@ export function ProductsSkeleton() {
               {/* 商品圖片骨架 */}
               <div
                 className={cn(
-                  "mb-2 md:mb-4 aspect-square rounded-none bg-surface-secondary",
-                  designTokens.neoBrutalism.border.mobile,
-                  "border-black",
+                  "mb-2 md:mb-4 aspect-square rounded-theme-sm bg-surface-secondary",
+                  designTokens.cleanCommerce.border.base,
+                  "border-border",
                 )}
               />
 
               {/* 商品資訊骨架 */}
               <div className="space-y-2 md:space-y-3">
                 {/* 商品名稱骨架 */}
-                <div className="h-4 md:h-5 bg-surface-secondary rounded-none w-3/4" />
-                <div className="h-4 md:h-5 bg-surface-secondary rounded-none w-1/2" />
+                <div className="h-4 md:h-5 bg-surface-secondary rounded-theme-sm w-3/4" />
+                <div className="h-4 md:h-5 bg-surface-secondary rounded-theme-sm w-1/2" />
 
                 {/* 價格骨架 */}
                 <div className={cn(
-                  "rounded-none bg-surface-secondary",
-                  designTokens.neoBrutalism.border.mobile,
-                  "border-gray-300",
+                  "rounded-theme-sm bg-surface-secondary",
+                  designTokens.cleanCommerce.border.base,
+                  "border-border",
                   "p-2 md:p-3"
                 )}>
-                  <div className="h-6 md:h-8 bg-surface-secondary rounded-none w-2/3" />
+                  <div className="h-6 md:h-8 bg-surface-secondary rounded-theme-sm w-2/3" />
                 </div>
 
                 {/* 按鈕骨架 */}
                 <div className={cn(
-                  "mt-1.5 md:mt-3 h-[44px] rounded-none bg-surface-secondary",
-                  designTokens.neoBrutalism.border.full,
-                  "border-black"
+                  "mt-1.5 md:mt-3 h-[44px] rounded-theme-sm bg-surface-secondary",
+                  designTokens.cleanCommerce.border.full,
+                  "border-border"
                 )} />
               </div>
             </div>
@@ -118,16 +118,16 @@ export function TextBlockSkeleton() {
       'px-4 md:px-6 lg:px-8'
     )}>
       <div className={cn(
-        "rounded-none bg-surface p-4 md:p-6 animate-pulse",
-        designTokens.neoBrutalism.border.full,
-        "border-black",
-        designTokens.neoBrutalism.shadow.full,
+        "rounded-theme-sm bg-surface p-4 md:p-6 animate-shimmer",
+        designTokens.cleanCommerce.border.full,
+        "border-border",
+        designTokens.cleanCommerce.shadow.full,
       )}>
-        <div className="h-6 md:h-8 bg-surface-secondary rounded-none w-1/3 mb-4" />
+        <div className="h-6 md:h-8 bg-surface-secondary rounded-theme-sm w-1/3 mb-4" />
         <div className="space-y-2">
-          <div className="h-4 bg-surface-secondary rounded-none w-full" />
-          <div className="h-4 bg-surface-secondary rounded-none w-5/6" />
-          <div className="h-4 bg-surface-secondary rounded-none w-4/5" />
+          <div className="h-4 bg-surface-secondary rounded-theme-sm w-full" />
+          <div className="h-4 bg-surface-secondary rounded-theme-sm w-5/6" />
+          <div className="h-4 bg-surface-secondary rounded-theme-sm w-4/5" />
         </div>
       </div>
     </div>

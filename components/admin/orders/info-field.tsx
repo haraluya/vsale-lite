@@ -94,7 +94,7 @@ export function InfoField({
       {/* 圖標容器 - 統一 40x40 */}
       <div
         className={cn(
-          'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm border-2',
+          'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm border',
           iconColorClasses[iconColor]
         )}
       >
@@ -141,7 +141,7 @@ export function SectionHeader({ title, icon: Icon, className }: SectionHeaderPro
   return (
     <div
       className={cn(
-        'flex items-center gap-2 border-b-2 border-gray-300 pb-2',
+        'flex items-center gap-2 border-b-2 border-border pb-2',
         'text-lg md:text-xl font-bold text-gray-700',
         className
       )}
@@ -220,7 +220,7 @@ export function NoteField({ icon: Icon, label, content, variant = 'info', classN
       {/* 內容 */}
       <div
         className={cn(
-          'rounded-none border-2 p-3 text-sm font-medium md:p-4',
+          'rounded-theme-sm border p-3 text-sm font-medium md:p-4',
           variantClasses.border,
           variantClasses.content
         )}

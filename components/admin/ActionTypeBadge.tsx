@@ -20,7 +20,7 @@ export function ActionTypeBadge({ actionType }: ActionTypeBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center rounded-none border-2 px-2 py-1 text-xs font-black uppercase ${config.color}`}
+      className={`inline-flex items-center rounded-theme-sm border px-2 py-1 text-xs font-black uppercase ${config.color}`}
     >
       {config.label}
     </span>

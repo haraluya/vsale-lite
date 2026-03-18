@@ -248,7 +248,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
             value={code}
             onChange={(e) => handleCodeChange(e.target.value)}
             placeholder="例如: WELCOME100"
-            className="w-full border-2 border-black p-3 font-mono text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+            className="w-full border p-3 font-mono text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
             required
             minLength={4}
             maxLength={20}
@@ -311,7 +311,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               value={discountValue || ''}
               onChange={(e) => setDiscountValue(Number(e.target.value))}
               placeholder={discountType === 'fixed' ? '100' : '20'}
-              className="flex-1 border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="flex-1 border p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
               required
               min={discountType === 'fixed' ? 1 : 1}
               max={discountType === 'percentage' ? 100 : undefined}
@@ -344,7 +344,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
                 setMinOrderAmount(e.target.value ? Number(e.target.value) : null)
               }
               placeholder="500"
-              className="flex-1 border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="flex-1 border p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
               min={0}
               step={1}
               disabled={loading}
@@ -367,7 +367,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               value={claimLimit || ''}
               onChange={(e) => setClaimLimit(Number(e.target.value))}
               placeholder="1"
-              className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
               required
               min={1}
               max={99}
@@ -389,7 +389,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               value={totalLimit || ''}
               onChange={(e) => setTotalLimit(e.target.value ? Number(e.target.value) : null)}
               placeholder="不填寫 = 無限發放"
-              className="w-full border-2 border-black p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border p-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-black"
               min={1}
               step={1}
               disabled={loading}
@@ -430,7 +430,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               id="valid_from"
               value={validFrom}
               onChange={(e) => setValidFrom(e.target.value)}
-              className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black"
               required
               disabled={loading}
             />
@@ -448,7 +448,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               id="valid_until"
               value={validUntil}
               onChange={(e) => setValidUntil(e.target.value)}
-              className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:bg-gray-100"
+              className="w-full border p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:bg-gray-100"
               required={!isUnlimitedPeriod}
               disabled={loading || isUnlimitedPeriod}
             />
@@ -460,7 +460,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
 
         {/* 日期範圍提示 */}
         {!isUnlimitedPeriod && (
-          <div className="mt-4 rounded-none border-2 border-orange-500 bg-orange-50 p-4">
+          <div className="mt-4 rounded-theme-sm border border-orange-500 bg-orange-50 p-4">
             <p className="text-sm font-bold text-orange-800">
               ⚠️ 重要：優惠券過期後將無法領取！請確保「結束時間」設定在未來，建議至少 30-90 天
             </p>
@@ -482,7 +482,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
             {tiers.map((tier) => (
               <label
                 key={tier.id}
-                className="flex items-center gap-3 cursor-pointer rounded border-2 border-gray-300 p-3 hover:border-black"
+                className="flex items-center gap-3 cursor-pointer rounded border border-border p-3 hover:border-primary"
               >
                 <input
                   type="checkbox"
@@ -498,7 +498,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         )}
 
         {selectedTiers.length > 0 && (
-          <div className="mt-4 border-t-2 border-gray-300 pt-4">
+          <div className="mt-4 border-t-2 border-border pt-4">
             <p className="font-bold text-green-600">
               ✓ 已選擇 {selectedTiers.length} 個等級限制
             </p>
@@ -522,7 +522,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               .map((s) => (
                 <label
                   key={s.id}
-                  className="flex items-center gap-3 cursor-pointer rounded border-2 border-gray-300 p-3 hover:border-black"
+                  className="flex items-center gap-3 cursor-pointer rounded border border-border p-3 hover:border-primary"
                 >
                   <input
                     type="checkbox"
@@ -538,7 +538,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         )}
 
         {selectedSeries.length > 0 && (
-          <div className="mt-4 border-t-2 border-gray-300 pt-4">
+          <div className="mt-4 border-t-2 border-border pt-4">
             <p className="font-bold text-green-600">
               ✓ 已選擇 {selectedSeries.length} 個系列限制
             </p>
@@ -555,7 +555,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         <div className="space-y-4">
           {/* 限制模式選擇 */}
           <div className="space-y-2">
-            <label className="flex items-center gap-2 cursor-pointer rounded border-2 border-gray-300 p-3 hover:border-black">
+            <label className="flex items-center gap-2 cursor-pointer rounded border border-border p-3 hover:border-primary">
               <input
                 type="radio"
                 value="none"
@@ -567,7 +567,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               <span className="font-bold">無限制（優惠券可用於所有訂單，包含組合優惠）</span>
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer rounded border-2 border-red-400 bg-red-50 p-3 hover:border-red-600">
+            <label className="flex items-center gap-2 cursor-pointer rounded border border-red-400 bg-red-50 p-3 hover:border-red-600">
               <input
                 type="radio"
                 value="exclude"
@@ -579,7 +579,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               <span className="font-bold text-red-800">❌ 排除組合優惠（優惠券不可用於包含組合優惠的訂單，推薦）</span>
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer rounded border-2 border-gray-300 p-3 hover:border-black">
+            <label className="flex items-center gap-2 cursor-pointer rounded border border-border p-3 hover:border-primary">
               <input
                 type="radio"
                 value="all"
@@ -591,7 +591,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               <span className="font-bold">適用所有組合優惠（僅當購物車包含組合優惠時可用）</span>
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer rounded border-2 border-gray-300 p-3 hover:border-black">
+            <label className="flex items-center gap-2 cursor-pointer rounded border border-border p-3 hover:border-primary">
               <input
                 type="radio"
                 value="specific"
@@ -606,7 +606,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
 
           {/* 當選擇「僅適用指定組合優惠」時顯示選擇器 */}
           {comboRestrictionMode === 'specific' && (
-            <div className="mt-4 border-t-2 border-gray-300 pt-4">
+            <div className="mt-4 border-t-2 border-border pt-4">
               <label className="mb-2 block font-bold">選擇組合優惠</label>
 
               {comboDeals.length === 0 ? (
@@ -616,7 +616,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
                   {comboDeals.map((combo) => (
                     <label
                       key={combo.id}
-                      className="flex items-center gap-3 cursor-pointer rounded border-2 border-gray-300 p-3 hover:border-black"
+                      className="flex items-center gap-3 cursor-pointer rounded border border-border p-3 hover:border-primary"
                     >
                       <input
                         type="checkbox"
@@ -632,7 +632,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               )}
 
               {selectedComboDeals.length > 0 && (
-                <div className="mt-4 border-t-2 border-gray-300 pt-4">
+                <div className="mt-4 border-t-2 border-border pt-4">
                   <p className="font-bold text-green-600">
                     ✓ 已選擇 {selectedComboDeals.length} 個組合優惠限制
                   </p>
@@ -642,7 +642,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
           )}
 
           {/* 說明提示 */}
-          <div className="rounded-none border-2 border-blue-500 bg-blue-50 p-4">
+          <div className="rounded-theme-sm border border-blue-500 bg-blue-50 p-4">
             <p className="text-sm font-bold text-blue-800">
               💡 組合優惠限制說明：
             </p>
@@ -692,7 +692,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="border-2 md:border-3 border-black bg-green-400 px-8 py-4 font-black text-black shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50"
+          className="border-theme bg-green-400 px-8 py-4 font-black text-black shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover disabled:opacity-50"
         >
           {loading ? '處理中...' : mode === 'create' ? '建立優惠券' : '更新優惠券'}
         </Button>
@@ -701,7 +701,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
           type="button"
           onClick={() => router.back()}
           disabled={loading}
-          className="border-2 md:border-3 border-black bg-white px-8 py-4 font-black text-black shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="border-theme bg-white px-8 py-4 font-black text-black shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover"
         >
           取消
         </Button>

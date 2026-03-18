@@ -177,10 +177,10 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
           <div
             key={index}
             className={`
-              flex flex-col md:flex-row gap-3 p-3 rounded-none bg-white
-              ${designTokens.neoBrutalism.border.full}
-              ${designTokens.neoBrutalism.shadow.full}
-              border-black
+              flex flex-col md:flex-row gap-3 p-3 rounded-theme-sm bg-white
+              ${designTokens.cleanCommerce.border.full}
+              ${designTokens.cleanCommerce.shadow.full}
+             
             `}
           >
             {/* 縮圖與刪除按鈕 */}
@@ -190,12 +190,12 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
                   src={image.url}
                   alt={`圖片 ${index + 1}`}
                   fill
-                  className="object-cover border-2 border-black"
+                  className="object-cover border"
                 />
                 <button
                   type="button"
                   onClick={() => handleDelete(index)}
-                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 border-2 border-black"
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center hover:bg-red-700 border"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -226,9 +226,9 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
                     onChange={(e) => handleSeriesChange(index, e.target.value || null)}
                     disabled={!!(image as any).combo_deal_id} // 🆕 已設定組合優惠時禁用
                     className={`
-                      w-full rounded-none bg-white text-sm
-                      ${designTokens.neoBrutalism.border.mobile}
-                      border-black px-3 py-2
+                      w-full rounded-theme-sm bg-white text-sm
+                      ${designTokens.cleanCommerce.border.base}
+                      px-3 py-2
                       focus:outline-none focus:ring-2 focus:ring-blue-500
                       disabled:opacity-50 disabled:cursor-not-allowed
                     `}
@@ -256,9 +256,9 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
                     onChange={(e) => handleComboDealChange(index, e.target.value || null)}
                     disabled={!!image.series_id} // 已設定系列時禁用
                     className={`
-                      w-full rounded-none bg-white text-sm
-                      ${designTokens.neoBrutalism.border.mobile}
-                      border-black px-3 py-2
+                      w-full rounded-theme-sm bg-white text-sm
+                      ${designTokens.cleanCommerce.border.base}
+                      px-3 py-2
                       focus:outline-none focus:ring-2 focus:ring-blue-500
                       disabled:opacity-50 disabled:cursor-not-allowed
                     `}
@@ -284,12 +284,12 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
       {images.length < 5 && (
         <label
           className={`
-            flex items-center justify-center gap-2 w-full py-3 rounded-none
+            flex items-center justify-center gap-2 w-full py-3 rounded-theme-sm
             bg-blue-500 text-white font-medium cursor-pointer
-            ${designTokens.neoBrutalism.border.full}
-            ${designTokens.neoBrutalism.shadow.full}
-            border-black
-            hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+            ${designTokens.cleanCommerce.border.full}
+            ${designTokens.cleanCommerce.shadow.full}
+           
+            hover:-translate-y-0.5 hover:shadow-theme-hover
             transition-all
             ${uploading !== null || !blockId ? 'opacity-50 cursor-not-allowed' : ''}
           `}
@@ -322,7 +322,7 @@ export function ImageUploadMultiple({ blockId, images = [], onChange }: ImageUpl
       )}
 
       {!blockId && (
-        <p className="text-xs text-amber-600 bg-amber-50 p-2 border-2 border-amber-600">
+        <p className="text-xs text-amber-600 bg-amber-50 p-2 border border-amber-600">
           請先儲存區塊後再上傳圖片
         </p>
       )}

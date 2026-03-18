@@ -66,10 +66,10 @@ function ImageCarouselPortraitComponent({ config, blockUpdatedAt }: ImageCarouse
     return (
       <div
         className={cn(
-          'w-full aspect-[4/5] rounded-none bg-surface-secondary',
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
+          'w-full aspect-[4/5] rounded-theme-sm bg-surface-secondary',
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full,
           'flex items-center justify-center text-text-secondary'
         )}
       >
@@ -85,10 +85,10 @@ function ImageCarouselPortraitComponent({ config, blockUpdatedAt }: ImageCarouse
       {/* 圖片容器 - 4:5 比例 */}
       <div
         className={cn(
-          'relative w-full aspect-[4/5] rounded-none bg-surface-secondary overflow-hidden',
-          designTokens.neoBrutalism.border.full,
-          'border-black',
-          designTokens.neoBrutalism.shadow.full,
+          'relative w-full aspect-[4/5] rounded-theme-sm bg-surface-secondary overflow-hidden',
+          designTokens.cleanCommerce.border.full,
+          'border-border',
+          designTokens.cleanCommerce.shadow.full,
           (currentImage?.series_id || (currentImage as any)?.combo_deal_id) && 'cursor-pointer' // 🆕 Feature 021: 支援組合優惠
         )}
         onClick={handleImageClick}
@@ -126,7 +126,7 @@ function ImageCarouselPortraitComponent({ config, blockUpdatedAt }: ImageCarouse
                 }}
                 className={cn(
                   'w-2.5 h-2.5 md:w-3 md:h-3 rounded-full transition-all',
-                  'border-2 border-white shadow-lg',
+                  'border border-white shadow-lg',
                   currentIndex === index
                     ? 'bg-white scale-125'
                     : 'bg-black/50 hover:bg-black/70',

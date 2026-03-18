@@ -98,9 +98,9 @@ export function PrefetchButton({
 }: PrefetchButtonProps) {
   // 按鈕樣式類別（基於 Button 組件的樣式）
   const buttonClasses = cn(
-    'inline-flex items-center justify-center gap-2 rounded-none font-bold transition-all',
-    'border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo',
-    'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+    'inline-flex items-center justify-center gap-2 rounded-theme-sm font-bold transition-all',
+    'border-theme shadow-neo-sm',
+    'active:scale-[0.98]',
     'disabled:opacity-50 disabled:cursor-not-allowed',
     // Variant 樣式
     variant === 'primary' && 'bg-primary hover:bg-primary-dark text-white',

@@ -125,7 +125,7 @@ export function PriceSummary({
   const ButtonIcon = editMode ? Check : ShoppingCart
 
   return (
-    <div className="sticky bottom-0 left-0 right-0 bg-surface border-t-2 md:border-t-3 border-black p-4 md:p-6 shadow-neo z-10">
+    <div className="sticky bottom-0 left-0 right-0 bg-surface border-t p-4 md:p-6 shadow-neo z-10">
       <div className="container mx-auto max-w-2xl">
         {/* 🆕 價格明細（完整折扣明細） */}
         {selectedProducts.length > 0 && (
@@ -148,7 +148,7 @@ export function PriceSummary({
             </div>
 
             {/* 分隔線 */}
-            <div className="border-t-2 border-gray-300 pt-2" />
+            <div className="border-t-2 border-border pt-2" />
 
             {/* 🆕 顯示小計（使用等級價格總和，與商品卡片一致） */}
             <div className="flex justify-between text-sm md:text-base">
@@ -165,7 +165,7 @@ export function PriceSummary({
             </div>
 
             {/* 分隔線 */}
-            <div className="border-t-2 border-black pt-2" />
+            <div className="border-t pt-2" />
 
             {/* 🆕 最終價格 */}
             <div className="flex justify-between text-lg md:text-2xl font-black">
@@ -182,13 +182,13 @@ export function PriceSummary({
           onClick={handleSubmit}
           disabled={!isValid || isValidating || isAdding || selectedProducts.length === 0}
           className={cn(
-            'w-full flex items-center justify-center gap-2 rounded-none border-2 md:border-3 border-black py-3 md:py-4 text-base md:text-lg font-black transition-all',
-            designTokens.neoBrutalism.shadow.mobile,
+            'w-full flex items-center justify-center gap-2 rounded-theme-sm border-theme py-3 md:py-4 text-base md:text-lg font-black transition-all',
+            designTokens.cleanCommerce.shadow.base,
             'md:shadow-neo',
             isValid && !isValidating && !isAdding && selectedProducts.length > 0
               ? editMode
-                ? 'bg-blue-400 text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                : 'bg-green-400 text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                ? 'bg-blue-400 text-foreground hover:-translate-y-0.5 hover:shadow-theme-hover'
+                : 'bg-green-400 text-foreground hover:-translate-y-0.5 hover:shadow-theme-hover'
               : 'bg-gray-200 text-text-secondary cursor-not-allowed'
           )}
         >

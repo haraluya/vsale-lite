@@ -21,7 +21,7 @@ async function MembersContent() {
 
   if (!result.success || !result.data) {
     return (
-      <div className="rounded-none border-2 md:border-3 border-red-500 bg-error-bg p-6 shadow-neo">
+      <div className="rounded-theme-sm border-theme border-red-500 bg-error-bg p-6 shadow-neo">
         <div className="flex items-center gap-3">
           <AlertCircle className="h-6 w-6 text-error" />
           <p className="text-sm font-bold text-foreground">

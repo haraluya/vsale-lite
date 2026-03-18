@@ -18,7 +18,7 @@ export function Error({
   return (
     <div
       className={cn(
-        'rounded-none border-2 md:border-3 border-error bg-error-bg p-6 shadow-neo',
+        'rounded-theme border-theme border-error bg-error-bg p-6 shadow-neo-sm',
         className
       )}
     >
@@ -27,7 +27,7 @@ export function Error({
           <AlertCircle className="h-6 w-6 text-error" />
         </div>
         <div className="flex-1">
-          <h3 className="mb-1 text-lg font-bold text-error">{title}</h3>
+          <h3 className="mb-1 text-lg font-semibold text-error">{title}</h3>
           <p className="text-sm text-error">{message}</p>
           {retry && (
             <Button
@@ -64,7 +64,7 @@ export function ErrorInline({ message, className }: { message: string; className
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-none border-2 border-error bg-error-bg p-3 text-sm text-error',
+        'flex items-center gap-2 rounded-theme-sm border-theme border-error bg-error-bg p-3 text-sm text-error',
         className
       )}
     >

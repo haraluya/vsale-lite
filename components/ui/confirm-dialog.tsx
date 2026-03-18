@@ -56,18 +56,18 @@ export function ConfirmDialog({
     switch (variant) {
       case 'danger':
         return {
-          button: 'bg-error hover:opacity-80 text-text-inverse',
+          button: 'bg-error hover:bg-error/90 text-text-inverse',
           border: 'border-error',
         }
       case 'warning':
         return {
-          button: 'bg-warning hover:opacity-80 text-foreground',
+          button: 'bg-warning hover:bg-warning/90 text-foreground',
           border: 'border-warning',
         }
       default:
         return {
-          button: 'bg-info hover:opacity-80 text-text-inverse',
-          border: 'border-info',
+          button: 'bg-primary hover:bg-primary-dark text-text-inverse',
+          border: 'border-primary',
         }
     }
   }
@@ -76,26 +76,26 @@ export function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4"
       onClick={handleBackdropClick}
     >
       <div
         ref={dialogRef}
-        className="w-full max-w-md border-2 md:border-3 bg-surface shadow-[8px_8px_0px_0px_var(--color-border)]"
+        className="w-full max-w-md border-theme bg-surface shadow-neo-lg rounded-theme"
         role="dialog"
         aria-modal="true"
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
       >
         {/* Header */}
-        <div className={`border-b-2 md:border-b-3 bg-surface-secondary p-4 ${colors.border}`}>
+        <div className={`border-b bg-surface-secondary p-4 rounded-t-theme ${colors.border}`}>
           <div className="flex items-start justify-between">
-            <h2 id="dialog-title" className="text-xl font-bold">
+            <h2 id="dialog-title" className="text-xl font-semibold">
               {title}
             </h2>
             <button
               onClick={onClose}
-              className="border-2 bg-surface p-1 transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm"
+              className="rounded-theme-sm border-theme bg-surface p-1 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm"
               aria-label="關閉對話框"
             >
               <X className="h-4 w-4" />
@@ -111,10 +111,10 @@ export function ConfirmDialog({
         </div>
 
         {/* Footer */}
-        <div className="flex gap-3 border-t-2 md:border-t-3 bg-surface-secondary p-4">
+        <div className="flex gap-3 border-t bg-surface-secondary p-4 rounded-b-theme">
           <button
             onClick={onClose}
-            className="flex-1 border-2 md:border-3 bg-surface px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo"
+            className="flex-1 border-theme rounded-theme-sm bg-surface px-4 py-2 font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm"
           >
             {cancelText}
           </button>
@@ -123,7 +123,7 @@ export function ConfirmDialog({
               onConfirm()
               onClose()
             }}
-            className={`flex-1 border-2 md:border-3 px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo ${colors.button}`}
+            className={`flex-1 border-theme rounded-theme-sm px-4 py-2 font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm ${colors.button}`}
           >
             {confirmText}
           </button>

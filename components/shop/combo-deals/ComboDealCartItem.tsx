@@ -54,10 +54,10 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
   return (
     <div
       className={cn(
-        'rounded-none bg-yellow-50',
-        designTokens.neoBrutalism.border.full,
+        'rounded-theme-sm bg-yellow-50',
+        designTokens.cleanCommerce.border.full,
         'border-yellow-400',
-        designTokens.neoBrutalism.shadow.mobile,
+        designTokens.cleanCommerce.shadow.base,
         'p-4 md:p-6'
       )}
     >
@@ -80,11 +80,11 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
           <Link
             href={`/store/combo-deals/${item.combo_deal_id}?edit=true&cart_item_id=${item.id}`}
             className={cn(
-              'flex items-center gap-2 rounded-none bg-blue-400 font-bold transition-all',
-              designTokens.neoBrutalism.border.full,
-              'border-black',
-              'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              'flex items-center gap-2 rounded-theme-sm bg-blue-400 font-bold transition-all',
+              designTokens.cleanCommerce.border.full,
+              'border-border',
+              'shadow-neo-sm',
+              'hover:-translate-y-0.5 hover:shadow-theme-hover',
               'px-3 py-2 text-sm',
               'min-h-[44px]'  // WCAG 2.1 AA 觸控目標
             )}
@@ -96,11 +96,11 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
           <button
             onClick={handleDelete}
             className={cn(
-              'flex items-center justify-center rounded-none bg-red-100 font-bold transition-all',
-              designTokens.neoBrutalism.border.full,
+              'flex items-center justify-center rounded-theme-sm bg-red-100 font-bold transition-all',
+              designTokens.cleanCommerce.border.full,
               'border-red-400',
-              'shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              'shadow-neo-sm',
+              'hover:-translate-y-0.5 hover:shadow-theme-hover',
               'hover:bg-red-200',
               'p-2 text-red-700',
               'min-h-[44px] min-w-[44px]'  // WCAG 2.1 AA 觸控目標
@@ -124,8 +124,8 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
               key={`${product.product_id}-${index}`}
               className={cn(
                 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2',
-                'rounded-none bg-surface',
-                'border-2 border-yellow-300',
+                'rounded-theme-sm bg-surface',
+                'border border-yellow-300',
                 'px-3 py-2'
               )}
             >
@@ -133,7 +133,7 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
                 {/* 系列名稱標籤 */}
                 {detail?.series_name && (
                   <div className={cn(
-                    "inline-block rounded-none bg-yellow-100 px-2 py-0.5 mb-1",
+                    "inline-block rounded-theme-sm bg-yellow-100 px-2 py-0.5 mb-1",
                     "border border-yellow-400",
                     "text-xs font-bold text-yellow-800"
                   )}>

@@ -29,7 +29,7 @@ export function LogoutButton() {
       onClick={handleLogout}
       disabled={loading}
       title={loading ? '登出中...' : '登出'}
-      className="flex w-full items-center rounded-none border-2 border-black bg-error font-bold text-white transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:opacity-50 md:justify-center md:w-12 md:h-12 md:p-0 lg:w-full lg:h-auto lg:justify-start lg:gap-3 lg:px-4 lg:py-3"
+      className="flex w-full items-center rounded-theme-sm border bg-error font-bold text-white transition-all hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm disabled:opacity-50 md:justify-center md:w-12 md:h-12 md:p-0 lg:w-full lg:h-auto lg:justify-start lg:gap-3 lg:px-4 lg:py-3"
     >
       <LogOut className="h-5 w-5 flex-shrink-0" />
       <span className="hidden lg:inline">{loading ? '登出中...' : '登出'}</span>

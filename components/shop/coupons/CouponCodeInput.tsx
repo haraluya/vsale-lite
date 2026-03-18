@@ -80,7 +80,7 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
   }
 
   return (
-    <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-surface p-4 md:p-6">
+    <div className="border-theme shadow-neo-sm bg-surface p-4 md:p-6">
       <div className="mb-3">
         <h3 className="text-base md:text-lg font-black">輸入優惠券代碼</h3>
         <p className="text-xs md:text-sm text-text-secondary mt-1">
@@ -95,7 +95,7 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
           onChange={handleInputChange}
           onKeyPress={handleKeyPress}
           placeholder="例如：WELCOME100"
-          className="flex-1 px-4 py-3 md:py-4 border-2 border-black text-base md:text-lg
+          className="flex-1 px-4 py-3 md:py-4 border text-base md:text-lg
                      font-bold placeholder:text-muted placeholder:font-normal
                      focus:outline-none focus:ring-2 focus:ring-offset-2
                      focus:ring-black disabled:bg-surface-secondary disabled:cursor-not-allowed"
@@ -106,8 +106,8 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
           onClick={handleClaim}
           disabled={loading || !code.trim()}
           className="px-6 md:px-8 py-3 md:py-4 bg-orange-400 text-foreground font-black
-                     border-2 border-black shadow-neo-sm hover:translate-x-[2px]
-                     hover:translate-y-[2px] hover:shadow-none transition-all
+                     border shadow-neo-sm hover:-translate-y-0.5
+                     hover:shadow-theme-hover hover:shadow-none transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed
                      disabled:hover:translate-x-0 disabled:hover:translate-y-0
                      disabled:hover:shadow-neo-sm text-sm md:text-base

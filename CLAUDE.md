@@ -169,7 +169,7 @@ Vsale-lite 是一個專為批發業務設計的輕量級 B2B 訂貨系統，解�
 - 🎯 雙入口設計: 客戶使用手機號碼登入，管理員使用 Email 登入
 - 💰 等級綁定價格: 不同會員等級看到不同價格
 - 📱 行動優先: 客戶端優化單手操作，管理端優化桌面批量操作
-- 🎨 Neo-Brutalism 設計風格: 強烈的品牌識別
+- 🎨 Clean Commerce 設計風格: 現代簡約商務（支援多主題切換）
 
 ---
 
@@ -265,10 +265,13 @@ vsale/
 - 所有表單使用 Server Actions 處理
 
 ### V. 設計系統一致性
-- 遵循 Neo-Brutalism 風格
-- 響應式邊框: 手機 2px / 桌面 3px (`border-2 md:border-3`)
-- 響應式陰影: 手機 neo-sm / 桌面 neo (`shadow-neo-sm md:shadow-neo`)
-- 點擊狀態包含位移效果 (translate + shadow-none)
+- 預設主題: Clean Commerce（現代簡約商務）
+- 支援多主題切換: Clean Commerce / Neo-Brutalism / Warm Industrial / Soft Depth
+- 主題透過 CSS 變數驅動: `--theme-border-width`, `--theme-radius`, `--shadow-neo` 等
+- 邊框: `border-theme`（主題感知寬度）
+- 圓角: `rounded-theme` / `rounded-theme-sm` / `rounded-theme-lg`
+- 陰影: `shadow-neo-sm`（CSS 變數自動適應主題）
+- 互動: `hover:-translate-y-0.5 hover:shadow-theme-hover` + `active:scale-[0.98]`
 - 使用設計 Token 系統確保一致性 (`lib/design-tokens.ts`)
 
 ### VI. 負庫存支援
@@ -591,18 +594,26 @@ Middleware (middleware.ts) 自動檢查：
   - 無等級價格：「零售價 $60」（使用零售價）
 - 支援批次價格設定（依系列或商品批量設定）
 
-### Neo-Brutalism 設計實作
-所有 UI 元件必須遵循：
+### Clean Commerce 設計實作
+所有 UI 元件遵循主題感知樣式（透過 CSS 變數自動適應主題）：
 ```tsx
-// 卡片樣式
-className="rounded-none border-3 border-black bg-white shadow-neo"
+// 卡片樣式（使用 .card-neo 類別或手動組合）
+className="rounded-theme border-theme bg-surface shadow-neo-sm"
 
-// 陰影定義（tailwind.config.ts）
-shadow-neo: '4px 4px 0px 0px rgba(0,0,0,1)'
+// 主題 CSS 變數（在 globals.css :root 定義）
+--theme-radius: 12px;
+--theme-border-width: 1px;
+--shadow-neo: 0 1px 3px 0 rgba(0,0,0,0.1);
 
-// 點擊效果
-hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+// 互動效果
+hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98]
 ```
+
+**可用的主題工具類別**:
+- `rounded-theme` / `rounded-theme-sm` / `rounded-theme-lg` — 主題感知圓角
+- `border-theme` — 主題感知邊框寬度
+- `shadow-neo-sm` / `shadow-neo` / `shadow-neo-lg` — 主題感知陰影
+- `shadow-theme-hover` — hover 狀態陰影
 
 ### Git Commit 規範
 ```bash

@@ -36,10 +36,10 @@ export async function HomeBlocksList() {
         designTokens.spacing.page.padding
       )}>
         <div className={cn(
-          "rounded-none bg-surface",
-          designTokens.neoBrutalism.border.full,
-          "border-black",
-          designTokens.neoBrutalism.shadow.full,
+          "rounded-theme-sm bg-surface",
+          designTokens.cleanCommerce.border.full,
+          "border-border",
+          designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding,
         )}>
           <h2 className={designTokens.typography.h2}>首頁廣告區塊</h2>

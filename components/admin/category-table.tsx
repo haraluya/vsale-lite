@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { deleteCategory, updateCategoriesOrder } from '@/lib/actions/categories'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { formatDateTW } from '@/lib/date-utils'
 import { useConfirm } from '@/lib/contexts/dialog-context'
@@ -53,7 +53,7 @@ function SortableCategoryRow({
   }
 
   return (
-    <tr ref={setNodeRef} style={style} className="border-b-2 md:border-b-3 border-black last:border-b-0 bg-white">
+    <tr ref={setNodeRef} style={style} className="border-b last:border-b-0 bg-white">
       <td className="px-4 py-3 md:px-6 md:py-4">
         <button
           {...attributes}
@@ -76,9 +76,9 @@ function SortableCategoryRow({
             href={`/admin/categories/${category.id}/edit`}
             className={cn(
               "inline-flex items-center gap-2 bg-white font-bold transition-all",
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.mobile,
-              designTokens.neoBrutalism.hover,
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.base,
+              designTokens.cleanCommerce.hover,
               designTokens.button.sm
             )}
           >
@@ -90,9 +90,9 @@ function SortableCategoryRow({
             disabled={loading === category.id}
             className={cn(
               "inline-flex items-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50",
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.mobile,
-              designTokens.neoBrutalism.hover,
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.base,
+              designTokens.cleanCommerce.hover,
               designTokens.button.sm
             )}
           >
@@ -134,8 +134,8 @@ function SortableCategoryCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "rounded-none bg-white",
-        getNeoBrutalismClasses(),
+        "rounded-theme-sm bg-white",
+        getThemeClasses(),
         designTokens.spacing.card.padding
       )}
     >
@@ -173,7 +173,7 @@ function SortableCategoryCard({
           href={`/admin/categories/${category.id}/edit`}
           className={cn(
             "flex-1 inline-flex items-center justify-center gap-2 bg-white font-bold transition-all",
-            getNeoBrutalismClasses({ active: true }),
+            getThemeClasses({ active: true }),
             designTokens.button.md
           )}
         >
@@ -185,7 +185,7 @@ function SortableCategoryCard({
           disabled={loading === category.id}
           className={cn(
             "flex-1 inline-flex items-center justify-center gap-2 bg-red-500 font-bold text-white transition-all disabled:opacity-50",
-            getNeoBrutalismClasses({ active: true }),
+            getThemeClasses({ active: true }),
             designTokens.button.md
           )}
         >
@@ -292,7 +292,7 @@ export function CategoryTable({ categories: initialCategories }: { categories: C
         {/* 桌面版: 完整表格 */}
         <div className="hidden lg:block card-neo overflow-hidden p-0">
           <table className="w-full">
-            <thead className="border-b-2 md:border-b-3 border-black bg-gray-100">
+            <thead className="border-b bg-gray-100">
               <tr>
                 <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)} style={{ width: '60px' }}>排序</th>
                 <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>分類名稱</th>

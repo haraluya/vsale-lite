@@ -139,9 +139,9 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
     return (
       <div className={cn(
         "bg-surface p-6",
-        designTokens.neoBrutalism.border.mobile,
-        "border-black",
-        designTokens.neoBrutalism.shadow.mobile
+        designTokens.cleanCommerce.border.base,
+        "border-border",
+        designTokens.cleanCommerce.shadow.base
       )}>
         <div className="text-center text-text-secondary">載入中...</div>
       </div>
@@ -152,9 +152,9 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
     return (
       <div className={cn(
         "bg-surface p-6",
-        designTokens.neoBrutalism.border.mobile,
-        "border-black",
-        designTokens.neoBrutalism.shadow.mobile
+        designTokens.cleanCommerce.border.base,
+        "border-border",
+        designTokens.cleanCommerce.shadow.base
       )}>
         <div className="text-center">
           <p className="text-text-secondary mb-4">您目前沒有可用的優惠券</p>
@@ -162,10 +162,10 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
             onClick={onClose}
             className={cn(
               "px-4 py-2 bg-black text-white font-bold transition-all",
-              designTokens.neoBrutalism.border.mobile,
-              "border-black",
-              designTokens.neoBrutalism.shadow.mobile,
-              "hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              designTokens.cleanCommerce.border.base,
+              "border-border",
+              designTokens.cleanCommerce.shadow.base,
+              "hover:-translate-y-0.5 hover:shadow-theme-hover"
             )}
           >
             關閉
@@ -176,9 +176,9 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   }
 
   return (
-    <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-surface">
+    <div className="border-theme shadow-neo-sm bg-surface">
       {/* 標題列 */}
-      <div className="flex items-center justify-between border-b-2 border-black p-4">
+      <div className="flex items-center justify-between border-b p-4">
         <h3 className="text-lg font-black">選擇優惠券</h3>
         {onClose && (
           <button
@@ -209,7 +209,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
           return (
             <div
               key={userCoupon.id}
-              className={`border-2 border-black p-3 ${
+              className={`border p-3 ${
                 isApplied ? 'bg-success-bg' : isValid ? 'bg-surface' : 'bg-surface-secondary'
               }`}
             >
@@ -244,7 +244,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                     <button
                       onClick={handleRemoveCoupon}
                       className="px-3 py-1 bg-gray-200 text-foreground font-bold
-                                 border-2 border-black text-sm hover:bg-gray-300
+                                 border text-sm hover:bg-gray-300
                                  transition-colors"
                     >
                       移除
@@ -254,7 +254,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                       onClick={() => handleApplyCoupon(userCoupon)}
                       disabled={!isValid || applying === userCoupon.id}
                       className="px-3 py-1 bg-orange-400 text-foreground font-bold
-                                 border-2 border-black text-sm
+                                 border text-sm
                                  shadow-neo-sm hover:translate-x-[1px]
                                  hover:translate-y-[1px] hover:shadow-none
                                  transition-all disabled:opacity-50
@@ -275,7 +275,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
 
       {/* 已套用優惠券提示 */}
       {appliedCoupon && (
-        <div className="border-t-2 border-black bg-success-bg p-4">
+        <div className="border-t bg-success-bg p-4">
           <div className="text-sm text-success font-bold">
             ✓ 已套用優惠券：{appliedCoupon.code_normalized}
           </div>

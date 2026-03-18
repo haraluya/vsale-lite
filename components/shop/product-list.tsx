@@ -19,7 +19,7 @@ export function ProductList({ products }: ProductListProps) {
   // 空狀態
   if (products.length === 0) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center rounded-none border-2 md:border-3 border-black bg-surface-secondary p-12">
+      <div className="flex min-h-[400px] items-center justify-center rounded-theme-sm border-theme bg-surface-secondary p-12">
         <div className="text-center">
           <div className="mb-4 text-6xl">📦</div>
           <h3 className="mb-2 text-xl font-bold">目前沒有商品</h3>

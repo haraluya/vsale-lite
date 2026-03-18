@@ -44,7 +44,7 @@ export function SplitPanelLayout({ order }: Props) {
     <div className="space-y-4">
       {/* 訂單標題 */}
       <div className={cn(
-        "rounded-none border-3 border-black shadow-neo p-5 md:p-6",
+        "rounded-theme-sm border shadow-neo p-5 md:p-6",
         gradientClass
       )}>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
@@ -63,7 +63,7 @@ export function SplitPanelLayout({ order }: Props) {
         {/* 左側/上方：商品明細 */}
         <div className="lg:col-span-2 space-y-4">
           {/* 商品區塊 */}
-          <div className="rounded-none border-3 border-black bg-surface shadow-neo overflow-hidden">
+          <div className="rounded-theme-sm border bg-surface shadow-neo overflow-hidden">
             <div className="bg-black text-white px-5 py-3 flex items-center gap-2">
               <Package className="w-5 h-5" />
               <h2 className="text-lg font-black">訂單商品</h2>
@@ -82,7 +82,7 @@ export function SplitPanelLayout({ order }: Props) {
                     return (
                       <div
                         key={comboDealItem.id}
-                        className="border-2 border-yellow-500 bg-yellow-50 p-4 rounded-none"
+                        className="border border-yellow-500 bg-yellow-50 p-4 rounded-theme-sm"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
@@ -122,13 +122,13 @@ export function SplitPanelLayout({ order }: Props) {
                 return (
                   <div
                     key={item.id}
-                    className="border-2 border-gray-300 bg-surface-secondary p-4 rounded-none hover:border-black transition-colors"
+                    className="border border-border bg-surface-secondary p-4 rounded-theme-sm hover:transition-colors"
                   >
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex-1">
                         {seriesName && (
                           <div className="mb-1.5">
-                            <span className="inline-block bg-blue-100 border-2 border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
+                            <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
                               {seriesName}
                             </span>
                           </div>
@@ -153,7 +153,7 @@ export function SplitPanelLayout({ order }: Props) {
 
           {/* 訂單備註 */}
           {order.notes && (
-            <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
+            <div className="rounded-theme-sm border bg-surface shadow-neo p-5">
               <h3 className="font-black mb-2 flex items-center gap-2">
                 <span className="text-lg">📝</span>
                 訂單備註
@@ -166,7 +166,7 @@ export function SplitPanelLayout({ order }: Props) {
         {/* 右側/下方：金額摘要與訂單資訊 */}
         <div className="lg:col-span-1 space-y-4">
           {/* 金額摘要 - 固定在右側 */}
-          <div className="rounded-none border-3 border-black bg-surface shadow-neo overflow-hidden lg:sticky lg:top-4">
+          <div className="rounded-theme-sm border bg-surface shadow-neo overflow-hidden lg:sticky lg:top-4">
             <div className="bg-green-600 text-white px-5 py-3 flex items-center gap-2">
               <Receipt className="w-5 h-5" />
               <h2 className="text-lg font-black">金額摘要</h2>
@@ -235,7 +235,7 @@ export function SplitPanelLayout({ order }: Props) {
               )}
 
               {/* 總金額 */}
-              <div className="pt-3 mt-2 border-t-3 border-black">
+              <div className="pt-3 mt-2 border-t">
                 <div className="flex justify-between items-center">
                   <span className="text-base font-black">總金額</span>
                   <span className="text-2xl md:text-3xl font-black text-success">
@@ -247,7 +247,7 @@ export function SplitPanelLayout({ order }: Props) {
           </div>
 
           {/* 訂單資訊卡片 */}
-          <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
+          <div className="rounded-theme-sm border bg-surface shadow-neo p-5">
             <h3 className="font-black mb-4 text-lg">訂單資訊</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-start gap-3">

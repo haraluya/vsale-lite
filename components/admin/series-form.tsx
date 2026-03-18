@@ -205,10 +205,10 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               name="name"
               defaultValue={series?.name}
               required
-              className={`w-full rounded-none border-2 px-4 py-2 focus:outline-none focus:ring-2 ${
+              className={`w-full rounded-theme-sm border px-4 py-2 focus:outline-none focus:ring-2 ${
                 fieldErrors.name
                   ? 'border-red-600 bg-red-50 focus:ring-red-500'
-                  : 'border-black focus:ring-blue-500'
+                  : 'focus:ring-blue-500'
               }`}
             />
             {fieldErrors.name && (
@@ -233,10 +233,10 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               maxLength={10}
               pattern="^[A-Z]{3,10}$"
               placeholder="TEA"
-              className={`w-full rounded-none border-2 px-4 py-2 uppercase focus:outline-none focus:ring-2 ${
+              className={`w-full rounded-theme-sm border px-4 py-2 uppercase focus:outline-none focus:ring-2 ${
                 fieldErrors.code
                   ? 'border-red-600 bg-red-50 focus:ring-red-500'
-                  : 'border-black focus:ring-blue-500'
+                  : 'focus:ring-blue-500'
               }`}
             />
             {fieldErrors.code ? (
@@ -259,7 +259,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               id="category_id"
               name="category_id"
               defaultValue={series?.category_id || ''}
-              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-theme-sm border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">無分類</option>
               {categories.map((category) => (
@@ -280,7 +280,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               name="description"
               defaultValue={series?.description || ''}
               rows={4}
-              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-theme-sm border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -294,7 +294,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               name="status"
               defaultValue={series?.status || 'active'}
               required
-              className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-theme-sm border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="active">上架 (Active)</option>
               <option value="inactive">下架 (Inactive)</option>
@@ -314,7 +314,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
         <div className="space-y-4">
           {/* 圖片預覽 */}
           {imagePreview && (
-            <div className="relative rounded-none border-2 border-black p-4">
+            <div className="relative rounded-theme-sm border p-4">
               <div className="relative h-64 w-full">
                 <Image
                   src={imagePreview}
@@ -328,7 +328,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
               <button
                 type="button"
                 onClick={handleRemoveImage}
-                className="absolute right-2 top-2 rounded-none border-2 border-black bg-red-500 p-2 font-bold text-white shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                className="absolute right-2 top-2 rounded-theme-sm border bg-red-500 p-2 font-bold text-white shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                 title="移除圖片"
               >
                 <X className="h-4 w-4" />
@@ -340,7 +340,7 @@ export function SeriesForm({ series, categories, mode }: SeriesFormProps) {
           <div>
             <label
               htmlFor="image"
-              className="inline-flex cursor-pointer items-center gap-2 rounded-none border-2 border-black bg-yellow-300 px-4 py-2 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-theme-sm border bg-yellow-300 px-4 py-2 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
             >
               <Upload className="h-5 w-5" />
               {imagePreview ? '更換圖片' : '選擇圖片'}

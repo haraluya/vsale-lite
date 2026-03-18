@@ -190,12 +190,12 @@ export function StorePageClient({
             <button
               onClick={() => setShowPromotionsOnly(!showPromotionsOnly)}
               className={cn(
-                'rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold transition-all',
-                designTokens.neoBrutalism.shadow.mobile,
+                'rounded-theme-sm border-theme px-4 py-2 text-sm font-bold transition-all',
+                designTokens.cleanCommerce.shadow.base,
                 'md:shadow-neo',
                 showPromotionsOnly
                   ? 'bg-red-500 text-white'
-                  : 'bg-surface text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                  : 'bg-surface text-foreground hover:-translate-y-0.5 hover:shadow-theme-hover'
               )}
             >
               🔥 優惠活動 ({comboDeals.length} 個)
@@ -234,10 +234,10 @@ export function StorePageClient({
         <>
           {searchedSeries.length === 0 && searchedProducts.length === 0 ? (
             <div className={cn(
-              "rounded-none bg-surface text-center",
-              designTokens.neoBrutalism.border.full,
-              "border-black",
-              designTokens.neoBrutalism.shadow.full,
+              "rounded-theme-sm bg-surface text-center",
+              designTokens.cleanCommerce.border.full,
+              "border-border",
+              designTokens.cleanCommerce.shadow.full,
               "p-8 md:p-12"
             )}>
               <p className={cn(
@@ -287,10 +287,10 @@ export function StorePageClient({
         <>
           {comboDeals.length === 0 ? (
             <div className={cn(
-              "rounded-none bg-surface text-center",
-              designTokens.neoBrutalism.border.full,
-              "border-black",
-              designTokens.neoBrutalism.shadow.full,
+              "rounded-theme-sm bg-surface text-center",
+              designTokens.cleanCommerce.border.full,
+              "border-border",
+              designTokens.cleanCommerce.shadow.full,
               "p-8 md:p-12"
             )}>
               <p className={cn(
@@ -314,10 +314,10 @@ export function StorePageClient({
         <>
           {displaySeries.length === 0 && comboDeals.length === 0 ? (
             <div className={cn(
-              "rounded-none bg-surface text-center",
-              designTokens.neoBrutalism.border.full,
-              "border-black",
-              designTokens.neoBrutalism.shadow.full,
+              "rounded-theme-sm bg-surface text-center",
+              designTokens.cleanCommerce.border.full,
+              "border-border",
+              designTokens.cleanCommerce.shadow.full,
               "p-8 md:p-12"
             )}>
               <p className={cn(

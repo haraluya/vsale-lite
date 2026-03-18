@@ -17,7 +17,7 @@ export function ExcelImportButton() {
       <Button
         onClick={() => setIsDialogOpen(true)}
         variant="secondary"
-        className="border-2 md:border-3 border-black bg-yellow-300 hover:bg-yellow-400"
+        className="border-theme bg-yellow-300 hover:bg-yellow-400"
       >
         <Upload className="mr-2 h-4 w-4" />
         批次匯入

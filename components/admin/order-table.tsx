@@ -3,7 +3,7 @@
 import { OrderTableRow } from '@/components/admin/orders/order-table-row'
 import { OrderCard } from '@/components/admin/orders/order-card'
 import { Pagination } from '@/components/admin/pagination'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { OrderWithUser } from '@/types'
 
@@ -33,13 +33,13 @@ export function OrderTable({ orders, total, currentPage, pageSize }: OrderTableP
       {/* 桌面版: 完整表格 */}
       <div
         className={cn(
-          'hidden lg:block rounded-none bg-surface overflow-x-auto',
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full
+          'hidden lg:block rounded-theme-sm bg-surface overflow-x-auto',
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full
         )}
       >
         {/* 標題列 */}
-        <div className="grid grid-cols-6 gap-4 border-b-2 md:border-b-3 border-black bg-surface-secondary p-4 font-bold">
+        <div className="grid grid-cols-6 gap-4 border-b bg-surface-secondary p-4 font-bold">
           <div>訂單編號</div>
           <div>客戶</div>
           <div>等級</div>
@@ -65,9 +65,9 @@ export function OrderTable({ orders, total, currentPage, pageSize }: OrderTableP
         {orders.length === 0 ? (
           <div
             className={cn(
-              'rounded-none bg-surface p-8 text-center text-text-secondary',
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.full
+              'rounded-theme-sm bg-surface p-8 text-center text-text-secondary',
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.full
             )}
           >
             找不到符合條件的訂單

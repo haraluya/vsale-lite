@@ -24,11 +24,11 @@ export function BlockTypeSelector({ value, onChange, disabled = false }: BlockTy
         onChange={(e) => onChange(e.target.value as BlockType)}
         disabled={disabled}
         className={`
-          w-full rounded-none text-foreground
-          ${designTokens.neoBrutalism.border.full}
-          ${designTokens.neoBrutalism.shadow.full}
+          w-full rounded-theme-sm text-foreground
+          ${designTokens.cleanCommerce.border.full}
+          ${designTokens.cleanCommerce.shadow.full}
           ${designTokens.input.base}
-          border-black
+         
           focus:outline-none focus:ring-2 focus:ring-blue-500
           ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
           disabled:opacity-50

@@ -8,13 +8,18 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   safelist: [
-    // 等級標籤循環色系統 (Neo-Brutalism 風格 - 鮮豔飽和)
+    // 等級標籤循環色系統
     'bg-blue-300',
     'bg-purple-300',
     'bg-green-300',
     'bg-yellow-300',
     'bg-pink-300',
     'bg-orange-300',
+    // 主題感知工具類別
+    'rounded-theme',
+    'rounded-theme-sm',
+    'rounded-theme-lg',
+    'border-theme',
   ],
   theme: {
     extend: {
@@ -22,9 +27,16 @@ const config: Config = {
         'neo': 'var(--shadow-neo)',
         'neo-sm': 'var(--shadow-neo-sm)',
         'neo-lg': 'var(--shadow-neo-lg)',
+        'theme-hover': 'var(--theme-shadow-hover)',
       },
       borderWidth: {
         '3': '3px',
+        'theme': 'var(--theme-border-width)',
+      },
+      borderRadius: {
+        'theme': 'var(--theme-radius)',
+        'theme-sm': 'var(--theme-radius-sm)',
+        'theme-lg': 'var(--theme-radius-lg)',
       },
       colors: {
         surface: 'var(--color-surface)',
@@ -61,7 +73,6 @@ const config: Config = {
           bg: 'var(--color-info-bg)',
           border: 'var(--color-info-border)',
         },
-        // 品牌色彩系統 (006-ux-enhancement)
         brand: {
           primary: '#1E40AF',
           secondary: '#F97316',

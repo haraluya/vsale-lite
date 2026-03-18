@@ -187,6 +187,14 @@ psql.zip
 # 但健康檢查腳本需要追蹤
 !/scripts/health-check/
 
+# Serwist Service Worker (自動產生)
+public/sw.js
+public/sw.js.map
+public/swe-worker-*.js
+public/swe-worker-*.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+
 # Claude Code
 .claude/
 

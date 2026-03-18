@@ -67,17 +67,17 @@ export function BlockTypeChoice({ onSelect, onCancel }: BlockTypeChoiceProps) {
               key={option.type}
               onClick={() => onSelect(option.type)}
               className={`
-                flex flex-col items-center gap-4 p-6 rounded-none
+                flex flex-col items-center gap-4 p-6 rounded-theme-sm
                 ${option.color} text-black
-                ${designTokens.neoBrutalism.border.full}
-                ${designTokens.neoBrutalism.shadow.full}
-                border-black
-                hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+                ${designTokens.cleanCommerce.border.full}
+                ${designTokens.cleanCommerce.shadow.full}
+               
+                hover:-translate-y-0.5 hover:shadow-theme-hover
                 transition-all
                 text-left
               `}
             >
-              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white border-2 md:border-3 border-black">
+              <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white border-theme">
                 <Icon className="w-8 h-8" />
               </div>
               <div className="w-full text-center">
@@ -93,12 +93,12 @@ export function BlockTypeChoice({ onSelect, onCancel }: BlockTypeChoiceProps) {
         <button
           onClick={onCancel}
           className={`
-            px-6 py-3 rounded-none font-medium
+            px-6 py-3 rounded-theme-sm font-medium
             bg-gray-300 text-black
-            ${designTokens.neoBrutalism.border.full}
-            ${designTokens.neoBrutalism.shadow.full}
-            border-black
-            hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none
+            ${designTokens.cleanCommerce.border.full}
+            ${designTokens.cleanCommerce.shadow.full}
+           
+            hover:-translate-y-0.5 hover:shadow-theme-hover
             transition-all
           `}
         >

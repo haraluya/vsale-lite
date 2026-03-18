@@ -100,7 +100,7 @@ export function ClientFilter({
             type="button"
             variant="secondary"
             onClick={clearFilters}
-            className="border-2 md:border-3 border-black bg-error text-white hover:bg-red-600 flex-shrink-0"
+            className="border-theme bg-error text-white hover:bg-red-600 flex-shrink-0"
           >
             <X className="mr-2 h-4 w-4" />
             清除篩選
@@ -122,10 +122,10 @@ export function ClientFilter({
                 key={tier.id}
                 onClick={() => toggleTier(tier.id)}
                 className={cn(
-                  'rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold transition-all duration-150',
+                  'rounded-theme-sm border-theme px-4 py-2 text-sm font-bold transition-all duration-150',
                   isSelected
-                    ? 'bg-blue-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                    : `${tierColor} text-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-opacity-80`
+                    ? 'bg-blue-500 text-white shadow-neo hover:-translate-y-0.5 hover:shadow-theme-hover'
+                    : `${tierColor} text-foreground shadow-neo-sm hover:bg-opacity-80`
                 )}
               >
                 {tier.name}

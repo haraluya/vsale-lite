@@ -38,13 +38,13 @@ vi.mock('@google-cloud/storage', () => {
   }
 
   return {
-    Storage: vi.fn().mockImplementation(() => mockStorage),
+    Storage: vi.fn().mockImplementation(function () { return mockStorage }),
   }
 })
 
 describe('Google Cloud Storage 整合測試（Mock）', () => {
   beforeEach(() => {
-    // 清除所有 Mock 呼叫記錄
+    // 只重置呼叫記錄，保留 mock implementation
     vi.clearAllMocks()
   })
 

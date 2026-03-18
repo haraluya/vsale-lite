@@ -40,7 +40,7 @@ export function TagBadge({ tag, variant, size = 'md', className = '' }: TagBadge
   return (
     <span
       className={cn(
-        'inline-block rounded-none border-2 font-bold',
+        'inline-block rounded-full border font-medium',
         colorClasses[finalVariant!],
         sizeClasses[size!],
         className
@@ -70,7 +70,7 @@ export function TagBadgeList({ tags, maxTags = 2, size = 'sm', className = '' }:
       {remainingCount > 0 && (
         <span
           className={cn(
-            'inline-block rounded-none border-2 bg-surface-secondary font-bold text-text-secondary',
+            'inline-block rounded-full border bg-surface-secondary font-medium text-text-secondary',
             size === 'sm' && 'px-2 py-0.5 text-xs',
             size === 'md' && 'px-3 py-1 text-sm',
             size === 'lg' && 'px-4 py-1.5 text-base'

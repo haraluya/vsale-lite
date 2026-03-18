@@ -156,7 +156,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
           type="text"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          className="w-full rounded-none border-2 border-black px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full rounded-theme-sm border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
           placeholder="請輸入廣告標題（最多 100 字）"
           maxLength={100}
           required
@@ -172,7 +172,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         <select
           value={formData.seriesId}
           onChange={(e) => setFormData({ ...formData, seriesId: e.target.value })}
-          className="w-full rounded-none border-2 md:border-3 border-black bg-white px-4 py-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-black"
+          className="w-full rounded-theme-sm border-theme bg-white px-4 py-3 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover focus:outline-none focus:ring-2 focus:ring-black"
         >
           <option value="">請選擇系列（不選則不跳轉）</option>
           {categoryList.map((categoryName) => {
@@ -205,7 +205,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
             type="checkbox"
             checked={formData.isActive}
             onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-            className="h-5 w-5 rounded-none border-2 border-black"
+            className="h-5 w-5 rounded-theme-sm border"
           />
           <span className="font-bold">啟用此廣告</span>
         </label>
@@ -219,7 +219,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         <label className="mb-2 block font-bold">
           廣告圖片 {!isEdit && <span className="text-red-600">*</span>}
         </label>
-        <div className="mb-2 rounded-none border-2 border-blue-500 bg-blue-50 p-3">
+        <div className="mb-2 rounded-theme-sm border border-blue-500 bg-blue-50 p-3">
           <p className="text-sm font-bold text-blue-900">
             📐 建議尺寸：1280 × 720 像素（16:9 比例）
           </p>
@@ -229,7 +229,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         </div>
 
         {imagePreview && (
-          <div className="mb-4 relative aspect-video overflow-hidden rounded-none border-2 border-black bg-gray-100">
+          <div className="mb-4 relative aspect-video overflow-hidden rounded-theme-sm border bg-gray-100">
             <Image
               src={imagePreview}
               alt="Preview"
@@ -239,7 +239,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
           </div>
         )}
 
-        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-none border-2 border-black bg-blue-100 px-4 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-theme-sm border bg-blue-100 px-4 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover">
           <Upload className="h-5 w-5" />
           {imagePreview ? '更換圖片' : '上傳圖片'}
           <input
@@ -259,7 +259,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 rounded-none border-2 md:border-3 border-black bg-green-400 px-6 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex-1 rounded-theme-sm border-theme bg-green-400 px-6 py-3 font-bold shadow-neo transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? '處理中...' : isEdit ? '更新廣告' : '建立廣告'}
         </button>
@@ -267,7 +267,7 @@ export function AnnouncementForm({ announcement, series }: AnnouncementFormProps
         <button
           type="button"
           onClick={() => router.back()}
-          className="flex-1 rounded-none border-2 md:border-3 border-black bg-gray-200 px-6 py-3 font-bold shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="flex-1 rounded-theme-sm border-theme bg-gray-200 px-6 py-3 font-bold shadow-neo transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
         >
           取消
         </button>

@@ -46,10 +46,10 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link
       href={`/store/${product.id}`}
       className={cn(
-        'group block rounded-none bg-surface transition-all relative',
-        designTokens.neoBrutalism.border.full,
-        designTokens.neoBrutalism.shadow.full,
-        designTokens.neoBrutalism.hover,
+        'group block rounded-theme-sm bg-surface transition-all relative',
+        designTokens.cleanCommerce.border.full,
+        designTokens.cleanCommerce.shadow.full,
+        designTokens.cleanCommerce.hover,
         "p-2 md:p-4",
         borderColor
       )}
@@ -63,10 +63,10 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* 商品圖片 */}
       <div className={cn(
-        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary",
+        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-theme-sm bg-surface-secondary",
         "relative",  // 新增：支援絕對定位
-        designTokens.neoBrutalism.border.mobile,
-        "border-black"
+        designTokens.cleanCommerce.border.base,
+        "border-border"
       )}>
         {imageUrl ? (
           <Image
@@ -87,8 +87,8 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* 查看商品按鈕（右下角） */}
         <div className="absolute right-2 bottom-2 z-10">
           <span className={cn(
-            "inline-block rounded-none bg-surface",
-            "border-2 border-black",
+            "inline-block rounded-theme-sm bg-surface",
+            "border",
             "shadow-neo-sm",
             "px-2 py-1",
             "text-xs font-bold",
@@ -122,9 +122,9 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* 系列標籤 */}
         {product.series_name && (
           <div className={cn(
-            "inline-block rounded-none bg-info-bg",
-            designTokens.neoBrutalism.border.mobile,
-            "border-black",
+            "inline-block rounded-theme-sm bg-info-bg",
+            designTokens.cleanCommerce.border.base,
+            "border-border",
             "px-1.5 py-0.5 text-xs font-bold"
           )}>
             {product.series_name}

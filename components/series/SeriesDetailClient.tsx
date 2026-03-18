@@ -160,7 +160,7 @@ export function SeriesDetailClient({
 
       {/* 商品列表 */}
       {filteredProducts.length === 0 ? (
-        <div className="rounded-none border-2 md:border-3 border-black bg-surface p-12 text-center shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-surface p-12 text-center shadow-neo">
           <p className="text-lg text-text-secondary">
             {hasFilters ? '找不到符合條件的商品' : '此系列目前沒有可用的商品'}
           </p>

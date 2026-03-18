@@ -27,8 +27,10 @@ import {
   Megaphone,
   UserCog,
   FileText,
+  Download,
   type LucideIcon
 } from 'lucide-react'
+import { usePwaInstall } from '@/lib/hooks/use-pwa-install'
 import { Logo } from '@/components/ui/logo'
 import { LogoutButton } from '@/components/admin/logout-button'
 
@@ -90,9 +92,10 @@ interface MobileSidebarProps {
 
 export function MobileSidebar({ onClose }: MobileSidebarProps) {
   const pathname = usePathname()
+  const { canInstall, install } = usePwaInstall()
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden">
+    <div className="flex flex-col h-full bg-surface overflow-hidden">
       <div className="flex flex-col h-full p-6 overflow-y-auto">
         {/* Logo */}
         <div className="mb-6 flex-shrink-0">
@@ -105,11 +108,11 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
             <div key={section.title}>
               {/* 分隔線（除了第一個區塊） */}
               {sectionIndex > 0 && (
-                <div className="mb-4 border-t-2 border-gray-300" />
+                <div className="mb-4 border-t-2 border-border" />
               )}
 
               {/* 區塊標題 */}
-              <h3 className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+              <h3 className="mb-2 px-2 text-xs font-bold uppercase tracking-wider text-muted">
                 {section.title}
               </h3>
 
@@ -125,10 +128,10 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
                       href={item.href}
                       onClick={onClose}
                       className={cn(
-                        'flex items-center gap-3 rounded-none border-2 px-4 py-2.5 font-bold transition-all w-full',
+                        'flex items-center gap-3 rounded-theme-sm border px-4 py-2.5 font-bold transition-all w-full',
                         isActive
-                          ? 'border-black bg-brand-primary text-white shadow-none translate-x-[2px] translate-y-[2px]'
-                          : 'border-black bg-white text-black shadow-neo-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
+                          ? 'bg-primary text-white shadow-none -translate-y-0.5 shadow-theme-hover'
+                          : 'bg-surface text-foreground shadow-neo-sm active:scale-[0.98]'
                       )}
                     >
                       <Icon className="h-5 w-5 flex-shrink-0" />
@@ -141,8 +144,17 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
           ))}
         </nav>
 
-        {/* Logout Button (底部) */}
-        <div className="mt-6 pt-6 border-t-2 border-gray-300 flex-shrink-0">
+        {/* 安裝按鈕 + Logout Button (底部) */}
+        <div className="mt-6 pt-6 border-t-2 border-border flex-shrink-0 space-y-2">
+          {canInstall && (
+            <button
+              onClick={install}
+              className="flex items-center gap-3 w-full rounded-theme-sm border bg-primary px-4 py-2.5 text-sm font-bold text-white shadow-neo-sm transition-all active:scale-[0.98]"
+            >
+              <Download className="h-5 w-5 flex-shrink-0" />
+              <span className="truncate">安裝到手機</span>
+            </button>
+          )}
           <LogoutButton />
         </div>
       </div>

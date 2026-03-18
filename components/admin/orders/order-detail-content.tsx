@@ -24,7 +24,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { designTokens, getPageContainerClasses, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getPageContainerClasses, getThemeClasses } from '@/lib/design-tokens'
 import type { OrderDetail, OrderTimelineWithActor } from '@/types'
 import { useConfirm } from '@/lib/contexts/dialog-context'
 
@@ -98,8 +98,8 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
       <Link
         href="/admin/orders"
         className={cn(
-          'inline-flex items-center gap-2 rounded-none bg-white font-bold transition-transform',
-          getNeoBrutalismClasses({ hover: true }),
+          'inline-flex items-center gap-2 rounded-theme-sm bg-white font-bold transition-transform',
+          getThemeClasses({ hover: true }),
           designTokens.button.md
         )}
       >
@@ -110,7 +110,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
       {editMode ? (
         /* 編輯模式 */
         <>
-          <div className={cn('rounded-none bg-white', getNeoBrutalismClasses(), designTokens.spacing.card.padding)}>
+          <div className={cn('rounded-theme-sm bg-white', getThemeClasses(), designTokens.spacing.card.padding)}>
             <div className="mb-4">
               <h1 className={cn(designTokens.typography.h1, 'mb-2 font-mono')}>{order.order_number}</h1>
               <OrderStatusBadge status={order.status} size="lg" />
@@ -123,7 +123,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
         /* 檢視模式 */
         <>
           {/* 客戶資訊區塊 - 統一設計系統版本 */}
-          <div className={cn('rounded-none bg-white', getNeoBrutalismClasses(), designTokens.spacing.card.padding)}>
+          <div className={cn('rounded-theme-sm bg-white', getThemeClasses(), designTokens.spacing.card.padding)}>
             {/* 左右分欄 */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
               {/* 左欄：客戶資料 */}
@@ -201,8 +201,8 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                     onClick={() => setEditMode(true)}
                     className={cn(
                       'bg-blue-600 hover:bg-blue-700 text-white font-bold',
-                      'border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo',
-                      'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                      'border-theme shadow-neo-sm',
+                      'active:scale-[0.98]',
                       'px-4 md:px-6 py-2 md:py-3 text-sm md:text-base'
                     )}
                   >
@@ -223,8 +223,8 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
           {(order.user.address || order.user.admin_notes) && (
             <div
               className={cn(
-                'rounded-none bg-white',
-                getNeoBrutalismClasses(),
+                'rounded-theme-sm bg-white',
+                getThemeClasses(),
                 designTokens.spacing.card.padding,
                 designTokens.spacing.card.gap
               )}
@@ -251,11 +251,11 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
           )}
 
           {/* 訂單明細 */}
-          <div className={cn('rounded-none bg-white', getNeoBrutalismClasses())}>
+          <div className={cn('rounded-theme-sm bg-white', getThemeClasses())}>
             <h2
               className={cn(
                 designTokens.typography.h3,
-                'border-b-2 md:border-b-3 border-black bg-gray-100 p-4 md:p-5'
+                'border-b bg-gray-100 p-4 md:p-5'
               )}
             >
               訂單明細
@@ -263,7 +263,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
             {/* 客戶訂單備註 - 統一設計系統版本 */}
             {order.notes && (
-              <div className="border-b-2 border-black bg-blue-50 p-4 md:p-5">
+              <div className="border-b bg-blue-50 p-4 md:p-5">
                 <NoteField icon={FileText} label="客戶訂單備註" content={order.notes} variant="info" />
               </div>
             )}
@@ -431,7 +431,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
               {/* 優惠券折扣 (Feature 009) */}
               {order.coupon && (
-                <div className="grid grid-cols-12 gap-2 md:gap-4 bg-orange-50 border-t-2 border-black p-3 md:p-4">
+                <div className="grid grid-cols-12 gap-2 md:gap-4 bg-orange-50 border-t p-3 md:p-4">
                   <div className={cn('col-span-12 md:col-span-6 font-bold text-orange-700', designTokens.typography.body.base)}>
                     🎫 優惠券折扣 ({order.coupon.coupon_code})
                   </div>
@@ -477,11 +477,11 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
           {/* 訂單修改歷史摘要 */}
           {timelines.some(t => t.action_type === 'order_modified') && (
-            <div className={cn('rounded-none bg-purple-50', getNeoBrutalismClasses())}>
+            <div className={cn('rounded-theme-sm bg-purple-50', getThemeClasses())}>
               <h2
                 className={cn(
                   designTokens.typography.h2,
-                  'border-b-2 md:border-b-3 border-black bg-purple-100 p-3 md:p-4'
+                  'border-b bg-purple-100 p-3 md:p-4'
                 )}
               >
                 ✏️ 訂單修改記錄
@@ -496,7 +496,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                     return (
                       <div
                         key={timeline.id}
-                        className="rounded-none border-2 border-purple-400 bg-white p-3"
+                        className="rounded-theme-sm border border-purple-400 bg-white p-3"
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="font-bold text-sm">
@@ -549,7 +549,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
           )}
 
           {/* 操作歷史與留言 (Feature 007 - US1) */}
-          <div className={cn('rounded-none bg-white', getNeoBrutalismClasses(), designTokens.spacing.card.padding)}>
+          <div className={cn('rounded-theme-sm bg-white', getThemeClasses(), designTokens.spacing.card.padding)}>
             <h2 className={cn(designTokens.typography.h2, 'mb-4 md:mb-6')}>訂單溝通與操作歷史</h2>
             <OrderCommentSection orderId={order.id} initialTimelines={timelines} />
           </div>

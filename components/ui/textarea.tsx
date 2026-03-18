@@ -8,7 +8,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <textarea
         ref={ref}
-        className={cn('input-neo rounded-none resize-y', className)}
+        className={cn(
+          'rounded-theme-sm border-theme bg-surface text-foreground px-3 py-2 text-sm md:px-4 md:py-2.5 md:text-base w-full resize-y transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary',
+          className
+        )}
         {...props}
       />
     )

@@ -7,6 +7,8 @@ import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/shop/navbar'
 import { SecondaryNav } from '@/components/shop/secondary-nav'
 import { BottomNav } from '@/components/shop/bottom-nav'
+import { InstallPrompt } from '@/components/shop/install-prompt'
+import { OfflineIndicator } from '@/components/shop/offline-indicator'
 import { getUnusedCouponCount } from '@/lib/actions/shop'
 
 export const revalidate = 300
@@ -67,6 +69,9 @@ export default async function ShopLayout({
 
   return (
     <div className="min-h-screen bg-background">
+      {/* 離線狀態指示器 */}
+      <OfflineIndicator />
+
       {/* 固定導覽列 */}
       <Navbar user={currentUser} />
 
@@ -86,6 +91,9 @@ export default async function ShopLayout({
 
       {/* 底部導覽列（僅手機版） */}
       <BottomNav />
+
+      {/* PWA 安裝提示 */}
+      <InstallPrompt />
     </div>
   )
 }

@@ -32,7 +32,7 @@ export default async function PromotionsPage() {
   if (!result.success) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="rounded-none border-3 border-red-600 bg-error-bg p-6 text-center">
+        <div className="rounded-theme-sm border border-red-600 bg-error-bg p-6 text-center">
           <p className="text-lg font-semibold text-error">載入失敗</p>
           <p className="mt-2 text-sm text-error">{result.message}</p>
         </div>
@@ -57,7 +57,7 @@ export default async function PromotionsPage() {
 
         {/* 組合優惠列表 */}
         {comboDeals.length === 0 ? (
-          <div className="rounded-none border-2 md:border-3 border-black bg-warning-bg p-8 text-center shadow-neo-sm md:shadow-neo">
+          <div className="rounded-theme-sm border-theme bg-warning-bg p-8 text-center shadow-neo-sm">
             <p className="text-lg font-semibold text-foreground">
               目前沒有適用於您等級的優惠活動
             </p>

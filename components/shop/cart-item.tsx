@@ -90,18 +90,18 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
 
   return (
     <div className={cn(
-      "rounded-none bg-surface",
-      designTokens.neoBrutalism.border.full,
-      "border-black",
-      designTokens.neoBrutalism.shadow.full,
+      "rounded-theme-sm bg-surface",
+      designTokens.cleanCommerce.border.full,
+      "border-border",
+      designTokens.cleanCommerce.shadow.full,
       designTokens.spacing.card.padding
     )}>
       <div className="flex gap-3 md:gap-4">
         {/* 商品圖片 */}
         <div className={cn(
-          "h-16 w-16 md:h-24 md:w-24 flex-shrink-0 overflow-hidden rounded-none bg-surface-secondary",
-          designTokens.neoBrutalism.border.mobile,
-          "border-black"
+          "h-16 w-16 md:h-24 md:w-24 flex-shrink-0 overflow-hidden rounded-theme-sm bg-surface-secondary",
+          designTokens.cleanCommerce.border.base,
+          "border-border"
         )}>
           {item.imageUrl ? (
             <Image
@@ -124,8 +124,8 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
           <div>
             {/* 系列名稱標籤 */}
             <div className={cn(
-              "inline-block rounded-none bg-yellow-100 px-2 py-1 mb-1",
-              designTokens.neoBrutalism.border.mobile,
+              "inline-block rounded-theme-sm bg-yellow-100 px-2 py-1 mb-1",
+              designTokens.cleanCommerce.border.base,
               "border-yellow-400",
               "text-xs font-bold text-yellow-800"
             )}>
@@ -158,9 +158,9 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
                 onClick={handleDecrease}
                 disabled={item.quantity <= 1}
                 className={cn(
-                  "rounded-none bg-surface transition-all hover:bg-surface-secondary",
-                  designTokens.neoBrutalism.border.mobile,
-                  "border-black",
+                  "rounded-theme-sm bg-surface transition-all hover:bg-surface-secondary",
+                  designTokens.cleanCommerce.border.base,
+                  "border-border",
                   "p-1.5 md:p-2",
                   "min-h-[44px] min-w-[44px]", // WCAG 2.1 AA (修正為 44px 標準)
                   "active:translate-x-[1px] active:translate-y-[1px]",
@@ -179,8 +179,8 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
                 onBlur={handleInputBlur}
                 onKeyDown={handleInputKeyDown}
                 className={cn(
-                  "w-16 md:w-20 text-center font-bold rounded-none",
-                  "border-2 border-black",
+                  "w-16 md:w-20 text-center font-bold rounded-theme-sm",
+                  "border",
                   "px-2 py-1.5 md:py-2",
                   "min-h-[44px]", // WCAG 2.1 AA (修正為 44px 標準)
                   "focus:outline-none focus:ring-2 focus:ring-blue-500",
@@ -192,9 +192,9 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
               <button
                 onClick={handleIncrease}
                 className={cn(
-                  "rounded-none bg-surface transition-all hover:bg-surface-secondary",
-                  designTokens.neoBrutalism.border.mobile,
-                  "border-black",
+                  "rounded-theme-sm bg-surface transition-all hover:bg-surface-secondary",
+                  designTokens.cleanCommerce.border.base,
+                  "border-border",
                   "p-1.5 md:p-2",
                   "min-h-[44px] min-w-[44px]", // WCAG 2.1 AA (修正為 44px 標準)
                   "active:translate-x-[1px] active:translate-y-[1px]"
@@ -209,9 +209,9 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
             <button
               onClick={handleRemove}
               className={cn(
-                "rounded-none bg-red-100 text-error transition-all hover:bg-red-200",
-                designTokens.neoBrutalism.border.mobile,
-                "border-black",
+                "rounded-theme-sm bg-red-100 text-error transition-all hover:bg-red-200",
+                designTokens.cleanCommerce.border.base,
+                "border-border",
                 "px-2.5 py-2 md:px-3",
                 "min-h-[40px]", // WCAG 2.1 AA
                 "active:translate-x-[1px] active:translate-y-[1px]"
@@ -227,7 +227,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
       {/* 小計 */}
       <div className={cn(
         "mt-3 md:mt-4 pt-3 md:pt-4",
-        designTokens.neoBrutalism.border.mobile,
+        designTokens.cleanCommerce.border.base,
         "border-t-black"
       )}>
         <div className="flex items-center justify-between">

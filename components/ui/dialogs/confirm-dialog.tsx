@@ -104,8 +104,8 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
       <div
         className={cn(
           'w-full max-w-md',
-          'border-2 md:border-3 bg-surface',
-          'shadow-[8px_8px_0px_0px_var(--color-border)]',
+          'border-theme bg-surface',
+          'shadow-neo-lg rounded-theme',
           'animate-in zoom-in-95 duration-200'
         )}
         onClick={(e) => e.stopPropagation()}
@@ -113,13 +113,13 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
         {/* 標題欄 */}
         <div
           className={cn(
-            'flex items-center gap-3 border-b-2 md:border-b-3 p-4',
+            'flex items-center gap-3 border-b p-4',
             config.headerBg,
             variant === 'default' ? 'text-foreground' : 'text-text-inverse'
           )}
         >
           <Icon className="h-6 w-6 flex-shrink-0" />
-          <h2 id="confirm-dialog-title" className="text-lg font-bold">
+          <h2 id="confirm-dialog-title" className="text-lg font-semibold">
             {title}
           </h2>
         </div>
@@ -132,19 +132,19 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
         </div>
 
         {/* 按鈕 */}
-        <div className="border-t-2 md:border-t-3 p-4 flex gap-3">
+        <div className="border-t p-4 flex gap-3">
           <button
             type="button"
             onClick={handleCancel}
             disabled={isLoading}
             className={cn(
               'flex-1 px-4 py-2',
-              'border-2 md:border-3',
+              'border-theme',
               'bg-surface hover:bg-surface-secondary',
               'font-bold text-sm uppercase',
-              'shadow-neo',
+              'shadow-neo-sm rounded-theme-sm',
               'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              'hover:-translate-y-0.5 hover:shadow-theme-hover',
               'focus:outline-none focus:ring-2 focus:ring-offset-2',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo'
             )}
@@ -158,12 +158,12 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
             disabled={isLoading}
             className={cn(
               'flex-1 px-4 py-2',
-              'border-2 md:border-3',
+              'border-theme',
               config.confirmBg,
               'text-text-inverse font-bold text-sm uppercase',
-              'shadow-neo',
+              'shadow-neo-sm rounded-theme-sm',
               'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              'hover:-translate-y-0.5 hover:shadow-theme-hover',
               'focus:outline-none focus:ring-2 focus:ring-offset-2',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo',
               'flex items-center justify-center gap-2'

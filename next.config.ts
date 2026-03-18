@@ -1,10 +1,18 @@
 import type { NextConfig } from 'next'
+import withSerwistInit from '@serwist/next'
+
+const withSerwist = withSerwistInit({
+  swSrc: 'app/sw.ts',
+  swDest: 'public/sw.js',
+  disable: process.env.NODE_ENV === 'development',
+})
 
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '3mb', // 提升至 3MB 以支援圖片上傳
     },
+    optimizePackageImports: ['lucide-react', 'date-fns', 'recharts'],
   },
   images: {
     // ✅ 使用自定義 Cloudinary loader（Next.js 15 已移除內建 loader）
@@ -29,4 +37,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+export default withSerwist(nextConfig)

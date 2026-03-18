@@ -28,7 +28,7 @@ export function MobileNav() {
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <button
-            className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-none border-2 border-black bg-surface shadow-neo-sm active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+            className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-theme-sm border bg-surface shadow-neo-sm active:scale-[0.98] transition-all"
             aria-label="開啟選單"
           >
             <Menu className="h-6 w-6" />

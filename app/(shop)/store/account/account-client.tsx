@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { LogOut, Sun, Moon } from 'lucide-react'
-import { useConfirm } from '@/lib/contexts/dialog-context'
+import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
 import { useTheme } from '@/lib/contexts/theme-context'
 import { logout } from '@/lib/actions/auth'
 import { cn } from '@/lib/utils'
@@ -17,8 +18,8 @@ export function AccountThemeToggle() {
       onClick={toggleTheme}
       className={cn(
         'flex items-center justify-between w-full',
-        'border-2 md:border-3 border-black bg-surface shadow-neo-sm md:shadow-neo',
-        'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+        'border-theme bg-surface shadow-neo-sm',
+        'active:scale-[0.98]',
         'p-4 md:p-5 font-bold transition-all'
       )}
     >
@@ -44,6 +45,8 @@ export function AccountThemeToggle() {
  */
 export function LogoutButton() {
   const confirm = useConfirm()
+  const alert = useAlert()
+  const [loading, setLoading] = useState(false)
 
   async function handleLogout() {
     const confirmed = await confirm({
@@ -52,23 +55,38 @@ export function LogoutButton() {
       variant: 'danger',
     })
 
-    if (confirmed) {
+    if (!confirmed) return
+
+    setLoading(true)
+    try {
       await logout()
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+        return
+      }
+      await alert({
+        title: '登出失敗',
+        message: '登出失敗，請稍後再試',
+        variant: 'error',
+      })
+      setLoading(false)
     }
   }
 
   return (
     <button
       onClick={handleLogout}
+      disabled={loading}
       className={cn(
         'flex items-center justify-center gap-2 w-full',
-        'border-2 md:border-3 border-black bg-red-400 text-black shadow-neo-sm md:shadow-neo',
-        'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-        'p-4 md:p-5 font-bold transition-all'
+        'border-theme bg-red-400 text-black shadow-neo-sm',
+        'active:scale-[0.98]',
+        'p-4 md:p-5 font-bold transition-all',
+        'disabled:opacity-50'
       )}
     >
       <LogOut className="w-5 h-5" />
-      <span className="text-sm md:text-base">登出</span>
+      <span className="text-sm md:text-base">{loading ? '登出中...' : '登出'}</span>
     </button>
   )
 }

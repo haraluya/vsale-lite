@@ -62,7 +62,7 @@ export function OrderStatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-none border-2 font-bold ${config.colorClass} ${sizeClass} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-theme-sm border font-bold ${config.colorClass} ${sizeClass} ${className}`}
     >
       <span>{config.emoji}</span>
       <span>{config.label}</span>

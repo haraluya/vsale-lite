@@ -79,7 +79,7 @@ export function CouponCard({
   const cardBgColor = isUsed || isExpired ? 'bg-surface-secondary' : 'bg-surface'
 
   return (
-    <div className={`relative border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo ${cardBgColor} overflow-hidden`}>
+    <div className={`relative border-theme shadow-neo-sm ${cardBgColor} overflow-hidden`}>
       {/* 鋸齒狀切口（虛線分隔） */}
       <div className="absolute top-0 right-24 md:right-32 bottom-0 w-px bg-black opacity-30"
            style={{
@@ -128,8 +128,8 @@ export function CouponCard({
             <button
               onClick={onClaim}
               className="mt-3 w-full md:w-auto px-4 py-2 bg-black text-white font-bold
-                         border-2 border-black shadow-neo-sm hover:translate-x-[2px]
-                         hover:translate-y-[2px] hover:shadow-none transition-all
+                         border shadow-neo-sm hover:-translate-y-0.5
+                         hover:shadow-theme-hover hover:shadow-none transition-all
                          text-sm md:text-base"
             >
               立即領取

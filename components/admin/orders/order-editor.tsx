@@ -405,7 +405,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
   }
 
   return (
-    <div className="border-2 md:border-3 border-black bg-white p-6 space-y-6 shadow-neo">
+    <div className="border-theme bg-white p-6 space-y-6 shadow-neo">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-xl">📝 編輯訂單</h3>
         <Button
@@ -431,7 +431,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           return (
             <div
               key={item.id}
-              className={`border-2 border-black p-4 space-y-3 ${
+              className={`border p-4 space-y-3 ${
                 item.is_removed ? 'bg-red-50 opacity-60' : 'bg-white'
               }`}
             >
@@ -470,7 +470,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                       step="1"
                       value={item.deal_price}
                       onChange={e => handlePriceChange(item.id, parseFloat(e.target.value) || 0)}
-                      className="w-32 border-2 border-black"
+                      className="w-32 border"
                       disabled={loading}
                     />
                     {priceChanged && (
@@ -492,7 +492,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                         size="sm"
                         onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                         disabled={item.quantity <= 1 || loading}
-                        className="border-2 border-black min-h-[40px] min-w-[40px]"
+                        className="border min-h-[40px] min-w-[40px]"
                       >
                         -
                       </Button>
@@ -501,7 +501,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                         inputMode="numeric"
                         value={item.quantity}
                         onChange={e => handleQuantityInputChange(item.id, e.target.value)}
-                        className="w-24 text-center border-2 border-black font-bold min-h-[40px]"
+                        className="w-24 text-center border font-bold min-h-[40px]"
                         disabled={loading}
                         placeholder="數量"
                       />
@@ -510,7 +510,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                         size="sm"
                         onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                         disabled={loading}
-                        className="border-2 border-black min-h-[40px] min-w-[40px]"
+                        className="border min-h-[40px] min-w-[40px]"
                       >
                         +
                       </Button>
@@ -521,7 +521,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                   </div>
 
                   {/* 小計 */}
-                  <div className="flex justify-between items-center pt-2 border-t border-gray-300">
+                  <div className="flex justify-between items-center pt-2 border-t border-border">
                     <span className="font-bold">小計:</span>
                     <span className="text-lg font-bold">NT${item.subtotal.toFixed(0)}</span>
                   </div>
@@ -541,7 +541,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             disabled={loading}
             size="sm"
             variant="outline"
-            className="border-2 border-black"
+            className="border"
           >
             <Plus className="w-4 h-4 mr-1" />
             新增費用
@@ -555,7 +555,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             {editedFees.map(fee => (
               <div
                 key={fee.id}
-                className={`flex justify-between items-center p-3 border-2 border-black ${
+                className={`flex justify-between items-center p-3 border ${
                   fee.is_new ? 'bg-green-50' : 'bg-white'
                 }`}
               >
@@ -598,7 +598,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             step="1"
             value={editedShippingFee}
             onChange={e => setEditedShippingFee(Math.ceil(parseFloat(e.target.value)) || 0)}
-            className="w-32 border-2 border-black"
+            className="w-32 border"
             disabled={loading}
           />
           {editedShippingFee !== (order.shipping_fee || 0) && (
@@ -619,7 +619,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           placeholder="輸入客戶備註..."
           maxLength={500}
           rows={3}
-          className="border-2 border-black resize-none"
+          className="border resize-none"
           disabled={loading}
         />
         <div className="flex justify-between text-sm">
@@ -633,7 +633,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
       </div>
 
       {/* 總額摘要 */}
-      <div className="border-t-2 md:border-t-3 border-black pt-4 space-y-2">
+      <div className="border-t pt-4 space-y-2">
         <h4 className="font-bold text-lg">💰 訂單摘要</h4>
 
         <div className="space-y-1 text-sm">
@@ -664,7 +664,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           )}
         </div>
 
-        <div className="border-t-2 border-black pt-2 flex justify-between font-bold text-xl">
+        <div className="border-t pt-2 flex justify-between font-bold text-xl">
           <span>訂單總額:</span>
           <span
             className={
@@ -688,14 +688,14 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           variant="outline"
           onClick={onCancel}
           disabled={loading}
-          className="flex-1 border-2 border-black"
+          className="flex-1 border"
         >
           取消編輯
         </Button>
         <Button
           onClick={() => handleSave()}
           disabled={loading}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 border-2 border-black shadow-neo-sm md:shadow-neo active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          className="flex-1 bg-blue-600 hover:bg-blue-700 border shadow-neo-sm active:scale-[0.98]"
         >
           {loading ? (
             <>

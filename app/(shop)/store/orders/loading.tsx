@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 function OrderCardSkeleton() {
   return (
-    <div className="border-2 border-black p-4 bg-surface shadow-neo-sm md:shadow-neo">
+    <div className="border p-4 bg-surface shadow-neo-sm">
       <div className="flex justify-between items-start mb-3">
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-6 w-20" />

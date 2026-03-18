@@ -153,7 +153,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
 
   if (selectedProductIds.length === 0) {
     return (
-      <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-6 text-center">
+      <div className="rounded-theme-sm border border-border bg-gray-50 p-6 text-center">
         <Tags className="mx-auto mb-2 h-12 w-12 text-gray-400" />
         <p className="text-gray-600">請先選擇商品以進行批次標籤設定</p>
       </div>
@@ -161,7 +161,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
   }
 
   return (
-    <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+    <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
       <h3 className="mb-4 text-lg font-bold">批次標籤設定</h3>
 
       {/* 選擇操作類型 */}
@@ -170,7 +170,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
         <div className="flex gap-2">
           <button
             onClick={() => setOperation('add')}
-            className={`flex-1 rounded-none border-2 md:border-3 border-black px-4 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none ${
+            className={`flex-1 rounded-theme-sm border-theme px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
               operation === 'add' ? 'bg-green-400' : 'bg-white'
             }`}
           >
@@ -181,7 +181,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
           </button>
           <button
             onClick={() => setOperation('remove')}
-            className={`flex-1 rounded-none border-2 md:border-3 border-black px-4 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none ${
+            className={`flex-1 rounded-theme-sm border-theme px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
               operation === 'remove' ? 'bg-red-400' : 'bg-white'
             }`}
           >
@@ -211,7 +211,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
                       handleAddToSelection(tag)
                     }
                   }}
-                  className={`inline-flex items-center gap-1 rounded-none border-2 border-black px-3 py-2 font-medium shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none ${
+                  className={`inline-flex items-center gap-1 rounded-theme-sm border px-3 py-2 font-medium shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
                     selectedTags.includes(tag)
                       ? 'bg-red-100 border-red-600'
                       : 'bg-white hover:bg-red-50'
@@ -225,7 +225,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
               ))}
             </div>
           ) : (
-            <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-4 text-center">
+            <div className="rounded-theme-sm border border-border bg-gray-50 p-4 text-center">
               <p className="text-sm text-gray-600">
                 所選商品沒有共同標籤
               </p>
@@ -248,7 +248,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
               <button
                 key={tag}
                 onClick={() => handleRemoveFromSelection(tag)}
-                className={`group inline-flex items-center gap-1 rounded-none border-2 border-black px-3 py-1 shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none ${
+                className={`group inline-flex items-center gap-1 rounded-theme-sm border px-3 py-1 shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
                   operation === 'add' ? 'bg-white hover:bg-red-50' : 'bg-red-100 hover:bg-red-200'
                 }`}
               >
@@ -276,12 +276,12 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
             onFocus={() => setShowSuggestions(inputValue.length > 0)}
             placeholder="輸入標籤名稱 (2-8 字元)..."
             disabled={isLoading}
-            className="w-full rounded-none border-2 border-black px-4 py-2 shadow-neo-sm md:shadow-neo focus:outline-none focus:ring-2 focus:ring-black disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-theme-sm border px-4 py-2 shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black disabled:cursor-not-allowed disabled:opacity-50"
           />
           <button
             onClick={() => handleAddToSelection(inputValue)}
             disabled={isLoading || !inputValue.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-none border-2 border-black bg-blue-400 p-2 shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-theme-sm border bg-blue-400 p-2 shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
           >
             <Plus className="h-4 w-4" />
           </button>
@@ -289,7 +289,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
 
         {/* 建議標籤 */}
         {showSuggestions && suggestedTags.length > 0 && (
-          <div className="absolute z-10 mt-2 w-full rounded-none border-2 border-black bg-white shadow-neo">
+          <div className="absolute z-10 mt-2 w-full rounded-theme-sm border bg-white shadow-neo">
             <div className="p-2">
               <p className="mb-2 text-xs font-bold text-gray-600">常用標籤</p>
               <div className="space-y-1">
@@ -297,7 +297,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
                   <button
                     key={tag}
                     onClick={() => handleAddToSelection(tag)}
-                    className="flex w-full items-center gap-2 rounded-none border-2 border-transparent px-3 py-2 text-left hover:border-black hover:bg-gray-50"
+                    className="flex w-full items-center gap-2 rounded-theme-sm border border-transparent px-3 py-2 text-left hover:hover:bg-gray-50"
                   >
                     <Tags className="h-4 w-4 text-gray-400" />
                     <span className="font-medium">{tag}</span>
@@ -318,7 +318,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
         <button
           onClick={handleBatchUpdate}
           disabled={isLoading || selectedTags.length === 0}
-          className="rounded-none border-2 md:border-3 border-black bg-yellow-400 px-6 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
+          className="rounded-theme-sm border-theme bg-yellow-400 px-6 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
         >
           {isLoading ? '處理中...' : '執行批次更新'}
         </button>

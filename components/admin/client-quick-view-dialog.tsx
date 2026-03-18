@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from '@/components/ui/button'
 import { User, Phone, Award, MapPin, FileText, Edit, ExternalLink, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { updateClientQuickInfo } from '@/lib/actions/clients'
 import { useAlert } from '@/lib/contexts/dialog-context'
 
@@ -112,12 +112,12 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
-        'sm:max-w-[500px] rounded-none bg-surface',
-        getNeoBrutalismClasses(),
+        'sm:max-w-[500px] rounded-theme-sm bg-surface',
+        getThemeClasses(),
         'p-0'
       )}>
         <DialogHeader className={cn(
-          'bg-surface-secondary border-b-2 md:border-b-3 border-black',
+          'bg-surface-secondary border-b',
           designTokens.spacing.card.padding
         )}>
           <DialogTitle className={designTokens.typography.h2}>
@@ -170,14 +170,14 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   placeholder="請輸入客戶常用地址"
                   rows={3}
                   className={cn(
-                    'w-full rounded-none border-2 border-black px-3 py-2',
+                    'w-full rounded-theme-sm border px-3 py-2',
                     'focus:outline-none focus:ring-2 focus:ring-blue-500',
                     designTokens.typography.body.base
                   )}
                 />
               ) : (
                 <div className={cn(
-                  'rounded-none border-2 border-gray-300 bg-surface-secondary px-3 py-2 min-h-[80px]',
+                  'rounded-theme-sm border border-border bg-surface-secondary px-3 py-2 min-h-[80px]',
                   designTokens.typography.body.base
                 )}>
                   {client.address || '未設定'}
@@ -197,14 +197,14 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   placeholder="請輸入管理員備註（客戶不可見）"
                   rows={4}
                   className={cn(
-                    'w-full rounded-none border-2 border-black px-3 py-2',
+                    'w-full rounded-theme-sm border px-3 py-2',
                     'focus:outline-none focus:ring-2 focus:ring-blue-500',
                     designTokens.typography.body.base
                   )}
                 />
               ) : (
                 <div className={cn(
-                  'rounded-none border-2 border-yellow-300 bg-warning-bg px-3 py-2 min-h-[100px]',
+                  'rounded-theme-sm border border-yellow-300 bg-warning-bg px-3 py-2 min-h-[100px]',
                   designTokens.typography.body.base,
                   client.admin_notes ? 'text-yellow-900' : 'text-muted'
                 )}>
@@ -223,8 +223,8 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   disabled={isSaving}
                   className={cn(
                     'flex-1 bg-green-600 hover:bg-green-700 text-white font-bold',
-                    'border-2 border-black shadow-neo-sm',
-                    'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                    'border shadow-neo-sm',
+                    'active:scale-[0.98]',
                     designTokens.button.md
                   )}
                 >
@@ -242,8 +242,8 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   disabled={isSaving}
                   className={cn(
                     'flex-1 bg-surface-secondary hover:bg-gray-300 text-foreground font-bold',
-                    'border-2 border-black shadow-neo-sm',
-                    'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                    'border shadow-neo-sm',
+                    'active:scale-[0.98]',
                     designTokens.button.md
                   )}
                 >
@@ -256,8 +256,8 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   onClick={() => setEditMode(true)}
                   className={cn(
                     'flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold',
-                    'border-2 border-black shadow-neo-sm',
-                    'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                    'border shadow-neo-sm',
+                    'active:scale-[0.98]',
                     designTokens.button.md
                   )}
                 >
@@ -268,8 +268,8 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   onClick={handleViewFullDetails}
                   className={cn(
                     'flex-1 bg-surface hover:bg-surface-secondary text-foreground font-bold',
-                    'border-2 border-black shadow-neo-sm',
-                    'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
+                    'border shadow-neo-sm',
+                    'active:scale-[0.98]',
                     designTokens.button.md
                   )}
                 >

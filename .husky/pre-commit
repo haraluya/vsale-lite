@@ -75,7 +75,7 @@ fi
 # 檢查 3: ESLint 檢查（僅檢查已暫存的檔案）
 echo "🔍 執行 ESLint 檢查..."
 if git diff --cached --name-only | grep -qE "\.(ts|tsx|js|jsx)$"; then
-  staged_files=$(git diff --cached --name-only | grep -E "\.(ts|tsx|js|jsx)$" | xargs)
+  staged_files=$(git diff --cached --name-only --diff-filter=d | grep -E "\.(ts|tsx|js|jsx)$" | xargs)
   if [ -n "$staged_files" ]; then
     echo "檢查檔案: $staged_files"
     # ESLint v9 使用舊配置格式需加上 --config 標誌

@@ -85,7 +85,7 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex md:w-16 lg:w-64 border-r-2 md:border-r-3 bg-surface flex-col fixed top-0 left-0 h-screen overflow-y-auto">
+    <aside className="hidden md:flex md:w-16 lg:w-64 border-r bg-surface flex-col fixed top-0 left-0 h-screen overflow-y-auto">
       {/* Logo */}
       <div className="mb-6 md:mb-8 p-3 md:p-4 lg:p-6">
         <div className="md:flex md:justify-center lg:block">
@@ -125,12 +125,12 @@ export function Sidebar() {
                     href={item.href}
                     title={item.label}
                     className={cn(
-                      'flex items-center rounded-none border-2 font-bold transition-all',
+                      'flex items-center rounded-theme-sm border font-bold transition-all',
                       'md:w-12 md:h-12 md:justify-center md:p-0',
                       'lg:w-auto lg:h-auto lg:justify-start lg:gap-3 lg:px-4 lg:py-2.5',
                       isActive
-                        ? 'border-primary bg-primary text-text-inverse shadow-none translate-x-[2px] translate-y-[2px]'
-                        : 'bg-surface shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                        ? 'border-primary bg-primary text-text-inverse shadow-none -translate-y-0.5 shadow-theme-hover'
+                        : 'bg-surface shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover'
                     )}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0" />

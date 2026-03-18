@@ -57,7 +57,7 @@ export function SystemSettingsTabs({
           return (
             <div className="space-y-8">
               {/* 基本設定 */}
-              <div className="rounded-none border-2 md:border-3 border-purple-500 bg-purple-50 p-6 shadow-neo-sm md:shadow-neo">
+              <div className="rounded-theme-sm border-theme border-purple-500 bg-purple-50 p-6 shadow-neo-sm">
                 <h2 className="text-xl font-black mb-4 flex items-center gap-2">
                   <span className="text-2xl">📝</span>
                   基本設定
@@ -81,7 +81,7 @@ export function SystemSettingsTabs({
 
               {/* 品牌圖片管理 - 整合所有尺寸 */}
               {(logoUrlSetting || logoIconUrlSetting || faviconUrlSetting) && (
-                <div className="rounded-none border-2 md:border-3 border-green-500 bg-green-50 p-6 shadow-neo-sm md:shadow-neo">
+                <div className="rounded-theme-sm border-theme border-green-500 bg-green-50 p-6 shadow-neo-sm">
                   <h2 className="text-xl font-black mb-4 flex items-center gap-2">
                     <span className="text-2xl">🖼️</span>
                     品牌圖片管理

@@ -175,7 +175,7 @@ export function SeriesSelector({
           {selectedSeries.map((series, index) => (
             <div
               key={series.series_id}
-              className="border-2 border-black rounded-none p-3 bg-white shadow-neo-sm"
+              className="border rounded-theme-sm p-3 bg-white shadow-neo-sm"
             >
               <div className="flex items-center gap-3">
                 {/* 順位調整按鈕 */}
@@ -184,7 +184,7 @@ export function SeriesSelector({
                     type="button"
                     onClick={() => handleMoveUp(index)}
                     disabled={index === 0 || disabled}
-                    className="p-1 border border-black rounded-none hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1 border rounded-theme-sm hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
                     title="上移"
                   >
                     <ChevronUp className="h-3 w-3" />
@@ -193,7 +193,7 @@ export function SeriesSelector({
                     type="button"
                     onClick={() => handleMoveDown(index)}
                     disabled={index === selectedSeries.length - 1 || disabled}
-                    className="p-1 border border-black rounded-none hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1 border rounded-theme-sm hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
                     title="下移"
                   >
                     <ChevronDown className="h-3 w-3" />
@@ -201,7 +201,7 @@ export function SeriesSelector({
                 </div>
 
                 {/* 順位編號 */}
-                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center border-2 border-black rounded-none bg-purple-100 font-bold">
+                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center border rounded-theme-sm bg-purple-100 font-bold">
                   {index + 1}
                 </div>
 
@@ -220,7 +220,7 @@ export function SeriesSelector({
                       onChange={(e) =>
                         handleQuantityChange(series.series_id, parseInt(e.target.value) || 1)
                       }
-                      className="w-20 px-2 py-1 border-2 border-black rounded-none text-center font-bold"
+                      className="w-20 px-2 py-1 border rounded-theme-sm text-center font-bold"
                       min="1"
                       disabled={disabled}
                     />
@@ -232,7 +232,7 @@ export function SeriesSelector({
                   type="button"
                   onClick={() => handleRemoveSeries(series.series_id)}
                   disabled={disabled}
-                  className="p-2 border-2 border-black rounded-none bg-red-100 hover:bg-red-200 disabled:opacity-50"
+                  className="p-2 border rounded-theme-sm bg-red-100 hover:bg-red-200 disabled:opacity-50"
                   title="移除系列"
                 >
                   <X className="h-4 w-4" />
@@ -250,7 +250,7 @@ export function SeriesSelector({
         </p>
 
         {selectedSeries.length >= 5 ? (
-          <p className="text-sm text-gray-600 py-4 text-center border-2 border-dashed border-gray-300 rounded-none">
+          <p className="text-sm text-gray-600 py-4 text-center border border-dashed border-border rounded-theme-sm">
             已達最大系列數量 (5 個)
           </p>
         ) : (() => {
@@ -258,7 +258,7 @@ export function SeriesSelector({
 
           if (sortedCategories.length === 0 && uncategorizedSeries.length === 0) {
             return (
-              <p className="text-sm text-gray-600 py-4 text-center border-2 border-dashed border-gray-300 rounded-none">
+              <p className="text-sm text-gray-600 py-4 text-center border border-dashed border-border rounded-theme-sm">
                 沒有可用的系列，請先建立系列
               </p>
             )
@@ -274,7 +274,7 @@ export function SeriesSelector({
                 return (
                   <div key={category.id}>
                     {/* 分類標題 */}
-                    <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-gray-300">
+                    <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-border">
                       {category.name}
                     </h4>
 
@@ -286,7 +286,7 @@ export function SeriesSelector({
                           type="button"
                           onClick={() => handleAddSeries(series.id)}
                           disabled={disabled}
-                          className="p-3 border-2 border-black rounded-none bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
+                          className="p-3 border rounded-theme-sm bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
                         >
                           <span className="font-bold text-sm">{series.name}</span>
                           {series.code && (
@@ -302,7 +302,7 @@ export function SeriesSelector({
               {/* 未分類的系列 */}
               {uncategorizedSeries.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-gray-300">
+                  <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-border">
                     未分類
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -312,7 +312,7 @@ export function SeriesSelector({
                         type="button"
                         onClick={() => handleAddSeries(series.id)}
                         disabled={disabled}
-                        className="p-3 border-2 border-black rounded-none bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
+                        className="p-3 border rounded-theme-sm bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
                       >
                         <span className="font-bold text-sm">{series.name}</span>
                         {series.code && (

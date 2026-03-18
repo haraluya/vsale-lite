@@ -147,7 +147,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
 
   if (timelines.length === 0) {
     return (
-      <div className="rounded-none border-2 border-black bg-gray-50 p-4 text-center text-gray-500">
+      <div className="rounded-theme-sm border bg-gray-50 p-4 text-center text-gray-500">
         尚無操作記錄
       </div>
     )
@@ -174,7 +174,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
               <div className={`max-w-md ${isAdminComment ? 'ml-auto' : 'mr-auto'}`}>
                 {/* 氣泡式留言框 */}
                 <div
-                  className={`rounded-none border-2 md:border-3 border-black p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]
+                  className={`rounded-theme-sm border-theme p-4 shadow-neo-sm
                              ${isAdminComment ? 'bg-blue-100' : 'bg-gray-100'}`}
                 >
                   {/* 留言內容 */}
@@ -207,7 +207,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
             {/* 時間線 */}
             <div className="flex flex-col items-center">
               <div
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-none border-2 ${config.colorClass} text-lg`}
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-theme-sm border ${config.colorClass} text-lg`}
               >
                 {config.emoji}
               </div>
@@ -216,7 +216,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
 
             {/* 內容 */}
             <div className="flex-1 pb-6">
-              <div className="rounded-none border-2 border-black bg-white p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              <div className="rounded-theme-sm border bg-white p-4 shadow-neo-sm">
                 <div className="mb-2 flex items-start justify-between">
                   <div className="font-bold">{getTimelineMessage(timeline)}</div>
                   <div className="flex items-center gap-1 text-sm text-gray-600">
@@ -229,7 +229,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
 
                 {/* 訂單修改詳細內容 (Feature 011) */}
                 {timeline.action_type === 'order_modified' && timeline.modifications && (
-                  <div className="mt-3 rounded-none border-2 border-purple-300 bg-purple-50 p-3">
+                  <div className="mt-3 rounded-theme-sm border border-purple-300 bg-purple-50 p-3">
                     <div className="mb-1 text-xs font-bold text-purple-700">修改明細：</div>
                     <div className="whitespace-pre-line text-sm text-gray-700">
                       {formatModifications(timeline.modifications)}

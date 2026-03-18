@@ -41,9 +41,9 @@ export function TableSkeleton({
       {showFilters && (
         <div
           className={cn(
-            'flex flex-col gap-4 rounded-none bg-surface sm:flex-row',
-            designTokens.neoBrutalism.border.full,
-            designTokens.neoBrutalism.shadow.full,
+            'flex flex-col gap-4 rounded-theme-sm bg-surface sm:flex-row',
+            designTokens.cleanCommerce.border.full,
+            designTokens.cleanCommerce.shadow.full,
             designTokens.spacing.card.padding
           )}
         >
@@ -61,13 +61,13 @@ export function TableSkeleton({
       {/* 桌面版表格骨架 */}
       <div
         className={cn(
-          'hidden lg:block rounded-none bg-surface',
-          designTokens.neoBrutalism.border.full,
-          designTokens.neoBrutalism.shadow.full
+          'hidden lg:block rounded-theme-sm bg-surface',
+          designTokens.cleanCommerce.border.full,
+          designTokens.cleanCommerce.shadow.full
         )}
       >
         {/* 表頭 */}
-        <div className="p-4 border-b-2 md:border-b-3 border-black">
+        <div className="p-4 border-b">
           <div
             className="grid gap-4"
             style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
@@ -100,9 +100,9 @@ export function TableSkeleton({
           <div
             key={i}
             className={cn(
-              'rounded-none bg-surface',
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.full,
+              'rounded-theme-sm bg-surface',
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.full,
               designTokens.spacing.card.padding,
               designTokens.spacing.card.gap
             )}

@@ -20,7 +20,7 @@ import { ProductThumbnail } from '@/components/admin/products/product-thumbnail'
 import { ProductNameWithSeries } from '@/components/admin/products/product-name-with-series'
 import { ProductStatusToggle } from '@/components/admin/product-status-toggle'
 import { TagBadgeList } from '@/components/ui/tag-badge'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import { formatAmount } from '@/lib/date-utils'
 import type { Product, Series } from '@/types'
@@ -55,13 +55,13 @@ export function VirtualProductList({
       <div className="hidden lg:block">
         <div
           className={cn(
-            'rounded-none bg-white overflow-hidden',
-            designTokens.neoBrutalism.border.full,
-            designTokens.neoBrutalism.shadow.full
+            'rounded-theme-sm bg-white overflow-hidden',
+            designTokens.cleanCommerce.border.full,
+            designTokens.cleanCommerce.shadow.full
           )}
         >
           {/* 表頭（固定） */}
-          <div className="grid grid-cols-8 gap-4 border-b-3 border-black bg-gray-100 p-4 font-bold sticky top-0 z-10">
+          <div className="grid grid-cols-8 gap-4 border-b bg-gray-100 p-4 font-bold sticky top-0 z-10">
             <div>圖片</div>
             <div className="col-span-2">名稱 / 系列</div>
             <div>標籤</div>
@@ -158,7 +158,7 @@ export function VirtualProductList({
                     <div className="flex gap-2 justify-center">
                       <Link
                         href={`/admin/products/${product.id}/edit`}
-                        className="inline-flex items-center justify-center gap-1 rounded-none border-2 border-black bg-blue-100 px-3 py-1.5 text-xs font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                        className="inline-flex items-center justify-center gap-1 rounded-theme-sm border bg-blue-100 px-3 py-1.5 text-xs font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                       >
                         <Edit className="h-3 w-3" />
                         編輯
@@ -194,8 +194,8 @@ export function VirtualProductList({
             <div
               key={product.id}
               className={cn(
-                'rounded-none bg-white',
-                getNeoBrutalismClasses({ active: true }),
+                'rounded-theme-sm bg-white',
+                getThemeClasses({ active: true }),
                 designTokens.spacing.card.padding
               )}
             >
@@ -255,7 +255,7 @@ export function VirtualProductList({
 
                     <Link
                       href={`/admin/products/${product.id}/edit`}
-                      className="inline-flex items-center justify-center gap-1 rounded-none border-2 border-black bg-blue-100 px-3 py-1.5 text-xs font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                      className="inline-flex items-center justify-center gap-1 rounded-theme-sm border bg-blue-100 px-3 py-1.5 text-xs font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                     >
                       <Edit className="h-3 w-3" />
                       編輯

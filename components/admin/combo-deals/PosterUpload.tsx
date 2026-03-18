@@ -189,7 +189,7 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
 
 
   return (
-    <div className={`rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo`}>
+    <div className={`rounded-theme-sm border-theme bg-white p-4 shadow-neo`}>
       <h3 className={`${designTokens.typography.h3} mb-4`}>
         組合優惠海報 <span className="text-red-600">*</span>
         {uploading && <span className="ml-2 text-xs text-blue-600">(上傳中...)</span>}
@@ -198,7 +198,7 @@ export function PosterUpload({ currentUrl, onUploadComplete, disabled = false }:
       {/* 預覽區域 */}
       {(currentUrl || previewUrl) && (
         <div className="mb-4">
-          <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-2 overflow-hidden">
+          <div className="rounded-theme-sm border border-border bg-gray-50 p-2 overflow-hidden">
             <div className="relative w-full aspect-[16/9]">
               <Image
                 src={previewUrl || currentUrl || ''}

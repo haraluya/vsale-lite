@@ -40,7 +40,7 @@ export function UpdatePasswordForm({ clientId, clientName }: UpdatePasswordFormP
 
   return (
     <form action={formAction} className="space-y-6">
-      <div className="bg-yellow-50 border-2 md:border-3 border-yellow-500 p-4 rounded-none">
+      <div className="bg-yellow-50 border-theme border-yellow-500 p-4 rounded-theme-sm">
         <p className="text-sm font-medium text-yellow-800">
           ⚠️ 正在為「{clientName}」修改密碼
         </p>

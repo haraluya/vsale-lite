@@ -37,7 +37,7 @@ export default async function ComboDealsPage(props: {
   if (!result.success) {
     return (
       <div className="p-6">
-        <div className="rounded-none border-2 border-red-500 bg-error-bg p-4">
+        <div className="rounded-theme-sm border border-red-500 bg-error-bg p-4">
           <p className="text-foreground">載入組合優惠列表失敗：{result.message}</p>
         </div>
       </div>
@@ -67,7 +67,7 @@ export default async function ComboDealsPage(props: {
       {/* Filters */}
       <Suspense
         fallback={
-          <div className="rounded-none border-2 border-black bg-surface p-4">
+          <div className="rounded-theme-sm border bg-surface p-4">
             載入篩選器...
           </div>
         }
@@ -79,7 +79,7 @@ export default async function ComboDealsPage(props: {
       </Suspense>
 
       {/* Table */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-surface shadow-neo-sm md:shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-surface shadow-neo-sm">
         {items.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-text-secondary">
@@ -99,7 +99,7 @@ export default async function ComboDealsPage(props: {
       </div>
 
       {/* Stats */}
-      <div className="rounded-none border-2 border-black bg-surface-secondary p-4">
+      <div className="rounded-theme-sm border bg-surface-secondary p-4">
         <p className="text-sm text-text-secondary">
           顯示第 {(page - 1) * limit + 1} - {Math.min(page * limit, total)} 筆，共{' '}
           {total} 筆組合優惠

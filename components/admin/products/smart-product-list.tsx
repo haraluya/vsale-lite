@@ -75,7 +75,7 @@ export function SmartProductList({
     return (
       <div>
         {/* 提示訊息 */}
-        <div className="mb-4 text-sm text-gray-600 bg-blue-50 border-2 border-black p-3">
+        <div className="mb-4 text-sm text-gray-600 bg-blue-50 border p-3">
           ⚡ 虛擬滾動模式已啟用（{products.length} 筆商品）- 部分批次編輯功能已簡化以提升性能
         </div>
 

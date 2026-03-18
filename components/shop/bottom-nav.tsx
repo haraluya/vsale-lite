@@ -34,8 +34,7 @@ export function BottomNav() {
     <nav
       className={cn(
         'fixed bottom-0 left-0 right-0 z-50 md:hidden',
-        'bg-surface border-t-2',
-        'shadow-[0_-2px_0_0_var(--color-border)]'
+        'bg-surface border-t shadow-neo-lg'
       )}
       style={{ paddingBottom: 'var(--safe-area-bottom)' }}
     >
@@ -53,16 +52,16 @@ export function BottomNav() {
               className={cn(
                 'flex flex-col items-center justify-center gap-0.5 relative',
                 'min-w-[44px] min-h-[44px] px-2',
-                'transition-colors',
+                'transition-colors duration-200',
                 isActive
-                  ? 'text-primary font-bold'
+                  ? 'text-primary font-semibold'
                   : 'text-muted'
               )}
             >
               <div className="relative">
                 <Icon className="h-5 w-5" />
                 {item.showBadge && cartItemsCount > 0 && (
-                  <span className="absolute -right-2.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-error text-text-inverse text-[10px] font-bold border">
+                  <span className="absolute -right-2.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-error text-text-inverse text-[10px] font-semibold border">
                     {cartItemsCount > 99 ? '99+' : cartItemsCount}
                   </span>
                 )}

@@ -39,7 +39,7 @@ export function SeriesHeroImage({
 
   return (
     <>
-      <div className="relative h-80 w-full overflow-hidden rounded-none border-2 md:border-3 border-black bg-surface-secondary shadow-neo">
+      <div className="relative h-80 w-full overflow-hidden rounded-theme-sm border-theme bg-surface-secondary shadow-neo">
         {/* 圖片顯示區 */}
         {currentImage ? (
           <div
@@ -73,7 +73,7 @@ export function SeriesHeroImage({
       {isProductImage && (
         <button
           onClick={onReset}
-          className="absolute right-4 top-4 rounded-none border-2 border-black bg-surface p-2 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="absolute right-4 top-4 rounded-theme-sm border bg-surface p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
           aria-label="恢復系列圖片"
         >
           <X className="h-5 w-5" />

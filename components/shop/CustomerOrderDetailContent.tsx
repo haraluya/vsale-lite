@@ -124,11 +124,11 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
             <Link
               href="/store/orders"
               className={cn(
-                "rounded-none bg-green-400 font-bold transition-all",
-                designTokens.neoBrutalism.border.full,
-                "border-black",
-                designTokens.neoBrutalism.shadow.full,
-                designTokens.neoBrutalism.hover,
+                "rounded-theme-sm bg-green-400 font-bold transition-all",
+                designTokens.cleanCommerce.border.full,
+                "border-border",
+                designTokens.cleanCommerce.shadow.full,
+                designTokens.cleanCommerce.hover,
                 "px-6 py-3 md:px-8 md:py-4",
                 designTokens.typography.body.large
               )}
@@ -153,8 +153,8 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
         {/* 成功訊息 */}
         {isSuccess && (
           <div className={cn(
-            "rounded-none bg-green-100 text-center",
-            designTokens.neoBrutalism.border.full,
+            "rounded-theme-sm bg-green-100 text-center",
+            designTokens.cleanCommerce.border.full,
             "border-green-600",
             designTokens.spacing.card.padding,
             designTokens.spacing.section.marginBottom
@@ -199,8 +199,8 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
 
         {/* 訂單狀態說明 */}
         <div className={cn(
-          "rounded-none bg-surface-secondary",
-          "border-2 border-gray-300",
+          "rounded-theme-sm bg-surface-secondary",
+          "border border-border",
           "p-3 md:p-4"
         )}>
           <h3 className={cn(
@@ -222,10 +222,10 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
 
         {/* 訂單留言與操作歷史 */}
         <div className={cn(
-          "rounded-none bg-surface",
-          designTokens.neoBrutalism.border.full,
-          "border-black",
-          designTokens.neoBrutalism.shadow.full,
+          "rounded-theme-sm bg-surface",
+          designTokens.cleanCommerce.border.full,
+          "border-border",
+          designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding
         )}>
           <h2 className={cn(
@@ -241,8 +241,8 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
           {/* 留言輸入框 */}
           {order.status !== 'cancelled' && order.status !== 'completed' && (
             <div className={cn(
-              "mt-4 md:mt-6 rounded-none bg-surface-secondary",
-              "border-2 border-gray-300",
+              "mt-4 md:mt-6 rounded-theme-sm bg-surface-secondary",
+              "border border-border",
               "p-3 md:p-4"
             )}>
               <h3 className={cn(

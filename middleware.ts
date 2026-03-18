@@ -75,9 +75,9 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl
 
-  // 公開路由:登入頁（根目錄會自動導向 /login，無需特殊處理）
+  // 公開路由:登入頁 + 風格預覽頁
   const publicPaths = ['/login', '/admin/login']
-  const isPublicPath = publicPaths.includes(pathname)
+  const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/style-preview')
 
   // 管理員路由
   const isAdminRoute = pathname.startsWith('/admin')
@@ -105,13 +105,40 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // 2. 已登入:檢查角色權限
-  // 查詢使用者角色（使用 Admin Client 繞過 RLS）
-  const { data: profile } = await adminClient
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
+  // 2. 已登入:檢查角色權限（優先從 Cookie 快取讀取，減少 DB 查詢）
+  const ROLE_COOKIE = 'vsale-role'
+  const ROLE_TTL = 5 * 60 // 5 分鐘
+  let profile: { role: string } | null = null
+
+  const cachedRole = request.cookies.get(ROLE_COOKIE)?.value
+  const cachedAt = request.cookies.get('vsale-role-ts')?.value
+  const now = Math.floor(Date.now() / 1000)
+
+  if (cachedRole && cachedAt && now - Number(cachedAt) < ROLE_TTL) {
+    profile = { role: cachedRole }
+  } else {
+    const { data } = await adminClient
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+    profile = data
+
+    if (profile) {
+      supabaseResponse.cookies.set(ROLE_COOKIE, profile.role, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: ROLE_TTL,
+      })
+      supabaseResponse.cookies.set('vsale-role-ts', String(now), {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: ROLE_TTL,
+      })
+    }
+  }
 
   if (!profile) {
     // 找不到 profile → 登出並導向對應的登入頁
@@ -122,7 +149,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // 3. 已登入訪問登入頁處理 (允許切換角色)
+  // 3. 已登入訪問公開路由 → 放行風格預覽頁，處理登入頁
+  if (pathname.startsWith('/style-preview')) {
+    return supabaseResponse
+  }
+
   if (isPublicPath) {
     // 客戶訪問後台登入頁 → 允許 (需要先登出才能以管理員身份登入)
     if (profile.role === 'client' && pathname === '/admin/login') {
@@ -174,6 +205,6 @@ export const config = {
      * - public files (public folder)
      * - api routes (API 路由)
      */
-    '/((?!_next/static|_next/image|favicon.ico|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api|sw\\.js|workbox-.*|swe-worker-.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

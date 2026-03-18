@@ -123,14 +123,14 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-none border-3 border-black bg-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] m-4">
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-theme-sm border bg-surface shadow-neo-lg m-4">
         {/* 標題列 */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b-3 border-black bg-yellow-300 px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-yellow-300 px-6 py-4">
           <h2 className="text-xl font-black">批次匯入客戶資料</h2>
           <button
             onClick={handleClose}
             disabled={isImporting}
-            className="rounded-none border-2 border-black bg-surface p-2 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-theme-sm border bg-surface p-2 hover:bg-gray-100 disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -163,14 +163,14 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
                   onChange={handleFileSelect}
                   className="hidden"
                 />
-                <div className="border-2 border-dashed border-gray-300 rounded-none p-8 text-center hover:border-black transition-colors">
+                <div className="border border-dashed border-border rounded-theme-sm p-8 text-center hover:transition-colors">
                   <Upload className="h-12 w-12 mx-auto mb-4 text-muted" />
                   <p className="text-sm font-medium mb-2">點擊上傳 Excel 檔案</p>
                   <p className="text-xs text-text-secondary">僅支援 .xlsx 格式，最大 5MB</p>
                 </div>
               </label>
             ) : (
-              <div className="flex items-center gap-3 p-4 border-2 border-black bg-surface-secondary">
+              <div className="flex items-center gap-3 p-4 border bg-surface-secondary">
                 <FileSpreadsheet className="h-8 w-8 text-success" />
                 <div className="flex-1">
                   <p className="font-medium">{selectedFile.name}</p>
@@ -187,14 +187,14 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
                 <button
                   onClick={() => handleImport(true)}
                   disabled={isImporting}
-                  className="flex-1 px-4 py-3 font-bold rounded-none border-2 border-black bg-yellow-300 hover:bg-yellow-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 font-bold rounded-theme-sm border bg-yellow-300 hover:bg-yellow-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isImporting ? '驗證中...' : '試算驗證'}
                 </button>
                 <button
                   onClick={() => handleImport(false)}
                   disabled={isImporting}
-                  className="flex-1 px-4 py-3 font-bold rounded-none border-2 border-black bg-green-300 hover:bg-green-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 font-bold rounded-theme-sm border bg-green-300 hover:bg-green-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isImporting ? '匯入中...' : '正式匯入'}
                 </button>
@@ -208,7 +208,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
 
           {/* 匯入結果顯示 */}
           {showResults && importResult && (
-            <div className="border-2 border-black bg-surface p-6">
+            <div className="border bg-surface p-6">
               <div className="flex items-center gap-2 mb-4">
                 {importResult.error_count === 0 ? (
                   <CheckCircle className="h-6 w-6 text-success" />
@@ -222,15 +222,15 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
 
               {/* 統計資訊 */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="border-2 border-black p-4 bg-surface-secondary">
+                <div className="border p-4 bg-surface-secondary">
                   <p className="text-sm text-text-secondary mb-1">總筆數</p>
                   <p className="text-2xl font-bold">{importResult.total_rows}</p>
                 </div>
-                <div className="border-2 border-black p-4 bg-success-bg">
+                <div className="border p-4 bg-success-bg">
                   <p className="text-sm text-text-secondary mb-1">成功筆數</p>
                   <p className="text-2xl font-bold text-success">{importResult.success_count}</p>
                 </div>
-                <div className="border-2 border-black p-4 bg-error-bg">
+                <div className="border p-4 bg-error-bg">
                   <p className="text-sm text-text-secondary mb-1">錯誤筆數</p>
                   <p className="text-2xl font-bold text-error">{importResult.error_count}</p>
                 </div>
@@ -242,7 +242,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
                   <h4 className="font-bold mb-3 text-error">錯誤明細</h4>
                   <div className="space-y-2 max-h-[300px] overflow-y-auto">
                     {importResult.errors.map((error, index) => (
-                      <div key={index} className="border-2 border-red-300 bg-error-bg p-3 text-sm">
+                      <div key={index} className="border border-red-300 bg-error-bg p-3 text-sm">
                         <p className="font-medium">
                           {error.row_number > 0 ? `第 ${error.row_number} 列` : '資料庫寫入'}：
                           {error.field}
@@ -259,7 +259,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
 
               {/* 下一步提示 */}
               {importResult.dry_run && importResult.error_count === 0 && (
-                <div className="mt-4 p-4 border-2 border-green-600 bg-success-bg">
+                <div className="mt-4 p-4 border border-green-600 bg-success-bg">
                   <p className="text-sm text-green-800">
                     資料驗證通過！請點擊「正式匯入」按鈕完成匯入。
                   </p>

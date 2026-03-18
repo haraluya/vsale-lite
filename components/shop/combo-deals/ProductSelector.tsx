@@ -207,7 +207,7 @@ export function ProductSelector({
       return (
         <div key={series.series_id} className="mb-8">
           {/* 系列標題 */}
-          <div className="mb-4 rounded-none border-2 md:border-3 border-black bg-yellow-50 p-4 shadow-neo-sm">
+          <div className="mb-4 rounded-theme-sm border-theme bg-yellow-50 p-4 shadow-neo-sm">
             <h3 className="text-lg md:text-xl font-black text-foreground mb-2">
               {series.series_name}
               {/* 🆕 顯示可選數量提示 */}
@@ -236,7 +236,7 @@ export function ProductSelector({
 
           {/* 商品列表 */}
           {series.products.length === 0 ? (
-            <div className="rounded-none border-2 border-gray-300 bg-surface-secondary p-4 text-center text-text-secondary">
+            <div className="rounded-theme-sm border border-border bg-surface-secondary p-4 text-center text-text-secondary">
               此系列無可用商品
             </div>
           ) : (
@@ -250,17 +250,17 @@ export function ProductSelector({
                   <div
                     key={product.product_id}
                     className={cn(
-                      'group relative rounded-none bg-surface p-2 md:p-4 transition-all',
-                      designTokens.neoBrutalism.border.full,
-                      designTokens.neoBrutalism.shadow.full,
-                      'border-black'
+                      'group relative rounded-theme-sm bg-surface p-2 md:p-4 transition-all',
+                      designTokens.cleanCommerce.border.full,
+                      designTokens.cleanCommerce.shadow.full,
+                      'border-border'
                     )}
                   >
                     {/* 商品圖片 */}
                     <div className={cn(
-                      "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary relative",
-                      designTokens.neoBrutalism.border.mobile,
-                      "border-black"
+                      "mb-2 md:mb-4 aspect-square overflow-hidden rounded-theme-sm bg-surface-secondary relative",
+                      designTokens.cleanCommerce.border.base,
+                      "border-border"
                     )}>
                       {product.product_image ? (
                         <Image
@@ -281,9 +281,9 @@ export function ProductSelector({
                     <div className="space-y-1.5 md:space-y-2">
                       {/* 商品名稱（黃色標籤） */}
                       <div className={cn(
-                        "rounded-none bg-yellow-300 p-1.5 md:p-2",
-                        designTokens.neoBrutalism.border.mobile,
-                        "border-black"
+                        "rounded-theme-sm bg-yellow-300 p-1.5 md:p-2",
+                        designTokens.cleanCommerce.border.base,
+                        "border-border"
                       )}>
                         <h4 className="text-sm md:text-base font-bold text-foreground line-clamp-2 min-h-[2.5em]">
                           {product.product_name}
@@ -314,11 +314,11 @@ export function ProductSelector({
                           }
                           disabled={quantity === 0}
                           className={cn(
-                            'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
-                            designTokens.neoBrutalism.border.full,
-                            'border-black',
+                            'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-theme-sm flex items-center justify-center transition-all',
+                            designTokens.cleanCommerce.border.full,
+                            'border-border',
                             quantity > 0
-                              ? 'bg-red-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                              ? 'bg-red-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover'
                               : 'bg-gray-200 opacity-30 cursor-not-allowed'
                           )}
                         >
@@ -345,11 +345,11 @@ export function ProductSelector({
                           }
                           disabled={!canIncrease}
                           className={cn(
-                            'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
-                            designTokens.neoBrutalism.border.full,
-                            'border-black',
+                            'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-theme-sm flex items-center justify-center transition-all',
+                            designTokens.cleanCommerce.border.full,
+                            'border-border',
                             canIncrease
-                              ? 'bg-green-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                              ? 'bg-green-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover'
                               : 'bg-gray-200 opacity-30 cursor-not-allowed'
                           )}
                         >
@@ -382,7 +382,7 @@ export function ProductSelector({
     return (
       <div className="mb-8">
         {/* 任選規則說明 */}
-        <div className="mb-4 rounded-none border-2 md:border-3 border-black bg-yellow-50 p-4 shadow-neo-sm">
+        <div className="mb-4 rounded-theme-sm border-theme bg-yellow-50 p-4 shadow-neo-sm">
           <h3 className="text-lg md:text-xl font-black text-foreground mb-2">
             任選 {requiredQuantity} 件商品
           </h3>
@@ -412,7 +412,7 @@ export function ProductSelector({
             </h4>
 
             {series.products.length === 0 ? (
-              <div className="rounded-none border-2 border-gray-300 bg-surface-secondary p-4 text-center text-text-secondary">
+              <div className="rounded-theme-sm border border-border bg-surface-secondary p-4 text-center text-text-secondary">
                 此系列無可用商品
               </div>
             ) : (
@@ -425,17 +425,17 @@ export function ProductSelector({
                     <div
                       key={product.product_id}
                       className={cn(
-                        'group relative rounded-none bg-surface p-2 md:p-4 transition-all',
-                        designTokens.neoBrutalism.border.full,
-                        designTokens.neoBrutalism.shadow.full,
-                        'border-black'
+                        'group relative rounded-theme-sm bg-surface p-2 md:p-4 transition-all',
+                        designTokens.cleanCommerce.border.full,
+                        designTokens.cleanCommerce.shadow.full,
+                        'border-border'
                       )}
                     >
                       {/* 商品圖片 */}
                       <div className={cn(
-                        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary relative",
-                        designTokens.neoBrutalism.border.mobile,
-                        "border-black"
+                        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-theme-sm bg-surface-secondary relative",
+                        designTokens.cleanCommerce.border.base,
+                        "border-border"
                       )}>
                         {product.product_image ? (
                           <Image
@@ -456,9 +456,9 @@ export function ProductSelector({
                       <div className="space-y-1.5 md:space-y-2">
                         {/* 商品名稱（黃色標籤） */}
                         <div className={cn(
-                          "rounded-none bg-yellow-300 p-1.5 md:p-2",
-                          designTokens.neoBrutalism.border.mobile,
-                          "border-black"
+                          "rounded-theme-sm bg-yellow-300 p-1.5 md:p-2",
+                          designTokens.cleanCommerce.border.base,
+                          "border-border"
                         )}>
                           <h5 className="text-sm md:text-base font-bold text-foreground line-clamp-2 min-h-[2.5em]">
                             {product.product_name}
@@ -489,11 +489,11 @@ export function ProductSelector({
                             }
                             disabled={quantity === 0}
                             className={cn(
-                              'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
-                              designTokens.neoBrutalism.border.full,
-                              'border-black',
+                              'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-theme-sm flex items-center justify-center transition-all',
+                              designTokens.cleanCommerce.border.full,
+                              'border-border',
                               quantity > 0
-                                ? 'bg-red-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                                ? 'bg-red-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover'
                                 : 'bg-gray-200 opacity-30 cursor-not-allowed'
                             )}
                           >
@@ -520,11 +520,11 @@ export function ProductSelector({
                             }
                             disabled={!canIncrease}
                             className={cn(
-                              'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-none flex items-center justify-center transition-all',
-                              designTokens.neoBrutalism.border.full,
-                              'border-black',
+                              'flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-theme-sm flex items-center justify-center transition-all',
+                              designTokens.cleanCommerce.border.full,
+                              'border-border',
                               canIncrease
-                                ? 'bg-green-400 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                                ? 'bg-green-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover'
                                 : 'bg-gray-200 opacity-30 cursor-not-allowed'
                             )}
                           >
@@ -563,7 +563,7 @@ export function ProductSelector({
       {validationMessage && (
         <div
           className={cn(
-            'mb-6 rounded-none border-2 md:border-3 border-black p-4 shadow-neo-sm flex items-start gap-3',
+            'mb-6 rounded-theme-sm border-theme p-4 shadow-neo-sm flex items-start gap-3',
             isValid ? 'bg-success-bg' : 'bg-orange-50'
           )}
         >

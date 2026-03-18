@@ -125,17 +125,17 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
       <div
         className={cn(
           'w-full max-w-md',
-          'border-2 md:border-3 bg-surface',
-          'shadow-[8px_8px_0px_0px_var(--color-border)]',
+          'border-theme bg-surface',
+          'shadow-neo-lg rounded-theme',
           'animate-in zoom-in-95 duration-200',
           'max-h-[90vh] overflow-y-auto'
         )}
         onClick={(e) => e.stopPropagation()}
       >
         {/* 標題欄 */}
-        <div className="flex items-center gap-3 border-b-2 md:border-b-3 bg-info p-4 text-text-inverse">
+        <div className="flex items-center gap-3 border-b bg-info p-4 text-text-inverse">
           <Info className="h-6 w-6 flex-shrink-0" />
-          <h2 id="prompt-dialog-title" className="text-lg font-bold">
+          <h2 id="prompt-dialog-title" className="text-lg font-semibold">
             {title}
           </h2>
         </div>
@@ -167,7 +167,7 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
                     rows={4}
                     className={cn(
                       'w-full px-3 py-2 bg-surface',
-                      'border-2 md:border-3',
+                      'border-theme',
                       'focus:outline-none focus:ring-2 focus:ring-info',
                       'resize-none',
                       errors[field.name] && 'border-error'
@@ -187,7 +187,7 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
                     maxLength={field.maxLength}
                     className={cn(
                       'w-full px-3 py-2 bg-surface',
-                      'border-2 md:border-3',
+                      'border-theme',
                       'focus:outline-none focus:ring-2 focus:ring-info',
                       errors[field.name] && 'border-error'
                     )}
@@ -213,18 +213,18 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
           </div>
 
           {/* 按鈕 */}
-          <div className="border-t-2 md:border-t-3 p-4 flex gap-3">
+          <div className="border-t p-4 flex gap-3">
             <button
               type="button"
               onClick={handleCancel}
               className={cn(
                 'flex-1 px-4 py-2',
-                'border-2 md:border-3',
+                'border-theme',
                 'bg-surface hover:bg-surface-secondary',
                 'font-bold text-sm uppercase',
-                'shadow-neo',
+                'shadow-neo-sm rounded-theme-sm',
                 'transition-all duration-150',
-                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+                'hover:-translate-y-0.5 hover:shadow-theme-hover',
                 'focus:outline-none focus:ring-2 focus:ring-offset-2'
               )}
             >
@@ -236,12 +236,12 @@ export function PromptDialog({ options, onClose }: PromptDialogProps) {
               disabled={!canSubmit}
               className={cn(
                 'flex-1 px-4 py-2',
-                'border-2 md:border-3',
+                'border-theme',
                 'bg-info hover:opacity-80',
                 'text-text-inverse font-bold text-sm uppercase',
-                'shadow-neo',
+                'shadow-neo-sm rounded-theme-sm',
                 'transition-all duration-150',
-                'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+                'hover:-translate-y-0.5 hover:shadow-theme-hover',
                 'focus:outline-none focus:ring-2 focus:ring-offset-2',
                 'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo'
               )}

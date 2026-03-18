@@ -68,7 +68,7 @@ export function OrderStatusUpdater({ orderId, currentStatus, onStatusChanged }: 
     <button
       onClick={handleUpdateStatus}
       disabled={isPending}
-      className="rounded-none border-2 md:border-3 border-black bg-blue-400 px-6 py-3 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
+      className="rounded-theme-sm border-theme bg-blue-400 px-6 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo"
       aria-label={`更新訂單狀態為${nextStatus.label}`}
     >
       {isPending ? '處理中...' : nextStatus.label}

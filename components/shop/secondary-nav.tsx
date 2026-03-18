@@ -1,6 +1,6 @@
 /**
  * SecondaryNav Component
- * 次要導覽列元件
+ * 次要導覽列元件 — Clean Commerce 風格
  */
 
 'use client'
@@ -8,7 +8,6 @@
 import Link from 'next/link'
 import { Ticket } from 'lucide-react'
 import { SegmentControl } from '@/components/shop/home-blocks/SegmentControl'
-import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 interface SecondaryNavProps {
@@ -29,8 +28,8 @@ export function SecondaryNav({
       aria-label="次要導覽"
       className={cn(
         'bg-info-bg',
-        'border-b-2 md:border-b-3',
-        'shadow-neo-sm md:shadow-neo'
+        'border-b',
+        'shadow-neo-sm'
       )}
     >
       <div
@@ -42,13 +41,13 @@ export function SecondaryNav({
       >
         {/* 左側區域 - 使用者資訊 */}
         <div role="region" aria-label="使用者資訊" className="flex-shrink">
-          <p className="text-sm md:text-base font-bold">
+          <p className="text-sm md:text-base font-semibold">
             {userPhone} {userName} 您好！
           </p>
 
           <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-text-secondary">
             <span>
-              會員等級: <span className="font-bold text-foreground">{tierName}</span>
+              會員等級: <span className="font-semibold text-foreground">{tierName}</span>
             </span>
 
             <Link

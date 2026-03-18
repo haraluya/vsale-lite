@@ -194,14 +194,14 @@ export function BackupManager() {
           <button
             onClick={loadJobs}
             disabled={loading}
-            className="rounded-none border-2 border-black bg-white px-4 py-2 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm md:border-3 md:shadow-neo"
+            className="rounded-theme-sm border bg-white px-4 py-2 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm md:border md:shadow-neo"
           >
             <RefreshCw className="h-4 w-4" />
           </button>
           <button
             onClick={handleTriggerBackup}
             disabled={backupInProgress || loading}
-            className="rounded-none border-2 border-black bg-blue-400 px-4 py-2 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm md:border-3 md:shadow-neo"
+            className="rounded-theme-sm border bg-blue-400 px-4 py-2 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm md:border md:shadow-neo"
           >
             <div className="flex items-center gap-2">
               <Database className="h-4 w-4" />
@@ -212,14 +212,14 @@ export function BackupManager() {
       </div>
 
       {/* 備份選項 */}
-      <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+      <div className="rounded-theme-sm border bg-white p-4 shadow-neo-sm md:border md:shadow-neo">
         <label className="flex cursor-pointer items-center gap-3">
           <input
             type="checkbox"
             checked={includeStorage}
             onChange={(e) => setIncludeStorage(e.target.checked)}
             disabled={backupInProgress}
-            className="h-5 w-5 cursor-pointer border-2 border-black accent-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-5 w-5 cursor-pointer border accent-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
           />
           <div>
             <span className="font-bold">備份包含商品圖片與系統圖片</span>
@@ -232,14 +232,14 @@ export function BackupManager() {
 
       {/* 備份進度條 */}
       {backupProgress && (
-        <div className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm md:border-3 md:shadow-neo">
+        <div className="rounded-theme-sm border bg-white p-4 shadow-neo-sm md:border md:shadow-neo">
           <div className="mb-2 flex items-center justify-between">
             <span className="font-bold">{backupProgress.message}</span>
             <span className="text-sm font-bold text-gray-600">
               {backupProgress.percentage}%
             </span>
           </div>
-          <div className="h-4 w-full rounded-none border-2 border-black bg-gray-100">
+          <div className="h-4 w-full rounded-theme-sm border bg-gray-100">
             <div
               className="h-full bg-blue-400 transition-all duration-300"
               style={{ width: `${backupProgress.percentage}%` }}
@@ -251,25 +251,25 @@ export function BackupManager() {
 
       {/* 備份列表 - 桌面表格視圖 */}
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full rounded-none border-2 border-black bg-white shadow-neo md:border-3">
-          <thead className="border-b-2 border-black bg-gray-50 md:border-b-3">
+        <table className="w-full rounded-theme-sm border bg-white shadow-neo md:border">
+          <thead className="border-b bg-gray-50 md:border-b">
             <tr>
-              <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
+              <th className="border-r-2 px-4 py-3 text-left font-bold md:border-r">
                 檔案名稱
               </th>
-              <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
+              <th className="border-r-2 px-4 py-3 text-left font-bold md:border-r">
                 大小
               </th>
-              <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
+              <th className="border-r-2 px-4 py-3 text-left font-bold md:border-r">
                 類型
               </th>
-              <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
+              <th className="border-r-2 px-4 py-3 text-left font-bold md:border-r">
                 狀態
               </th>
-              <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
+              <th className="border-r-2 px-4 py-3 text-left font-bold md:border-r">
                 包含內容
               </th>
-              <th className="border-r-2 border-black px-4 py-3 text-left font-bold md:border-r-3">
+              <th className="border-r-2 px-4 py-3 text-left font-bold md:border-r">
                 時間
               </th>
               <th className="px-4 py-3 text-left font-bold">操作</th>
@@ -290,23 +290,23 @@ export function BackupManager() {
               </tr>
             ) : (
               jobs.map((job) => (
-                <tr key={job.id} className="border-t-2 border-black md:border-t-3">
-                  <td className="border-r-2 border-black px-4 py-3 font-mono text-sm md:border-r-3">
+                <tr key={job.id} className="border-t md:border-t">
+                  <td className="border-r-2 px-4 py-3 font-mono text-sm md:border-r">
                     {job.filename}
                   </td>
-                  <td className="border-r-2 border-black px-4 py-3 md:border-r-3">
+                  <td className="border-r-2 px-4 py-3 md:border-r">
                     {formatFileSize(job.file_size)}
                   </td>
-                  <td className="border-r-2 border-black px-4 py-3 md:border-r-3">
+                  <td className="border-r-2 px-4 py-3 md:border-r">
                     <BackupTypeBadge type={job.backup_type} />
                   </td>
-                  <td className="border-r-2 border-black px-4 py-3 md:border-r-3">
+                  <td className="border-r-2 px-4 py-3 md:border-r">
                     <BackupStatusBadge status={job.status} />
                   </td>
-                  <td className="border-r-2 border-black px-4 py-3 md:border-r-3">
+                  <td className="border-r-2 px-4 py-3 md:border-r">
                     <BackupContentBadge includesStorage={job.includes_storage} />
                   </td>
-                  <td className="border-r-2 border-black px-4 py-3 md:border-r-3">
+                  <td className="border-r-2 px-4 py-3 md:border-r">
                     {formatBackupTime(job.started_at)}
                   </td>
                   <td className="px-4 py-3">
@@ -317,13 +317,13 @@ export function BackupManager() {
                           <div className="relative">
                             <button
                               onClick={() => setShowDownloadMenu(showDownloadMenu === job.id ? null : job.id)}
-                              className="rounded-none border-2 border-black bg-green-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                              className="rounded-theme-sm border bg-green-100 p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                               title="下載備份"
                             >
                               <Download className="h-4 w-4" />
                             </button>
                             {showDownloadMenu === job.id && (
-                              <div className="absolute right-0 top-full mt-2 z-10 rounded-none border-2 border-black bg-white shadow-neo-sm">
+                              <div className="absolute right-0 top-full mt-2 z-10 rounded-theme-sm border bg-white shadow-neo-sm">
                                 <button
                                   onClick={() => handleDownloadBackup(job, 'database')}
                                   className="block w-full whitespace-nowrap px-4 py-2 text-left text-sm hover:bg-gray-100"
@@ -332,7 +332,7 @@ export function BackupManager() {
                                 </button>
                                 <button
                                   onClick={() => handleDownloadBackup(job, 'storage')}
-                                  className="block w-full whitespace-nowrap border-t-2 border-black px-4 py-2 text-left text-sm hover:bg-gray-100"
+                                  className="block w-full whitespace-nowrap border-t px-4 py-2 text-left text-sm hover:bg-gray-100"
                                 >
                                   🖼️ 下載圖片
                                 </button>
@@ -343,7 +343,7 @@ export function BackupManager() {
                           // 單一下載按鈕（僅資料庫）
                           <button
                             onClick={() => handleDownloadBackup(job, 'database')}
-                            className="rounded-none border-2 border-black bg-green-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                            className="rounded-theme-sm border bg-green-100 p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                             title="下載備份"
                           >
                             <Download className="h-4 w-4" />
@@ -352,7 +352,7 @@ export function BackupManager() {
                       )}
                       <button
                         onClick={() => handleDeleteBackup(job)}
-                        className="rounded-none border-2 border-black bg-red-100 p-2 shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                        className="rounded-theme-sm border bg-red-100 p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                         title="刪除備份"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -369,18 +369,18 @@ export function BackupManager() {
       {/* 備份列表 - 手機卡片視圖 */}
       <div className="space-y-3 md:hidden">
         {loading && jobs.length === 0 ? (
-          <div className="rounded-none border-2 border-black bg-white p-4 text-center shadow-neo-sm">
+          <div className="rounded-theme-sm border bg-white p-4 text-center shadow-neo-sm">
             載入中...
           </div>
         ) : jobs.length === 0 ? (
-          <div className="rounded-none border-2 border-black bg-white p-4 text-center shadow-neo-sm">
+          <div className="rounded-theme-sm border bg-white p-4 text-center shadow-neo-sm">
             尚無備份記錄
           </div>
         ) : (
           jobs.map((job) => (
             <div
               key={job.id}
-              className="rounded-none border-2 border-black bg-white p-4 shadow-neo-sm"
+              className="rounded-theme-sm border bg-white p-4 shadow-neo-sm"
             >
               <div className="mb-3 flex items-start justify-between">
                 <div className="min-w-0 flex-1">
@@ -402,20 +402,20 @@ export function BackupManager() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleDownloadBackup(job, 'database')}
-                      className="flex-1 rounded-none border-2 border-black bg-green-100 px-3 py-2 text-xs font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                      className="flex-1 rounded-theme-sm border bg-green-100 px-3 py-2 text-xs font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                     >
                       📊 資料庫
                     </button>
                     <button
                       onClick={() => handleDownloadBackup(job, 'storage')}
-                      className="flex-1 rounded-none border-2 border-black bg-blue-100 px-3 py-2 text-xs font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                      className="flex-1 rounded-theme-sm border bg-blue-100 px-3 py-2 text-xs font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                     >
                       🖼️ 圖片
                     </button>
                   </div>
                   <button
                     onClick={() => handleDeleteBackup(job)}
-                    className="w-full rounded-none border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    className="w-full rounded-theme-sm border bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                   >
                     <Trash2 className="mx-auto h-4 w-4" />
                   </button>
@@ -426,14 +426,14 @@ export function BackupManager() {
                   {job.status === 'success' && (
                     <button
                       onClick={() => handleDownloadBackup(job, 'database')}
-                      className="flex-1 rounded-none border-2 border-black bg-green-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                      className="flex-1 rounded-theme-sm border bg-green-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                     >
                       <Download className="mx-auto h-4 w-4" />
                     </button>
                   )}
                   <button
                     onClick={() => handleDeleteBackup(job)}
-                    className="flex-1 rounded-none border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
+                    className="flex-1 rounded-theme-sm border bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                   >
                     <Trash2 className="mx-auto h-4 w-4" />
                   </button>
@@ -453,7 +453,7 @@ export function BackupManager() {
 function BackupTypeBadge({ type }: { type: 'auto' | 'manual' }) {
   return (
     <span
-      className={`inline-flex rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${
+      className={`inline-flex rounded-theme-sm border px-2 py-1 text-xs font-bold ${
         type === 'auto' ? 'bg-blue-100' : 'bg-purple-100'
       }`}
     >
@@ -495,7 +495,7 @@ function BackupStatusBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${bg} ${color}`}
+      className={`inline-flex items-center gap-1 rounded-theme-sm border px-2 py-1 text-xs font-bold ${bg} ${color}`}
     >
       <Icon className="h-3 w-3" />
       <span>{text}</span>
@@ -509,7 +509,7 @@ function BackupStatusBadge({
 function BackupContentBadge({ includesStorage }: { includesStorage: boolean }) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${
+      className={`inline-flex items-center gap-1 rounded-theme-sm border px-2 py-1 text-xs font-bold ${
         includesStorage ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
       }`}
     >

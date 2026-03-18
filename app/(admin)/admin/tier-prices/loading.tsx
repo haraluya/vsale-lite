@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 
 function PriceTableRowSkeleton() {
   return (
-    <div className="border-b-2 border-black p-4 flex justify-between items-center">
+    <div className="border-b p-4 flex justify-between items-center">
       <div className="flex-1">
         <Skeleton className="h-4 w-48 mb-1" />
         <Skeleton className="h-3 w-24" />
@@ -33,7 +33,7 @@ export default function TierPricesLoading() {
       </div>
 
       {/* 價格設定表單骨架 */}
-      <div className="border-2 border-black p-6 bg-surface shadow-neo mb-6">
+      <div className="border p-6 bg-surface shadow-neo mb-6">
         <Skeleton className="h-6 w-32 mb-4" />
         <div className="grid grid-cols-2 gap-4 mb-4">
           <Skeleton className="h-10 w-full" />
@@ -46,9 +46,9 @@ export default function TierPricesLoading() {
       <Skeleton className="h-6 w-48 mb-4" />
 
       {/* 價格表格骨架（桌面版） */}
-      <div className="hidden md:block border-2 border-black bg-surface shadow-neo">
+      <div className="hidden md:block border bg-surface shadow-neo">
         {/* 表頭骨架 */}
-        <div className="border-b-2 border-black p-4 bg-surface-secondary flex justify-between">
+        <div className="border-b p-4 bg-surface-secondary flex justify-between">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-4 w-20" />
@@ -63,7 +63,7 @@ export default function TierPricesLoading() {
       {/* 卡片骨架（手機版） */}
       <div className="md:hidden grid gap-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className="border-2 border-black p-4 bg-surface shadow-neo-sm">
+          <div key={i} className="border p-4 bg-surface shadow-neo-sm">
             <Skeleton className="h-5 w-40 mb-2" />
             <Skeleton className="h-4 w-24 mb-3" />
             <Skeleton className="h-6 w-20 mb-4" />

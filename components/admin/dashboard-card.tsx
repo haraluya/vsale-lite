@@ -44,7 +44,7 @@ export function DashboardCard({
     <div className={cn('card-neo p-6', href && 'cursor-pointer transition-all hover:shadow-neo-hover', className)}>
       <div className="flex items-center gap-4">
         {/* 圖示區塊 */}
-        <div className={cn('rounded-none border-2 md:border-3 border-black p-4', iconColor)}>
+        <div className={cn('rounded-theme-sm border-theme p-4', iconColor)}>
           <Icon className="h-6 w-6 text-white" />
         </div>
 

@@ -34,18 +34,18 @@ export function FilterButtons({
             type="button"
             onClick={() => onToggle(option.id)}
             className={cn(
-              'px-4 py-2 text-sm font-bold',
-              'border-2 md:border-3 rounded-none',
-              'transition-all duration-150',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
+              'px-4 py-2 text-sm font-medium',
+              'border-theme rounded-theme-sm',
+              'transition-all duration-200',
               isSelected
                 ? cn(
-                    'shadow-none translate-x-[2px] translate-y-[2px]',
-                    option.color || 'bg-brand-primary text-text-inverse'
+                    'shadow-neo-sm -translate-y-0.5',
+                    option.color || 'bg-primary text-text-inverse'
                   )
                 : cn(
-                    'shadow-neo',
-                    option.color || 'bg-surface text-foreground'
+                    'shadow-neo-sm',
+                    option.color || 'bg-surface text-foreground',
+                    'hover:-translate-y-0.5 hover:shadow-theme-hover'
                   )
             )}
             aria-pressed={isSelected}
@@ -78,16 +78,12 @@ export function ClearFiltersButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'px-4 py-2 text-sm font-bold',
-        'border-2 md:border-3 rounded-none',
-        'transition-all duration-150',
+        'px-4 py-2 text-sm font-medium',
+        'border-theme rounded-theme-sm',
+        'transition-all duration-200',
         disabled
           ? 'bg-surface-secondary text-muted cursor-not-allowed'
-          : cn(
-              'bg-surface text-error',
-              'shadow-neo',
-              'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-            ),
+          : 'bg-surface text-error shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover',
         className
       )}
       aria-label="清除所有篩選"
@@ -112,12 +108,12 @@ export function FilterResultCount({
     <div
       className={cn(
         'px-3 py-1 text-sm',
-        'border-2 md:border-3 rounded-none bg-warning-bg',
+        'border-theme rounded-theme-sm bg-warning-bg',
         className
       )}
       aria-live="polite"
     >
-      <span className="font-bold">{count}</span>
+      <span className="font-semibold">{count}</span>
       {total !== undefined && (
         <span className="text-text-secondary"> / {total}</span>
       )}

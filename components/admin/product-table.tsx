@@ -14,7 +14,7 @@ import { deleteProduct, updateProductStock } from '@/lib/actions/products'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Pagination } from '@/components/admin/pagination'
-import { designTokens, getNeoBrutalismClasses } from '@/lib/design-tokens'
+import { designTokens, getThemeClasses } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 import type { Product, Series } from '@/types'
 import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
@@ -106,9 +106,9 @@ export function ProductTable({
 
   return (
     <div className={cn(
-      "rounded-none bg-white",
-      designTokens.neoBrutalism.border.full,
-      designTokens.neoBrutalism.shadow.full,
+      "rounded-theme-sm bg-white",
+      designTokens.cleanCommerce.border.full,
+      designTokens.cleanCommerce.shadow.full,
       designTokens.spacing.card.padding,
       designTokens.spacing.page.gap
     )}>
@@ -125,9 +125,9 @@ export function ProductTable({
 
         <select
           className={cn(
-            "rounded-none border-2 border-black bg-white font-bold",
+            "rounded-theme-sm border bg-white font-bold",
             designTokens.input.base,
-            designTokens.neoBrutalism.shadow.mobile
+            designTokens.cleanCommerce.shadow.base
           )}
           value={seriesFilter}
           onChange={(e) => {
@@ -156,7 +156,7 @@ export function ProductTable({
       <div className="hidden lg:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b-2 md:border-b-3 border-black">
+            <tr className="border-b">
               <th className="px-4 py-3 text-left font-bold">商品編號</th>
               <th className="px-4 py-3 text-left font-bold">商品名稱</th>
               <th className="px-4 py-3 text-left font-bold">分類</th>
@@ -188,19 +188,19 @@ export function ProductTable({
                           type="number"
                           value={stockValue}
                           onChange={(e) => setStockValue(parseInt(e.target.value) || 0)}
-                          className="w-20 rounded-none border-2 border-black px-2 py-1 text-right font-mono text-sm"
+                          className="w-20 rounded-theme-sm border px-2 py-1 text-right font-mono text-sm"
                           autoFocus
                         />
                         <button
                           onClick={() => handleSaveStock(product.id)}
-                          className="rounded-none border-2 border-black bg-green-100 p-1 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
+                          className="rounded-theme-sm border bg-green-100 p-1 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm transition-all"
                           title="儲存"
                         >
                           <Check className="h-4 w-4" />
                         </button>
                         <button
                           onClick={handleCancelEditStock}
-                          className="rounded-none border-2 border-black bg-gray-100 p-1 hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all"
+                          className="rounded-theme-sm border bg-gray-100 p-1 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm transition-all"
                           title="取消"
                         >
                           <X className="h-4 w-4" />
@@ -225,7 +225,7 @@ export function ProductTable({
                   <td className="px-4 py-3 text-sm">{product.unit}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${
+                      className={`rounded-theme-sm border px-2 py-1 text-xs font-bold ${
                         product.status === 'active'
                           ? 'bg-green-100 text-green-800'
                           : 'bg-gray-100 text-gray-800'
@@ -237,13 +237,13 @@ export function ProductTable({
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       <Link href={`/admin/products/${product.id}/edit`}>
-                        <button className="rounded-none border-2 border-black bg-blue-100 p-2 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
+                        <button className="rounded-theme-sm border bg-blue-100 p-2 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm transition-all">
                           <Edit className="h-4 w-4" />
                         </button>
                       </Link>
                       <button
                         onClick={() => handleDelete(product.id, product.name)}
-                        className="rounded-none border-2 border-black bg-red-100 p-2 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                        className="rounded-theme-sm border bg-red-100 p-2 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm transition-all"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -269,8 +269,8 @@ export function ProductTable({
             <div
               key={product.id}
               className={cn(
-                "rounded-none bg-gray-50",
-                "border-2 border-black",
+                "rounded-theme-sm bg-gray-50",
+                "border",
                 "shadow-neo-sm",
                 designTokens.spacing.card.padding,
                 designTokens.spacing.card.gap
@@ -282,7 +282,7 @@ export function ProductTable({
                   {product.code}
                 </div>
                 <span
-                  className={`rounded-none border-2 border-black px-2 py-1 text-xs font-bold whitespace-nowrap ${
+                  className={`rounded-theme-sm border px-2 py-1 text-xs font-bold whitespace-nowrap ${
                     product.status === 'active'
                       ? 'bg-green-100 text-green-800'
                       : 'bg-gray-100 text-gray-800'
@@ -303,7 +303,7 @@ export function ProductTable({
               </div>
 
               {/* 庫存資訊 */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-300">
+              <div className="flex items-center justify-between pt-2 border-t border-border">
                 <span className={cn("text-gray-600", designTokens.typography.caption)}>
                   庫存
                 </span>
@@ -313,18 +313,18 @@ export function ProductTable({
                       type="number"
                       value={stockValue}
                       onChange={(e) => setStockValue(parseInt(e.target.value) || 0)}
-                      className="w-20 rounded-none border-2 border-black px-2 py-1 text-right font-mono text-sm"
+                      className="w-20 rounded-theme-sm border px-2 py-1 text-right font-mono text-sm"
                       autoFocus
                     />
                     <button
                       onClick={() => handleSaveStock(product.id)}
-                      className="rounded-none border-2 border-black bg-green-100 p-1.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                      className="rounded-theme-sm border bg-green-100 p-1.5 shadow-neo-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
                     >
                       <Check className="h-4 w-4" />
                     </button>
                     <button
                       onClick={handleCancelEditStock}
-                      className="rounded-none border-2 border-black bg-gray-100 p-1.5 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                      className="rounded-theme-sm border bg-gray-100 p-1.5 shadow-neo-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -350,14 +350,14 @@ export function ProductTable({
               {/* 操作按鈕 */}
               <div className="grid grid-cols-2 gap-2 pt-2">
                 <Link href={`/admin/products/${product.id}/edit`}>
-                  <button className="w-full rounded-none border-2 border-black bg-blue-100 px-3 py-2 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
+                  <button className="w-full rounded-theme-sm border bg-blue-100 px-3 py-2 text-sm font-bold shadow-neo-sm active:scale-[0.98]">
                     <Edit className="inline h-3 w-3 mr-1" />
                     編輯
                   </button>
                 </Link>
                 <button
                   onClick={() => handleDelete(product.id, product.name)}
-                  className="w-full rounded-none border-2 border-black bg-red-100 px-3 py-2 text-sm font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                  className="w-full rounded-theme-sm border bg-red-100 px-3 py-2 text-sm font-bold shadow-neo-sm active:scale-[0.98]"
                 >
                   <Trash2 className="inline h-3 w-3 mr-1" />
                   刪除

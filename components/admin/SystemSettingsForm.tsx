@@ -87,8 +87,8 @@ export function SystemSettingsForm({ settings, updateAction, fieldHints }: Syste
         return (
           <div
             key={setting.key}
-            className={`rounded-none border-2 md:border-3 bg-surface p-4 shadow-neo-sm md:shadow-neo ${
-              isChanged ? 'border-blue-500' : 'border-black'
+            className={`rounded-theme-sm border-theme bg-surface p-4 shadow-neo-sm ${
+              isChanged ? 'border-blue-500' : 'border-border'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -109,7 +109,7 @@ export function SystemSettingsForm({ settings, updateAction, fieldHints }: Syste
                   <input
                     type="checkbox"
                     checked={currentValue as boolean}
-                    className="h-5 w-5 rounded border-2 border-black"
+                    className="h-5 w-5 rounded border"
                     onChange={(e) => handleChange(setting.key, e.target.checked)}
                     disabled={loading}
                   />
@@ -121,7 +121,7 @@ export function SystemSettingsForm({ settings, updateAction, fieldHints }: Syste
                     step="1"
                     min="0"
                     value={currentValue as number}
-                    className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
+                    className="w-full rounded-theme-sm border px-3 py-2 font-bold"
                     onChange={(e) => handleChange(setting.key, parseFloat(e.target.value) || 0)}
                     disabled={loading}
                   />
@@ -131,7 +131,7 @@ export function SystemSettingsForm({ settings, updateAction, fieldHints }: Syste
                   <input
                     type="text"
                     value={currentValue as string}
-                    className="w-full rounded-none border-2 border-black px-3 py-2 font-bold"
+                    className="w-full rounded-theme-sm border px-3 py-2 font-bold"
                     onChange={(e) => handleChange(setting.key, e.target.value)}
                     disabled={loading}
                   />
@@ -144,7 +144,7 @@ export function SystemSettingsForm({ settings, updateAction, fieldHints }: Syste
                         ? currentValue
                         : JSON.stringify(currentValue, null, 2)
                     }
-                    className="w-full rounded-none border-2 border-black px-3 py-2 font-mono text-sm"
+                    className="w-full rounded-theme-sm border px-3 py-2 font-mono text-sm"
                     rows={4}
                     onChange={(e) => {
                       try {
@@ -165,7 +165,7 @@ export function SystemSettingsForm({ settings, updateAction, fieldHints }: Syste
       })}
 
       {/* 儲存按鈕 */}
-      <div className="flex justify-end gap-4 pt-4 border-t-2 md:border-t-3 border-black">
+      <div className="flex justify-end gap-4 pt-4 border-t">
         <Button type="button" variant="outline" onClick={handleCancel} disabled={!hasChanges || loading}>
           取消變更
         </Button>

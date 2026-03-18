@@ -90,7 +90,7 @@ export function CouponFilters() {
     status !== 'all' || discountType !== 'all' || search.trim() !== ''
 
   return (
-    <div className="border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo md:p-6">
+    <div className="border-theme bg-white p-4 shadow-neo-sm md:p-6">
       <div className="mb-4 flex items-center gap-2">
         <Filter className="h-5 w-5" />
         <h2 className="font-black text-lg">篩選條件</h2>
@@ -105,7 +105,7 @@ export function CouponFilters() {
               value={search}
               onChange={(e) => setSearch(e.target.value.toUpperCase())}
               placeholder="搜尋優惠券代碼..."
-              className="w-full border-2 border-black p-3 pr-10 font-mono font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border p-3 pr-10 font-mono font-bold focus:outline-none focus:ring-2 focus:ring-black"
             />
             {search && (
               <button
@@ -121,9 +121,9 @@ export function CouponFilters() {
             type="submit"
             className={cn(
               'inline-flex items-center gap-2 bg-black font-bold text-white transition-all',
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.mobile,
-              designTokens.neoBrutalism.hover,
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.base,
+              designTokens.cleanCommerce.hover,
               designTokens.button.md
             )}
           >
@@ -139,7 +139,7 @@ export function CouponFilters() {
             <select
               value={status}
               onChange={(e) => handleStatusChange(e.target.value)}
-              className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="all">全部狀態</option>
               <option value="active">啟用</option>
@@ -153,7 +153,7 @@ export function CouponFilters() {
             <select
               value={discountType}
               onChange={(e) => handleDiscountTypeChange(e.target.value)}
-              className="w-full border-2 border-black p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-full border p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black"
             >
               <option value="all">全部方式</option>
               <option value="fixed">現金折扣</option>
@@ -169,9 +169,9 @@ export function CouponFilters() {
             onClick={handleClearFilters}
             className={cn(
               'inline-flex items-center gap-2 bg-white font-bold transition-all',
-              designTokens.neoBrutalism.border.full,
-              designTokens.neoBrutalism.shadow.mobile,
-              designTokens.neoBrutalism.hover,
+              designTokens.cleanCommerce.border.full,
+              designTokens.cleanCommerce.shadow.base,
+              designTokens.cleanCommerce.hover,
               designTokens.button.sm
             )}
           >

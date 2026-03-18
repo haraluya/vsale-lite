@@ -70,7 +70,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
             </div>
             <Link
               href="/admin/announcements/new"
-              className="inline-flex items-center gap-2 rounded-none border-2 md:border-3 border-black bg-green-400 px-6 py-3 font-bold shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              className="inline-flex items-center gap-2 rounded-theme-sm border-theme bg-green-400 px-6 py-3 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
             >
               <Plus className="h-5 w-5" />
               新增廣告
@@ -79,11 +79,11 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
 
           {/* Announcements List */}
           {announcements.length === 0 ? (
-            <div className="rounded-none border-2 md:border-3 border-black bg-surface p-12 text-center shadow-neo">
+            <div className="rounded-theme-sm border-theme bg-surface p-12 text-center shadow-neo">
               <p className="text-lg text-text-secondary">目前沒有任何廣告</p>
               <Link
                 href="/admin/announcements/new"
-                className="mt-4 inline-flex items-center gap-2 rounded-none border-2 border-black bg-green-400 px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                className="mt-4 inline-flex items-center gap-2 rounded-theme-sm border bg-green-400 px-4 py-2 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
               >
                 <Plus className="h-4 w-4" />
                 新增第一個廣告
