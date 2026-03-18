@@ -18,10 +18,11 @@ import {
   ShoppingCart,
   LogOut,
   Download,
+  ChevronRight,
+  User,
 } from 'lucide-react'
 import { logout } from '@/lib/actions/auth'
 import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
-import { usePwaInstall } from '@/lib/hooks/use-pwa-install'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 
@@ -37,7 +38,7 @@ interface StoreSidebarProps {
 
 const navItems = [
   { href: '/store', label: '首頁', icon: Home, exact: true },
-  { href: '/store/products', label: '商品', icon: Package },
+  { href: '/store/products', label: '所有商品', icon: Package },
   { href: '/store/promotions', label: '優惠活動', icon: Gift },
   { href: '/store/orders', label: '我的訂單', icon: ClipboardList },
   { href: '/store/coupons', label: '優惠券', icon: Ticket },
@@ -64,7 +65,8 @@ export function StoreSidebar({
   const router = useRouter()
   const confirm = useConfirm()
   const alert = useAlert()
-  const { canInstall, install } = usePwaInstall()
+  const isStandalone = typeof window !== 'undefined' &&
+    (window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone === true)
 
   const panelRef = useRef<HTMLDivElement>(null)
   const touchState = useRef<{
@@ -119,9 +121,8 @@ export function StoreSidebar({
     // 方向鎖定：首次移動超過閾值時決定方向
     if (!touchState.current.direction) {
       if (Math.abs(deltaX) < DIRECTION_LOCK_THRESHOLD && Math.abs(deltaY) < DIRECTION_LOCK_THRESHOLD) {
-        return // 尚未超過閾值，不做任何事
+        return
       }
-      // 判斷主要方向
       touchState.current.direction = Math.abs(deltaX) > Math.abs(deltaY) ? 'horizontal' : 'vertical'
     }
 
@@ -132,11 +133,9 @@ export function StoreSidebar({
 
     // 水平方向：只允許向右滑（關閉方向）
     if (deltaX > 0) {
-      e.preventDefault() // 阻止瀏覽器預設行為
+      e.preventDefault()
       touchState.current.isDragging = true
       touchState.current.currentX = touch.clientX
-
-      // 直接設定 transform，不經過 state 以獲得最流暢的動畫
       panelRef.current.style.transition = 'none'
       panelRef.current.style.transform = `translateX(${deltaX}px)`
     }
@@ -154,20 +153,16 @@ export function StoreSidebar({
 
     const deltaX = currentX - startX
     const elapsed = Date.now() - startTime
-    const velocity = deltaX / elapsed // px/ms
+    const velocity = deltaX / elapsed
 
-    // 判斷是否觸發關閉：距離超過閾值 或 速度夠快
     if (deltaX > SWIPE_CLOSE_THRESHOLD || velocity > VELOCITY_THRESHOLD) {
-      // 滑出動畫
       panelRef.current.style.transition = 'transform 200ms ease-out'
       panelRef.current.style.transform = 'translateX(100%)'
-      // 動畫結束後關閉
       setTimeout(() => {
         resetPanelPosition()
         onClose()
       }, 200)
     } else {
-      // 回彈動畫
       panelRef.current.style.transition = 'transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
       panelRef.current.style.transform = 'translateX(0)'
       setTimeout(resetPanelPosition, 250)
@@ -216,22 +211,25 @@ export function StoreSidebar({
       {/* 遮罩 */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/50 z-50 transition-opacity duration-300',
+          'fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 transition-opacity duration-300',
           open ? 'opacity-100' : 'opacity-0 pointer-events-none'
         )}
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* 面板 */}
+      {/* 面板 — 手機 60vw / 桌面 320px */}
       <aside
         ref={panelRef}
         className={cn(
-          'fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface border-l z-50',
+          'fixed top-0 right-0 h-full z-50',
+          'w-[62vw] md:w-80',
+          'bg-surface border-l',
           'transform transition-transform duration-300 ease-out',
           'flex flex-col',
           open ? 'translate-x-0' : 'translate-x-full'
         )}
+        style={{ paddingTop: 'var(--safe-area-top)' }}
         aria-label="側邊選單"
         role="dialog"
         aria-modal="true"
@@ -239,38 +237,72 @@ export function StoreSidebar({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* 頂部：用戶資訊 + 關閉按鈕 */}
-        <div className="p-4 border-b">
-          <div className="flex items-start justify-between">
-            <div className="min-w-0">
-              <p className="font-semibold text-base truncate">{userName} 您好！</p>
-              <p className="text-sm text-text-secondary mt-0.5">{userPhone}</p>
-              <p className="text-sm text-text-secondary mt-0.5">
-                會員等級: <span className="font-semibold text-foreground">{tierName}</span>
-              </p>
-              {unusedCouponCount > 0 && (
-                <button
-                  onClick={() => handleNavClick('/store/coupons')}
-                  className="flex items-center gap-1 text-sm text-warning-border font-medium mt-1"
-                >
-                  <Ticket className="h-3.5 w-3.5" />
-                  優惠券 ({unusedCouponCount})
-                </button>
-              )}
-            </div>
+        {/* ── 頂部：用戶資訊卡片 ── */}
+        <div className="px-4 pt-4 pb-3">
+          {/* 關閉按鈕 */}
+          <div className="flex justify-end -mr-1 mb-2">
             <button
               onClick={onClose}
-              className="flex items-center justify-center min-h-[44px] min-w-[44px] -mr-2 -mt-1"
+              className={cn(
+                'flex items-center justify-center rounded-full',
+                'min-h-[36px] min-w-[36px]',
+                'bg-muted/15 hover:bg-muted/30 transition-colors'
+              )}
               aria-label="關閉選單"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 text-text-secondary" />
             </button>
           </div>
+
+          {/* 用戶卡片 */}
+          <button
+            onClick={() => handleNavClick('/store/account')}
+            className={cn(
+              'w-full flex items-center gap-3 p-3 rounded-theme',
+              'bg-primary/5 border border-primary/15',
+              'transition-colors hover:bg-primary/10',
+              'text-left'
+            )}
+          >
+            {/* 頭像 */}
+            <div className={cn(
+              'flex-shrink-0 w-10 h-10 rounded-full',
+              'bg-primary/15 flex items-center justify-center'
+            )}>
+              <User className="h-5 w-5 text-primary" />
+            </div>
+            {/* 資訊 */}
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-[15px] truncate leading-tight">{userName}</p>
+              <p className="text-xs text-text-secondary mt-0.5 leading-tight">{tierName}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-text-secondary flex-shrink-0" />
+          </button>
+
+          {/* 優惠券提示 */}
+          {unusedCouponCount > 0 && (
+            <button
+              onClick={() => handleNavClick('/store/coupons')}
+              className={cn(
+                'w-full flex items-center gap-2 mt-2 px-3 py-2 rounded-theme-sm',
+                'bg-warning/10 border border-warning/20',
+                'transition-colors hover:bg-warning/15'
+              )}
+            >
+              <Ticket className="h-4 w-4 text-warning-border flex-shrink-0" />
+              <span className="text-[13px] font-semibold text-warning-border">
+                {unusedCouponCount} 張優惠券可使用
+              </span>
+            </button>
+          )}
         </div>
 
-        {/* 導覽群組 */}
-        <nav className="flex-1 overflow-y-auto py-2 overscroll-contain">
-          <div className="px-2">
+        {/* ── 導覽群組 ── */}
+        <nav className="flex-1 overflow-y-auto overscroll-contain px-3 py-1">
+          <p className="px-2 pt-2 pb-1.5 text-[11px] font-semibold text-text-secondary/60 tracking-widest">
+            功能選單
+          </p>
+          <div className="space-y-0.5">
             {navItems.map((item) => {
               const Icon = item.icon
               const active = isActive(item.href, item.exact)
@@ -279,82 +311,101 @@ export function StoreSidebar({
                   key={item.href}
                   onClick={() => handleNavClick(item.href)}
                   className={cn(
-                    'flex items-center gap-3 w-full px-3 py-2.5 rounded-theme-sm text-sm font-medium',
-                    'transition-colors duration-150 min-h-[44px]',
+                    'group flex items-center gap-3 w-full px-3 py-2.5 rounded-theme-sm',
+                    'transition-all duration-150 min-h-[46px]',
                     active
-                      ? 'bg-primary text-text-inverse'
-                      : 'text-foreground hover:bg-muted/20'
+                      ? 'bg-primary text-text-inverse shadow-neo-sm'
+                      : 'text-foreground hover:bg-muted/12 active:bg-muted/20'
                   )}
                 >
-                  <Icon className="h-5 w-5 flex-shrink-0" />
-                  {item.label}
+                  <div className={cn(
+                    'flex items-center justify-center w-8 h-8 rounded-theme-sm flex-shrink-0',
+                    'transition-colors duration-150',
+                    active
+                      ? 'bg-white/20'
+                      : 'bg-muted/10 group-hover:bg-muted/18'
+                  )}>
+                    <Icon className="h-[18px] w-[18px]" />
+                  </div>
+                  <span className="text-[15px] font-medium">{item.label}</span>
                 </button>
               )
             })}
           </div>
 
-          {/* 分類群組 */}
+          {/* ── 分類群組 ── */}
           {categories.length > 0 && (
-            <div className="mt-3 pt-3 border-t px-2">
-              <p className="px-3 py-1.5 text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                分類導覽
+            <div className="mt-4 pt-3 border-t">
+              <p className="px-2 pb-1.5 text-[11px] font-semibold text-text-secondary/60 tracking-widest">
+                商品分類
               </p>
-              <button
-                onClick={() => handleNavClick('/store/products')}
-                className={cn(
-                  'flex items-center w-full px-3 py-2 rounded-theme-sm text-sm',
-                  'transition-colors duration-150 min-h-[40px]',
-                  pathname === '/store/products' && !new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').has('category')
-                    ? 'bg-primary/10 text-primary font-medium'
-                    : 'text-foreground hover:bg-muted/20'
-                )}
-              >
-                全部
-              </button>
-              {categories.map((cat) => (
+              <div className="space-y-0.5">
                 <button
-                  key={cat.id}
-                  onClick={() => handleCategoryClick(cat.id)}
+                  onClick={() => handleNavClick('/store/products')}
                   className={cn(
-                    'flex items-center w-full px-3 py-2 rounded-theme-sm text-sm',
-                    'transition-colors duration-150 min-h-[40px]',
-                    'text-foreground hover:bg-muted/20'
+                    'flex items-center w-full px-3 py-2 rounded-theme-sm',
+                    'transition-all duration-150 min-h-[42px]',
+                    pathname === '/store/products' && !new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').has('category')
+                      ? 'bg-primary/10 text-primary font-semibold'
+                      : 'text-foreground hover:bg-muted/12 active:bg-muted/20'
                   )}
                 >
-                  {cat.name}
+                  <span className="text-[14px]">全部商品</span>
                 </button>
-              ))}
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => handleCategoryClick(cat.id)}
+                    className={cn(
+                      'flex items-center w-full px-3 py-2 rounded-theme-sm',
+                      'transition-all duration-150 min-h-[42px]',
+                      'text-foreground hover:bg-muted/12 active:bg-muted/20'
+                    )}
+                  >
+                    <span className="text-[14px]">{cat.name}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </nav>
 
-        {/* 底部固定：安裝 APP + 深色模式 + 登出 */}
-        <div className="border-t p-3 flex items-center gap-2">
-          {canInstall && (
+        {/* ── 底部工具列 ── */}
+        <div className="border-t px-3 py-3 space-y-2" style={{ paddingBottom: 'calc(var(--safe-area-bottom, 0px) + 12px)' }}>
+          {/* 安裝 APP */}
+          {!isStandalone && (
             <button
-              onClick={install}
+              onClick={() => handleNavClick('/store/install')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-theme-sm',
-                'bg-primary text-text-inverse min-h-[40px]',
-                'transition-all duration-200'
+                'w-full flex items-center justify-center gap-2 py-2.5 rounded-theme-sm',
+                'bg-primary text-text-inverse text-[14px] font-semibold',
+                'border-theme shadow-neo-sm',
+                'transition-all duration-200',
+                'hover:-translate-y-0.5 hover:shadow-theme-hover',
+                'active:scale-[0.98] min-h-[44px]'
               )}
             >
               <Download className="h-4 w-4" />
-              安裝APP
+              安裝 APP
             </button>
           )}
-          <ThemeToggle className="min-h-[40px] min-w-[40px]" />
-          <button
-            onClick={handleLogout}
-            className={cn(
-              'flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-theme-sm ml-auto',
-              'border-theme min-h-[40px]',
-              'text-foreground hover:bg-muted/20 transition-colors duration-150'
-            )}
-          >
-            <LogOut className="h-4 w-4" />
-            登出
-          </button>
+
+          {/* 深色模式 + 登出 */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle className="min-h-[40px] min-w-[40px]" />
+            <button
+              onClick={handleLogout}
+              className={cn(
+                'flex-1 flex items-center justify-center gap-1.5 py-2 rounded-theme-sm',
+                'text-[13px] font-medium text-text-secondary',
+                'border border-transparent hover:border-muted/30 hover:bg-muted/10',
+                'transition-all duration-150 min-h-[40px]'
+              )}
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              登出
+            </button>
+          </div>
         </div>
       </aside>
     </>

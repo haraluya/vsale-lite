@@ -1,7 +1,7 @@
 /**
  * Navbar Component
  * 前台導航列 — 精簡版
- * - 手機版：Logo + 購物車 + 漢堡選單
+ * - 手機版：Logo + 漢堡選單（購物車在底部導覽列）
  * - 桌面版：Logo + 歡迎詞 + 購物車 + 漢堡選單
  */
 
@@ -61,11 +61,11 @@ export function Navbar({ onMenuOpen, userName, tierName }: NavbarProps) {
               {userName} 您好！<span className="text-foreground font-medium">{tierName}</span>
             </span>
 
-            {/* 購物車 */}
+            {/* 購物車（僅桌面版，手機版有底部導覽列） */}
             <Link
               href="/store/cart"
               className={cn(
-                'relative flex items-center justify-center',
+                'relative hidden md:flex items-center justify-center',
                 'min-h-[44px] min-w-[44px] rounded-theme-sm',
                 'transition-all duration-200',
                 'hover:bg-muted/20 active:scale-[0.95]'
