@@ -15,7 +15,7 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useCartStore } from '@/stores/cart'
 import { getCartItemsWithPrices, getComboDealProductDetails } from '@/lib/actions/cart'
 import { validateCoupon } from '@/lib/actions/coupons'
@@ -46,10 +46,16 @@ export function CartContent() {
   const [error, setError] = useState<string | null>(null)
   const [showCouponSelector, setShowCouponSelector] = useState(false)
 
-  // 載入購物車商品
+  // 穩定的商品 ID 集合 key — 只有新增/移除商品時才改變，數量變更不會
+  const productIdsKey = useMemo(
+    () => items.map(i => i.productId).sort().join(','),
+    [items]
+  )
+
+  // 載入購物車商品（僅在商品集合變化時觸發，數量變更不觸發）
   useEffect(() => {
     async function loadCartItems() {
-      if (items.length === 0) {
+      if (productIdsKey === '') {
         setCartItemsWithPrices([])
         setIsLoading(false)
         return
@@ -82,7 +88,25 @@ export function CartContent() {
     }
 
     loadCartItems()
-  }, [items, removeInvalidItems])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productIdsKey, removeInvalidItems])
+
+  // Client 端數量同步 — 不觸發 Server Action，純用已快取的 price 計算
+  useEffect(() => {
+    if (cartItemsWithPrices.length === 0) return
+    setCartItemsWithPrices(prev =>
+      prev.map(cartItem => {
+        const storeItem = items.find(i => i.productId === cartItem.productId)
+        if (!storeItem || storeItem.quantity === cartItem.quantity) return cartItem
+        return {
+          ...cartItem,
+          quantity: storeItem.quantity,
+          subtotal: (cartItem.price ?? 0) * storeItem.quantity,
+        }
+      })
+    )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items])
 
   // 🆕 載入組合優惠商品詳細資訊
   useEffect(() => {
@@ -207,7 +231,7 @@ export function CartContent() {
         )}
 
         {/* 載入中 */}
-        {isLoading ? (
+        {isLoading && cartItemsWithPrices.length === 0 ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="mb-4 text-6xl">⏳</div>
