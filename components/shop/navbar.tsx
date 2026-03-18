@@ -1,33 +1,26 @@
 /**
  * Navbar Component
- * 前台導航列元件 — Clean Commerce 風格
- * - 手機版：僅 Logo + 主題切換
- * - 桌面版：完整功能按鈕
+ * 前台導航列 — 精簡版
+ * - 手機版：Logo + 購物車 + 漢堡選單
+ * - 桌面版：Logo + 歡迎詞 + 購物車 + 漢堡選單
  */
 
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import type { CurrentUser } from '@/types'
-import { LogOut, ShoppingCart, Package, Ticket, Gift } from 'lucide-react'
-import { logout } from '@/lib/actions/auth'
+import { ShoppingCart, Menu } from 'lucide-react'
 import { useCartStore } from '@/stores/cart'
 import { Logo } from '@/components/ui/logo'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
-import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
 
 interface NavbarProps {
-  user: CurrentUser
+  onMenuOpen: () => void
+  userName: string
+  tierName: string
 }
 
-export function Navbar({ user }: NavbarProps) {
-  const confirm = useConfirm()
-  const alert = useAlert()
-  const [loading, setLoading] = useState(false)
-
+export function Navbar({ onMenuOpen, userName, tierName }: NavbarProps) {
   const cartItemsCount = useCartStore(state => {
     const normalItemsCount = state.items.reduce(
       (total, item) => total + item.quantity,
@@ -41,128 +34,64 @@ export function Navbar({ user }: NavbarProps) {
     return normalItemsCount + comboDealItemsCount
   })
 
-  const handleLogout = async () => {
-    const confirmed = await confirm({
-      title: '確認登出',
-      description: '確定要登出嗎？',
-      variant: 'default'
-    })
-
-    if (!confirmed) return
-
-    setLoading(true)
-
-    try {
-      await logout()
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-        return
-      }
-
-      await alert({
-        title: '登出失敗',
-        message: '登出失敗，請稍後再試',
-        variant: 'error'
-      })
-      setLoading(false)
-    }
-  }
-
-  const navBtnClass = cn(
-    "flex items-center gap-2 rounded-theme-sm border-theme font-medium transition-all duration-200",
-    "shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover",
-    "active:scale-[0.98] active:translate-y-0",
-    "px-3 py-2 md:px-4",
-    "min-h-[44px] min-w-[44px]"
-  )
-
   return (
     <nav
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 bg-surface w-full",
-        "border-b shadow-neo-sm"
+        'fixed top-0 left-0 right-0 z-40 bg-surface w-full',
+        'border-b shadow-neo-sm'
       )}
       style={{ paddingTop: 'var(--safe-area-top)' }}
     >
       <div className={cn(
         designTokens.container.default,
-        "p-3 md:p-4",
-        "w-full mx-auto"
+        'px-3 md:px-4',
+        'w-full mx-auto'
       )}>
-        <div className="flex h-14 md:h-16 items-center justify-between flex-wrap gap-2">
+        <div className="flex h-[52px] md:h-[60px] items-center justify-between gap-2">
           {/* Logo */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center">
             <Logo variant="full" href="/store" className="hidden sm:block" />
             <Logo variant="icon" href="/store" className="block sm:hidden" />
           </div>
 
-          {/* 手機版：僅主題切換 */}
-          <div className="flex items-center gap-2 md:hidden">
-            <ThemeToggle />
-          </div>
+          {/* 右側按鈕群組 */}
+          <div className="flex items-center gap-1.5 md:gap-2">
+            {/* 桌面版歡迎詞 */}
+            <span className="hidden md:inline text-sm text-text-secondary mr-2">
+              {userName} 您好！<span className="text-foreground font-medium">{tierName}</span>
+            </span>
 
-          {/* 桌面版：完整功能按鈕 */}
-          <div className="hidden md:flex items-center gap-2 md:gap-3">
-            {/* 優惠活動按鈕 */}
-            <Link
-              href="/store/promotions"
-              className={navBtnClass}
-              style={{ backgroundColor: 'var(--color-nav-promotions)' }}
-            >
-              <Gift className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">優惠活動</span>
-            </Link>
-
-            {/* 我的訂單按鈕 */}
-            <Link
-              href="/store/orders"
-              className={navBtnClass}
-              style={{ backgroundColor: 'var(--color-nav-orders)' }}
-            >
-              <Package className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">我的訂單</span>
-            </Link>
-
-            {/* 優惠券按鈕 */}
-            <Link
-              href="/store/coupons"
-              className={navBtnClass}
-              style={{ backgroundColor: 'var(--color-nav-coupons)' }}
-            >
-              <Ticket className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">優惠券</span>
-            </Link>
-
-            {/* 購物車按鈕 */}
+            {/* 購物車 */}
             <Link
               href="/store/cart"
-              className={cn(navBtnClass, "relative")}
-              style={{ backgroundColor: 'var(--color-nav-cart)' }}
+              className={cn(
+                'relative flex items-center justify-center',
+                'min-h-[44px] min-w-[44px] rounded-theme-sm',
+                'transition-all duration-200',
+                'hover:bg-muted/20 active:scale-[0.95]'
+              )}
+              aria-label={`購物車${cartItemsCount > 0 ? `，${cartItemsCount} 件商品` : ''}`}
             >
-              <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">購物車</span>
+              <ShoppingCart className="h-5 w-5" />
               {cartItemsCount > 0 && (
-                <span className="absolute -right-2 -top-2 flex h-5 w-5 md:h-6 md:w-6 items-center justify-center rounded-full bg-error font-semibold text-text-inverse border text-xs">
+                <span className="absolute top-1 right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-error font-semibold text-text-inverse border text-[10px]">
                   {cartItemsCount > 99 ? '99+' : cartItemsCount}
                 </span>
               )}
             </Link>
 
-            {/* 主題切換 */}
-            <ThemeToggle />
-
-            {/* 登出按鈕 */}
+            {/* 漢堡選單 */}
             <button
-              onClick={handleLogout}
-              disabled={loading}
+              onClick={onMenuOpen}
               className={cn(
-                navBtnClass,
-                "disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
+                'flex items-center justify-center',
+                'min-h-[44px] min-w-[44px] rounded-theme-sm',
+                'transition-all duration-200',
+                'hover:bg-muted/20 active:scale-[0.95]'
               )}
-              style={{ backgroundColor: 'var(--color-nav-logout)' }}
+              aria-label="開啟選單"
             >
-              <LogOut className="h-4 w-4 md:h-5 md:w-5" />
-              <span className="hidden sm:inline">{loading ? '登出中...' : '登出'}</span>
+              <Menu className="h-5 w-5" />
             </button>
           </div>
         </div>
