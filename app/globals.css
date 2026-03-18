@@ -474,7 +474,7 @@
 .animate-stagger-item:nth-child(11) { animation-delay: 0.22s; }
 .animate-stagger-item:nth-child(12) { animation-delay: 0.24s; }
 
-/* === MONSKR Logo 頁面過渡動畫 === */
+/* === MONSKR Logo 頁面過渡動畫 — 光暈脈衝 === */
 .page-transition-overlay {
   position: fixed;
   inset: 0;
@@ -482,67 +482,66 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-surface);
+  background: radial-gradient(circle at center, var(--color-primary-light) 0%, var(--color-surface) 70%);
+  overflow: hidden;
 }
 
 .page-transition-logo {
-  width: min(70vw, 320px);
+  width: min(70vw, 360px);
   height: auto;
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  filter: drop-shadow(0 0 0px var(--color-primary));
+  transform: scale(0.9);
 }
 
-/* 字母描繪動畫 — stroke-dashoffset 從滿到零 */
-.page-transition-letter {
-  fill: transparent;
-  stroke: var(--color-text-primary);
-  stroke-width: 1.5;
-  stroke-dasharray: 600;
-  stroke-dashoffset: 600;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.page-transition-logo-visible {
+  animation: ptLogoIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.letter-1 { animation: letterDraw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s forwards; }
-.letter-2 { animation: letterDraw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s forwards; }
-.letter-3 { animation: letterDraw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards; }
-.letter-4 { animation: letterDraw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.7s forwards; }
-.letter-5 { animation: letterDraw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.9s forwards; }
-.letter-6 { animation: letterDraw 0.6s cubic-bezier(0.4, 0, 0.2, 1) 1.1s forwards; }
-
-@keyframes letterDraw {
-  to { stroke-dashoffset: 0; }
+.page-transition-path {
+  fill: var(--color-text-primary);
 }
 
-/* 填色階段 — stroke 消失，fill 浮現 */
-.page-transition-letter.letter-filled {
-  animation: letterFill 0.4s ease-out forwards;
+/* 光圈脈衝 */
+.page-transition-ring {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  opacity: 0;
 }
 
-@keyframes letterFill {
-  from {
-    fill: transparent;
-    stroke: var(--color-text-primary);
-    stroke-dashoffset: 0;
-  }
-  to {
-    fill: var(--color-text-primary);
-    stroke: transparent;
-    stroke-dashoffset: 0;
-  }
+.page-transition-ring-1 {
+  animation: ptRing 1.2s cubic-bezier(0, 0.5, 0.5, 1) 0.1s forwards;
+}
+.page-transition-ring-2 {
+  animation: ptRing 1.2s cubic-bezier(0, 0.5, 0.5, 1) 0.4s forwards;
+}
+.page-transition-ring-3 {
+  animation: ptRing 1.2s cubic-bezier(0, 0.5, 0.5, 1) 0.7s forwards;
 }
 
-/* 退場 — 整體向上滑出 + 淡出 */
+@keyframes ptRing {
+  0% { opacity: 0.8; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(8); }
+}
+
+@keyframes ptLogoIn {
+  0% { opacity: 0; transform: scale(0.9); filter: drop-shadow(0 0 0px var(--color-primary)); }
+  50% { opacity: 1; transform: scale(1.02); filter: drop-shadow(0 0 30px var(--color-primary)); }
+  100% { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 12px var(--color-primary)); }
+}
+
+/* 退場 — 亮白爆閃 */
 .page-transition-exit {
-  animation: transitionExit 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation: ptExit 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes transitionExit {
-  0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-30px) scale(0.96);
-    pointer-events: none;
-  }
+@keyframes ptExit {
+  0% { opacity: 1; }
+  50% { opacity: 1; transform: scale(1.1); filter: brightness(1.5); }
+  100% { opacity: 0; transform: scale(1.3); filter: brightness(2); pointer-events: none; }
 }
