@@ -136,7 +136,7 @@ export function OrderFilters() {
               className={cn(
                 baseClasses,
                 isActive ? activeBgColor : bgColor,
-                isActive && 'shadow-none -translate-y-0.5 shadow-theme-hover'
+                isActive && '-translate-y-0.5 shadow-theme-hover'
               )}
             >
               {option.label}

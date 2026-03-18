@@ -130,7 +130,7 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
                       className={cn(
                         'flex items-center gap-3 rounded-theme-sm border px-4 py-2.5 font-bold transition-all w-full',
                         isActive
-                          ? 'bg-primary text-white shadow-none -translate-y-0.5 shadow-theme-hover'
+                          ? 'bg-primary text-white -translate-y-0.5 shadow-theme-hover'
                           : 'bg-surface text-foreground shadow-neo-sm active:scale-[0.98]'
                       )}
                     >

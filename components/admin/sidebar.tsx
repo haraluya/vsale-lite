@@ -129,7 +129,7 @@ export function Sidebar() {
                       'md:w-12 md:h-12 md:justify-center md:p-0',
                       'lg:w-auto lg:h-auto lg:justify-start lg:gap-3 lg:px-4 lg:py-2.5',
                       isActive
-                        ? 'border-primary bg-primary text-text-inverse shadow-none -translate-y-0.5 shadow-theme-hover'
+                        ? 'border-primary bg-primary text-text-inverse -translate-y-0.5 shadow-theme-hover'
                         : 'bg-surface shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover'
                     )}
                   >

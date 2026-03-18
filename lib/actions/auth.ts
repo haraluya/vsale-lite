@@ -6,6 +6,7 @@ import { withRetry } from '@/lib/supabase/retry'
 import type { ActionResult } from '@/types'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 
 /**
  * 管理員使用 Email 登入後台
@@ -206,6 +207,11 @@ export async function logout(): Promise<void> {
       console.error('登出失敗:', error)
       throw new Error('登出失敗，請稍後再試')
     }
+
+    // 清除 middleware role 快取 cookie，避免切換帳號時讀到舊角色
+    const cookieStore = await cookies()
+    cookieStore.delete('vsale-role')
+    cookieStore.delete('vsale-role-ts')
 
     revalidatePath('/', 'layout')
   } catch (error) {

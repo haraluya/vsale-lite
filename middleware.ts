@@ -114,7 +114,10 @@ export async function middleware(request: NextRequest) {
   const cachedAt = request.cookies.get('vsale-role-ts')?.value
   const now = Math.floor(Date.now() / 1000)
 
-  if (cachedRole && cachedAt && now - Number(cachedAt) < ROLE_TTL) {
+  // 登入頁不使用快取（可能剛切換帳號）
+  const isLoginPage = pathname === '/login' || pathname === '/admin/login'
+
+  if (cachedRole && cachedAt && now - Number(cachedAt) < ROLE_TTL && !isLoginPage) {
     profile = { role: cachedRole }
   } else {
     const { data } = await adminClient

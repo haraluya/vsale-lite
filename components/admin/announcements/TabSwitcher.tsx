@@ -28,7 +28,7 @@ export function TabSwitcher() {
           transition-all
           ${
             currentTab === 'home'
-              ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+              ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
           }
         `}
@@ -46,7 +46,7 @@ export function TabSwitcher() {
           transition-all
           ${
             currentTab === 'products'
-              ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+              ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
           }
         `}

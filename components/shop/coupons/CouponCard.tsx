@@ -129,7 +129,7 @@ export function CouponCard({
               onClick={onClaim}
               className="mt-3 w-full md:w-auto px-4 py-2 bg-black text-white font-bold
                          border shadow-neo-sm hover:-translate-y-0.5
-                         hover:shadow-theme-hover hover:shadow-none transition-all
+                         hover:shadow-theme-hover transition-all
                          text-sm md:text-base"
             >
               立即領取

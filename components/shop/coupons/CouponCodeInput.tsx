@@ -107,7 +107,7 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
           disabled={loading || !code.trim()}
           className="px-6 md:px-8 py-3 md:py-4 bg-orange-400 text-foreground font-black
                      border shadow-neo-sm hover:-translate-y-0.5
-                     hover:shadow-theme-hover hover:shadow-none transition-all
+                     hover:shadow-theme-hover transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed
                      disabled:hover:translate-x-0 disabled:hover:translate-y-0
                      disabled:hover:shadow-neo-sm text-sm md:text-base

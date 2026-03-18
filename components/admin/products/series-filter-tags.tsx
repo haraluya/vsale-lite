@@ -220,7 +220,7 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
             rounded-theme-sm border px-4 py-2 font-bold text-sm
             transition-all shadow-neo-sm
             ${activeTab === 'series'
-              ? 'bg-blue-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+              ? 'bg-blue-400 -translate-y-0.5 shadow-theme-hover'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
             }
           `}
@@ -233,7 +233,7 @@ export function SeriesFilterTags({ series }: SeriesFilterTagsProps) {
             rounded-theme-sm border px-4 py-2 font-bold text-sm
             transition-all shadow-neo-sm
             ${activeTab === 'tags'
-              ? 'bg-blue-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+              ? 'bg-blue-400 -translate-y-0.5 shadow-theme-hover'
               : 'bg-white hover:translate-x-[1px] hover:translate-y-[1px]'
             }
           `}

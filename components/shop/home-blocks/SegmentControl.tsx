@@ -41,7 +41,7 @@ export function SegmentControl() {
 
           // 啟用狀態
           isHomePage
-            ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+            ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover'
             : 'bg-surface active:scale-[0.98]'
         )}
       >
@@ -65,7 +65,7 @@ export function SegmentControl() {
 
           // 啟用狀態
           isProductsPage
-            ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover shadow-none'
+            ? 'bg-green-400 -translate-y-0.5 shadow-theme-hover'
             : 'bg-surface active:scale-[0.98]'
         )}
       >
