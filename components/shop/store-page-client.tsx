@@ -195,7 +195,7 @@ export function StorePageClient({
                 'md:shadow-neo',
                 showPromotionsOnly
                   ? 'bg-red-500 text-white'
-                  : 'bg-white text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                  : 'bg-surface text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
               )}
             >
               🔥 優惠活動 ({comboDeals.length} 個)
@@ -234,7 +234,7 @@ export function StorePageClient({
         <>
           {searchedSeries.length === 0 && searchedProducts.length === 0 ? (
             <div className={cn(
-              "rounded-none bg-white text-center",
+              "rounded-none bg-surface text-center",
               designTokens.neoBrutalism.border.full,
               "border-black",
               designTokens.neoBrutalism.shadow.full,
@@ -242,9 +242,9 @@ export function StorePageClient({
             )}>
               <p className={cn(
                 designTokens.typography.body.large,
-                "text-gray-500"
+                "text-text-secondary"
               )}>找不到符合條件的系列或商品</p>
-              <p className="mt-2 text-sm text-gray-400">
+              <p className="mt-2 text-sm text-text-secondary">
                 請嘗試使用其他關鍵字
               </p>
             </div>
@@ -287,7 +287,7 @@ export function StorePageClient({
         <>
           {comboDeals.length === 0 ? (
             <div className={cn(
-              "rounded-none bg-white text-center",
+              "rounded-none bg-surface text-center",
               designTokens.neoBrutalism.border.full,
               "border-black",
               designTokens.neoBrutalism.shadow.full,
@@ -295,9 +295,9 @@ export function StorePageClient({
             )}>
               <p className={cn(
                 designTokens.typography.body.large,
-                "text-gray-500"
+                "text-text-secondary"
               )}>目前沒有適用於您等級的優惠活動</p>
-              <p className="mt-2 text-sm text-gray-400">
+              <p className="mt-2 text-sm text-text-secondary">
                 請稍後再來看看，或聯繫客服了解更多優惠資訊
               </p>
             </div>
@@ -314,7 +314,7 @@ export function StorePageClient({
         <>
           {displaySeries.length === 0 && comboDeals.length === 0 ? (
             <div className={cn(
-              "rounded-none bg-white text-center",
+              "rounded-none bg-surface text-center",
               designTokens.neoBrutalism.border.full,
               "border-black",
               designTokens.neoBrutalism.shadow.full,
@@ -322,10 +322,10 @@ export function StorePageClient({
             )}>
               <p className={cn(
                 designTokens.typography.body.large,
-                "text-gray-500"
+                "text-text-secondary"
               )}>{hasFilters ? '找不到符合條件的系列' : '目前沒有可用的商品系列'}</p>
               {hasFilters && (
-                <p className="mt-2 text-sm text-gray-400">
+                <p className="mt-2 text-sm text-text-secondary">
                   請嘗試使用其他篩選條件
                 </p>
               )}
@@ -340,7 +340,7 @@ export function StorePageClient({
                     "mb-4 flex items-center gap-2"
                   )}>
                     <span>🔥 優惠活動</span>
-                    <span className="text-base font-normal text-gray-500">
+                    <span className="text-base font-normal text-text-secondary">
                       ({comboDeals.length} 個)
                     </span>
                   </h2>

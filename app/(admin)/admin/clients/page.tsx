@@ -48,7 +48,7 @@ export default async function ClientsPage({
       <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className={designTokens.typography.h1}>客戶管理</h1>
-          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>
+          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-text-secondary")}>
             共 {total} 位客戶
           </p>
         </div>

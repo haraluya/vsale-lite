@@ -32,7 +32,7 @@ export function ClientLoginForm() {
           onChange={(e) => setPhone(e.target.value)}
         />
         {state && 'errors' in state && state.errors?.phone && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.phone[0]}</p>
+          <p className="mt-2 text-sm text-error">{state.errors.phone[0]}</p>
         )}
       </div>
 
@@ -48,7 +48,7 @@ export function ClientLoginForm() {
           className="mt-2"
         />
         {state && 'errors' in state && state.errors?.password && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.password[0]}</p>
+          <p className="mt-2 text-sm text-error">{state.errors.password[0]}</p>
         )}
       </div>
 

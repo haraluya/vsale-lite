@@ -1,25 +1,15 @@
 /**
  * Shop Layout (前台布局)
- * Feature: 003-series-and-pricing (US3)
- * Feature: 016-home-page-blocks (US1 - 歡迎訊息與切換控制)
- *
- * 前台共用布局
- * - 包含導航列 (Navbar)
- * - 顯示用戶資訊與登出按鈕
- * - 歡迎訊息與會員等級顯示
- * - SegmentControl 切換控制
  */
 
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/shop/navbar'
 import { SecondaryNav } from '@/components/shop/secondary-nav'
+import { BottomNav } from '@/components/shop/bottom-nav'
 import { getUnusedCouponCount } from '@/lib/actions/shop'
 
-// ISR 快取策略：5 分鐘
-// 移除 force-dynamic，啟用快取以提升效能
-// export const dynamic = 'force-dynamic'  // 已移除
-export const revalidate = 300 // 5 分鐘快取
+export const revalidate = 300
 
 export default async function ShopLayout({
   children,
@@ -28,7 +18,6 @@ export default async function ShopLayout({
 }) {
   const supabase = await createClient()
 
-  // 檢查登入狀態
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -37,7 +26,6 @@ export default async function ShopLayout({
     redirect('/login')
   }
 
-  // 並行查詢用戶資料與優惠券數量
   const [{ data: profile }, couponCountResult] = await Promise.all([
     supabase
       .from('profiles')
@@ -82,7 +70,7 @@ export default async function ShopLayout({
       {/* 固定導覽列 */}
       <Navbar user={currentUser} />
 
-      {/* 主要內容區域 - 添加頂部間距避免被導覽列遮擋 */}
+      {/* 主要內容區域 */}
       <div className="pt-[84px] md:pt-[100px]">
         {/* 次導覽列 */}
         <SecondaryNav
@@ -92,9 +80,12 @@ export default async function ShopLayout({
           unusedCouponCount={unusedCouponCount}
         />
 
-        {/* 主要內容 - 添加頂部間距與次導覽列保持呼吸空間 */}
-        <main className="pt-6 md:pt-8">{children}</main>
+        {/* 主要內容 - 手機版底部留空給底部導覽列 */}
+        <main className="pt-6 md:pt-8 pb-20 md:pb-0">{children}</main>
       </div>
+
+      {/* 底部導覽列（僅手機版） */}
+      <BottomNav />
     </div>
   )
 }

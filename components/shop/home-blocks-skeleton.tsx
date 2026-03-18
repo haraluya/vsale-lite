@@ -21,7 +21,7 @@ export function CarouselSkeleton() {
     )}>
       <div
         className={cn(
-          'relative w-full aspect-[16/9] rounded-none bg-gray-200 animate-pulse',
+          'relative w-full aspect-[16/9] rounded-none bg-surface-secondary animate-pulse',
           designTokens.neoBrutalism.border.full,
           'border-black',
           designTokens.neoBrutalism.shadow.full,
@@ -31,7 +31,7 @@ export function CarouselSkeleton() {
       >
         {/* 骨架屏中央文字 */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <p className="text-sm md:text-base text-gray-400">載入中...</p>
+          <p className="text-sm md:text-base text-text-secondary">載入中...</p>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@ export function ProductsSkeleton() {
             <div
               key={index}
               className={cn(
-                "rounded-none bg-white",
+                "rounded-none bg-surface",
                 designTokens.neoBrutalism.border.full,
                 "border-black",
                 designTokens.neoBrutalism.shadow.full,
@@ -71,7 +71,7 @@ export function ProductsSkeleton() {
               {/* 商品圖片骨架 */}
               <div
                 className={cn(
-                  "mb-2 md:mb-4 aspect-square rounded-none bg-gray-200",
+                  "mb-2 md:mb-4 aspect-square rounded-none bg-surface-secondary",
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                 )}
@@ -80,22 +80,22 @@ export function ProductsSkeleton() {
               {/* 商品資訊骨架 */}
               <div className="space-y-2 md:space-y-3">
                 {/* 商品名稱骨架 */}
-                <div className="h-4 md:h-5 bg-gray-200 rounded-none w-3/4" />
-                <div className="h-4 md:h-5 bg-gray-200 rounded-none w-1/2" />
+                <div className="h-4 md:h-5 bg-surface-secondary rounded-none w-3/4" />
+                <div className="h-4 md:h-5 bg-surface-secondary rounded-none w-1/2" />
 
                 {/* 價格骨架 */}
                 <div className={cn(
-                  "rounded-none bg-gray-100",
+                  "rounded-none bg-surface-secondary",
                   designTokens.neoBrutalism.border.mobile,
                   "border-gray-300",
                   "p-2 md:p-3"
                 )}>
-                  <div className="h-6 md:h-8 bg-gray-200 rounded-none w-2/3" />
+                  <div className="h-6 md:h-8 bg-surface-secondary rounded-none w-2/3" />
                 </div>
 
                 {/* 按鈕骨架 */}
                 <div className={cn(
-                  "mt-1.5 md:mt-3 h-[44px] rounded-none bg-gray-200",
+                  "mt-1.5 md:mt-3 h-[44px] rounded-none bg-surface-secondary",
                   designTokens.neoBrutalism.border.full,
                   "border-black"
                 )} />
@@ -118,16 +118,16 @@ export function TextBlockSkeleton() {
       'px-4 md:px-6 lg:px-8'
     )}>
       <div className={cn(
-        "rounded-none bg-white p-4 md:p-6 animate-pulse",
+        "rounded-none bg-surface p-4 md:p-6 animate-pulse",
         designTokens.neoBrutalism.border.full,
         "border-black",
         designTokens.neoBrutalism.shadow.full,
       )}>
-        <div className="h-6 md:h-8 bg-gray-200 rounded-none w-1/3 mb-4" />
+        <div className="h-6 md:h-8 bg-surface-secondary rounded-none w-1/3 mb-4" />
         <div className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded-none w-full" />
-          <div className="h-4 bg-gray-200 rounded-none w-5/6" />
-          <div className="h-4 bg-gray-200 rounded-none w-4/5" />
+          <div className="h-4 bg-surface-secondary rounded-none w-full" />
+          <div className="h-4 bg-surface-secondary rounded-none w-5/6" />
+          <div className="h-4 bg-surface-secondary rounded-none w-4/5" />
         </div>
       </div>
     </div>

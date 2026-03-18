@@ -10,10 +10,6 @@ interface AlertDialogProps {
   onClose: () => void
 }
 
-/**
- * AlertDialog 元件
- * 替代原生 alert()，符合 Neo-Brutalism 設計風格
- */
 export function AlertDialog({ options, onClose }: AlertDialogProps) {
   const {
     title,
@@ -23,7 +19,6 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
     closable = true,
   } = options
 
-  // ESC 鍵關閉
   useEffect(() => {
     if (!closable) return
 
@@ -37,7 +32,6 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
     return () => document.removeEventListener('keydown', handleEsc)
   }, [closable, onClose])
 
-  // 背景滾動鎖定
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => {
@@ -45,27 +39,26 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
     }
   }, [])
 
-  // 變體配置
   const variantConfig = {
     success: {
-      headerBg: 'bg-green-400',
+      headerBg: 'bg-success',
       icon: CheckCircle,
-      buttonBg: 'bg-green-500 hover:bg-green-600',
+      buttonBg: 'bg-success hover:opacity-80',
     },
     error: {
-      headerBg: 'bg-red-400',
+      headerBg: 'bg-error',
       icon: XCircle,
-      buttonBg: 'bg-red-500 hover:bg-red-600',
+      buttonBg: 'bg-error hover:opacity-80',
     },
     warning: {
-      headerBg: 'bg-yellow-400',
+      headerBg: 'bg-warning',
       icon: AlertTriangle,
-      buttonBg: 'bg-yellow-500 hover:bg-yellow-600',
+      buttonBg: 'bg-warning hover:opacity-80',
     },
     info: {
-      headerBg: 'bg-blue-400',
+      headerBg: 'bg-info',
       icon: Info,
-      buttonBg: 'bg-blue-500 hover:bg-blue-600',
+      buttonBg: 'bg-info hover:opacity-80',
     },
   }
 
@@ -74,7 +67,7 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in-0 duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4 animate-in fade-in-0 duration-200"
       onClick={closable ? onClose : undefined}
       role="dialog"
       aria-modal="true"
@@ -84,8 +77,8 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
       <div
         className={cn(
           'w-full max-w-md',
-          'border-2 md:border-3 border-black bg-white',
-          'shadow-neo-sm md:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]',
+          'border-2 md:border-3 bg-surface',
+          'shadow-neo-sm md:shadow-[8px_8px_0px_0px_var(--color-border)]',
           'animate-in zoom-in-95 duration-200'
         )}
         onClick={(e) => e.stopPropagation()}
@@ -93,9 +86,9 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
         {/* 標題欄 */}
         <div
           className={cn(
-            'flex items-center gap-3 border-b-2 md:border-b-3 border-black p-4',
+            'flex items-center gap-3 border-b-2 md:border-b-3 p-4',
             config.headerBg,
-            'text-white'
+            'text-text-inverse'
           )}
         >
           <Icon className="h-6 w-6 flex-shrink-0" />
@@ -106,25 +99,25 @@ export function AlertDialog({ options, onClose }: AlertDialogProps) {
 
         {/* 內容 */}
         <div className="p-6">
-          <p id="alert-dialog-message" className="text-base text-gray-800 whitespace-pre-wrap">
+          <p id="alert-dialog-message" className="text-base whitespace-pre-wrap">
             {message}
           </p>
         </div>
 
         {/* 按鈕 */}
-        <div className="border-t-2 md:border-t-3 border-black p-4">
+        <div className="border-t-2 md:border-t-3 p-4">
           <button
             type="button"
             onClick={onClose}
             className={cn(
               'w-full px-4 py-2',
-              'border-2 md:border-3 border-black',
+              'border-2 md:border-3',
               config.buttonBg,
-              'text-white font-bold text-sm uppercase',
-              'shadow-neo-sm md:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+              'text-text-inverse font-bold text-sm uppercase',
+              'shadow-neo-sm md:shadow-neo',
               'transition-all duration-150',
               'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-              'focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2'
+              'focus:outline-none focus:ring-2 focus:ring-offset-2'
             )}
             autoFocus
           >

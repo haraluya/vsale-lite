@@ -50,14 +50,14 @@ const mockBlocks = [
 
 export default function SortDemoPage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-surface-secondary p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* 成功提示 */}
-        <div className="mb-6 rounded-none border-3 border-green-600 bg-green-50 p-6">
-          <h2 className="mb-2 flex items-center gap-2 text-xl font-bold text-green-800">
+        <div className="mb-6 rounded-none border-3 border-green-600 bg-success-bg p-6">
+          <h2 className="mb-2 flex items-center gap-2 text-xl font-bold text-success">
             ✅ 整合版已上線！
           </h2>
-          <p className="mb-3 text-green-700">
+          <p className="mb-3 text-success">
             我們已經將<strong>方案一（拖曳排序）</strong>和<strong>方案三（快速操作）</strong>整合到實際的首頁廣告管理頁面了！
           </p>
           <a
@@ -71,7 +71,7 @@ export default function SortDemoPage() {
         {/* 標題 */}
         <div className="mb-8">
           <h1 className="mb-2 text-3xl font-bold">首頁廣告排序方案測試</h1>
-          <p className="text-gray-600">
+          <p className="text-text-secondary">
             以下是三種排序方式的獨立測試版本，你可以繼續體驗
           </p>
         </div>
@@ -79,17 +79,17 @@ export default function SortDemoPage() {
         {/* 三個方案展示 */}
         <div className="space-y-8">
           {/* 方案一：拖曳排序 */}
-          <section className="rounded-lg border-3 border-black bg-white p-6 shadow-neo">
+          <section className="rounded-lg border-3 border-black bg-surface p-6 shadow-neo">
             <div className="mb-4 flex items-start justify-between">
               <div>
                 <h2 className="mb-1 text-2xl font-bold">
                   方案一：拖曳排序 🎯
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   最直覺的操作方式 - 按住項目拖曳到想要的位置
                 </p>
               </div>
-              <span className="rounded-none border-2 border-green-600 bg-green-100 px-3 py-1 text-sm font-bold text-green-800">
+              <span className="rounded-none border-2 border-green-600 bg-green-100 px-3 py-1 text-sm font-bold text-success">
                 推薦
               </span>
             </div>
@@ -97,12 +97,12 @@ export default function SortDemoPage() {
           </section>
 
           {/* 方案二：數字輸入排序 */}
-          <section className="rounded-lg border-3 border-black bg-white p-6 shadow-neo">
+          <section className="rounded-lg border-3 border-black bg-surface p-6 shadow-neo">
             <div className="mb-4">
               <h2 className="mb-1 text-2xl font-bold">
                 方案二：數字輸入排序 🔢
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 精確控制 - 直接輸入想要的順序號碼，適合大量調整
               </p>
             </div>
@@ -110,12 +110,12 @@ export default function SortDemoPage() {
           </section>
 
           {/* 方案三：快速操作排序 */}
-          <section className="rounded-lg border-3 border-black bg-white p-6 shadow-neo">
+          <section className="rounded-lg border-3 border-black bg-surface p-6 shadow-neo">
             <div className="mb-4">
               <h2 className="mb-1 text-2xl font-bold">
                 方案三：快速操作排序 ⚡
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-text-secondary">
                 強化版按鈕 - 除了上移/下移，還能一鍵移到頂部或底部
               </p>
             </div>
@@ -124,7 +124,7 @@ export default function SortDemoPage() {
         </div>
 
         {/* 說明 */}
-        <div className="mt-8 rounded-lg border-2 border-blue-600 bg-blue-50 p-6">
+        <div className="mt-8 rounded-lg border-2 border-blue-600 bg-info-bg p-6">
           <h3 className="mb-3 text-lg font-bold text-blue-900">💡 操作說明</h3>
           <div className="space-y-2 text-sm text-blue-800">
             <p>
@@ -146,7 +146,7 @@ export default function SortDemoPage() {
         <div className="mt-8 text-center">
           <a
             href="/admin/announcements"
-            className="inline-block rounded-none border-3 border-black bg-gray-200 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+            className="inline-block rounded-none border-3 border-black bg-surface-secondary px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
           >
             ← 回到首頁廣告管理
           </a>

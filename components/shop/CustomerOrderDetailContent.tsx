@@ -88,7 +88,7 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
   if (isLoading) {
     return (
       <div className={cn(
-        "min-h-screen bg-gray-50",
+        "min-h-screen bg-surface-secondary",
         designTokens.spacing.page.padding
       )}>
         <div className={designTokens.container.default}>
@@ -107,7 +107,7 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
   if (error || !order) {
     return (
       <div className={cn(
-        "min-h-screen bg-gray-50",
+        "min-h-screen bg-surface-secondary",
         designTokens.spacing.page.padding
       )}>
         <div className={designTokens.container.default}>
@@ -119,7 +119,7 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
             )}>無法載入訂單</h2>
             <p className={cn(
               designTokens.typography.body.large,
-              "mb-8 text-gray-600"
+              "mb-8 text-text-secondary"
             )}>{error}</p>
             <Link
               href="/store/orders"
@@ -143,7 +143,7 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
 
   return (
     <div className={cn(
-      "min-h-screen bg-gray-50",
+      "min-h-screen bg-surface-secondary",
       designTokens.spacing.page.padding
     )}>
       <div className={cn(
@@ -199,7 +199,7 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
 
         {/* 訂單狀態說明 */}
         <div className={cn(
-          "rounded-none bg-gray-50",
+          "rounded-none bg-surface-secondary",
           "border-2 border-gray-300",
           "p-3 md:p-4"
         )}>
@@ -210,7 +210,7 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
           <ul className={cn(
             "space-y-1",
             designTokens.typography.caption,
-            "text-gray-600"
+            "text-text-secondary"
           )}>
             <li>⏳ <strong>待確認</strong>: 訂單已送出,等待管理員確認</li>
             <li>✅ <strong>已確認</strong>: 訂單已確認,準備出貨</li>
@@ -222,7 +222,7 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
 
         {/* 訂單留言與操作歷史 */}
         <div className={cn(
-          "rounded-none bg-white",
+          "rounded-none bg-surface",
           designTokens.neoBrutalism.border.full,
           "border-black",
           designTokens.neoBrutalism.shadow.full,
@@ -241,13 +241,13 @@ export function CustomerOrderDetailContent({ orderId }: Props) {
           {/* 留言輸入框 */}
           {order.status !== 'cancelled' && order.status !== 'completed' && (
             <div className={cn(
-              "mt-4 md:mt-6 rounded-none bg-gray-50",
+              "mt-4 md:mt-6 rounded-none bg-surface-secondary",
               "border-2 border-gray-300",
               "p-3 md:p-4"
             )}>
               <h3 className={cn(
                 designTokens.typography.caption,
-                "font-bold mb-3 text-gray-700"
+                "font-bold mb-3 text-foreground"
               )}>新增留言</h3>
               <CommentInput
                 onSubmit={handleSubmitComment}

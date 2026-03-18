@@ -123,7 +123,7 @@ export function ProductDisplay({ config, initialProducts, initialTierName }: Pro
 
   if (isLoading) {
     return (
-      <div className="w-full py-8 text-center text-gray-500">
+      <div className="w-full py-8 text-center text-text-secondary">
         <p className="text-sm md:text-base">載入中...</p>
       </div>
     )
@@ -131,7 +131,7 @@ export function ProductDisplay({ config, initialProducts, initialTierName }: Pro
 
   if (error) {
     return (
-      <div className="w-full py-8 text-center text-red-600">
+      <div className="w-full py-8 text-center text-error">
         <p className="text-sm md:text-base">{error}</p>
       </div>
     )
@@ -139,7 +139,7 @@ export function ProductDisplay({ config, initialProducts, initialTierName }: Pro
 
   if (products.length === 0) {
     return (
-      <div className="w-full py-8 text-center text-gray-500">
+      <div className="w-full py-8 text-center text-text-secondary">
         <p className="text-sm md:text-base">暫無商品</p>
       </div>
     )

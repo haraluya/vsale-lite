@@ -60,18 +60,18 @@ export default async function EditAnnouncementPage({ params }: EditAnnouncementP
       <div className="flex items-center gap-4">
         <Link
           href="/admin/announcements"
-          className="rounded-none border-2 border-black bg-white p-2 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="rounded-none border-2 border-black bg-surface p-2 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
         >
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
           <h1 className="text-3xl font-bold">編輯廣告</h1>
-          <p className="mt-1 text-gray-600">{announcement.title}</p>
+          <p className="mt-1 text-text-secondary">{announcement.title}</p>
         </div>
       </div>
 
       {/* Form */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
         <AnnouncementForm announcement={announcement} series={series} />
       </div>
     </div>

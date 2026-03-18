@@ -69,7 +69,7 @@ export function ProductSelectorClient({
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="mb-4 text-4xl">⏳</div>
-          <p className="text-gray-600">載入購物車項目...</p>
+          <p className="text-text-secondary">載入購物車項目...</p>
         </div>
       </div>
     )
@@ -80,16 +80,16 @@ export function ProductSelectorClient({
     return (
       <div
         className={cn(
-          'rounded-none bg-red-50',
+          'rounded-none bg-error-bg',
           designTokens.neoBrutalism.border.full,
           'border-red-600',
           'p-6 text-center',
           designTokens.neoBrutalism.shadow.mobile
         )}
       >
-        <AlertCircle className="mx-auto mb-3 h-12 w-12 text-red-600" />
-        <p className="text-lg font-semibold text-red-800">載入失敗</p>
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+        <AlertCircle className="mx-auto mb-3 h-12 w-12 text-error" />
+        <p className="text-lg font-semibold text-error">載入失敗</p>
+        <p className="mt-2 text-sm text-error">{error}</p>
         <Link
           href="/store/cart"
           className={cn(

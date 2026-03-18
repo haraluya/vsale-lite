@@ -33,13 +33,13 @@ export function OrderTable({ orders, total, currentPage, pageSize }: OrderTableP
       {/* 桌面版: 完整表格 */}
       <div
         className={cn(
-          'hidden lg:block rounded-none bg-white overflow-x-auto',
+          'hidden lg:block rounded-none bg-surface overflow-x-auto',
           designTokens.neoBrutalism.border.full,
           designTokens.neoBrutalism.shadow.full
         )}
       >
         {/* 標題列 */}
-        <div className="grid grid-cols-6 gap-4 border-b-2 md:border-b-3 border-black bg-gray-100 p-4 font-bold">
+        <div className="grid grid-cols-6 gap-4 border-b-2 md:border-b-3 border-black bg-surface-secondary p-4 font-bold">
           <div>訂單編號</div>
           <div>客戶</div>
           <div>等級</div>
@@ -50,7 +50,7 @@ export function OrderTable({ orders, total, currentPage, pageSize }: OrderTableP
 
         {/* 訂單列表 - 🚀 Phase 3.4: 使用 Memoized Row 組件 */}
         {orders.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">找不到符合條件的訂單</div>
+          <div className="p-8 text-center text-text-secondary">找不到符合條件的訂單</div>
         ) : (
           <div className="divide-y-2 divide-black">
             {orders.map((order) => (
@@ -65,7 +65,7 @@ export function OrderTable({ orders, total, currentPage, pageSize }: OrderTableP
         {orders.length === 0 ? (
           <div
             className={cn(
-              'rounded-none bg-white p-8 text-center text-gray-500',
+              'rounded-none bg-surface p-8 text-center text-text-secondary',
               designTokens.neoBrutalism.border.full,
               designTokens.neoBrutalism.shadow.full
             )}
@@ -87,7 +87,7 @@ export function OrderTable({ orders, total, currentPage, pageSize }: OrderTableP
       )}
 
       {/* 統計資訊 */}
-      <div className={cn('text-gray-600', designTokens.typography.caption)}>顯示 {orders.length} / 共 {total} 筆訂單</div>
+      <div className={cn('text-text-secondary', designTokens.typography.caption)}>顯示 {orders.length} / 共 {total} 筆訂單</div>
     </div>
   )
 }

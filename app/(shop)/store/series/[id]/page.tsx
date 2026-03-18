@@ -91,7 +91,7 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
       )}>
         {/* 系列標題與返回按鈕 */}
         <div className={cn(
-          "rounded-none bg-white",
+          "rounded-none bg-surface",
           designTokens.neoBrutalism.border.full,
           "border-black",
           designTokens.neoBrutalism.shadow.full,
@@ -103,7 +103,7 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
             <Link
               href="/store/products"
               className={cn(
-                "inline-flex items-center gap-2 rounded-none bg-gray-100 font-bold transition-all",
+                "inline-flex items-center gap-2 rounded-none bg-surface-secondary font-bold transition-all",
                 designTokens.neoBrutalism.border.full,
                 "border-black",
                 designTokens.neoBrutalism.shadow.mobile,
@@ -126,7 +126,7 @@ export default async function SeriesDetailPage({ params }: SeriesDetailPageProps
           {series.description && (
             <p className={cn(
               designTokens.typography.body.base,
-              "text-gray-600"
+              "text-text-secondary"
             )}>{series.description}</p>
           )}
         </div>

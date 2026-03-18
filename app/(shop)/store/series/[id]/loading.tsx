@@ -5,7 +5,7 @@ export default function SeriesDetailLoading() {
   return (
     <div className="container mx-auto p-4">
       {/* 系列資訊骨架 */}
-      <div className="border-2 border-black p-6 bg-white shadow-neo mb-6">
+      <div className="border-2 border-black p-6 bg-surface shadow-neo mb-6">
         <Skeleton className="h-8 w-1/3 mb-4" />
         <Skeleton className="h-4 w-2/3 mb-2" />
         <Skeleton className="h-4 w-1/2" />

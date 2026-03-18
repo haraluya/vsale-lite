@@ -80,10 +80,10 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
   }
 
   return (
-    <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-white p-4 md:p-6">
+    <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-surface p-4 md:p-6">
       <div className="mb-3">
         <h3 className="text-base md:text-lg font-black">輸入優惠券代碼</h3>
-        <p className="text-xs md:text-sm text-gray-600 mt-1">
+        <p className="text-xs md:text-sm text-text-secondary mt-1">
           輸入口令即可領取優惠券
         </p>
       </div>
@@ -96,16 +96,16 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
           onKeyPress={handleKeyPress}
           placeholder="例如：WELCOME100"
           className="flex-1 px-4 py-3 md:py-4 border-2 border-black text-base md:text-lg
-                     font-bold placeholder:text-gray-400 placeholder:font-normal
+                     font-bold placeholder:text-muted placeholder:font-normal
                      focus:outline-none focus:ring-2 focus:ring-offset-2
-                     focus:ring-black disabled:bg-gray-100 disabled:cursor-not-allowed"
+                     focus:ring-black disabled:bg-surface-secondary disabled:cursor-not-allowed"
           disabled={loading}
           maxLength={20}
         />
         <button
           onClick={handleClaim}
           disabled={loading || !code.trim()}
-          className="px-6 md:px-8 py-3 md:py-4 bg-orange-400 text-black font-black
+          className="px-6 md:px-8 py-3 md:py-4 bg-orange-400 text-foreground font-black
                      border-2 border-black shadow-neo-sm hover:translate-x-[2px]
                      hover:translate-y-[2px] hover:shadow-none transition-all
                      disabled:opacity-50 disabled:cursor-not-allowed
@@ -117,7 +117,7 @@ export function CouponCodeInput({ onClaimSuccess }: CouponCodeInputProps) {
         </button>
       </div>
 
-      <div className="mt-2 text-xs text-gray-500">
+      <div className="mt-2 text-xs text-text-secondary">
         提示：輸入時會自動轉換為大寫，不用擔心大小寫問題
       </div>
     </div>

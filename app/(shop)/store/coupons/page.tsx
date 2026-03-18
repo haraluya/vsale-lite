@@ -30,7 +30,7 @@ async function CouponsPageContent() {
         </div>
         <div>
           <h1 className="text-2xl md:text-3xl font-black">我的優惠券</h1>
-          <p className="text-sm md:text-base text-gray-600">管理您的優惠券，享受更多折扣</p>
+          <p className="text-sm md:text-base text-text-secondary">管理您的優惠券，享受更多折扣</p>
         </div>
       </div>
 
@@ -44,9 +44,9 @@ async function CouponsPageContent() {
         </h2>
 
         {unusedCoupons.length === 0 ? (
-          <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-white p-8 text-center">
-            <p className="text-gray-600 mb-2">您目前沒有可使用的優惠券</p>
-            <p className="text-sm text-gray-500">試試輸入優惠券代碼來領取優惠券！</p>
+          <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-surface p-8 text-center">
+            <p className="text-text-secondary mb-2">您目前沒有可使用的優惠券</p>
+            <p className="text-sm text-text-secondary">試試輸入優惠券代碼來領取優惠券！</p>
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
@@ -94,7 +94,7 @@ export default function CouponsPage() {
       <Suspense
         fallback={
           <div className="text-center py-12">
-            <div className="text-gray-600">載入中...</div>
+            <div className="text-text-secondary">載入中...</div>
           </div>
         }
       >

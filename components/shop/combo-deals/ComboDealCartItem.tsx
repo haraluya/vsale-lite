@@ -114,7 +114,7 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
 
       {/* 商品清單 */}
       <div className="space-y-2">
-        <div className="text-sm font-semibold text-gray-700 mb-2">
+        <div className="text-sm font-semibold text-foreground mb-2">
           包含商品 ({totalQuantity} 件):
         </div>
         {item.selected_products.map((product, index) => {
@@ -124,7 +124,7 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
               key={`${product.product_id}-${index}`}
               className={cn(
                 'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2',
-                'rounded-none bg-white',
+                'rounded-none bg-surface',
                 'border-2 border-yellow-300',
                 'px-3 py-2'
               )}
@@ -142,23 +142,23 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
                 )}
 
                 {/* 商品名稱 */}
-                <div className="font-medium text-gray-900">
+                <div className="font-medium text-foreground">
                   {detail?.product_name || product.product_id}
                 </div>
 
                 {/* 商品編號（如果有） */}
                 {detail?.product_code && (
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-text-secondary">
                     品號: {detail.product_code}
                   </div>
                 )}
               </div>
 
               {/* 🔧 顯示零售價 × 數量 */}
-              <div className="text-sm text-gray-600 whitespace-nowrap sm:text-right">
+              <div className="text-sm text-text-secondary whitespace-nowrap sm:text-right">
                 {detail?.retail_price ? (
                   <>
-                    <span className="text-gray-600 font-semibold">
+                    <span className="text-text-secondary font-semibold">
                       NT$ {detail.retail_price.toLocaleString()}
                     </span>
                     {' × '}
@@ -166,14 +166,14 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
                   </>
                 ) : detail?.unit_price ? (
                   <>
-                    <span className="text-green-600 font-semibold">
+                    <span className="text-success font-semibold">
                       NT$ {detail.unit_price.toLocaleString()}
                     </span>
                     {' × '}
                     <span className="font-semibold">{product.quantity}</span>
                   </>
                 ) : (
-                  <span className="text-gray-500">× {product.quantity}</span>
+                  <span className="text-text-secondary">× {product.quantity}</span>
                 )}
               </div>
             </div>

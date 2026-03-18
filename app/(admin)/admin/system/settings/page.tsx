@@ -24,8 +24,8 @@ export default async function SystemSettingsPage() {
 
   if (!result.success || !result.data) {
     return (
-      <div className="rounded-none border-2 md:border-3 border-red-500 bg-red-50 p-6 shadow-neo">
-        <p className="text-sm font-bold text-red-800">
+      <div className="rounded-none border-2 md:border-3 border-red-500 bg-error-bg p-6 shadow-neo">
+        <p className="text-sm font-bold text-foreground">
           {result.message || '載入設定失敗'}
         </p>
       </div>
@@ -100,7 +100,7 @@ export default async function SystemSettingsPage() {
       {/* 標題 */}
       <div>
         <h1 className="text-3xl font-black">系統設定</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm text-text-secondary">
           管理網站標題、Logo、客戶通知範本與系統參數
         </p>
       </div>

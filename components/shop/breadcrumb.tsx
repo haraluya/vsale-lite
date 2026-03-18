@@ -25,7 +25,7 @@ export function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
       {/* 首頁圖示 */}
       <Link
         href="/store"
-        className="flex items-center gap-1 text-sm font-bold text-gray-600 hover:text-black transition-colors"
+        className="flex items-center gap-1 text-sm font-bold text-text-secondary hover:text-foreground transition-colors"
         aria-label="返回首頁"
       >
         <Home className="h-4 w-4" />
@@ -38,11 +38,11 @@ export function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
 
         return (
           <div key={item.href} className="flex items-center gap-2">
-            <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
+            <ChevronRight className="h-4 w-4 text-text-secondary" aria-hidden="true" />
 
             {isLast ? (
               <span
-                className="text-sm font-bold text-black truncate max-w-[150px] sm:max-w-none"
+                className="text-sm font-bold text-foreground truncate max-w-[150px] sm:max-w-none"
                 aria-current="page"
               >
                 {item.label}
@@ -50,7 +50,7 @@ export function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
             ) : (
               <Link
                 href={item.href}
-                className="text-sm font-bold text-gray-600 hover:text-black transition-colors truncate max-w-[150px] sm:max-w-none"
+                className="text-sm font-bold text-text-secondary hover:text-foreground transition-colors truncate max-w-[150px] sm:max-w-none"
               >
                 {item.label}
               </Link>
@@ -77,13 +77,13 @@ export function SimpleBreadcrumb({ currentPage, backHref = '/store', className =
     <div className={cn('flex items-center gap-2', className)}>
       <Link
         href={backHref}
-        className="text-sm font-bold text-gray-600 hover:text-black transition-colors"
+        className="text-sm font-bold text-text-secondary hover:text-foreground transition-colors"
         aria-label="返回上一頁"
       >
         <Home className="h-4 w-4" />
       </Link>
-      <ChevronRight className="h-4 w-4 text-gray-400" aria-hidden="true" />
-      <span className="text-sm font-bold text-black truncate" aria-current="page">
+      <ChevronRight className="h-4 w-4 text-text-secondary" aria-hidden="true" />
+      <span className="text-sm font-bold text-foreground truncate" aria-current="page">
         {currentPage}
       </span>
     </div>

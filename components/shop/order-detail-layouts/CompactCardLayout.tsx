@@ -23,18 +23,18 @@ export function CompactCardLayout({ order }: Props) {
   return (
     <div className="space-y-4">
       {/* 訂單標題區 - 緊湊型 */}
-      <div className="rounded-none border-3 border-black bg-white shadow-neo p-5">
+      <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl md:text-3xl font-black truncate">{order.order_number}</h1>
-            <p className="text-sm text-gray-600 mt-1">{formatDateTW(order.created_at)}</p>
+            <p className="text-sm text-text-secondary mt-1">{formatDateTW(order.created_at)}</p>
           </div>
           <OrderStatusBadge status={order.status} size="lg" />
         </div>
       </div>
 
       {/* 商品區 - 緊湑表格式 */}
-      <div className="rounded-none border-3 border-black bg-white shadow-neo overflow-hidden">
+      <div className="rounded-none border-3 border-black bg-surface shadow-neo overflow-hidden">
         <div className="bg-black text-white px-5 py-3">
           <h2 className="text-lg md:text-xl font-black flex items-center gap-2">
             <Package className="w-5 h-5" />
@@ -76,8 +76,8 @@ export function CompactCardLayout({ order }: Props) {
                             <span className="inline-block bg-yellow-200 border border-yellow-500 px-1.5 py-0.5 font-bold text-yellow-900 mr-2 shrink-0">
                               {series.series_name}
                             </span>
-                            <span className="flex-1 truncate text-gray-900">{product.product_name}</span>
-                            <span className="text-gray-600 ml-2 shrink-0">
+                            <span className="flex-1 truncate text-foreground">{product.product_name}</span>
+                            <span className="text-text-secondary ml-2 shrink-0">
                               {formatCurrency(product.unit_price)} × {product.quantity}
                             </span>
                           </div>
@@ -110,14 +110,14 @@ export function CompactCardLayout({ order }: Props) {
                       )}
                       <span className="font-bold truncate">{item.product_name_snapshot}</span>
                     </div>
-                    <div className="text-xs text-gray-600 mt-0.5">
+                    <div className="text-xs text-text-secondary mt-0.5">
                       {formatCurrency(item.deal_price)} × {item.quantity}
                     </div>
                   </div>
 
                   {/* 右側：小計 */}
                   <div className="text-right shrink-0">
-                    <div className="text-lg font-black text-green-600">
+                    <div className="text-lg font-black text-success">
                       {formatCurrency(item.subtotal)}
                     </div>
                   </div>
@@ -129,11 +129,11 @@ export function CompactCardLayout({ order }: Props) {
       </div>
 
       {/* 金額摘要區 - 緊湊網格 */}
-      <div className="rounded-none border-3 border-black bg-white shadow-neo p-5">
+      <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
         <div className="space-y-2">
           {/* 商品小計 */}
           <div className="flex items-center justify-between py-1.5">
-            <span className="text-sm text-gray-700">商品小計</span>
+            <span className="text-sm text-foreground">商品小計</span>
             <span className="font-bold">
               {formatCurrency(
                 order.items.reduce((sum, item) => sum + item.subtotal, 0) +
@@ -177,7 +177,7 @@ export function CompactCardLayout({ order }: Props) {
               </span>
               <span className={cn(
                 "font-bold",
-                order.shipping_fee === 0 ? 'text-green-600' : 'text-gray-900'
+                order.shipping_fee === 0 ? 'text-success' : 'text-foreground'
               )}>
                 {order.shipping_fee === 0 ? '免運' : formatCurrency(order.shipping_fee)}
               </span>
@@ -192,7 +192,7 @@ export function CompactCardLayout({ order }: Props) {
                   <span className="text-sm">{fee.fee_name}</span>
                   <span className={cn(
                     "font-bold",
-                    fee.amount < 0 ? 'text-red-600' : 'text-gray-900'
+                    fee.amount < 0 ? 'text-error' : 'text-foreground'
                   )}>
                     {fee.amount >= 0 ? '+' : ''}{formatCurrency(Math.abs(fee.amount))}
                   </span>
@@ -204,7 +204,7 @@ export function CompactCardLayout({ order }: Props) {
           {/* 總金額 - 強調顯示 */}
           <div className="flex items-center justify-between pt-3 mt-2 border-t-3 border-black">
             <span className="text-lg md:text-xl font-black">訂單總金額</span>
-            <span className="text-2xl md:text-3xl font-black text-green-600">
+            <span className="text-2xl md:text-3xl font-black text-success">
               {formatCurrency(order.total_amount)}
             </span>
           </div>
@@ -212,7 +212,7 @@ export function CompactCardLayout({ order }: Props) {
       </div>
 
       {/* 訂單資訊 - 網格佈局 */}
-      <div className="rounded-none border-3 border-black bg-white shadow-neo p-5">
+      <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
         <h2 className="text-lg md:text-xl font-black mb-4 flex items-center gap-2">
           <FileText className="w-5 h-5" />
           訂單資訊
@@ -221,7 +221,7 @@ export function CompactCardLayout({ order }: Props) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 text-sm">
           <div className="flex justify-between md:block">
             <span className="font-bold">訂單編號</span>
-            <span className="text-gray-700 md:block">{order.order_number}</span>
+            <span className="text-foreground md:block">{order.order_number}</span>
           </div>
           <div className="flex justify-between md:block">
             <span className="font-bold">訂單狀態</span>
@@ -231,18 +231,18 @@ export function CompactCardLayout({ order }: Props) {
           </div>
           <div className="flex justify-between md:block">
             <span className="font-bold">建立時間</span>
-            <span className="text-gray-700 md:block">{formatDateTW(order.created_at)}</span>
+            <span className="text-foreground md:block">{formatDateTW(order.created_at)}</span>
           </div>
           <div className="flex justify-between md:block">
             <span className="font-bold">商品數量</span>
-            <span className="text-gray-700 md:block">
+            <span className="text-foreground md:block">
               {order.items.reduce((sum, item) => sum + item.quantity, 0)} 件
             </span>
           </div>
           {order.user.address && (
             <div className="col-span-1 md:col-span-2 pt-2 border-t-2 border-gray-200">
               <span className="font-bold block mb-1">送貨地址</span>
-              <span className="text-gray-700">{order.user.address}</span>
+              <span className="text-foreground">{order.user.address}</span>
             </div>
           )}
         </div>
@@ -250,9 +250,9 @@ export function CompactCardLayout({ order }: Props) {
 
       {/* 訂單備註 */}
       {order.notes && (
-        <div className="rounded-none border-3 border-black bg-white shadow-neo p-5">
+        <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
           <h2 className="text-lg md:text-xl font-black mb-3">訂單備註</h2>
-          <p className="text-sm text-gray-800">{order.notes}</p>
+          <p className="text-sm text-foreground">{order.notes}</p>
         </div>
       )}
     </div>

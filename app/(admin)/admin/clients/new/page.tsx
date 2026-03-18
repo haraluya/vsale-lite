@@ -14,12 +14,12 @@ export default async function NewClientPage() {
     <div className="max-w-2xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold">快速開戶</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm text-text-secondary">
           建立新客戶帳號,系統會自動產生預設密碼
         </p>
       </div>
 
-      <div className="card-neo bg-white">
+      <div className="card-neo bg-surface">
         <ClientForm tiers={tiers} mode="create" />
       </div>
     </div>

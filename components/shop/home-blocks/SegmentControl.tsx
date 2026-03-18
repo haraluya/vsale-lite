@@ -42,7 +42,7 @@ export function SegmentControl() {
           // 啟用狀態
           isHomePage
             ? 'bg-green-400 translate-x-[2px] translate-y-[2px] shadow-none'
-            : 'bg-white active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
+            : 'bg-surface active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
         )}
       >
         首頁
@@ -66,7 +66,7 @@ export function SegmentControl() {
           // 啟用狀態
           isProductsPage
             ? 'bg-green-400 translate-x-[2px] translate-y-[2px] shadow-none'
-            : 'bg-white active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
+            : 'bg-surface active:translate-x-[2px] active:translate-y-[2px] active:shadow-none'
         )}
       >
         商品

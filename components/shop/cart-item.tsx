@@ -90,7 +90,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
 
   return (
     <div className={cn(
-      "rounded-none bg-white",
+      "rounded-none bg-surface",
       designTokens.neoBrutalism.border.full,
       "border-black",
       designTokens.neoBrutalism.shadow.full,
@@ -99,7 +99,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
       <div className="flex gap-3 md:gap-4">
         {/* 商品圖片 */}
         <div className={cn(
-          "h-16 w-16 md:h-24 md:w-24 flex-shrink-0 overflow-hidden rounded-none bg-gray-100",
+          "h-16 w-16 md:h-24 md:w-24 flex-shrink-0 overflow-hidden rounded-none bg-surface-secondary",
           designTokens.neoBrutalism.border.mobile,
           "border-black"
         )}>
@@ -113,7 +113,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
               sizes="96px"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-3xl md:text-4xl text-gray-300">
+            <div className="flex h-full w-full items-center justify-center text-3xl md:text-4xl text-text-secondary">
               📦
             </div>
           )}
@@ -139,12 +139,12 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
             <div className="mt-1">
               {item.price !== null ? (
                 <p className={cn(
-                  "text-lg md:text-xl font-bold text-green-600"
+                  "text-lg md:text-xl font-bold text-success"
                 )}>NT$ {item.price.toLocaleString()}</p>
               ) : (
                 <p className={cn(
                   designTokens.typography.caption,
-                  "text-red-600"
+                  "text-error"
                 )}>價格未設定</p>
               )}
             </div>
@@ -158,7 +158,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
                 onClick={handleDecrease}
                 disabled={item.quantity <= 1}
                 className={cn(
-                  "rounded-none bg-white transition-all hover:bg-gray-100",
+                  "rounded-none bg-surface transition-all hover:bg-surface-secondary",
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                   "p-1.5 md:p-2",
@@ -192,7 +192,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
               <button
                 onClick={handleIncrease}
                 className={cn(
-                  "rounded-none bg-white transition-all hover:bg-gray-100",
+                  "rounded-none bg-surface transition-all hover:bg-surface-secondary",
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                   "p-1.5 md:p-2",
@@ -209,7 +209,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
             <button
               onClick={handleRemove}
               className={cn(
-                "rounded-none bg-red-100 text-red-600 transition-all hover:bg-red-200",
+                "rounded-none bg-red-100 text-error transition-all hover:bg-red-200",
                 designTokens.neoBrutalism.border.mobile,
                 "border-black",
                 "px-2.5 py-2 md:px-3",
@@ -233,7 +233,7 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
         <div className="flex items-center justify-between">
           <span className={cn(
             designTokens.typography.body.base,
-            "text-gray-600"
+            "text-text-secondary"
           )}>小計</span>
           <span className={cn(
             "text-lg md:text-xl font-bold"

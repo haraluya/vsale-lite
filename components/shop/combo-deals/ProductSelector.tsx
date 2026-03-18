@@ -211,17 +211,17 @@ export function ProductSelector({
             <h3 className="text-lg md:text-xl font-black text-foreground mb-2">
               {series.series_name}
               {/* 🆕 顯示可選數量提示 */}
-              <span className="ml-2 text-base md:text-lg font-semibold text-gray-600">
+              <span className="ml-2 text-base md:text-lg font-semibold text-text-secondary">
                 (需選 {requiredQuantity} 件)
               </span>
             </h3>
-            <p className="text-sm md:text-base text-gray-700">
+            <p className="text-sm md:text-base text-foreground">
               {seriesSelectedCount > 0 && (
                 <span
                   className={cn(
                     'font-bold',
                     seriesSelectedCount === requiredQuantity
-                      ? 'text-green-600'
+                      ? 'text-success'
                       : 'text-orange-600'
                   )}
                 >
@@ -229,14 +229,14 @@ export function ProductSelector({
                 </span>
               )}
               {seriesSelectedCount === 0 && (
-                <span className="text-gray-500">尚未選擇</span>
+                <span className="text-text-secondary">尚未選擇</span>
               )}
             </p>
           </div>
 
           {/* 商品列表 */}
           {series.products.length === 0 ? (
-            <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-4 text-center text-gray-500">
+            <div className="rounded-none border-2 border-gray-300 bg-surface-secondary p-4 text-center text-text-secondary">
               此系列無可用商品
             </div>
           ) : (
@@ -250,7 +250,7 @@ export function ProductSelector({
                   <div
                     key={product.product_id}
                     className={cn(
-                      'group relative rounded-none bg-white p-2 md:p-4 transition-all',
+                      'group relative rounded-none bg-surface p-2 md:p-4 transition-all',
                       designTokens.neoBrutalism.border.full,
                       designTokens.neoBrutalism.shadow.full,
                       'border-black'
@@ -258,7 +258,7 @@ export function ProductSelector({
                   >
                     {/* 商品圖片 */}
                     <div className={cn(
-                      "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100 relative",
+                      "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary relative",
                       designTokens.neoBrutalism.border.mobile,
                       "border-black"
                     )}>
@@ -271,7 +271,7 @@ export function ProductSelector({
                           className="object-cover"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-4xl md:text-6xl text-gray-300">
+                        <div className="w-full h-full flex items-center justify-center text-4xl md:text-6xl text-text-secondary">
                           📦
                         </div>
                       )}
@@ -293,7 +293,7 @@ export function ProductSelector({
                       {/* 商品價格 */}
                       <p className="text-lg md:text-2xl font-bold text-brand-primary">
                         ${product.tier_price}
-                        <span className="text-xs ml-1 font-normal text-gray-600">
+                        <span className="text-xs ml-1 font-normal text-text-secondary">
                           /件
                         </span>
                       </p>
@@ -360,7 +360,7 @@ export function ProductSelector({
 
                     {/* 庫存狀態（根據 stock_status 判斷，支援負庫存銷售） */}
                     {product.stock_status === 'out_of_stock' && (
-                      <p className="text-xs text-red-600 mt-1 text-center font-bold">
+                      <p className="text-xs text-error mt-1 text-center font-bold">
                         暫時缺貨
                       </p>
                     )}
@@ -386,7 +386,7 @@ export function ProductSelector({
           <h3 className="text-lg md:text-xl font-black text-foreground mb-2">
             任選 {requiredQuantity} 件商品
           </h3>
-          <p className="text-sm md:text-base text-gray-700">
+          <p className="text-sm md:text-base text-foreground">
             從以下所有系列中任意選擇商品，總數量達到{' '}
             <span className="font-bold">{requiredQuantity}</span> 件即可享受優惠
             {totalSelectedCount > 0 && (
@@ -394,7 +394,7 @@ export function ProductSelector({
                 className={cn(
                   'ml-2 font-bold',
                   totalSelectedCount === requiredQuantity
-                    ? 'text-green-600'
+                    ? 'text-success'
                     : 'text-orange-600'
                 )}
               >
@@ -412,7 +412,7 @@ export function ProductSelector({
             </h4>
 
             {series.products.length === 0 ? (
-              <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-4 text-center text-gray-500">
+              <div className="rounded-none border-2 border-gray-300 bg-surface-secondary p-4 text-center text-text-secondary">
                 此系列無可用商品
               </div>
             ) : (
@@ -425,7 +425,7 @@ export function ProductSelector({
                     <div
                       key={product.product_id}
                       className={cn(
-                        'group relative rounded-none bg-white p-2 md:p-4 transition-all',
+                        'group relative rounded-none bg-surface p-2 md:p-4 transition-all',
                         designTokens.neoBrutalism.border.full,
                         designTokens.neoBrutalism.shadow.full,
                         'border-black'
@@ -433,7 +433,7 @@ export function ProductSelector({
                     >
                       {/* 商品圖片 */}
                       <div className={cn(
-                        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100 relative",
+                        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary relative",
                         designTokens.neoBrutalism.border.mobile,
                         "border-black"
                       )}>
@@ -446,7 +446,7 @@ export function ProductSelector({
                             className="object-cover"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-4xl md:text-6xl text-gray-300">
+                          <div className="w-full h-full flex items-center justify-center text-4xl md:text-6xl text-text-secondary">
                             📦
                           </div>
                         )}
@@ -468,7 +468,7 @@ export function ProductSelector({
                         {/* 商品價格 */}
                         <p className="text-lg md:text-2xl font-bold text-brand-primary">
                           ${product.tier_price}
-                          <span className="text-xs ml-1 font-normal text-gray-600">
+                          <span className="text-xs ml-1 font-normal text-text-secondary">
                             /件
                           </span>
                         </p>
@@ -535,7 +535,7 @@ export function ProductSelector({
 
                       {/* 庫存狀態（根據 stock_status 判斷，支援負庫存銷售） */}
                       {product.stock_status === 'out_of_stock' && (
-                        <p className="text-xs text-red-600 mt-1 text-center font-bold">
+                        <p className="text-xs text-error mt-1 text-center font-bold">
                           暫時缺貨
                         </p>
                       )}
@@ -564,13 +564,13 @@ export function ProductSelector({
         <div
           className={cn(
             'mb-6 rounded-none border-2 md:border-3 border-black p-4 shadow-neo-sm flex items-start gap-3',
-            isValid ? 'bg-green-50' : 'bg-orange-50'
+            isValid ? 'bg-success-bg' : 'bg-orange-50'
           )}
         >
           <AlertCircle
             className={cn(
               'flex-shrink-0 w-5 h-5 md:w-6 md:h-6',
-              isValid ? 'text-green-600' : 'text-orange-600'
+              isValid ? 'text-success' : 'text-orange-600'
             )}
           />
           <p

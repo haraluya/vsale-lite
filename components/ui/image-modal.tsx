@@ -1,13 +1,6 @@
 /**
  * ImageModal Component
- *
  * 圖片彈窗元件，用於全螢幕查看圖片
- * - Neo-Brutalism 設計風格
- * - 支援 ESC 鍵關閉
- * - 背景點擊關閉
- * - 圖片縮放適應螢幕
- * - 關閉按鈕與標題顯示
- * - ⭐ 優化：使用 Supabase Image Transformation API 優化圖片載入速度
  */
 
 'use client'
@@ -24,13 +17,12 @@ interface ImageModalProps {
   onClose: () => void
   imageUrl: string
   imageName: string
-  description?: string  // 商品簡介（選填）
+  description?: string
 }
 
 export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }: ImageModalProps) {
   const [isImageLoading, setIsImageLoading] = useState(true)
 
-  // ESC 鍵關閉
   const handleEscKey = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -40,12 +32,11 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
     [onClose]
   )
 
-  // 背景滾動鎖定
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
       document.addEventListener('keydown', handleEscKey)
-      setIsImageLoading(true) // 重設載入狀態
+      setIsImageLoading(true)
     } else {
       document.body.style.overflow = ''
       document.removeEventListener('keydown', handleEscKey)
@@ -59,18 +50,16 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
 
   if (!isOpen) return null
 
-  // ⭐ 優化：使用 Supabase Image Transformation API（1200px, WebP, 85% 品質）
   const optimizedImageUrl = optimizeProductDetailImage(imageUrl)
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/80 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="圖片預覽"
     >
-      {/* 彈窗內容 */}
       <div
         className="relative max-h-[90vh] max-w-[90vw]"
         onClick={(e) => e.stopPropagation()}
@@ -79,13 +68,12 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
         <button
           onClick={onClose}
           className={cn(
-            "absolute -right-4 -top-4 z-10 rounded-none bg-white transition-all",
+            "absolute -right-4 -top-4 z-10 rounded-none bg-surface transition-all",
             designTokens.neoBrutalism.border.full,
-            "border-black",
             designTokens.neoBrutalism.shadow.full,
             designTokens.neoBrutalism.hover,
             "p-3",
-            "min-h-[44px] min-w-[44px]"  // WCAG 2.1 AA
+            "min-h-[44px] min-w-[44px]"
           )}
           aria-label="關閉圖片預覽"
         >
@@ -94,21 +82,18 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
 
         {/* 圖片 */}
         <div className={cn(
-          "relative rounded-none bg-white",
+          "relative rounded-none bg-surface",
           designTokens.neoBrutalism.border.full,
-          "border-black",
           designTokens.neoBrutalism.shadow.full,
           "overflow-hidden",
           "min-h-[300px] flex items-center justify-center"
         )}>
-          {/* 載入指示器 */}
           {isImageLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-              <Loader2 className="h-12 w-12 animate-spin text-gray-400" />
+            <div className="absolute inset-0 flex items-center justify-center bg-surface-secondary">
+              <Loader2 className="h-12 w-12 animate-spin text-muted" />
             </div>
           )}
 
-          {/* 優化後的圖片 */}
           <Image
             src={optimizedImageUrl}
             alt={imageName}
@@ -126,17 +111,14 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
 
         {/* 商品資訊 */}
         <div className={cn(
-          "mt-4 rounded-none bg-white",
+          "mt-4 rounded-none bg-surface",
           designTokens.neoBrutalism.border.full,
-          "border-black",
           designTokens.neoBrutalism.shadow.full,
           "overflow-hidden"
         )}>
-          {/* 商品名稱 */}
           <div className={cn(
-            "bg-yellow-300",
+            "bg-warning",
             "border-b-2 md:border-b-3",
-            "border-black",
             "px-4 py-3"
           )}>
             <p className={cn(
@@ -147,19 +129,18 @@ export function ImageModal({ isOpen, onClose, imageUrl, imageName, description }
             </p>
           </div>
 
-          {/* 商品簡介 */}
           {description && (
             <div className="px-4 py-3">
               <div className="flex items-center gap-2 mb-2">
                 <div className={cn(
-                  "rounded-none bg-blue-400",
-                  "border-2 border-black",
+                  "rounded-none bg-info",
+                  "border-2",
                   "w-1 h-4"
                 )} />
-                <p className="font-bold text-sm text-gray-700">商品簡介</p>
+                <p className="font-bold text-sm text-text-secondary">商品簡介</p>
               </div>
               <p className={cn(
-                "whitespace-pre-wrap text-gray-700 leading-relaxed",
+                "whitespace-pre-wrap text-text-secondary leading-relaxed",
                 designTokens.typography.body.base
               )}>
                 {description}

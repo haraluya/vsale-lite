@@ -32,19 +32,19 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
       href={showCustomerInfo ? `/admin/orders/${order.id}` : `/store/orders/${order.id}`}
       className="block"
     >
-      <div className="group rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
+      <div className="group rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none">
         {/* 訂單編號與狀態 */}
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <h3 className="text-xl font-bold">{order.order_number}</h3>
-            <p className="mt-1 text-sm text-gray-600">{createdDate}</p>
+            <p className="mt-1 text-sm text-text-secondary">{createdDate}</p>
           </div>
           <OrderStatusBadge status={order.status} />
         </div>
 
         {/* 客戶資訊 (管理員檢視) */}
         {showCustomerInfo && (
-          <div className="mb-4 rounded-none border-2 border-gray-300 bg-gray-50 p-3">
+          <div className="mb-4 rounded-none border-2 border-gray-300 bg-surface-secondary p-3">
             <p className="text-sm">
               <span className="font-bold">客戶:</span> {order.user_name}
             </p>
@@ -59,15 +59,15 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
 
         {/* 訂單金額 */}
         <div className="mb-4">
-          <p className="text-sm text-gray-600">訂單金額</p>
-          <p className="text-2xl font-bold text-green-600">
+          <p className="text-sm text-text-secondary">訂單金額</p>
+          <p className="text-2xl font-bold text-success">
             {formatCurrency(order.total_amount)}
           </p>
         </div>
 
         {/* 備註 */}
         {order.notes && (
-          <div className="rounded-none border-2 border-gray-300 bg-gray-50 p-3">
+          <div className="rounded-none border-2 border-gray-300 bg-surface-secondary p-3">
             <p className="text-sm">
               <span className="font-bold">備註:</span> {order.notes}
             </p>
@@ -75,7 +75,7 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
         )}
 
         {/* Hover 提示 */}
-        <div className="mt-4 flex items-center justify-end text-sm text-gray-500 group-hover:text-black">
+        <div className="mt-4 flex items-center justify-end text-sm text-text-secondary group-hover:text-foreground">
           <span>點擊查看詳情</span>
           <span className="ml-1">→</span>
         </div>

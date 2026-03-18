@@ -44,7 +44,7 @@ export function ComboDealCard({ deal }: ComboDealCardProps) {
   return (
     <Link href={`/store/combo-deals/${deal.id}`}>
       <div className={cn(
-        "group h-full rounded-none bg-white transition-all",
+        "group h-full rounded-none bg-surface transition-all",
         designTokens.neoBrutalism.border.full,
         "border-black",
         designTokens.neoBrutalism.shadow.full,
@@ -103,7 +103,7 @@ export function ComboDealCard({ deal }: ComboDealCardProps) {
           <h3 className="text-base md:text-xl font-bold mb-1.5 md:mb-2 leading-tight">
             {deal.name}
           </h3>
-          <p className="text-xs md:text-sm text-gray-600">
+          <p className="text-xs md:text-sm text-text-secondary">
             包含 {deal.series_count} 個系列
           </p>
         </div>

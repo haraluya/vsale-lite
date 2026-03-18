@@ -82,11 +82,11 @@ export function ClientFilter({
   }
 
   return (
-    <div className="card-neo bg-white p-4">
+    <div className="card-neo bg-surface p-4">
       {/* 搜尋欄與清除按鈕 */}
       <div className="flex gap-2 mb-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
           <Input
             type="search"
             placeholder="搜尋手機號碼或顯示名稱..."
@@ -100,7 +100,7 @@ export function ClientFilter({
             type="button"
             variant="secondary"
             onClick={clearFilters}
-            className="border-2 md:border-3 border-black bg-red-500 text-white hover:bg-red-600 flex-shrink-0"
+            className="border-2 md:border-3 border-black bg-error text-white hover:bg-red-600 flex-shrink-0"
           >
             <X className="mr-2 h-4 w-4" />
             清除篩選
@@ -111,7 +111,7 @@ export function ClientFilter({
       {/* 等級篩選按鈕 */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-gray-700">等級篩選</h3>
+          <h3 className="text-sm font-bold text-text-secondary">等級篩選</h3>
         </div>
         <div className="flex flex-wrap gap-2">
           {tiers.map((tier) => {
@@ -125,7 +125,7 @@ export function ClientFilter({
                   'rounded-none border-2 md:border-3 border-black px-4 py-2 text-sm font-bold transition-all duration-150',
                   isSelected
                     ? 'bg-blue-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                    : `${tierColor} text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-opacity-80`
+                    : `${tierColor} text-foreground shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-opacity-80`
                 )}
               >
                 {tier.name}
@@ -137,17 +137,17 @@ export function ClientFilter({
 
       {/* 篩選結果數量提示 */}
       {hasActiveFilters && (
-        <div className="mt-4 pt-4 border-t-2 border-gray-200 flex items-center gap-2 text-sm text-gray-600">
+        <div className="mt-4 pt-4 border-t-2 border-gray-200 flex items-center gap-2 text-sm text-text-secondary">
           <span>
             找到 <span className="font-bold text-blue-600">{totalCount}</span> 位客戶
           </span>
           {selectedTierIds.length > 0 && (
-            <span className="text-gray-400">
+            <span className="text-muted">
               • 已選擇 {selectedTierIds.length} 個等級
             </span>
           )}
           {search && (
-            <span className="text-gray-400">
+            <span className="text-muted">
               • 搜尋關鍵字: <span className="font-mono font-bold">{search}</span>
             </span>
           )}

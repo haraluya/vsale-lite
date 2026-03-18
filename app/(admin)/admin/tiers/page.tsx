@@ -19,7 +19,7 @@ export default async function TiersPage() {
       <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className={designTokens.typography.h1}>會員等級管理</h1>
-          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>管理客戶的會員等級分類</p>
+          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-text-secondary")}>管理客戶的會員等級分類</p>
         </div>
         <Link
           href="/admin/tiers/new"

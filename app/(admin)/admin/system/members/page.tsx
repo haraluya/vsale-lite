@@ -21,10 +21,10 @@ async function MembersContent() {
 
   if (!result.success || !result.data) {
     return (
-      <div className="rounded-none border-2 md:border-3 border-red-500 bg-red-50 p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-red-500 bg-error-bg p-6 shadow-neo">
         <div className="flex items-center gap-3">
-          <AlertCircle className="h-6 w-6 text-red-600" />
-          <p className="text-sm font-bold text-red-800">
+          <AlertCircle className="h-6 w-6 text-error" />
+          <p className="text-sm font-bold text-foreground">
             {result.message || '無法載入成員列表'}
           </p>
         </div>
@@ -44,7 +44,7 @@ export default async function MembersPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-black">成員管理</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-text-secondary">
             管理工作人員帳號，建立、編輯、重設密碼、刪除
           </p>
         </div>
@@ -62,7 +62,7 @@ export default async function MembersPage() {
         fallback={
           <div className="flex items-center justify-center py-12">
             <LoadingSpinner className="h-8 w-8" />
-            <span className="ml-3 text-sm font-bold text-gray-500">載入中...</span>
+            <span className="ml-3 text-sm font-bold text-text-secondary">載入中...</span>
           </div>
         }
       >

@@ -1,10 +1,5 @@
 'use client'
 
-/**
- * 標籤徽章元件
- * Feature: 006-ux-enhancement (US4)
- */
-
 import { cn } from '@/lib/utils'
 
 interface TagBadgeProps {
@@ -14,9 +9,6 @@ interface TagBadgeProps {
   className?: string
 }
 
-/**
- * 根據標籤名稱自動判斷樣式
- */
 function getTagVariant(tag: string): TagBadgeProps['variant'] {
   const tagLower = tag.toLowerCase()
 
@@ -29,19 +21,16 @@ function getTagVariant(tag: string): TagBadgeProps['variant'] {
 }
 
 export function TagBadge({ tag, variant, size = 'md', className = '' }: TagBadgeProps) {
-  // 若未指定 variant，根據標籤名稱自動判斷
   const finalVariant = variant || getTagVariant(tag)
 
-  // 根據 variant 決定顏色
   const colorClasses: Record<Exclude<TagBadgeProps['variant'], undefined>, string> = {
-    default: 'bg-gray-100 border-gray-600 text-gray-900',
-    hot: 'bg-red-100 border-red-600 text-red-900',
-    new: 'bg-green-100 border-green-600 text-green-900',
-    limited: 'bg-purple-100 border-purple-600 text-purple-900',
-    sale: 'bg-yellow-100 border-yellow-600 text-yellow-900',
+    default: 'bg-surface-secondary text-text-secondary',
+    hot: 'bg-[var(--color-tag-hot-bg)] border-[var(--color-tag-hot-border)] text-[var(--color-tag-hot-text)]',
+    new: 'bg-[var(--color-tag-new-bg)] border-[var(--color-tag-new-border)] text-[var(--color-tag-new-text)]',
+    limited: 'bg-[var(--color-tag-limited-bg)] border-[var(--color-tag-limited-border)] text-[var(--color-tag-limited-text)]',
+    sale: 'bg-[var(--color-tag-sale-bg)] border-[var(--color-tag-sale-border)] text-[var(--color-tag-sale-text)]',
   }
 
-  // 根據 size 決定尺寸
   const sizeClasses: Record<Exclude<TagBadgeProps['size'], undefined>, string> = {
     sm: 'px-2 py-0.5 text-xs',
     md: 'px-3 py-1 text-sm',
@@ -62,9 +51,6 @@ export function TagBadge({ tag, variant, size = 'md', className = '' }: TagBadge
   )
 }
 
-/**
- * 標籤徽章列表（限制數量）
- */
 interface TagBadgeListProps {
   tags: string[]
   maxTags?: number
@@ -84,7 +70,7 @@ export function TagBadgeList({ tags, maxTags = 2, size = 'sm', className = '' }:
       {remainingCount > 0 && (
         <span
           className={cn(
-            'inline-block rounded-none border-2 border-gray-400 bg-gray-100 font-bold text-gray-600',
+            'inline-block rounded-none border-2 bg-surface-secondary font-bold text-text-secondary',
             size === 'sm' && 'px-2 py-0.5 text-xs',
             size === 'md' && 'px-3 py-1 text-sm',
             size === 'lg' && 'px-4 py-1.5 text-base'

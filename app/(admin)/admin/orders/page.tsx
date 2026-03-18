@@ -49,7 +49,7 @@ export default async function AdminOrdersPage({
       {/* 標題 - 立即顯示 */}
       <div
         className={cn(
-          'flex items-center gap-3 md:gap-4 rounded-none bg-white',
+          'flex items-center gap-3 md:gap-4 rounded-none bg-surface',
           getNeoBrutalismClasses(),
           designTokens.spacing.card.padding
         )}
@@ -59,7 +59,7 @@ export default async function AdminOrdersPage({
         </div>
         <div>
           <h1 className={designTokens.typography.h1}>訂單管理</h1>
-          <p className={cn(designTokens.typography.body.base, 'text-gray-600')}>管理所有客戶訂單</p>
+          <p className={cn(designTokens.typography.body.base, 'text-text-secondary')}>管理所有客戶訂單</p>
         </div>
       </div>
 

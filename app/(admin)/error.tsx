@@ -25,10 +25,10 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-surface-secondary p-4">
       <div
         className={cn(
-          'max-w-md rounded-none bg-white p-6',
+          'max-w-md rounded-none bg-surface p-6',
           designTokens.neoBrutalism.border.full,
           'border-black',
           designTokens.neoBrutalism.shadow.full
@@ -37,7 +37,7 @@ export default function Error({
         <h2 className={cn('mb-4', designTokens.typography.h2)}>
           系統錯誤
         </h2>
-        <p className={cn('mb-6 text-gray-700', designTokens.typography.body.base)}>
+        <p className={cn('mb-6 text-text-secondary', designTokens.typography.body.base)}>
           {error.message || '管理系統發生未預期的錯誤，請稍後再試。'}
         </p>
 
@@ -57,7 +57,7 @@ export default function Error({
           <Link
             href="/admin/dashboard"
             className={cn(
-              'rounded-none bg-white px-6 py-3 text-center font-bold transition-all',
+              'rounded-none bg-surface px-6 py-3 text-center font-bold transition-all',
               designTokens.neoBrutalism.border.full,
               'border-black',
               designTokens.neoBrutalism.shadow.full,
@@ -69,8 +69,8 @@ export default function Error({
         </div>
 
         {process.env.NODE_ENV === 'development' && error.digest && (
-          <div className="mt-4 rounded-none border-2 border-gray-300 bg-gray-100 p-3">
-            <p className="text-xs text-gray-600">錯誤 ID: {error.digest}</p>
+          <div className="mt-4 rounded-none border-2 border-gray-300 bg-surface-secondary p-3">
+            <p className="text-xs text-text-secondary">錯誤 ID: {error.digest}</p>
           </div>
         )}
       </div>

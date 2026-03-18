@@ -77,10 +77,10 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
       {announcements.map((announcement) => (
         <div
           key={announcement.id}
-          className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo"
+          className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo"
         >
           {/* 圖片預覽 */}
-          <div className="relative mb-4 aspect-video overflow-hidden rounded-none border-2 border-black bg-gray-100">
+          <div className="relative mb-4 aspect-video overflow-hidden rounded-none border-2 border-black bg-surface-secondary">
             {announcement.image_url ? (
               <Image
                 src={announcement.image_url}
@@ -100,8 +100,8 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
                 onClick={() => handleToggleActive(announcement)}
                 className={`rounded-none border-2 border-black px-2 py-1 text-xs font-bold ${
                   announcement.is_active
-                    ? 'bg-green-400 text-black'
-                    : 'bg-gray-300 text-gray-600'
+                    ? 'bg-green-400 text-foreground'
+                    : 'bg-gray-300 text-text-secondary'
                 }`}
               >
                 {announcement.is_active ? '啟用' : '停用'}
@@ -115,7 +115,7 @@ export function AnnouncementListClient({ announcements: initialAnnouncements }: 
             <h3 className="line-clamp-1 text-lg font-bold">{announcement.title}</h3>
 
             {announcement.series_id && (
-              <div className="flex items-center gap-1 text-sm text-gray-600">
+              <div className="flex items-center gap-1 text-sm text-text-secondary">
                 <ExternalLink className="h-3 w-3" />
                 <span className="line-clamp-1">連結至系列商品頁</span>
               </div>

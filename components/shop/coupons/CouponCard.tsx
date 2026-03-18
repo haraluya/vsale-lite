@@ -65,18 +65,18 @@ export function CouponCard({
 
   if (isUsed) {
     statusText = '已使用'
-    statusColor = 'text-gray-500'
+    statusColor = 'text-text-secondary'
   } else if (isExpired) {
     statusText = '已過期'
-    statusColor = 'text-red-600'
+    statusColor = 'text-error'
   } else if (isClaimed) {
     statusText = '已領取'
-    statusColor = 'text-green-600'
+    statusColor = 'text-success'
   }
 
   // 決定背景色
   const leftBgColor = isUsed || isExpired ? 'bg-gray-300' : 'bg-orange-400'
-  const cardBgColor = isUsed || isExpired ? 'bg-gray-50' : 'bg-white'
+  const cardBgColor = isUsed || isExpired ? 'bg-surface-secondary' : 'bg-surface'
 
   return (
     <div className={`relative border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo ${cardBgColor} overflow-hidden`}>
@@ -107,10 +107,10 @@ export function CouponCard({
               <div className="font-bold text-base md:text-lg mb-1">
                 {coupon.code_normalized || coupon.code}
               </div>
-              <div className="text-xs md:text-sm text-gray-600 mb-1">
+              <div className="text-xs md:text-sm text-text-secondary mb-1">
                 {minAmountText}
               </div>
-              <div className="text-xs text-gray-500">
+              <div className="text-xs text-text-secondary">
                 有效期限: {formatDate(coupon.valid_until)}
               </div>
             </div>

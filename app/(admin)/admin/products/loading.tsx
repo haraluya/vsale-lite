@@ -45,9 +45,9 @@ export default function ProductsAdminLoading() {
       </div>
 
       {/* 表格骨架（桌面版） */}
-      <div className="hidden md:block border-2 border-black bg-white shadow-neo">
+      <div className="hidden md:block border-2 border-black bg-surface shadow-neo">
         {/* 表頭骨架 */}
-        <div className="border-b-2 border-black p-4 bg-gray-100 flex justify-between">
+        <div className="border-b-2 border-black p-4 bg-surface-secondary flex justify-between">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-4 w-20" />
@@ -62,7 +62,7 @@ export default function ProductsAdminLoading() {
       {/* 卡片骨架（手機版） */}
       <div className="md:hidden grid gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="border-2 border-black p-4 bg-white shadow-neo-sm flex gap-4">
+          <div key={i} className="border-2 border-black p-4 bg-surface shadow-neo-sm flex gap-4">
             <Skeleton className="w-20 h-20" />
             <div className="flex-1">
               <Skeleton className="h-5 w-40 mb-2" />

@@ -138,12 +138,12 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   if (loading) {
     return (
       <div className={cn(
-        "bg-white p-6",
+        "bg-surface p-6",
         designTokens.neoBrutalism.border.mobile,
         "border-black",
         designTokens.neoBrutalism.shadow.mobile
       )}>
-        <div className="text-center text-gray-600">載入中...</div>
+        <div className="text-center text-text-secondary">載入中...</div>
       </div>
     )
   }
@@ -151,13 +151,13 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   if (availableCoupons.length === 0) {
     return (
       <div className={cn(
-        "bg-white p-6",
+        "bg-surface p-6",
         designTokens.neoBrutalism.border.mobile,
         "border-black",
         designTokens.neoBrutalism.shadow.mobile
       )}>
         <div className="text-center">
-          <p className="text-gray-600 mb-4">您目前沒有可用的優惠券</p>
+          <p className="text-text-secondary mb-4">您目前沒有可用的優惠券</p>
           <button
             onClick={onClose}
             className={cn(
@@ -176,14 +176,14 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
   }
 
   return (
-    <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-white">
+    <div className="border-2 md:border-3 border-black shadow-neo-sm md:shadow-neo bg-surface">
       {/* 標題列 */}
       <div className="flex items-center justify-between border-b-2 border-black p-4">
         <h3 className="text-lg font-black">選擇優惠券</h3>
         {onClose && (
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 transition-colors"
+            className="p-2 hover:bg-surface-secondary transition-colors"
             aria-label="關閉"
           >
             <X className="w-5 h-5" />
@@ -210,7 +210,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
             <div
               key={userCoupon.id}
               className={`border-2 border-black p-3 ${
-                isApplied ? 'bg-green-50' : isValid ? 'bg-white' : 'bg-gray-50'
+                isApplied ? 'bg-success-bg' : isValid ? 'bg-surface' : 'bg-surface-secondary'
               }`}
             >
               <div className="flex items-start justify-between">
@@ -221,19 +221,19 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                   </div>
 
                   {validation && validation.valid && validation.discountAmount && (
-                    <div className="text-sm text-green-600 font-bold mb-1">
+                    <div className="text-sm text-success font-bold mb-1">
                       可折抵 ${validation.discountAmount}
                     </div>
                   )}
 
                   {validation && !validation.valid && (
-                    <div className="text-sm text-red-600 mb-1">
+                    <div className="text-sm text-error mb-1">
                       {validation.error}
                     </div>
                   )}
 
                   {coupon.min_order_amount && (
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-text-secondary">
                       滿 ${coupon.min_order_amount} 可用
                     </div>
                   )}
@@ -243,7 +243,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                   {isApplied ? (
                     <button
                       onClick={handleRemoveCoupon}
-                      className="px-3 py-1 bg-gray-200 text-black font-bold
+                      className="px-3 py-1 bg-gray-200 text-foreground font-bold
                                  border-2 border-black text-sm hover:bg-gray-300
                                  transition-colors"
                     >
@@ -253,7 +253,7 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                     <button
                       onClick={() => handleApplyCoupon(userCoupon)}
                       disabled={!isValid || applying === userCoupon.id}
-                      className="px-3 py-1 bg-orange-400 text-black font-bold
+                      className="px-3 py-1 bg-orange-400 text-foreground font-bold
                                  border-2 border-black text-sm
                                  shadow-neo-sm hover:translate-x-[1px]
                                  hover:translate-y-[1px] hover:shadow-none
@@ -275,8 +275,8 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
 
       {/* 已套用優惠券提示 */}
       {appliedCoupon && (
-        <div className="border-t-2 border-black bg-green-50 p-4">
-          <div className="text-sm text-green-700 font-bold">
+        <div className="border-t-2 border-black bg-success-bg p-4">
+          <div className="text-sm text-success font-bold">
             ✓ 已套用優惠券：{appliedCoupon.code_normalized}
           </div>
         </div>

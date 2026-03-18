@@ -18,7 +18,7 @@ export default async function CategoriesPage() {
       <div className="flex flex-col gap-3 md:gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className={designTokens.typography.h1}>商品分類管理</h1>
-          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>管理商品的分類類別</p>
+          <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-text-secondary")}>管理商品的分類類別</p>
         </div>
         <Link
           href="/admin/categories/new"

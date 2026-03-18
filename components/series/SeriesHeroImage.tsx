@@ -39,7 +39,7 @@ export function SeriesHeroImage({
 
   return (
     <>
-      <div className="relative h-80 w-full overflow-hidden rounded-none border-2 md:border-3 border-black bg-gray-100 shadow-neo">
+      <div className="relative h-80 w-full overflow-hidden rounded-none border-2 md:border-3 border-black bg-surface-secondary shadow-neo">
         {/* 圖片顯示區 */}
         {currentImage ? (
           <div
@@ -61,10 +61,10 @@ export function SeriesHeroImage({
           <div className="flex h-full w-full items-center justify-center">
             <div className="text-center">
               <div className="text-9xl text-gray-300">📦</div>
-              <p className="mt-4 text-lg font-bold text-gray-400">
+              <p className="mt-4 text-lg font-bold text-muted">
                 {displayName}
               </p>
-              <p className="mt-2 text-sm text-gray-400">尚無圖片</p>
+              <p className="mt-2 text-sm text-muted">尚無圖片</p>
             </div>
           </div>
         )}
@@ -73,7 +73,7 @@ export function SeriesHeroImage({
       {isProductImage && (
         <button
           onClick={onReset}
-          className="absolute right-4 top-4 rounded-none border-2 border-black bg-white p-2 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+          className="absolute right-4 top-4 rounded-none border-2 border-black bg-surface p-2 shadow-neo-sm md:shadow-neo transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
           aria-label="恢復系列圖片"
         >
           <X className="h-5 w-5" />

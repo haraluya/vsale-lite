@@ -28,7 +28,7 @@ export default function DashboardPage() {
       {/* 頁面標題 - 立即顯示 */}
       <div>
         <h1 className={designTokens.typography.h1}>儀表板</h1>
-        <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-gray-600")}>
+        <p className={cn(designTokens.typography.body.base, "mt-1 md:mt-2 text-text-secondary")}>
           歡迎使用 Vsale-lite 管理後台
         </p>
       </div>

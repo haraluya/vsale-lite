@@ -145,7 +145,7 @@ export function CheckoutContent() {
   if (isLoading) {
     return (
       <div className={cn(
-        "min-h-screen bg-gray-50",
+        "min-h-screen bg-surface-secondary",
         designTokens.spacing.page.padding
       )}>
         <div className={designTokens.container.default}>
@@ -164,7 +164,7 @@ export function CheckoutContent() {
   if (isEmpty) {
     return (
       <div className={cn(
-        "min-h-screen bg-gray-50",
+        "min-h-screen bg-surface-secondary",
         designTokens.spacing.page.padding
       )}>
         <div className={designTokens.container.default}>
@@ -176,7 +176,7 @@ export function CheckoutContent() {
             )}>購物車是空的</h2>
             <p className={cn(
               designTokens.typography.body.large,
-              "mb-8 text-gray-600"
+              "mb-8 text-text-secondary"
             )}>請先將商品加入購物車</p>
             <Link
               href="/store"
@@ -201,7 +201,7 @@ export function CheckoutContent() {
 
   return (
     <div className={cn(
-      "min-h-screen bg-gray-50",
+      "min-h-screen bg-surface-secondary",
       designTokens.spacing.page.padding
     )}>
       <div className={cn(
@@ -213,7 +213,7 @@ export function CheckoutContent() {
           <h1 className={designTokens.typography.h1}>訂單確認</h1>
           <p className={cn(
             designTokens.typography.body.base,
-            "mt-2 text-gray-600"
+            "mt-2 text-text-secondary"
           )}>請確認訂單資訊後送出</p>
         </div>
 
@@ -226,7 +226,7 @@ export function CheckoutContent() {
             "p-3 md:p-4",
             designTokens.spacing.section.marginBottom
           )}>
-            <p className="text-red-600 font-bold">❌ {error}</p>
+            <p className="text-error font-bold">❌ {error}</p>
           </div>
         )}
 
@@ -234,7 +234,7 @@ export function CheckoutContent() {
         <div className={designTokens.spacing.page.gap}>
           {/* 商品列表 */}
           <div className={cn(
-            "rounded-none bg-white",
+            "rounded-none bg-surface",
             designTokens.neoBrutalism.border.full,
             "border-black",
             designTokens.neoBrutalism.shadow.full,
@@ -278,11 +278,11 @@ export function CheckoutContent() {
                                 【{detail.series_name}】
                               </span>
                             )}
-                            <span className="text-gray-900">
+                            <span className="text-foreground">
                               {detail?.product_name || product.product_id}
                             </span>
                           </div>
-                          <div className="text-gray-600 whitespace-nowrap sm:text-right">
+                          <div className="text-text-secondary whitespace-nowrap sm:text-right">
                             {detail?.unit_price ? (
                               <>NT$ {detail.unit_price.toLocaleString()} × {product.quantity}</>
                             ) : (
@@ -296,17 +296,17 @@ export function CheckoutContent() {
 
                   {/* 價格資訊 */}
                   <div className="border-t-2 border-yellow-300 pt-2 ml-7 space-y-1 text-sm">
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-text-secondary">
                       <span>原價</span>
                       <span className="line-through">NT$ {deal.original_price.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between text-green-600 font-semibold">
+                    <div className="flex justify-between text-success font-semibold">
                       <span>組合優惠折扣</span>
                       <span>- NT$ {deal.discount_amount.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between font-bold pt-1 border-t border-yellow-300">
                       <span>優惠價</span>
-                      <span className="text-green-600 text-lg">NT$ {deal.discounted_price.toLocaleString()}</span>
+                      <span className="text-success text-lg">NT$ {deal.discounted_price.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -332,13 +332,13 @@ export function CheckoutContent() {
                     )}>{item.productName}</h3>
                     <p className={cn(
                       designTokens.typography.caption,
-                      "text-gray-600"
+                      "text-text-secondary"
                     )}>
                       單價: {formatCurrency(item.price || 0)} × {item.quantity}
                     </p>
                   </div>
                   <div className="text-left sm:text-right">
-                    <p className="text-lg md:text-xl font-bold text-green-600">
+                    <p className="text-lg md:text-xl font-bold text-success">
                       {formatCurrency(item.subtotal)}
                     </p>
                   </div>
@@ -356,7 +356,7 @@ export function CheckoutContent() {
               <div className="space-y-2">
                 {/* 普通商品總額 */}
                 {normalItemsTotal > 0 && (
-                  <div className="flex items-center justify-between text-gray-700">
+                  <div className="flex items-center justify-between text-foreground">
                     <p className={designTokens.typography.body.base}>普通商品總額</p>
                     <p className="text-base font-semibold">
                       {formatCurrency(normalItemsTotal)}
@@ -366,7 +366,7 @@ export function CheckoutContent() {
 
                 {/* 組合優惠原價 */}
                 {comboDeals.length > 0 && (
-                  <div className="flex items-center justify-between text-gray-700">
+                  <div className="flex items-center justify-between text-foreground">
                     <p className={designTokens.typography.body.base}>組合優惠原價</p>
                     <p className="text-base font-semibold">
                       {formatCurrency(comboDealOriginalTotal)}
@@ -386,7 +386,7 @@ export function CheckoutContent() {
 
                 {/* 組合優惠折扣（分項顯示） */}
                 {comboDeals.map((deal) => (
-                  <div key={deal.id} className="flex items-center justify-between text-green-600">
+                  <div key={deal.id} className="flex items-center justify-between text-success">
                     <p className={cn(designTokens.typography.body.base, "truncate mr-2")}>
                       組合優惠折扣 - {deal.combo_deal_name}
                     </p>
@@ -409,7 +409,7 @@ export function CheckoutContent() {
                 )}
 
                 {/* 運費提示 */}
-                <div className="flex items-center justify-between text-gray-600 text-sm pt-2 border-t border-gray-200">
+                <div className="flex items-center justify-between text-text-secondary text-sm pt-2 border-t border-gray-200">
                   <p>運費</p>
                   <p>（訂單送出後計算）</p>
                 </div>
@@ -422,7 +422,7 @@ export function CheckoutContent() {
                   "border-t-gray-300"
                 )}>
                   <p className={designTokens.typography.h3}>訂單總金額</p>
-                  <p className="text-2xl md:text-3xl font-bold text-green-600">
+                  <p className="text-2xl md:text-3xl font-bold text-success">
                     {formatCurrency(finalAmount)}
                   </p>
                 </div>
@@ -432,7 +432,7 @@ export function CheckoutContent() {
 
           {/* 訂單備註 */}
           <div className={cn(
-            "rounded-none bg-white",
+            "rounded-none bg-surface",
             designTokens.neoBrutalism.border.full,
             "border-black",
             designTokens.neoBrutalism.shadow.full,
@@ -460,7 +460,7 @@ export function CheckoutContent() {
             <p className={cn(
               "mt-2",
               designTokens.typography.caption,
-              "text-gray-600"
+              "text-text-secondary"
             )}>
               {notes.length} / 500 字
             </p>
@@ -505,13 +505,13 @@ export function CheckoutContent() {
 
           {/* 提示訊息 */}
           <div className={cn(
-            "rounded-none bg-gray-50",
+            "rounded-none bg-surface-secondary",
             "border-2 border-gray-300",
             "p-3 md:p-4"
           )}>
             <p className={cn(
               designTokens.typography.caption,
-              "text-gray-600"
+              "text-text-secondary"
             )}>
               📝 訂單送出後，我們將盡快為您處理。您可以在「我的訂單」查看訂單狀態。
             </p>

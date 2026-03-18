@@ -42,10 +42,10 @@ export default async function LoginPage() {
           </div>
 
           <div className="space-y-3">
-            <h1 className="text-4xl md:text-5xl font-black text-black leading-tight">
+            <h1 className="text-4xl md:text-5xl font-black text-foreground leading-tight">
               快速下單系統
             </h1>
-            <p className="text-lg md:text-xl font-bold text-gray-800">
+            <p className="text-lg md:text-xl font-bold text-foreground">
               批發訂貨，隨時隨地輕鬆搞定
             </p>
           </div>
@@ -53,45 +53,45 @@ export default async function LoginPage() {
 
         {/* 特色說明卡片（手機隱藏，桌面顯示） */}
         <div className="hidden md:grid grid-cols-3 gap-4 w-full max-w-3xl mb-8">
-          <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+          <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
             <div className="flex justify-center mb-3">
               <div className="rounded-none border-2 border-black bg-gradient-to-br from-orange-400 to-amber-400 p-2">
-                <ShoppingBag className="h-6 w-6 text-black" />
+                <ShoppingBag className="h-6 w-6 text-foreground" />
               </div>
             </div>
             <h3 className="font-black text-center mb-1">即時下單</h3>
-            <p className="text-xs font-medium text-gray-700 text-center">24小時隨時查看商品價格</p>
+            <p className="text-xs font-medium text-text-secondary text-center">24小時隨時查看商品價格</p>
           </div>
 
-          <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+          <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
             <div className="flex justify-center mb-3">
               <div className="rounded-none border-2 border-black bg-gradient-to-br from-orange-400 to-amber-400 p-2">
-                <Smartphone className="h-6 w-6 text-black" />
+                <Smartphone className="h-6 w-6 text-foreground" />
               </div>
             </div>
             <h3 className="font-black text-center mb-1">行動優先</h3>
-            <p className="text-xs font-medium text-gray-700 text-center">單手操作輕鬆完成訂單</p>
+            <p className="text-xs font-medium text-text-secondary text-center">單手操作輕鬆完成訂單</p>
           </div>
 
-          <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+          <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo-sm md:shadow-neo hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
             <div className="flex justify-center mb-3">
               <div className="rounded-none border-2 border-black bg-gradient-to-br from-orange-400 to-amber-400 p-2">
-                <Shield className="h-6 w-6 text-black" />
+                <Shield className="h-6 w-6 text-foreground" />
               </div>
             </div>
             <h3 className="font-black text-center mb-1">專屬價格</h3>
-            <p className="text-xs font-medium text-gray-700 text-center">會員專屬優惠</p>
+            <p className="text-xs font-medium text-text-secondary text-center">會員專屬優惠</p>
           </div>
         </div>
 
         {/* 登入卡片 */}
         <div className="w-full max-w-md">
-          <div className="rounded-none border-2 md:border-4 border-black bg-white p-6 md:p-8 shadow-neo-sm md:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <div className="rounded-none border-2 md:border-4 border-black bg-surface p-6 md:p-8 shadow-neo-sm md:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
             <div className="mb-6">
               <div className="inline-block rounded-none border-2 md:border-3 border-black bg-gradient-to-r from-orange-400 to-amber-400 px-4 py-2 mb-4 shadow-neo-sm">
                 <h2 className="text-sm font-black uppercase tracking-wider">客戶登入</h2>
               </div>
-              <p className="text-sm font-bold text-gray-700">
+              <p className="text-sm font-bold text-text-secondary">
                 請使用手機號碼登入
               </p>
             </div>
@@ -117,7 +117,7 @@ export default async function LoginPage() {
 
           {/* 切換到後台登入 */}
           <div className="text-center mt-6">
-            <div className="inline-flex items-center gap-2 rounded-none border-2 border-black bg-white px-4 py-2 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
+            <div className="inline-flex items-center gap-2 rounded-none border-2 border-black bg-surface px-4 py-2 shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all">
               <Shield className="h-4 w-4" />
               <span className="text-sm font-bold">管理員請前往</span>
               <a href="/admin/login" className="text-sm font-black text-orange-600 hover:underline">

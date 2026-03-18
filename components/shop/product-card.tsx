@@ -46,7 +46,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <Link
       href={`/store/${product.id}`}
       className={cn(
-        'group block rounded-none bg-white transition-all relative',
+        'group block rounded-none bg-surface transition-all relative',
         designTokens.neoBrutalism.border.full,
         designTokens.neoBrutalism.shadow.full,
         designTokens.neoBrutalism.hover,
@@ -63,7 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
       {/* 商品圖片 */}
       <div className={cn(
-        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
+        "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary",
         "relative",  // 新增：支援絕對定位
         designTokens.neoBrutalism.border.mobile,
         "border-black"
@@ -79,7 +79,7 @@ export function ProductCard({ product }: ProductCardProps) {
             quality={80}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-gray-300">
+          <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-muted">
             📦
           </div>
         )}
@@ -87,7 +87,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* 查看商品按鈕（右下角） */}
         <div className="absolute right-2 bottom-2 z-10">
           <span className={cn(
-            "inline-block rounded-none bg-white",
+            "inline-block rounded-none bg-surface",
             "border-2 border-black",
             "shadow-neo-sm",
             "px-2 py-1",
@@ -108,21 +108,21 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* 商品簡介（一行 + fadeout 效果） */}
         {product.description && (
           <div className="relative">
-            <p className="text-xs text-gray-600 leading-relaxed overflow-hidden whitespace-nowrap">
+            <p className="text-xs text-text-secondary leading-relaxed overflow-hidden whitespace-nowrap">
               {product.description}
             </p>
-            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-surface to-transparent pointer-events-none" />
           </div>
         )}
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-text-secondary">
           編號: {product.code}
         </p>
 
         {/* 系列標籤 */}
         {product.series_name && (
           <div className={cn(
-            "inline-block rounded-none bg-blue-100",
+            "inline-block rounded-none bg-info-bg",
             designTokens.neoBrutalism.border.mobile,
             "border-black",
             "px-1.5 py-0.5 text-xs font-bold"
@@ -136,20 +136,20 @@ export function ProductCard({ product }: ProductCardProps) {
           <div className="space-y-0.5">
             {/* 原價（刪除線） */}
             {product.retail_price && product.retail_price > 0 && (
-              <p className="text-xs text-gray-500 line-through">
+              <p className="text-xs text-text-secondary line-through">
                 原價 ${product.retail_price}
               </p>
             )}
             {/* 您的價格（醒目） */}
             <p className="text-lg md:text-2xl font-bold text-brand-primary">
               ${product.user_price}
-              <span className="text-xs ml-1 font-normal text-gray-600">
+              <span className="text-xs ml-1 font-normal text-text-secondary">
                 /{product.unit || '件'}
               </span>
             </p>
           </div>
         ) : (
-          <p className="text-xs font-bold text-red-600">
+          <p className="text-xs font-bold text-error">
             價格未設定
           </p>
         )}
@@ -161,7 +161,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
           {/* 預購商品提示 */}
           {(product.stock || 0) < 0 && (
-            <p className="text-xs font-bold text-red-600">可預購</p>
+            <p className="text-xs font-bold text-error">可預購</p>
           )}
         </div>
       </div>

@@ -46,7 +46,7 @@ export default async function NewMemberPage() {
       <Link href="/admin/system/members">
         <Button
           variant="outline"
-          className="inline-flex items-center gap-2 rounded-none border-2 border-black bg-white px-4 py-2 text-sm font-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+          className="inline-flex items-center gap-2 rounded-none border-2 border-black bg-surface px-4 py-2 text-sm font-bold hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
         >
           <ArrowLeft className="h-4 w-4" />
           返回列表
@@ -56,18 +56,18 @@ export default async function NewMemberPage() {
       {/* 頁面標題 */}
       <div className="rounded-none border-2 md:border-3 border-black bg-yellow-400 p-6 shadow-neo">
         <h1 className="text-3xl font-black">新增成員</h1>
-        <p className="mt-2 text-sm font-bold text-gray-800">
+        <p className="mt-2 text-sm font-bold text-foreground">
           建立新的工作人員帳號
         </p>
       </div>
 
       {/* 表單卡片 */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
         <MemberForm onSubmit={handleSubmit} submitLabel="建立帳號" />
       </div>
 
       {/* 提示說明 */}
-      <div className="rounded-none border-2 border-blue-500 bg-blue-50 p-4">
+      <div className="rounded-none border-2 border-info bg-info-bg p-4">
         <p className="text-xs font-bold text-blue-900">
           💡 <strong>提示</strong>：帳號建立後即可使用帳號 + 密碼登入後台。暱稱會顯示於訂單留言、操作日誌等客戶互動場景。
         </p>

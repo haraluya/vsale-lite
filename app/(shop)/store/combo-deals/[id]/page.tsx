@@ -50,9 +50,9 @@ export default async function ComboDealDetailPage({
   if (!result.success || !result.data) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="rounded-none border-3 border-red-600 bg-red-50 p-6 text-center">
-          <p className="text-lg font-semibold text-red-800">載入失敗</p>
-          <p className="mt-2 text-sm text-red-600">
+        <div className="rounded-none border-3 border-red-600 bg-error-bg p-6 text-center">
+          <p className="text-lg font-semibold text-error">載入失敗</p>
+          <p className="mt-2 text-sm text-error">
             {result.message || '組合優惠不存在或您無權訪問'}
           </p>
         </div>
@@ -86,7 +86,7 @@ export default async function ComboDealDetailPage({
       )}>
         {/* 🆕 Phase 7: 編輯模式標示 */}
         {editMode && (
-          <div className="mb-4 rounded-none border-2 md:border-3 border-blue-600 bg-blue-50 p-4 shadow-neo-sm">
+          <div className="mb-4 rounded-none border-2 md:border-3 border-blue-600 bg-info-bg p-4 shadow-neo-sm">
             <p className="text-sm md:text-base font-bold text-blue-800">
               ✏️ 編輯模式：您正在編輯購物車中的組合優惠
             </p>
@@ -115,7 +115,7 @@ export default async function ComboDealDetailPage({
           </div>
 
           {/* 組合優惠名稱與資訊 */}
-          <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 md:p-6 shadow-neo-sm md:shadow-neo">
+          <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 md:p-6 shadow-neo-sm md:shadow-neo">
             <h1 className="text-2xl md:text-3xl font-black text-foreground mb-3">
               {comboDeal.name}
             </h1>
@@ -124,7 +124,7 @@ export default async function ComboDealDetailPage({
               <span className="inline-block px-3 py-1 bg-yellow-100 border-2 border-yellow-600 text-yellow-800 text-sm md:text-base font-bold">
                 {modeText}
               </span>
-              <span className="text-sm md:text-base text-gray-600">
+              <span className="text-sm md:text-base text-text-secondary">
                 包含 {comboDeal.series.length} 個系列
               </span>
             </div>

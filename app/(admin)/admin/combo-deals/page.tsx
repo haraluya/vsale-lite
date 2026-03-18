@@ -37,8 +37,8 @@ export default async function ComboDealsPage(props: {
   if (!result.success) {
     return (
       <div className="p-6">
-        <div className="rounded-none border-2 border-red-500 bg-red-50 p-4">
-          <p className="text-red-800">載入組合優惠列表失敗：{result.message}</p>
+        <div className="rounded-none border-2 border-red-500 bg-error-bg p-4">
+          <p className="text-foreground">載入組合優惠列表失敗：{result.message}</p>
         </div>
       </div>
     )
@@ -52,7 +52,7 @@ export default async function ComboDealsPage(props: {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">組合優惠管理</h1>
-          <p className="mt-1 text-gray-600">
+          <p className="mt-1 text-text-secondary">
             管理跨系列的商品組合促銷活動
           </p>
         </div>
@@ -67,7 +67,7 @@ export default async function ComboDealsPage(props: {
       {/* Filters */}
       <Suspense
         fallback={
-          <div className="rounded-none border-2 border-black bg-white p-4">
+          <div className="rounded-none border-2 border-black bg-surface p-4">
             載入篩選器...
           </div>
         }
@@ -79,10 +79,10 @@ export default async function ComboDealsPage(props: {
       </Suspense>
 
       {/* Table */}
-      <div className="rounded-none border-2 md:border-3 border-black bg-white shadow-neo-sm md:shadow-neo">
+      <div className="rounded-none border-2 md:border-3 border-black bg-surface shadow-neo-sm md:shadow-neo">
         {items.length === 0 ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500">
+            <p className="text-text-secondary">
               {filters.status || filters.tier_id
                 ? '沒有符合篩選條件的組合優惠'
                 : '尚未建立任何組合優惠'}
@@ -99,8 +99,8 @@ export default async function ComboDealsPage(props: {
       </div>
 
       {/* Stats */}
-      <div className="rounded-none border-2 border-black bg-gray-50 p-4">
-        <p className="text-sm text-gray-600">
+      <div className="rounded-none border-2 border-black bg-surface-secondary p-4">
+        <p className="text-sm text-text-secondary">
           顯示第 {(page - 1) * limit + 1} - {Math.min(page * limit, total)} 筆，共{' '}
           {total} 筆組合優惠
         </p>

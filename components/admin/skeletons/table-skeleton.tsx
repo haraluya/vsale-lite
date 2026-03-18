@@ -41,7 +41,7 @@ export function TableSkeleton({
       {showFilters && (
         <div
           className={cn(
-            'flex flex-col gap-4 rounded-none bg-white sm:flex-row',
+            'flex flex-col gap-4 rounded-none bg-surface sm:flex-row',
             designTokens.neoBrutalism.border.full,
             designTokens.neoBrutalism.shadow.full,
             designTokens.spacing.card.padding
@@ -61,7 +61,7 @@ export function TableSkeleton({
       {/* 桌面版表格骨架 */}
       <div
         className={cn(
-          'hidden lg:block rounded-none bg-white',
+          'hidden lg:block rounded-none bg-surface',
           designTokens.neoBrutalism.border.full,
           designTokens.neoBrutalism.shadow.full
         )}
@@ -100,7 +100,7 @@ export function TableSkeleton({
           <div
             key={i}
             className={cn(
-              'rounded-none bg-white',
+              'rounded-none bg-surface',
               designTokens.neoBrutalism.border.full,
               designTokens.neoBrutalism.shadow.full,
               designTokens.spacing.card.padding,

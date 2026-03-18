@@ -28,7 +28,7 @@ export default async function EditProductPage({
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold">編輯商品</h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-text-secondary">
           編輯商品: {product.name} ({product.code})
         </p>
       </div>
@@ -41,7 +41,7 @@ export default async function EditProductPage({
 
         {/* 標籤管理 */}
         <div className="lg:col-span-1">
-          <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+          <div className="rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
             <h2 className="mb-4 text-xl font-bold">標籤管理</h2>
             <TagManager productId={product.id} initialTags={product.tags || []} />
           </div>

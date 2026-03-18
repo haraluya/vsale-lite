@@ -63,7 +63,7 @@ export function SplitPanelLayout({ order }: Props) {
         {/* 左側/上方：商品明細 */}
         <div className="lg:col-span-2 space-y-4">
           {/* 商品區塊 */}
-          <div className="rounded-none border-3 border-black bg-white shadow-neo overflow-hidden">
+          <div className="rounded-none border-3 border-black bg-surface shadow-neo overflow-hidden">
             <div className="bg-black text-white px-5 py-3 flex items-center gap-2">
               <Package className="w-5 h-5" />
               <h2 className="text-lg font-black">訂單商品</h2>
@@ -102,7 +102,7 @@ export function SplitPanelLayout({ order }: Props) {
                                   {series.series_name}
                                 </span>
                                 <span className="flex-1 truncate">{product.product_name}</span>
-                                <span className="text-gray-600 text-xs shrink-0">
+                                <span className="text-text-secondary text-xs shrink-0">
                                   {formatCurrency(product.unit_price)} × {product.quantity}
                                 </span>
                               </div>
@@ -122,7 +122,7 @@ export function SplitPanelLayout({ order }: Props) {
                 return (
                   <div
                     key={item.id}
-                    className="border-2 border-gray-300 bg-gray-50 p-4 rounded-none hover:border-black transition-colors"
+                    className="border-2 border-gray-300 bg-surface-secondary p-4 rounded-none hover:border-black transition-colors"
                   >
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="flex-1">
@@ -136,12 +136,12 @@ export function SplitPanelLayout({ order }: Props) {
                         <h3 className="font-bold text-base">{item.product_name_snapshot}</h3>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className="text-xl font-black text-green-600">
+                        <div className="text-xl font-black text-success">
                           {formatCurrency(item.subtotal)}
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
+                    <div className="flex items-center justify-between text-sm text-text-secondary">
                       <span>單價 {formatCurrency(item.deal_price)}</span>
                       <span>數量 {item.quantity}</span>
                     </div>
@@ -153,12 +153,12 @@ export function SplitPanelLayout({ order }: Props) {
 
           {/* 訂單備註 */}
           {order.notes && (
-            <div className="rounded-none border-3 border-black bg-white shadow-neo p-5">
+            <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
               <h3 className="font-black mb-2 flex items-center gap-2">
                 <span className="text-lg">📝</span>
                 訂單備註
               </h3>
-              <p className="text-sm text-gray-800">{order.notes}</p>
+              <p className="text-sm text-foreground">{order.notes}</p>
             </div>
           )}
         </div>
@@ -166,7 +166,7 @@ export function SplitPanelLayout({ order }: Props) {
         {/* 右側/下方：金額摘要與訂單資訊 */}
         <div className="lg:col-span-1 space-y-4">
           {/* 金額摘要 - 固定在右側 */}
-          <div className="rounded-none border-3 border-black bg-white shadow-neo overflow-hidden lg:sticky lg:top-4">
+          <div className="rounded-none border-3 border-black bg-surface shadow-neo overflow-hidden lg:sticky lg:top-4">
             <div className="bg-green-600 text-white px-5 py-3 flex items-center gap-2">
               <Receipt className="w-5 h-5" />
               <h2 className="text-lg font-black">金額摘要</h2>
@@ -175,7 +175,7 @@ export function SplitPanelLayout({ order }: Props) {
             <div className="p-5 space-y-2.5">
               {/* 商品小計 */}
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-700">商品小計</span>
+                <span className="text-foreground">商品小計</span>
                 <span className="font-bold">
                   {formatCurrency(
                     order.items.reduce((sum, item) => sum + item.subtotal, 0) +
@@ -207,10 +207,10 @@ export function SplitPanelLayout({ order }: Props) {
               {/* 運費 */}
               {order.shipping_fee !== undefined && order.shipping_fee !== null && (
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-700">運費</span>
+                  <span className="text-foreground">運費</span>
                   <span className={cn(
                     "font-bold",
-                    order.shipping_fee === 0 ? 'text-green-600' : 'text-gray-900'
+                    order.shipping_fee === 0 ? 'text-success' : 'text-foreground'
                   )}>
                     {order.shipping_fee === 0 ? '免運' : formatCurrency(order.shipping_fee)}
                   </span>
@@ -222,10 +222,10 @@ export function SplitPanelLayout({ order }: Props) {
                 <>
                   {order.custom_fees.map((fee) => (
                     <div key={fee.id} className="flex justify-between items-center text-sm">
-                      <span className="text-gray-700 text-xs truncate">{fee.fee_name}</span>
+                      <span className="text-foreground text-xs truncate">{fee.fee_name}</span>
                       <span className={cn(
                         "font-bold shrink-0",
-                        fee.amount < 0 ? 'text-red-600' : 'text-gray-900'
+                        fee.amount < 0 ? 'text-error' : 'text-foreground'
                       )}>
                         {fee.amount >= 0 ? '+' : ''}{formatCurrency(Math.abs(fee.amount))}
                       </span>
@@ -238,7 +238,7 @@ export function SplitPanelLayout({ order }: Props) {
               <div className="pt-3 mt-2 border-t-3 border-black">
                 <div className="flex justify-between items-center">
                   <span className="text-base font-black">總金額</span>
-                  <span className="text-2xl md:text-3xl font-black text-green-600">
+                  <span className="text-2xl md:text-3xl font-black text-success">
                     {formatCurrency(order.total_amount)}
                   </span>
                 </div>
@@ -247,29 +247,29 @@ export function SplitPanelLayout({ order }: Props) {
           </div>
 
           {/* 訂單資訊卡片 */}
-          <div className="rounded-none border-3 border-black bg-white shadow-neo p-5">
+          <div className="rounded-none border-3 border-black bg-surface shadow-neo p-5">
             <h3 className="font-black mb-4 text-lg">訂單資訊</h3>
             <div className="space-y-3 text-sm">
               <div className="flex items-start gap-3">
-                <Hash className="w-4 h-4 mt-0.5 text-gray-600 shrink-0" />
+                <Hash className="w-4 h-4 mt-0.5 text-text-secondary shrink-0" />
                 <div className="flex-1">
-                  <div className="text-xs text-gray-600 mb-0.5">訂單編號</div>
+                  <div className="text-xs text-text-secondary mb-0.5">訂單編號</div>
                   <div className="font-bold">{order.order_number}</div>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <Calendar className="w-4 h-4 mt-0.5 text-gray-600 shrink-0" />
+                <Calendar className="w-4 h-4 mt-0.5 text-text-secondary shrink-0" />
                 <div className="flex-1">
-                  <div className="text-xs text-gray-600 mb-0.5">建立時間</div>
+                  <div className="text-xs text-text-secondary mb-0.5">建立時間</div>
                   <div className="font-bold">{formatDateTW(order.created_at)}</div>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <Package className="w-4 h-4 mt-0.5 text-gray-600 shrink-0" />
+                <Package className="w-4 h-4 mt-0.5 text-text-secondary shrink-0" />
                 <div className="flex-1">
-                  <div className="text-xs text-gray-600 mb-0.5">商品數量</div>
+                  <div className="text-xs text-text-secondary mb-0.5">商品數量</div>
                   <div className="font-bold">
                     {order.items.reduce((sum, item) => sum + item.quantity, 0)} 件
                   </div>
@@ -278,9 +278,9 @@ export function SplitPanelLayout({ order }: Props) {
 
               {order.user.address && (
                 <div className="flex items-start gap-3 pt-3 border-t-2 border-gray-200">
-                  <MapPin className="w-4 h-4 mt-0.5 text-gray-600 shrink-0" />
+                  <MapPin className="w-4 h-4 mt-0.5 text-text-secondary shrink-0" />
                   <div className="flex-1">
-                    <div className="text-xs text-gray-600 mb-0.5">送貨地址</div>
+                    <div className="text-xs text-text-secondary mb-0.5">送貨地址</div>
                     <div className="font-bold">{order.user.address}</div>
                   </div>
                 </div>

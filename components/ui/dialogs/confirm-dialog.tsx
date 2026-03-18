@@ -10,10 +10,6 @@ interface ConfirmDialogProps {
   onClose: (confirmed: boolean) => void
 }
 
-/**
- * ConfirmDialog 元件
- * 替代原生 confirm()，符合 Neo-Brutalism 設計風格
- */
 export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
   const {
     title,
@@ -27,7 +23,6 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
 
   const [isLoading, setIsLoading] = useState(false)
 
-  // ESC 鍵關閉
   useEffect(() => {
     if (!closable || isLoading) return
 
@@ -41,7 +36,6 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
     return () => document.removeEventListener('keydown', handleEsc)
   }, [closable, isLoading, onClose])
 
-  // 背景滾動鎖定
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => {
@@ -49,53 +43,49 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
     }
   }, [])
 
-  // 處理確認
   const handleConfirm = async () => {
     if (isAsync) {
       setIsLoading(true)
-      // 模擬異步操作 - 實際使用時由外部處理
       await new Promise((resolve) => setTimeout(resolve, 500))
     }
     onClose(true)
   }
 
-  // 處理取消
   const handleCancel = () => {
     if (isLoading) return
     onClose(false)
   }
 
-  // 變體配置
   const variantConfig = {
     success: {
-      headerBg: 'bg-green-400',
+      headerBg: 'bg-success',
       icon: CheckCircle,
-      confirmBg: 'bg-green-500 hover:bg-green-600',
+      confirmBg: 'bg-success hover:opacity-80',
     },
     error: {
-      headerBg: 'bg-red-400',
+      headerBg: 'bg-error',
       icon: XCircle,
-      confirmBg: 'bg-red-500 hover:bg-red-600',
+      confirmBg: 'bg-error hover:opacity-80',
     },
     warning: {
-      headerBg: 'bg-yellow-400',
+      headerBg: 'bg-warning',
       icon: AlertTriangle,
-      confirmBg: 'bg-yellow-500 hover:bg-yellow-600',
+      confirmBg: 'bg-warning hover:opacity-80',
     },
     info: {
-      headerBg: 'bg-blue-400',
+      headerBg: 'bg-info',
       icon: Info,
-      confirmBg: 'bg-blue-500 hover:bg-blue-600',
+      confirmBg: 'bg-info hover:opacity-80',
     },
     danger: {
-      headerBg: 'bg-red-400',
+      headerBg: 'bg-error',
       icon: AlertTriangle,
-      confirmBg: 'bg-red-500 hover:bg-red-600',
+      confirmBg: 'bg-error hover:opacity-80',
     },
     default: {
-      headerBg: 'bg-gray-200',
+      headerBg: 'bg-surface-secondary',
       icon: Info,
-      confirmBg: 'bg-gray-800 hover:bg-gray-900',
+      confirmBg: 'bg-foreground hover:opacity-80',
     },
   }
 
@@ -104,7 +94,7 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 animate-in fade-in-0 duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4 animate-in fade-in-0 duration-200"
       onClick={closable && !isLoading ? handleCancel : undefined}
       role="dialog"
       aria-modal="true"
@@ -114,8 +104,8 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
       <div
         className={cn(
           'w-full max-w-md',
-          'border-2 md:border-3 border-black bg-white',
-          'shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]',
+          'border-2 md:border-3 bg-surface',
+          'shadow-[8px_8px_0px_0px_var(--color-border)]',
           'animate-in zoom-in-95 duration-200'
         )}
         onClick={(e) => e.stopPropagation()}
@@ -123,9 +113,9 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
         {/* 標題欄 */}
         <div
           className={cn(
-            'flex items-center gap-3 border-b-2 md:border-b-3 border-black p-4',
+            'flex items-center gap-3 border-b-2 md:border-b-3 p-4',
             config.headerBg,
-            variant === 'default' ? 'text-gray-800' : 'text-white'
+            variant === 'default' ? 'text-foreground' : 'text-text-inverse'
           )}
         >
           <Icon className="h-6 w-6 flex-shrink-0" />
@@ -136,48 +126,46 @@ export function ConfirmDialog({ options, onClose }: ConfirmDialogProps) {
 
         {/* 內容 */}
         <div className="p-6">
-          <p id="confirm-dialog-description" className="text-base text-gray-800 whitespace-pre-wrap">
+          <p id="confirm-dialog-description" className="text-base whitespace-pre-wrap">
             {description}
           </p>
         </div>
 
         {/* 按鈕 */}
-        <div className="border-t-2 md:border-t-3 border-black p-4 flex gap-3">
-          {/* 取消按鈕 */}
+        <div className="border-t-2 md:border-t-3 p-4 flex gap-3">
           <button
             type="button"
             onClick={handleCancel}
             disabled={isLoading}
             className={cn(
               'flex-1 px-4 py-2',
-              'border-2 md:border-3 border-black',
-              'bg-white hover:bg-gray-100',
-              'text-gray-800 font-bold text-sm uppercase',
-              'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+              'border-2 md:border-3',
+              'bg-surface hover:bg-surface-secondary',
+              'font-bold text-sm uppercase',
+              'shadow-neo',
               'transition-all duration-150',
               'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
-              'focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+              'focus:outline-none focus:ring-2 focus:ring-offset-2',
+              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo'
             )}
           >
             {cancelText}
           </button>
 
-          {/* 確認按鈕 */}
           <button
             type="button"
             onClick={handleConfirm}
             disabled={isLoading}
             className={cn(
               'flex-1 px-4 py-2',
-              'border-2 md:border-3 border-black',
+              'border-2 md:border-3',
               config.confirmBg,
-              'text-white font-bold text-sm uppercase',
-              'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+              'text-text-inverse font-bold text-sm uppercase',
+              'shadow-neo',
               'transition-all duration-150',
               'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
-              'focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2',
-              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
+              'focus:outline-none focus:ring-2 focus:ring-offset-2',
+              'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo',
               'flex items-center justify-center gap-2'
             )}
             autoFocus

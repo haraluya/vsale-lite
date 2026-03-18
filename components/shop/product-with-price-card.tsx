@@ -136,7 +136,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
 
   return (
     <div className={cn(
-      "group rounded-none bg-white",
+      "group rounded-none bg-surface",
       designTokens.neoBrutalism.border.full,
       "border-black",
       designTokens.neoBrutalism.shadow.full,
@@ -145,7 +145,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
       {/* 商品圖片 */}
       <div
         className={cn(
-          "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-gray-100",
+          "mb-2 md:mb-4 aspect-square overflow-hidden rounded-none bg-surface-secondary",
           "relative",  // 新增：支援絕對定位
           designTokens.neoBrutalism.border.mobile,
           "border-black",
@@ -171,7 +171,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
             quality={80}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-gray-300">
+          <div className="flex h-full w-full items-center justify-center text-4xl md:text-6xl text-text-secondary">
             📦
           </div>
         )}
@@ -198,22 +198,22 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         {/* 商品簡介（一行 + fadeout 效果） */}
         {product.description && (
           <div className={cn(
-            "rounded-none bg-gray-50 relative",
+            "rounded-none bg-surface-secondary relative",
             designTokens.neoBrutalism.border.mobile,
             "border-gray-400",
             "p-2"
           )}>
-            <p className="text-xs text-gray-700 leading-relaxed overflow-hidden whitespace-nowrap pr-8">
+            <p className="text-xs text-foreground leading-relaxed overflow-hidden whitespace-nowrap pr-8">
               {product.description}
             </p>
-            <div className="absolute right-2 top-0 bottom-0 w-12 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none" />
+            <div className="absolute right-2 top-0 bottom-0 w-12 bg-gradient-to-l from-surface-secondary to-transparent pointer-events-none" />
           </div>
         )}
 
         {/* 價格顯示 */}
         {displayPrice ? (
           <div className={cn(
-            "rounded-none bg-blue-50",
+            "rounded-none bg-info-bg",
             designTokens.neoBrutalism.border.mobile,
             "border-black",
             "p-2 md:p-3"
@@ -223,7 +223,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
               // 情況：會員價 < 售價 → 靠右對齊，顯示刪除線售價 + 會員價
               <div className="flex items-baseline gap-1.5 justify-end flex-wrap">
                 {/* 售價（刪除線） */}
-                <span className="text-xs text-gray-400 line-through">
+                <span className="text-xs text-text-secondary line-through">
                   ${product.retail_price}
                 </span>
 
@@ -233,7 +233,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
                 </span>
 
                 {/* 價格標籤 */}
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-text-secondary">
                   ({priceLabel})
                 </span>
               </div>
@@ -246,7 +246,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
                 </span>
 
                 {/* 價格標籤 */}
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-text-secondary">
                   ({priceLabel})
                 </span>
               </div>
@@ -255,11 +255,11 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
         ) : (
           // 沒有任何價格：顯示「價格未設定」
           <div className={cn(
-            "rounded-none bg-gray-100",
+            "rounded-none bg-surface-secondary",
             "border-2 border-gray-400",
             "p-2 md:p-3"
           )}>
-            <p className="text-center font-bold text-gray-600 text-xs">
+            <p className="text-center font-bold text-text-secondary text-xs">
               價格未設定
             </p>
           </div>
@@ -296,7 +296,7 @@ export function ProductWithPriceCard({ product, tierName, onImageClick }: Produc
               "min-h-[44px]",
               "focus:outline-none focus:ring-2 focus:ring-blue-500",
               "text-sm md:text-base",
-              "disabled:cursor-not-allowed disabled:bg-gray-100 disabled:opacity-50"
+              "disabled:cursor-not-allowed disabled:bg-surface-secondary disabled:opacity-50"
             )}
             aria-label="商品數量"
           />

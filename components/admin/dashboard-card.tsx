@@ -50,9 +50,9 @@ export function DashboardCard({
 
         {/* 數據區塊 */}
         <div className="flex-1">
-          <p className="text-sm text-gray-600">{title}</p>
+          <p className="text-sm text-text-secondary">{title}</p>
           <p className="text-3xl font-bold mt-1">{value}</p>
-          {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+          {subtitle && <p className="text-xs text-text-secondary mt-1">{subtitle}</p>}
         </div>
       </div>
     </div>
@@ -81,7 +81,7 @@ export function DashboardTrendCard({ title, subtitle, children, className }: Das
     <div className={cn('card-neo p-6', className)}>
       <div className="mb-4">
         <h2 className="text-xl font-bold">{title}</h2>
-        {subtitle && <p className="text-sm text-gray-600 mt-1">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-text-secondary mt-1">{subtitle}</p>}
       </div>
       {children}
     </div>

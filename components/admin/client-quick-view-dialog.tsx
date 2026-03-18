@@ -112,12 +112,12 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className={cn(
-        'sm:max-w-[500px] rounded-none bg-white',
+        'sm:max-w-[500px] rounded-none bg-surface',
         getNeoBrutalismClasses(),
         'p-0'
       )}>
         <DialogHeader className={cn(
-          'bg-gray-100 border-b-2 md:border-b-3 border-black',
+          'bg-surface-secondary border-b-2 md:border-b-3 border-black',
           designTokens.spacing.card.padding
         )}>
           <DialogTitle className={designTokens.typography.h2}>
@@ -132,23 +132,23 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
           {/* 基本資訊（唯讀） */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <User className="h-5 w-5 text-gray-600" />
+              <User className="h-5 w-5 text-text-secondary" />
               <div>
-                <div className={cn(designTokens.typography.caption, 'text-gray-600')}>客戶姓名</div>
+                <div className={cn(designTokens.typography.caption, 'text-text-secondary')}>客戶姓名</div>
                 <div className={cn(designTokens.typography.body.base, 'font-bold')}>{client.name}</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Phone className="h-5 w-5 text-gray-600" />
+              <Phone className="h-5 w-5 text-text-secondary" />
               <div>
-                <div className={cn(designTokens.typography.caption, 'text-gray-600')}>手機號碼</div>
+                <div className={cn(designTokens.typography.caption, 'text-text-secondary')}>手機號碼</div>
                 <div className={cn(designTokens.typography.body.base, 'font-bold')}>{client.phone}</div>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Award className="h-5 w-5 text-gray-600" />
+              <Award className="h-5 w-5 text-text-secondary" />
               <div>
-                <div className={cn(designTokens.typography.caption, 'text-gray-600')}>會員等級</div>
+                <div className={cn(designTokens.typography.caption, 'text-text-secondary')}>會員等級</div>
                 <div className={cn(designTokens.typography.body.base, 'font-bold')}>{client.tier_name}</div>
               </div>
             </div>
@@ -177,7 +177,7 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                 />
               ) : (
                 <div className={cn(
-                  'rounded-none border-2 border-gray-300 bg-gray-50 px-3 py-2 min-h-[80px]',
+                  'rounded-none border-2 border-gray-300 bg-surface-secondary px-3 py-2 min-h-[80px]',
                   designTokens.typography.body.base
                 )}>
                   {client.address || '未設定'}
@@ -204,9 +204,9 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                 />
               ) : (
                 <div className={cn(
-                  'rounded-none border-2 border-yellow-300 bg-yellow-50 px-3 py-2 min-h-[100px]',
+                  'rounded-none border-2 border-yellow-300 bg-warning-bg px-3 py-2 min-h-[100px]',
                   designTokens.typography.body.base,
-                  client.admin_notes ? 'text-yellow-900' : 'text-gray-400'
+                  client.admin_notes ? 'text-yellow-900' : 'text-muted'
                 )}>
                   {client.admin_notes || '未設定'}
                 </div>
@@ -241,7 +241,7 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   onClick={handleCancel}
                   disabled={isSaving}
                   className={cn(
-                    'flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold',
+                    'flex-1 bg-surface-secondary hover:bg-gray-300 text-foreground font-bold',
                     'border-2 border-black shadow-neo-sm',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                     designTokens.button.md
@@ -267,7 +267,7 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                 <Button
                   onClick={handleViewFullDetails}
                   className={cn(
-                    'flex-1 bg-white hover:bg-gray-50 text-gray-800 font-bold',
+                    'flex-1 bg-surface hover:bg-surface-secondary text-foreground font-bold',
                     'border-2 border-black shadow-neo-sm',
                     'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                     designTokens.button.md

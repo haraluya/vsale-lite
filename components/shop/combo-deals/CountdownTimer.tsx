@@ -62,7 +62,7 @@ export function CountdownTimer({ endDate }: CountdownTimerProps) {
   // 載入中或活動已結束
   if (!timeLeft) {
     return (
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-text-secondary">
         <Clock className="w-4 h-4" />
         <span>活動已結束</span>
       </div>
@@ -85,7 +85,7 @@ export function CountdownTimer({ endDate }: CountdownTimerProps) {
   return (
     <div
       className={`flex items-center gap-2 text-sm font-semibold ${
-        isUrgent ? 'text-red-600' : 'text-gray-700'
+        isUrgent ? 'text-error' : 'text-foreground'
       }`}
     >
       <Clock className="w-4 h-4" />

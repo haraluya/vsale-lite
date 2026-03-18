@@ -122,15 +122,15 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-none border-3 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] m-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50">
+      <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-none border-3 border-black bg-surface shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] m-4">
         {/* 標題列 */}
         <div className="sticky top-0 z-10 flex items-center justify-between border-b-3 border-black bg-yellow-300 px-6 py-4">
           <h2 className="text-xl font-black">批次匯入客戶資料</h2>
           <button
             onClick={handleClose}
             disabled={isImporting}
-            className="rounded-none border-2 border-black bg-white p-2 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-none border-2 border-black bg-surface p-2 hover:bg-gray-100 disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -145,7 +145,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
               {selectedFile && (
                 <button
                   onClick={handleClearFile}
-                  className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                  className="text-sm text-text-secondary hover:text-gray-900 flex items-center gap-1"
                 >
                   <X className="h-4 w-4" />
                   清除
@@ -164,17 +164,17 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
                   className="hidden"
                 />
                 <div className="border-2 border-dashed border-gray-300 rounded-none p-8 text-center hover:border-black transition-colors">
-                  <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <Upload className="h-12 w-12 mx-auto mb-4 text-muted" />
                   <p className="text-sm font-medium mb-2">點擊上傳 Excel 檔案</p>
-                  <p className="text-xs text-gray-500">僅支援 .xlsx 格式，最大 5MB</p>
+                  <p className="text-xs text-text-secondary">僅支援 .xlsx 格式，最大 5MB</p>
                 </div>
               </label>
             ) : (
-              <div className="flex items-center gap-3 p-4 border-2 border-black bg-gray-50">
-                <FileSpreadsheet className="h-8 w-8 text-green-600" />
+              <div className="flex items-center gap-3 p-4 border-2 border-black bg-surface-secondary">
+                <FileSpreadsheet className="h-8 w-8 text-success" />
                 <div className="flex-1">
                   <p className="font-medium">{selectedFile.name}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-text-secondary">
                     {(selectedFile.size / 1024).toFixed(2)} KB
                   </p>
                 </div>
@@ -201,17 +201,17 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
               </div>
             )}
 
-            <p className="text-xs text-gray-500 mt-4">
+            <p className="text-xs text-text-secondary mt-4">
               提示：建議先執行「試算驗證」檢查資料格式，確認無誤後再執行「正式匯入」
             </p>
           </div>
 
           {/* 匯入結果顯示 */}
           {showResults && importResult && (
-            <div className="border-2 border-black bg-white p-6">
+            <div className="border-2 border-black bg-surface p-6">
               <div className="flex items-center gap-2 mb-4">
                 {importResult.error_count === 0 ? (
-                  <CheckCircle className="h-6 w-6 text-green-600" />
+                  <CheckCircle className="h-6 w-6 text-success" />
                 ) : (
                   <AlertCircle className="h-6 w-6 text-yellow-600" />
                 )}
@@ -222,34 +222,34 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
 
               {/* 統計資訊 */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="border-2 border-black p-4 bg-gray-50">
-                  <p className="text-sm text-gray-600 mb-1">總筆數</p>
+                <div className="border-2 border-black p-4 bg-surface-secondary">
+                  <p className="text-sm text-text-secondary mb-1">總筆數</p>
                   <p className="text-2xl font-bold">{importResult.total_rows}</p>
                 </div>
-                <div className="border-2 border-black p-4 bg-green-50">
-                  <p className="text-sm text-gray-600 mb-1">成功筆數</p>
-                  <p className="text-2xl font-bold text-green-600">{importResult.success_count}</p>
+                <div className="border-2 border-black p-4 bg-success-bg">
+                  <p className="text-sm text-text-secondary mb-1">成功筆數</p>
+                  <p className="text-2xl font-bold text-success">{importResult.success_count}</p>
                 </div>
-                <div className="border-2 border-black p-4 bg-red-50">
-                  <p className="text-sm text-gray-600 mb-1">錯誤筆數</p>
-                  <p className="text-2xl font-bold text-red-600">{importResult.error_count}</p>
+                <div className="border-2 border-black p-4 bg-error-bg">
+                  <p className="text-sm text-text-secondary mb-1">錯誤筆數</p>
+                  <p className="text-2xl font-bold text-error">{importResult.error_count}</p>
                 </div>
               </div>
 
               {/* 錯誤明細 */}
               {importResult.errors.length > 0 && (
                 <div>
-                  <h4 className="font-bold mb-3 text-red-600">錯誤明細</h4>
+                  <h4 className="font-bold mb-3 text-error">錯誤明細</h4>
                   <div className="space-y-2 max-h-[300px] overflow-y-auto">
                     {importResult.errors.map((error, index) => (
-                      <div key={index} className="border-2 border-red-300 bg-red-50 p-3 text-sm">
+                      <div key={index} className="border-2 border-red-300 bg-error-bg p-3 text-sm">
                         <p className="font-medium">
                           {error.row_number > 0 ? `第 ${error.row_number} 列` : '資料庫寫入'}：
                           {error.field}
                         </p>
-                        <p className="text-gray-700 mt-1">{error.message}</p>
+                        <p className="text-text-secondary mt-1">{error.message}</p>
                         {error.value && (
-                          <p className="text-xs text-gray-500 mt-1">值：{error.value}</p>
+                          <p className="text-xs text-text-secondary mt-1">值：{error.value}</p>
                         )}
                       </div>
                     ))}
@@ -259,7 +259,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
 
               {/* 下一步提示 */}
               {importResult.dry_run && importResult.error_count === 0 && (
-                <div className="mt-4 p-4 border-2 border-green-600 bg-green-50">
+                <div className="mt-4 p-4 border-2 border-green-600 bg-success-bg">
                   <p className="text-sm text-green-800">
                     資料驗證通過！請點擊「正式匯入」按鈕完成匯入。
                   </p>

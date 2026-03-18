@@ -27,16 +27,16 @@ export function CategorySelector({ categories, selectedCategoryId }: CategorySel
   }
 
   return (
-    <div className="rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+    <div className="rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
       <div className="mb-4">
         <h2 className="text-xl font-bold">選擇分類 (批量設定)</h2>
-        <p className="mt-1 text-sm text-gray-600">選擇分類後可批量設定該分類所有商品的價格</p>
+        <p className="mt-1 text-sm text-text-secondary">選擇分類後可批量設定該分類所有商品的價格</p>
       </div>
 
       <select
         value={selectedCategoryId || ''}
         onChange={handleChange}
-        className="w-full rounded-none border-2 md:border-3 border-black bg-white px-4 py-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-black"
+        className="w-full rounded-none border-2 md:border-3 border-black bg-surface px-4 py-3 font-bold shadow-neo-sm transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none focus:outline-none focus:ring-2 focus:ring-black"
       >
         <option value="">請選擇分類...</option>
         {categories
@@ -49,7 +49,7 @@ export function CategorySelector({ categories, selectedCategoryId }: CategorySel
       </select>
 
       {categories.length === 0 && (
-        <p className="mt-4 text-sm text-gray-500">目前沒有可用的分類</p>
+        <p className="mt-4 text-sm text-text-secondary">目前沒有可用的分類</p>
       )}
     </div>
   )

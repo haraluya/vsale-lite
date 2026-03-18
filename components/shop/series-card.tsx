@@ -30,7 +30,7 @@ export function SeriesCard({ series }: SeriesCardProps) {
   return (
     <Link href={`/store/series/${series.id}`}>
       <div className={cn(
-        "group h-full rounded-none bg-white transition-all",
+        "group h-full rounded-none bg-surface transition-all",
         designTokens.neoBrutalism.border.full,
         "border-black",
         designTokens.neoBrutalism.shadow.full,
@@ -53,7 +53,7 @@ export function SeriesCard({ series }: SeriesCardProps) {
               quality={80}
             />
           ) : (
-            <div className="flex h-full items-center justify-center bg-gray-100">
+            <div className="flex h-full items-center justify-center bg-surface-secondary">
               <span className="text-4xl md:text-6xl">📦</span>
             </div>
           )}
@@ -97,7 +97,7 @@ export function SeriesCard({ series }: SeriesCardProps) {
             {series.name}
           </h3>
           {series.description && (
-            <p className="line-clamp-2 text-xs md:text-sm text-gray-600">
+            <p className="line-clamp-2 text-xs md:text-sm text-text-secondary">
               {series.description}
             </p>
           )}

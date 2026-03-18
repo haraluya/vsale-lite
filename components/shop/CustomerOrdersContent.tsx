@@ -59,7 +59,7 @@ export function CustomerOrdersContent() {
   if (isLoading) {
     return (
       <div className={cn(
-        "min-h-screen bg-gray-50",
+        "min-h-screen bg-surface-secondary",
         designTokens.spacing.page.padding
       )}>
         <div className={designTokens.container.default}>
@@ -76,7 +76,7 @@ export function CustomerOrdersContent() {
 
   return (
     <div className={cn(
-      "min-h-screen bg-gray-50",
+      "min-h-screen bg-surface-secondary",
       designTokens.spacing.page.padding
     )}>
       <div className={cn(
@@ -88,7 +88,7 @@ export function CustomerOrdersContent() {
           <h1 className={designTokens.typography.h1}>我的訂單</h1>
           <p className={cn(
             designTokens.typography.body.base,
-            "mt-2 text-gray-600"
+            "mt-2 text-text-secondary"
           )}>
             查看您的所有訂單記錄
           </p>
@@ -103,7 +103,7 @@ export function CustomerOrdersContent() {
             "p-4",
             designTokens.spacing.section.marginBottom
           )}>
-            <p className="text-red-600 font-bold">❌ {error}</p>
+            <p className="text-error font-bold">❌ {error}</p>
           </div>
         )}
 
@@ -126,7 +126,7 @@ export function CustomerOrdersContent() {
                   "border-black bg-green-400",
                   designTokens.neoBrutalism.shadow.full
                 ] : [
-                  "border-2 border-gray-400 bg-white",
+                  "border-2 border-gray-400 bg-surface",
                   "hover:border-black hover:shadow-neo-sm md:hover:shadow-neo"
                 ]
               )}
@@ -148,7 +148,7 @@ export function CustomerOrdersContent() {
             </h2>
             <p className={cn(
               designTokens.typography.body.large,
-              "mb-8 text-gray-600 text-center"
+              "mb-8 text-text-secondary text-center"
             )}>
               {statusFilter === 'all'
                 ? '趕快去挑選喜歡的商品吧!'
@@ -185,13 +185,13 @@ export function CustomerOrdersContent() {
         {/* 訂單統計 */}
         {orders.length > 0 && (
           <div className={cn(
-            "mt-6 md:mt-8 rounded-none bg-white text-center",
+            "mt-6 md:mt-8 rounded-none bg-surface text-center",
             "border-2 border-gray-300",
             "p-3 md:p-4"
           )}>
             <p className={cn(
               designTokens.typography.caption,
-              "text-gray-600"
+              "text-text-secondary"
             )}>
               共 {orders.length} 筆訂單
               {statusFilter !== 'all' && ` (${statusOptions.find(o => o.value === statusFilter)?.label})`}

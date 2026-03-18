@@ -1,15 +1,5 @@
 'use client'
 
-/**
- * 後台側邊欄元件
- * Feature: 006-ux-enhancement (US5)
- *
- * 視覺分類導航
- * - 功能模組分組（分隔線與標題）
- * - 當前頁面高亮顯示
- * - Neo-Brutalism 設計風格
- */
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
@@ -32,6 +22,7 @@ import {
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { LogoutButton } from '@/components/admin/logout-button'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 type NavItem = {
   label: string
@@ -94,8 +85,8 @@ export function Sidebar() {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden md:flex md:w-16 lg:w-64 border-r-2 md:border-r-3 border-black bg-white flex-col fixed top-0 left-0 h-screen overflow-y-auto">
-      {/* Logo - 平板顯示 icon / 桌面顯示 full */}
+    <aside className="hidden md:flex md:w-16 lg:w-64 border-r-2 md:border-r-3 bg-surface flex-col fixed top-0 left-0 h-screen overflow-y-auto">
+      {/* Logo */}
       <div className="mb-6 md:mb-8 p-3 md:p-4 lg:p-6">
         <div className="md:flex md:justify-center lg:block">
           <Logo
@@ -115,17 +106,14 @@ export function Sidebar() {
       <nav className="flex-1 space-y-3 md:space-y-4 lg:space-y-6 px-3 md:px-4 lg:px-6 pb-6">
         {navSections.map((section, sectionIndex) => (
           <div key={section.title}>
-            {/* 分隔線（除了第一個區塊） */}
             {sectionIndex > 0 && (
-              <div className="mb-3 md:mb-4 border-t-2 border-gray-300" />
+              <div className="mb-3 md:mb-4 border-t-2 border-surface-secondary" />
             )}
 
-            {/* 區塊標題 - 桌面版顯示 */}
-            <h3 className="hidden lg:block mb-2 px-2 text-xs font-bold uppercase tracking-wider text-gray-500">
+            <h3 className="hidden lg:block mb-2 px-2 text-xs font-bold uppercase tracking-wider text-muted">
               {section.title}
             </h3>
 
-            {/* 導航項目 */}
             <div className="space-y-1 md:space-y-2">
               {section.items.map((item) => {
                 const Icon = item.icon
@@ -138,13 +126,11 @@ export function Sidebar() {
                     title={item.label}
                     className={cn(
                       'flex items-center rounded-none border-2 font-bold transition-all',
-                      // 平板版: 正方形圖示按鈕 (w-12 h-12)
                       'md:w-12 md:h-12 md:justify-center md:p-0',
-                      // 桌面版: 完整按鈕
                       'lg:w-auto lg:h-auto lg:justify-start lg:gap-3 lg:px-4 lg:py-2.5',
                       isActive
-                        ? 'border-black bg-brand-primary text-white shadow-none translate-x-[2px] translate-y-[2px]'
-                        : 'border-black bg-white text-black shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                        ? 'border-primary bg-primary text-text-inverse shadow-none translate-x-[2px] translate-y-[2px]'
+                        : 'bg-surface shadow-neo-sm hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
                     )}
                   >
                     <Icon className="h-5 w-5 flex-shrink-0" />
@@ -153,9 +139,13 @@ export function Sidebar() {
                 )
               })}
 
-              {/* 登出按鈕 - 放在帳戶區塊內 */}
               {section.title === '帳戶' && (
-                <LogoutButton />
+                <div className="space-y-2">
+                  <div className="flex justify-center lg:justify-start">
+                    <ThemeToggle />
+                  </div>
+                  <LogoutButton />
+                </div>
               )}
             </div>
           </div>

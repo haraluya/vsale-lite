@@ -69,12 +69,12 @@ export default async function EditClientPage({
     <div className="max-w-2xl space-y-6">
       <div>
         <h1 className="text-3xl font-bold">編輯客戶</h1>
-        <p className="mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm text-text-secondary">
           {client.phone} ({client.tier_name})
         </p>
       </div>
 
-      <div className="card-neo bg-white">
+      <div className="card-neo bg-surface">
         <ClientFormV2 client={client} tiers={tiers} />
       </div>
     </div>

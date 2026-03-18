@@ -125,7 +125,7 @@ export function PriceSummary({
   const ButtonIcon = editMode ? Check : ShoppingCart
 
   return (
-    <div className="sticky bottom-0 left-0 right-0 bg-white border-t-2 md:border-t-3 border-black p-4 md:p-6 shadow-neo z-10">
+    <div className="sticky bottom-0 left-0 right-0 bg-surface border-t-2 md:border-t-3 border-black p-4 md:p-6 shadow-neo z-10">
       <div className="container mx-auto max-w-2xl">
         {/* 🆕 價格明細（完整折扣明細） */}
         {selectedProducts.length > 0 && (
@@ -135,7 +135,7 @@ export function PriceSummary({
               {selectedProducts.map((product) => (
                 <div
                   key={product.product_id}
-                  className="flex justify-between text-xs md:text-sm text-gray-600"
+                  className="flex justify-between text-xs md:text-sm text-text-secondary"
                 >
                   <span className="line-clamp-1">
                     {product.product_name} × {product.quantity}
@@ -152,14 +152,14 @@ export function PriceSummary({
 
             {/* 🆕 顯示小計（使用等級價格總和，與商品卡片一致） */}
             <div className="flex justify-between text-sm md:text-base">
-              <span className="font-semibold text-gray-700">小計</span>
-              <span className="font-semibold text-gray-700">
+              <span className="font-semibold text-foreground">小計</span>
+              <span className="font-semibold text-foreground">
                 ${priceInfo.tierPrice.toFixed(0)}
               </span>
             </div>
 
             {/* 🆕 組合優惠折扣 */}
-            <div className="flex justify-between text-sm md:text-base text-green-600 font-bold">
+            <div className="flex justify-between text-sm md:text-base text-success font-bold">
               <span>組合優惠折扣</span>
               <span>-${priceInfo.comboDealDiscount.toFixed(0)}</span>
             </div>
@@ -170,7 +170,7 @@ export function PriceSummary({
             {/* 🆕 最終價格 */}
             <div className="flex justify-between text-lg md:text-2xl font-black">
               <span className="text-foreground">總計</span>
-              <span className="text-red-600">
+              <span className="text-error">
                 ${priceInfo.finalPrice.toFixed(0)}
               </span>
             </div>
@@ -187,9 +187,9 @@ export function PriceSummary({
             'md:shadow-neo',
             isValid && !isValidating && !isAdding && selectedProducts.length > 0
               ? editMode
-                ? 'bg-blue-400 text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-                : 'bg-green-400 text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
-              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                ? 'bg-blue-400 text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                : 'bg-green-400 text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              : 'bg-gray-200 text-text-secondary cursor-not-allowed'
           )}
         >
           {isAdding ? (
@@ -214,7 +214,7 @@ export function PriceSummary({
 
         {/* 提示訊息 */}
         {selectedProducts.length === 0 && (
-          <p className="mt-2 text-center text-xs md:text-sm text-gray-500">
+          <p className="mt-2 text-center text-xs md:text-sm text-text-secondary">
             請選擇商品以查看價格
           </p>
         )}

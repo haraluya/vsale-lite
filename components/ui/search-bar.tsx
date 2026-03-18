@@ -1,10 +1,5 @@
 'use client'
 
-/**
- * 搜尋欄元件
- * Feature: 006-ux-enhancement (US1)
- */
-
 import { useState, useCallback, useEffect } from 'react'
 import { Search, X, Loader2 } from 'lucide-react'
 
@@ -26,7 +21,6 @@ export function SearchBar({
   const [query, setQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
 
-  // 防抖搜尋
   const debouncedSearch = useCallback(
     (searchQuery: string) => {
       const timer = setTimeout(async () => {
@@ -45,21 +39,18 @@ export function SearchBar({
     [onSearch, debounceMs, minLength]
   )
 
-  // 監聽 query 變化
   useEffect(() => {
     const cleanup = debouncedSearch(query)
     return cleanup
   }, [query, debouncedSearch])
 
-  // 清除搜尋
   const handleClear = () => {
     setQuery('')
   }
 
   return (
     <div className={`relative ${className}`}>
-      {/* 搜尋圖示 */}
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted">
         {isSearching ? (
           <Loader2 className="h-5 w-5 animate-spin" />
         ) : (
@@ -67,7 +58,6 @@ export function SearchBar({
         )}
       </div>
 
-      {/* 輸入框 */}
       <input
         type="search"
         value={query}
@@ -75,25 +65,24 @@ export function SearchBar({
         placeholder={placeholder}
         className="
           w-full pl-10 pr-10 py-3
-          border-2 md:border-3 border-black rounded-none
-          bg-white
-          shadow-neo-sm md:shadow-neo 
+          border-2 md:border-3 rounded-none
+          bg-surface
+          shadow-neo-sm md:shadow-neo
           focus:outline-none focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none
           transition-all duration-150
           text-base
-          placeholder:text-gray-400
+          placeholder:text-muted
         "
         aria-label="搜尋商品"
       />
 
-      {/* 清除按鈕 */}
       {query && (
         <button
           type="button"
           onClick={handleClear}
           className="
             absolute right-3 top-1/2 -translate-y-1/2
-            text-gray-500 hover:text-black
+            text-muted hover:text-foreground
             transition-colors
           "
           aria-label="清除搜尋"

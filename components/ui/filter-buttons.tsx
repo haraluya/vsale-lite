@@ -1,16 +1,11 @@
 'use client'
 
-/**
- * 篩選按鈕元件
- * Feature: 006-ux-enhancement (US2)
- */
-
 import { cn } from '@/lib/utils'
 
 export type FilterOption = {
   id: string
   label: string
-  color?: string  // Tailwind 色彩類別 (如 'bg-blue-100 border-blue-500')
+  color?: string
 }
 
 interface FilterButtonsProps {
@@ -40,17 +35,17 @@ export function FilterButtons({
             onClick={() => onToggle(option.id)}
             className={cn(
               'px-4 py-2 text-sm font-bold',
-              'border-2 md:border-3 border-black rounded-none',
+              'border-2 md:border-3 rounded-none',
               'transition-all duration-150',
               'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none',
               isSelected
                 ? cn(
                     'shadow-none translate-x-[2px] translate-y-[2px]',
-                    option.color || 'bg-brand-primary text-white'
+                    option.color || 'bg-brand-primary text-text-inverse'
                   )
                 : cn(
                     'shadow-neo',
-                    option.color || 'bg-white text-black'
+                    option.color || 'bg-surface text-foreground'
                   )
             )}
             aria-pressed={isSelected}
@@ -66,9 +61,6 @@ export function FilterButtons({
   )
 }
 
-/**
- * 清除篩選按鈕
- */
 interface ClearFiltersButtonProps {
   onClick: () => void
   disabled?: boolean
@@ -87,12 +79,12 @@ export function ClearFiltersButton({
       disabled={disabled}
       className={cn(
         'px-4 py-2 text-sm font-bold',
-        'border-2 md:border-3 border-black rounded-none',
+        'border-2 md:border-3 rounded-none',
         'transition-all duration-150',
         disabled
-          ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          ? 'bg-surface-secondary text-muted cursor-not-allowed'
           : cn(
-              'bg-white text-red-600',
+              'bg-surface text-error',
               'shadow-neo',
               'hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
             ),
@@ -105,9 +97,6 @@ export function ClearFiltersButton({
   )
 }
 
-/**
- * 篩選結果計數器
- */
 interface FilterResultCountProps {
   count: number
   total?: number
@@ -123,16 +112,16 @@ export function FilterResultCount({
     <div
       className={cn(
         'px-3 py-1 text-sm',
-        'border-2 md:border-3 border-black rounded-none bg-yellow-100',
+        'border-2 md:border-3 rounded-none bg-warning-bg',
         className
       )}
       aria-live="polite"
     >
       <span className="font-bold">{count}</span>
       {total !== undefined && (
-        <span className="text-gray-600"> / {total}</span>
+        <span className="text-text-secondary"> / {total}</span>
       )}
-      <span className="text-gray-600 ml-1">筆商品</span>
+      <span className="text-text-secondary ml-1">筆商品</span>
     </div>
   )
 }

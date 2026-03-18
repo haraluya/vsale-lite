@@ -1,13 +1,5 @@
 'use client'
 
-/**
- * Image Upload Component
- * Feature: 002-product-management (US4)
- *
- * 提供圖片上傳、預覽、刪除功能
- * 支援 JPG, PNG, WebP 格式,限制 3MB
- */
-
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import { Upload, X, Loader2 } from 'lucide-react'
@@ -17,9 +9,6 @@ import { compressProductImage, shouldCompress } from '@/lib/utils/image-compress
 import { Button } from '@/components/ui/button'
 import { useConfirm } from '@/lib/contexts/dialog-context'
 
-/**
- * 為 Promise 添加超時保護（保留用於刪除功能）
- */
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return Promise.race([
     promise,
@@ -29,9 +18,6 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   ])
 }
 
-/**
- * 格式化上傳狀態文字
- */
 function getUploadStatusText(
   isCompressing: boolean,
   isUploading: boolean,
@@ -61,7 +47,7 @@ export function ImageUpload({
 }: ImageUploadProps) {
   const confirm = useConfirm()
   const [imageUrl, setImageUrl] = useState<string | null>(currentImageUrl || null)
-  const [imageKey, setImageKey] = useState(Date.now()) // 用於強制重新渲染
+  const [imageKey, setImageKey] = useState(Date.now())
   const [uploading, setUploading] = useState(false)
   const [isCompressing, setIsCompressing] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -79,22 +65,17 @@ export function ImageUpload({
     try {
       let fileToUpload = file
 
-      // 1. 壓縮圖片（如果需要）
       if (shouldCompress(file)) {
         setIsCompressing(true)
-        console.log('🗜️ 圖片大小超過 1MB，開始壓縮...')
         fileToUpload = await compressProductImage(file)
         setIsCompressing(false)
         setProgress(5)
       }
 
-      // 2. 直接上傳至 Supabase Storage
-      console.log('📤 開始直接上傳至 Supabase Storage...')
       const uploadResult = await uploadProductImageDirect(
         productId,
         fileToUpload,
         (uploadProgress) => {
-          // 進度：5-90%
           setProgress(5 + uploadProgress * 0.85)
         }
       )
@@ -106,8 +87,6 @@ export function ImageUpload({
 
       setProgress(90)
 
-      // 3. 呼叫 Server Action 更新資料庫
-      console.log('💾 更新資料庫 image_url...')
       const updateResult = await updateProductImageUrl(productId, uploadResult.url)
 
       if (!updateResult.success) {
@@ -116,15 +95,9 @@ export function ImageUpload({
       }
 
       setProgress(100)
-
-      // 強制更新圖片 URL 和 key（繞過快取）
       setImageUrl(uploadResult.url)
       setImageKey(Date.now())
-
-      // 通知父元件刷新
       onUploadSuccess?.(uploadResult.url)
-
-      console.log('✅ 圖片上傳完成!', uploadResult.url)
     } catch (err) {
       setError('上傳失敗，請稍後再試')
       console.error('Image upload error:', err)
@@ -132,7 +105,6 @@ export function ImageUpload({
       setUploading(false)
       setIsCompressing(false)
       setProgress(0)
-      // 清除檔案輸入，允許重複上傳同檔案
       if (fileInputRef.current) {
         fileInputRef.current.value = ''
       }
@@ -175,7 +147,6 @@ export function ImageUpload({
 
   return (
     <div className="space-y-4">
-      {/* 隱藏的檔案輸入 */}
       <input
         ref={fileInputRef}
         type="file"
@@ -185,10 +156,9 @@ export function ImageUpload({
         disabled={uploading}
       />
 
-      {/* 圖片預覽或上傳區域 */}
       {imageUrl ? (
         <div className="relative">
-          <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-none border-2 md:border-3 border-black shadow-neo">
+          <div className="relative aspect-square w-full max-w-md overflow-hidden rounded-none border-2 md:border-3 shadow-neo">
             <Image
               key={imageKey}
               src={imageUrl}
@@ -196,11 +166,10 @@ export function ImageUpload({
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, 400px"
-              unoptimized={imageUrl.includes('?t=')} // 帶時間戳的 URL 不使用最佳化
+              unoptimized={imageUrl.includes('?t=')}
             />
           </div>
 
-          {/* 操作按鈕 */}
           <div className="mt-4 flex gap-3">
             <Button
               type="button"
@@ -226,7 +195,7 @@ export function ImageUpload({
               type="button"
               onClick={handleDelete}
               disabled={uploading}
-              className="rounded-none border-2 md:border-3 border-black bg-red-100 px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-none border-2 md:border-3 bg-error-bg px-6 py-3 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-neo-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <X className="h-4 w-4" />
             </button>
@@ -235,61 +204,57 @@ export function ImageUpload({
       ) : (
         <div
           onClick={uploading ? undefined : triggerFileInput}
-          className={`flex aspect-square w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-none border-2 md:border-3 border-dashed border-black bg-gray-50 p-8 shadow-neo transition-colors hover:bg-gray-100 ${
+          className={`flex aspect-square w-full max-w-md cursor-pointer flex-col items-center justify-center rounded-none border-2 md:border-3 border-dashed bg-surface-secondary p-8 shadow-neo transition-colors hover:opacity-80 ${
             uploading ? 'cursor-not-allowed opacity-50' : ''
           }`}
         >
           {uploading ? (
             <>
-              <Loader2 className="h-12 w-12 animate-spin text-gray-400" />
-              <p className="mt-4 text-sm font-bold text-gray-600">
+              <Loader2 className="h-12 w-12 animate-spin text-muted" />
+              <p className="mt-4 text-sm font-bold text-text-secondary">
                 {getUploadStatusText(isCompressing, uploading, progress)}
               </p>
               {progress > 0 && !isCompressing && (
                 <div className="mt-4 w-full max-w-xs">
-                  {/* Neo-Brutalism 進度條 */}
-                  <div className="h-6 w-full rounded-none border-2 border-black bg-white shadow-neo-sm overflow-hidden">
+                  <div className="h-6 w-full rounded-none border-2 bg-surface shadow-neo-sm overflow-hidden">
                     <div
-                      className="h-full bg-purple-500 transition-all duration-300"
+                      className="h-full bg-primary transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <p className="mt-2 text-center text-xs text-gray-500">
+                  <p className="mt-2 text-center text-xs text-muted">
                     {Math.round(progress)}%
                   </p>
                 </div>
               )}
-              <p className="mt-2 text-xs text-gray-500">大檔案可能需要 30-60 秒，請耐心等候</p>
+              <p className="mt-2 text-xs text-muted">大檔案可能需要 30-60 秒，請耐心等候</p>
             </>
           ) : (
             <>
-              <Upload className="h-12 w-12 text-gray-400" />
-              <p className="mt-4 text-sm font-bold text-gray-600">點擊上傳商品圖片</p>
-              <p className="mt-2 text-xs text-gray-500">支援 JPG, PNG, WebP (最大 3MB)</p>
+              <Upload className="h-12 w-12 text-muted" />
+              <p className="mt-4 text-sm font-bold text-text-secondary">點擊上傳商品圖片</p>
+              <p className="mt-2 text-xs text-muted">支援 JPG, PNG, WebP (最大 3MB)</p>
             </>
           )}
         </div>
       )}
 
-      {/* 錯誤訊息 */}
       {error && (
-        <div className="rounded-none border-2 md:border-3 border-red-600 bg-red-50 p-4">
-          <p className="text-sm font-bold text-red-800">{error}</p>
+        <div className="rounded-none border-2 md:border-3 border-error bg-error-bg p-4">
+          <p className="text-sm font-bold text-error">{error}</p>
         </div>
       )}
 
-      {/* 建議尺寸提示 */}
-      <div className="rounded-none border-2 border-blue-500 bg-blue-50 p-3">
-        <p className="text-sm font-bold text-blue-900">
+      <div className="rounded-none border-2 border-info bg-info-bg p-3">
+        <p className="text-sm font-bold">
           📐 建議尺寸：800 × 800 像素（正方形 1:1 比例）
         </p>
-        <p className="mt-1 text-xs text-blue-700">
+        <p className="mt-1 text-xs text-text-secondary">
           正方形圖片最適合商品展示，確保在各種裝置上都能完整顯示
         </p>
       </div>
 
-      {/* 提示訊息 */}
-      <p className="text-xs text-gray-600">
+      <p className="text-xs text-text-secondary">
         • 支援格式: JPG, PNG, WebP
         <br />
         • 檔案大小限制: 3MB

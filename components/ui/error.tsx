@@ -18,23 +18,23 @@ export function Error({
   return (
     <div
       className={cn(
-        'rounded-none border-2 md:border-3 border-red-500 bg-red-50 p-6 shadow-neo',
+        'rounded-none border-2 md:border-3 border-error bg-error-bg p-6 shadow-neo',
         className
       )}
     >
       <div className="flex items-start gap-4">
         <div className="flex-shrink-0">
-          <AlertCircle className="h-6 w-6 text-red-500" />
+          <AlertCircle className="h-6 w-6 text-error" />
         </div>
         <div className="flex-1">
-          <h3 className="mb-1 text-lg font-bold text-red-700">{title}</h3>
-          <p className="text-sm text-red-600">{message}</p>
+          <h3 className="mb-1 text-lg font-bold text-error">{title}</h3>
+          <p className="text-sm text-error">{message}</p>
           {retry && (
             <Button
               onClick={retry}
               variant="outline"
               size="sm"
-              className="mt-4 border-red-500 text-red-700 hover:bg-red-100"
+              className="mt-4 border-error text-error hover:bg-error-bg"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
               重試
@@ -64,7 +64,7 @@ export function ErrorInline({ message, className }: { message: string; className
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-none border-2 border-red-500 bg-red-50 p-3 text-sm text-red-600',
+        'flex items-center gap-2 rounded-none border-2 border-error bg-error-bg p-3 text-sm text-error',
         className
       )}
     >

@@ -60,20 +60,20 @@ async function CouponsContent({ searchParams }: PageProps) {
     <>
       {/* 統計資訊 */}
       <div className="mb-6 grid gap-4 md:grid-cols-4">
-        <div className="border-2 md:border-3 border-black bg-white p-4 shadow-neo">
-          <p className="text-sm text-gray-600">總優惠券數</p>
+        <div className="border-2 md:border-3 border-black bg-surface p-4 shadow-neo">
+          <p className="text-sm text-text-secondary">總優惠券數</p>
           <p className="text-3xl font-black">{allCoupons.length}</p>
         </div>
         <div className="border-2 md:border-3 border-black bg-green-100 p-4 shadow-neo">
-          <p className="text-sm text-gray-600">有效中</p>
+          <p className="text-sm text-text-secondary">有效中</p>
           <p className="text-3xl font-black">{activeCoupons.length}</p>
         </div>
         <div className="border-2 md:border-3 border-black bg-orange-100 p-4 shadow-neo">
-          <p className="text-sm text-gray-600">已過期</p>
+          <p className="text-sm text-text-secondary">已過期</p>
           <p className="text-3xl font-black">{expiredCoupons.length}</p>
         </div>
         <div className="border-2 md:border-3 border-black bg-red-100 p-4 shadow-neo">
-          <p className="text-sm text-gray-600">已刪除</p>
+          <p className="text-sm text-text-secondary">已刪除</p>
           <p className="text-3xl font-black">{deletedCoupons.length}</p>
         </div>
       </div>
@@ -88,7 +88,7 @@ async function CouponsContent({ searchParams }: PageProps) {
           className={cn(
             'inline-flex items-center gap-2 font-bold transition-all',
             showArchived
-              ? 'bg-white text-black'
+              ? 'bg-surface text-foreground'
               : 'bg-gray-400 text-white',
             designTokens.neoBrutalism.border.full,
             designTokens.neoBrutalism.shadow.mobile,
@@ -120,7 +120,7 @@ export default function CouponsPage({ searchParams }: PageProps) {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-black md:text-4xl">優惠券管理</h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-text-secondary">
             建立與管理優惠券，設定折扣方式、等級限制與系列限制
           </p>
         </div>
@@ -143,8 +143,8 @@ export default function CouponsPage({ searchParams }: PageProps) {
       {/* 優惠券內容（使用 Suspense） */}
       <Suspense
         fallback={
-          <div className="border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
-            <p className="text-gray-500">載入中...</p>
+          <div className="border-2 md:border-3 border-black bg-surface p-12 text-center shadow-neo">
+            <p className="text-text-secondary">載入中...</p>
           </div>
         }
       >

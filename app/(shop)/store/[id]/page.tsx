@@ -79,7 +79,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         <Link
           href="/store"
           className={cn(
-            "inline-flex items-center gap-2 rounded-none bg-white font-bold transition-all",
+            "inline-flex items-center gap-2 rounded-none bg-surface font-bold transition-all",
             designTokens.neoBrutalism.border.full,
             "border-black",
             designTokens.neoBrutalism.shadow.mobile,
@@ -100,14 +100,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         )}>
           {/* 商品圖片 */}
           <div className={cn(
-            "rounded-none bg-white",
+            "rounded-none bg-surface",
             designTokens.neoBrutalism.border.full,
             "border-black",
             designTokens.neoBrutalism.shadow.full,
             designTokens.spacing.card.padding
           )}>
             <div className={cn(
-              "aspect-square overflow-hidden rounded-none bg-gray-100",
+              "aspect-square overflow-hidden rounded-none bg-surface-secondary",
               designTokens.neoBrutalism.border.mobile,
               "border-black"
             )}>
@@ -132,7 +132,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           {/* 商品資訊 */}
           <div className={designTokens.spacing.card.gap}>
             <div className={cn(
-              "rounded-none bg-white",
+              "rounded-none bg-surface",
               designTokens.neoBrutalism.border.full,
               "border-black",
               designTokens.neoBrutalism.shadow.full,
@@ -146,14 +146,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <div className={designTokens.spacing.card.gap}>
                 {/* 商品編號 */}
                 <div className={cn(
-                  "rounded-none bg-gray-50",
+                  "rounded-none bg-surface-secondary",
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                   "p-2.5 md:p-3"
                 )}>
                   <p className={cn(
                     designTokens.typography.label,
-                    "text-gray-600"
+                    "text-text-secondary"
                   )}>商品編號</p>
                   <p className={cn(
                     "font-mono",
@@ -164,14 +164,14 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                 {/* 系列 */}
                 {product.series_name && (
                   <div className={cn(
-                    "rounded-none bg-gray-50",
+                    "rounded-none bg-surface-secondary",
                     designTokens.neoBrutalism.border.mobile,
                     "border-black",
                     "p-2.5 md:p-3"
                   )}>
                     <p className={cn(
                       designTokens.typography.label,
-                      "text-gray-600"
+                      "text-text-secondary"
                     )}>商品系列</p>
                     <p className={designTokens.typography.body.large}>{product.series_name}</p>
                   </div>
@@ -179,28 +179,28 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
                 {/* 單位 */}
                 <div className={cn(
-                  "rounded-none bg-gray-50",
+                  "rounded-none bg-surface-secondary",
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                   "p-2.5 md:p-3"
                 )}>
                   <p className={cn(
                     designTokens.typography.label,
-                    "text-gray-600"
+                    "text-text-secondary"
                   )}>銷售單位</p>
                   <p className={designTokens.typography.body.large}>{product.unit}</p>
                 </div>
 
                 {/* 庫存狀態 - 僅顯示狀態標籤，不顯示實際數量 */}
                 <div className={cn(
-                  "rounded-none bg-gray-50",
+                  "rounded-none bg-surface-secondary",
                   designTokens.neoBrutalism.border.mobile,
                   "border-black",
                   "p-3 md:p-4"
                 )}>
                   <p className={cn(
                     designTokens.typography.label,
-                    "mb-2 text-gray-600"
+                    "mb-2 text-text-secondary"
                   )}>庫存狀態</p>
                   <StockStatus status={product.stock_status} size="lg" />
                 </div>
@@ -228,15 +228,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
                   )}>商品簡介</h2>
                 </div>
                 <p className={cn(
-                  "whitespace-pre-wrap text-gray-800 leading-relaxed",
+                  "whitespace-pre-wrap text-foreground leading-relaxed",
                   designTokens.typography.body.base
                 )}>{product.description}</p>
                 <div className={cn(
-                  "mt-3 rounded-none bg-white/70",
+                  "mt-3 rounded-none bg-surface/70",
                   "border-2 border-black",
                   "px-3 py-2"
                 )}>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs text-text-secondary">
                     💡 商品列表顯示時，簡介會自動截短至約50字（3行）
                   </p>
                 </div>
@@ -245,7 +245,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
             {/* 提示訊息 */}
             <div className={cn(
-              "rounded-none bg-blue-50",
+              "rounded-none bg-info-bg",
               "border-2 border-blue-600",
               "p-3 md:p-4"
             )}>

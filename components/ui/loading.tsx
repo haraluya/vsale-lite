@@ -17,12 +17,12 @@ export function Loading({ message = '載入中...', size = 'md', className }: Lo
     <div className={cn('flex flex-col items-center justify-center gap-4 p-8', className)}>
       <div
         className={cn(
-          'animate-spin rounded-none border-black border-t-transparent',
+          'animate-spin rounded-none border-t-transparent',
           sizeClasses[size]
         )}
         aria-label="載入中"
       />
-      {message && <p className="text-sm font-medium text-gray-600">{message}</p>}
+      {message && <p className="text-sm font-medium text-text-secondary">{message}</p>}
     </div>
   )
 }
@@ -39,7 +39,7 @@ export function LoadingSpinner({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'h-4 w-4 animate-spin rounded-none border-2 border-black border-t-transparent',
+        'h-4 w-4 animate-spin rounded-none border-2 border-t-transparent',
         className
       )}
       aria-label="載入中"

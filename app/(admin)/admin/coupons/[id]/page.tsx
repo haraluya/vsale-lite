@@ -88,7 +88,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
       <Link
         href="/admin/coupons"
         className={cn(
-          'inline-flex items-center gap-2 bg-white font-bold transition-all',
+          'inline-flex items-center gap-2 bg-surface font-bold transition-all',
           designTokens.neoBrutalism.border.full,
           designTokens.neoBrutalism.shadow.mobile,
           designTokens.neoBrutalism.hover,
@@ -102,7 +102,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
       {/* 頁面標題 */}
       <div>
         <h1 className="text-3xl font-black md:text-4xl">優惠券詳情</h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-text-secondary">
           優惠券代碼「<span className="font-mono font-bold text-xl">{coupon.code_normalized}</span>」
         </p>
       </div>
@@ -115,18 +115,18 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
             <p className="text-sm font-bold text-blue-600">發放張數</p>
           </div>
           <p className="text-3xl font-black">{claimCount}</p>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-text-secondary mt-1">
             {claimCount} 位客戶領取 {claimCount} 張
           </p>
         </div>
 
         <div className="border-2 md:border-3 border-black bg-green-100 p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
-            <Tag className="h-5 w-5 text-green-600" />
-            <p className="text-sm font-bold text-green-600">使用張數</p>
+            <Tag className="h-5 w-5 text-success" />
+            <p className="text-sm font-bold text-success">使用張數</p>
           </div>
           <p className="text-3xl font-black">{usedCount}</p>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-text-secondary mt-1">
             使用率 {claimCount > 0 ? Math.round((usedCount / claimCount) * 100) : 0}%
           </p>
         </div>
@@ -141,20 +141,20 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
       </div>
 
       {/* 優惠券表單 */}
-      <div className="border-2 md:border-3 border-black bg-white p-6 shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-surface p-6 shadow-neo">
         <h2 className="text-2xl font-black mb-4">編輯優惠券</h2>
         <CouponForm mode="edit" coupon={coupon} />
       </div>
 
       {/* 領取用戶列表 */}
-      <div className="border-2 md:border-3 border-black bg-white shadow-neo">
+      <div className="border-2 md:border-3 border-black bg-surface shadow-neo">
         <div className="border-b-2 md:border-b-3 border-black bg-yellow-300 p-4">
           <h2 className="text-2xl font-black flex items-center gap-2">
             <Users className="h-6 w-6" />
             領取用戶名單 ({total} 位用戶)
           </h2>
           {total > 0 && (
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-text-secondary">
               第 {(page - 1) * limit + 1}-{Math.min(page * limit, total)} 筆，共 {total} 筆
             </p>
           )}
@@ -162,7 +162,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
 
         {users.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-gray-500">目前沒有客戶領取此優惠券</p>
+            <p className="text-text-secondary">目前沒有客戶領取此優惠券</p>
           </div>
         ) : (
           <>
@@ -172,22 +172,22 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div className="flex-1">
                       <p className="font-bold text-lg">{user.user_name}</p>
-                      <p className="text-sm text-gray-600">{user.user_phone}</p>
+                      <p className="text-sm text-text-secondary">{user.user_phone}</p>
                     </div>
 
                     <div className="flex flex-col md:items-end gap-2">
                       {/* 領取統計 */}
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded border-2 border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-green-600">
+                        <span className="inline-flex items-center gap-1 rounded border-2 border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-success">
                           已使用 {user.total_used} 張
                         </span>
-                        <span className="inline-flex items-center gap-1 rounded border-2 border-gray-400 bg-gray-100 px-2 py-1 text-xs font-bold text-gray-600">
+                        <span className="inline-flex items-center gap-1 rounded border-2 border-gray-400 bg-surface-secondary px-2 py-1 text-xs font-bold text-text-secondary">
                           未使用 {user.total_unused} 張
                         </span>
                       </div>
 
                       {/* 領取時間 */}
-                      <div className="flex items-center gap-1 text-xs text-gray-600">
+                      <div className="flex items-center gap-1 text-xs text-text-secondary">
                         <Calendar className="h-3 w-3" />
                         <span>
                           {user.total_claimed > 1
@@ -204,7 +204,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
             {/* 分頁控制 */}
             {totalPages > 1 && (
               <div className="border-t-2 md:border-t-3 border-black p-4 flex items-center justify-between">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-text-secondary">
                   共 {totalPages} 頁
                 </div>
                 <div className="flex items-center gap-2">
@@ -212,7 +212,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
                     <Link
                       href={`/admin/coupons/${id}?page=${page - 1}`}
                       className={cn(
-                        'px-4 py-2 bg-white font-bold transition-all',
+                        'px-4 py-2 bg-surface font-bold transition-all',
                         designTokens.neoBrutalism.border.full,
                         designTokens.neoBrutalism.shadow.mobile,
                         designTokens.neoBrutalism.hover
@@ -228,7 +228,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
                     <Link
                       href={`/admin/coupons/${id}?page=${page + 1}`}
                       className={cn(
-                        'px-4 py-2 bg-white font-bold transition-all',
+                        'px-4 py-2 bg-surface font-bold transition-all',
                         designTokens.neoBrutalism.border.full,
                         designTokens.neoBrutalism.shadow.mobile,
                         designTokens.neoBrutalism.hover

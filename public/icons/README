@@ -1,0 +1,17 @@
+PWA 圖示檔案
+
+需要從 /public/logo-icon.svg 產生以下 PNG 圖示：
+
+1. icon-192.png  - 192x192px - 標準圖示
+2. icon-512.png  - 512x512px - 高解析度圖示
+3. icon-maskable.png - 512x512px - 可遮罩圖示（需額外安全區域 padding）
+
+產生方式（使用 sharp 或線上工具）：
+
+  npx sharp-cli -i ../logo-icon.svg -o icon-192.png resize 192 192
+  npx sharp-cli -i ../logo-icon.svg -o icon-512.png resize 512 512
+
+可遮罩圖示需在圖示四周保留至少 10% 的安全區域（padding），
+以確保在不同裝置裁切時核心內容不被切掉。
+
+參考：https://web.dev/articles/maskable-icon

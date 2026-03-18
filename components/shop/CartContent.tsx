@@ -175,7 +175,7 @@ export function CartContent() {
 
   return (
     <div className={cn(
-      "min-h-screen bg-gray-50",
+      "min-h-screen bg-surface-secondary",
       designTokens.spacing.page.padding
     )}>
       <div className={cn(
@@ -187,7 +187,7 @@ export function CartContent() {
           <h1 className={designTokens.typography.h1}>購物車</h1>
           <p className={cn(
             designTokens.typography.body.base,
-            "mt-2 text-gray-600"
+            "mt-2 text-text-secondary"
           )}>
             {isEmpty ? '您的購物車目前是空的' : `您有 ${totalItems} 件商品在購物車中`}
           </p>
@@ -202,7 +202,7 @@ export function CartContent() {
             "p-4",
             designTokens.spacing.section.marginBottom
           )}>
-            <p className="text-red-600 font-bold">❌ {error}</p>
+            <p className="text-error font-bold">❌ {error}</p>
           </div>
         )}
 
@@ -226,7 +226,7 @@ export function CartContent() {
             )}>購物車是空的</h2>
             <p className={cn(
               designTokens.typography.body.large,
-              "mb-8 text-gray-600"
+              "mb-8 text-text-secondary"
             )}>趕快去挑選喜歡的商品吧!</p>
             <Link
               href="/store"

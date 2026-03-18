@@ -67,7 +67,7 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
       {/* 確認對話框 */}
       {showConfirmDialog && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-foreground/50"
           onClick={(e) => {
             // 點擊背景關閉對話框
             if (e.target === e.currentTarget && !isPending) {
@@ -76,16 +76,16 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
           }}
         >
           <div
-            className="mx-4 max-w-md rounded-none border-2 md:border-3 border-black bg-white p-6 shadow-neo"
+            className="mx-4 max-w-md rounded-none border-2 md:border-3 border-black bg-surface p-6 shadow-neo"
             onClick={(e) => {
               e.stopPropagation() // 防止事件冒泡到背景
             }}
           >
             <h3 className="mb-4 text-xl font-bold">確認取消訂單</h3>
-            <p className="mb-6 text-gray-700">
+            <p className="mb-6 text-text-secondary">
               您確定要取消訂單 <span className="font-mono font-bold">{orderNumber}</span> 嗎？
               {currentStatus === 'shipping' && (
-                <span className="mt-2 block text-sm text-red-600">此訂單已出貨，取消後將回補庫存。</span>
+                <span className="mt-2 block text-sm text-error">此訂單已出貨，取消後將回補庫存。</span>
               )}
             </p>
 
@@ -102,7 +102,7 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
                 onClick={() => setShowConfirmDialog(false)}
                 disabled={isPending}
                 type="button"
-                className="flex-1 rounded-none border-2 md:border-3 border-black bg-gray-200 px-4 py-2 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
+                className="flex-1 rounded-none border-2 md:border-3 border-black bg-surface-secondary px-4 py-2 font-bold shadow-neo-sm md:shadow-neo transition-transform hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50"
               >
                 返回
               </button>

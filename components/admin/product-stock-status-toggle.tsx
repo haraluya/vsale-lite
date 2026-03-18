@@ -36,7 +36,7 @@ const STOCK_STATUS_CONFIG = {
   },
   out_of_stock: {
     label: '缺貨',
-    color: 'bg-red-100 text-red-800',
+    color: 'bg-red-100 text-error',
   },
 }
 
@@ -126,7 +126,7 @@ export function ProductStockStatusToggle({
         <div
           className={cn(
             'absolute left-0 top-full mt-1 z-50',
-            'rounded-none border-2 border-black bg-white',
+            'rounded-none border-2 border-black bg-surface',
             'shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]',
             'min-w-[100px]'
           )}
@@ -143,7 +143,7 @@ export function ProductStockStatusToggle({
                   'w-full px-3 py-2 text-left font-bold transition-colors',
                   'border-b-2 border-black last:border-b-0',
                   'hover:bg-gray-100',
-                  isSelected && 'bg-gray-200',
+                  isSelected && 'bg-surface-secondary',
                   designTokens.typography.caption,
                   config.color.replace('bg-', 'text-')
                 )}

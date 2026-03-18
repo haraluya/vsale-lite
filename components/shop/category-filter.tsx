@@ -36,8 +36,8 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   }
 
   return (
-    <div className="rounded-none border-2 md:border-3 border-black bg-white p-4 shadow-neo">
-      <h3 className="mb-3 text-sm font-bold uppercase text-gray-600">商品分類</h3>
+    <div className="rounded-none border-2 md:border-3 border-black bg-surface p-4 shadow-neo">
+      <h3 className="mb-3 text-sm font-bold uppercase text-text-secondary">商品分類</h3>
 
       <div className="flex flex-wrap gap-2">
         {/* 全部按鈕 */}
@@ -46,7 +46,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
           className={`rounded-none border-2 border-black px-4 py-2 text-sm font-bold transition-all ${
             currentCategoryId === ''
               ? 'bg-black text-white'
-              : 'bg-white text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+              : 'bg-surface text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
           }`}
         >
           全部
@@ -60,7 +60,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
             className={`rounded-none border-2 border-black px-4 py-2 text-sm font-bold transition-all ${
               currentCategoryId === category.id
                 ? 'bg-black text-white'
-                : 'bg-white text-black hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
+                : 'bg-surface text-foreground hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none'
             }`}
           >
             {category.name}

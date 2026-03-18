@@ -66,11 +66,11 @@ function ImageCarouselPortraitComponent({ config, blockUpdatedAt }: ImageCarouse
     return (
       <div
         className={cn(
-          'w-full aspect-[4/5] rounded-none bg-gray-100',
+          'w-full aspect-[4/5] rounded-none bg-surface-secondary',
           designTokens.neoBrutalism.border.full,
           'border-black',
           designTokens.neoBrutalism.shadow.full,
-          'flex items-center justify-center text-gray-400'
+          'flex items-center justify-center text-text-secondary'
         )}
       >
         <p className="text-sm md:text-base">暫無圖片</p>
@@ -85,7 +85,7 @@ function ImageCarouselPortraitComponent({ config, blockUpdatedAt }: ImageCarouse
       {/* 圖片容器 - 4:5 比例 */}
       <div
         className={cn(
-          'relative w-full aspect-[4/5] rounded-none bg-gray-100 overflow-hidden',
+          'relative w-full aspect-[4/5] rounded-none bg-surface-secondary overflow-hidden',
           designTokens.neoBrutalism.border.full,
           'border-black',
           designTokens.neoBrutalism.shadow.full,
@@ -109,7 +109,7 @@ function ImageCarouselPortraitComponent({ config, blockUpdatedAt }: ImageCarouse
             loading={currentIndex === 0 ? 'eager' : 'lazy'}
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-gray-300">
+          <div className="flex h-full w-full items-center justify-center text-text-secondary">
             <span className="text-4xl md:text-6xl">🖼️</span>
           </div>
         )}

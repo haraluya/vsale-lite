@@ -36,7 +36,7 @@ export function AdminLoginForm() {
           onChange={(e) => setUsername(e.target.value)}
         />
         {state && 'errors' in state && state.errors?.username && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.username[0]}</p>
+          <p className="mt-2 text-sm text-error">{state.errors.username[0]}</p>
         )}
       </div>
 
@@ -52,7 +52,7 @@ export function AdminLoginForm() {
           className="mt-2"
         />
         {state && 'errors' in state && state.errors?.password && (
-          <p className="mt-2 text-sm text-red-500">{state.errors.password[0]}</p>
+          <p className="mt-2 text-sm text-error">{state.errors.password[0]}</p>
         )}
       </div>
 

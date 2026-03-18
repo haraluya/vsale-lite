@@ -43,7 +43,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">廣告管理</h1>
-        <p className="mt-2 text-gray-600">管理前台廣告內容</p>
+        <p className="mt-2 text-text-secondary">管理前台廣告內容</p>
       </div>
 
       {/* Tab 切換器 */}
@@ -54,7 +54,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
         <>
           <div>
             <h2 className="text-2xl font-bold">首頁廣告</h2>
-            <p className="mt-1 text-gray-600">首頁上的廣告區塊（圖片輪播、商品展示、文字區塊）</p>
+            <p className="mt-1 text-text-secondary">首頁上的廣告區塊（圖片輪播、商品展示、文字區塊）</p>
           </div>
           <HomeBlockList />
         </>
@@ -66,7 +66,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold">商品頁廣告</h2>
-              <p className="mt-1 text-gray-600">商品頁面上方的輪播廣告</p>
+              <p className="mt-1 text-text-secondary">商品頁面上方的輪播廣告</p>
             </div>
             <Link
               href="/admin/announcements/new"
@@ -79,8 +79,8 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
 
           {/* Announcements List */}
           {announcements.length === 0 ? (
-            <div className="rounded-none border-2 md:border-3 border-black bg-white p-12 text-center shadow-neo">
-              <p className="text-lg text-gray-500">目前沒有任何廣告</p>
+            <div className="rounded-none border-2 md:border-3 border-black bg-surface p-12 text-center shadow-neo">
+              <p className="text-lg text-text-secondary">目前沒有任何廣告</p>
               <Link
                 href="/admin/announcements/new"
                 className="mt-4 inline-flex items-center gap-2 rounded-none border-2 border-black bg-green-400 px-4 py-2 font-bold transition-all hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
