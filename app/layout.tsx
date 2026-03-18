@@ -4,6 +4,7 @@ import { getPublicSettings } from '@/lib/actions/system'
 import { DialogProvider } from '@/lib/contexts/dialog-context'
 import { ThemeProvider } from '@/lib/contexts/theme-context'
 import { Toaster } from 'sonner'
+import { PageTransition } from '@/components/ui/page-transition'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -63,6 +64,7 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <DialogProvider>
+            <PageTransition />
             {children}
             <Toaster
               position="top-right"
