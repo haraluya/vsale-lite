@@ -18,11 +18,13 @@ import {
   UserCog,
   FileText,
   Settings,
+  Download,
   type LucideIcon
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { LogoutButton } from '@/components/admin/logout-button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { usePwaInstall } from '@/lib/hooks/use-pwa-install'
 
 type NavItem = {
   label: string
@@ -80,6 +82,28 @@ const navSections: NavSection[] = [
     items: [],
   },
 ]
+
+function PwaInstallButton() {
+  const { canInstall, install } = usePwaInstall()
+
+  if (!canInstall) return null
+
+  return (
+    <button
+      onClick={install}
+      title="安裝應用程式"
+      className={cn(
+        'flex items-center rounded-theme-sm border font-bold transition-all',
+        'md:w-12 md:h-12 md:justify-center md:p-0',
+        'lg:w-auto lg:h-auto lg:justify-start lg:gap-3 lg:px-4 lg:py-2.5',
+        'bg-surface shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover'
+      )}
+    >
+      <Download className="h-5 w-5 flex-shrink-0" />
+      <span className="hidden lg:inline text-sm">安裝應用程式</span>
+    </button>
+  )
+}
 
 export function Sidebar() {
   const pathname = usePathname()
@@ -141,6 +165,7 @@ export function Sidebar() {
 
               {section.title === '帳戶' && (
                 <div className="space-y-2">
+                  <PwaInstallButton />
                   <div className="flex justify-center lg:justify-start">
                     <ThemeToggle />
                   </div>
