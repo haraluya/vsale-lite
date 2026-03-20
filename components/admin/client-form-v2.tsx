@@ -118,7 +118,7 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
           rows={3}
           className="mt-2 resize-none bg-warning-bg"
         />
-        <p className="mt-1 text-xs text-gray-500">客戶端可見此欄位</p>
+        <p className="mt-1 text-xs text-muted">客戶端可見此欄位</p>
       </div>
 
       {/* 🆕 Feature 007: 管理員備註 */}

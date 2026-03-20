@@ -412,7 +412,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           variant="outline"
           size="sm"
           onClick={onCancel}
-          className="text-gray-600 hover:text-black"
+          className="text-text-secondary hover:text-foreground"
         >
           <X className="w-5 h-5" />
         </Button>
@@ -460,7 +460,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                   <div className="flex items-center gap-3">
                     <Label className="w-20">單價:</Label>
                     {priceChanged && (
-                      <span className="line-through text-gray-400">
+                      <span className="line-through text-muted">
                         NT${item.original_price.toFixed(0)}
                       </span>
                     )}
@@ -482,7 +482,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                   <div className="flex items-center gap-3">
                     <Label className="w-20">數量:</Label>
                     {quantityChanged && (
-                      <span className="line-through text-gray-400">
+                      <span className="line-through text-muted">
                         {item.original_quantity}
                       </span>
                     )}
@@ -549,7 +549,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
         </div>
 
         {editedFees.length === 0 ? (
-          <p className="text-gray-500 text-sm">尚無自訂費用</p>
+          <p className="text-muted text-sm">尚無自訂費用</p>
         ) : (
           <div className="space-y-2">
             {editedFees.map(fee => (
@@ -588,7 +588,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
         <h4 className="font-bold text-lg">🚚 運費</h4>
         <div className="flex items-center gap-3">
           {editedShippingFee !== (order.shipping_fee || 0) && (
-            <span className="line-through text-gray-400">
+            <span className="line-through text-muted">
               NT${(order.shipping_fee || 0).toFixed(0)}
             </span>
           )}
@@ -623,7 +623,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           disabled={loading}
         />
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">
+          <span className="text-muted">
             {editedNotes.length} / 500 字
           </span>
           {editedNotes !== (order.notes || '') && (
@@ -676,7 +676,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
         </div>
 
         {newTotalAmount !== order.total_amount && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-text-secondary">
             原總額: NT${order.total_amount.toFixed(0)}
           </p>
         )}
