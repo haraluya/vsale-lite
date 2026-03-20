@@ -56,7 +56,7 @@ export function CommentInput({
           maxLength={maxLength}
           rows={3}
           disabled={disabled || isSubmitting}
-          className="resize-none rounded-theme-sm border-theme bg-white p-3
+          className="resize-none rounded-theme-sm border-theme bg-surface p-3
                      focus:outline-none focus:ring-2 focus:ring-black
                      disabled:opacity-50 disabled:cursor-not-allowed"
         />
@@ -64,7 +64,7 @@ export function CommentInput({
 
       <div className="flex items-center justify-between">
         {/* 字數統計 */}
-        <span className={`text-sm ${charCount > maxLength ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+        <span className={`text-sm ${charCount > maxLength ? 'text-red-600 font-bold' : 'text-text-secondary'}`}>
           {charCount} / {maxLength}
         </span>
 

@@ -147,7 +147,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
 
   if (timelines.length === 0) {
     return (
-      <div className="rounded-theme-sm border bg-gray-50 p-4 text-center text-gray-500">
+      <div className="rounded-theme-sm border bg-surface-secondary p-4 text-center text-text-secondary">
         尚無操作記錄
       </div>
     )
@@ -175,15 +175,15 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
                 {/* 氣泡式留言框 */}
                 <div
                   className={`rounded-theme-sm border-theme p-4 shadow-neo-sm
-                             ${isAdminComment ? 'bg-blue-100' : 'bg-gray-100'}`}
+                             ${isAdminComment ? 'bg-blue-100 dark:bg-blue-900/30' : 'bg-surface-secondary'}`}
                 >
                   {/* 留言內容 */}
-                  <div className="mb-3 whitespace-pre-wrap break-words text-sm">
+                  <div className="mb-3 whitespace-pre-wrap break-words text-sm text-foreground">
                     {timeline.content}
                   </div>
 
                   {/* 操作者與時間 */}
-                  <div className="flex items-center justify-between gap-2 text-xs text-gray-600">
+                  <div className="flex items-center justify-between gap-2 text-xs text-text-secondary">
                     <div className="flex items-center gap-1">
                       <User className="h-3 w-3" />
                       <span className="font-semibold">
@@ -216,28 +216,28 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
 
             {/* 內容 */}
             <div className="flex-1 pb-6">
-              <div className="rounded-theme-sm border bg-white p-4 shadow-neo-sm">
+              <div className="rounded-theme-sm border bg-surface p-4 shadow-neo-sm">
                 <div className="mb-2 flex items-start justify-between">
                   <div className="font-bold">{getTimelineMessage(timeline)}</div>
-                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                  <div className="flex items-center gap-1 text-sm text-text-secondary">
                     <Clock className="h-4 w-4" />
                     {formatDateTW(timeline.created_at)}
                   </div>
                 </div>
 
-                {timeline.content && <div className="text-sm text-gray-600">{timeline.content}</div>}
+                {timeline.content && <div className="text-sm text-text-secondary">{timeline.content}</div>}
 
                 {/* 訂單修改詳細內容 (Feature 011) */}
                 {timeline.action_type === 'order_modified' && timeline.modifications && (
-                  <div className="mt-3 rounded-theme-sm border border-purple-300 bg-purple-50 p-3">
-                    <div className="mb-1 text-xs font-bold text-purple-700">修改明細：</div>
-                    <div className="whitespace-pre-line text-sm text-gray-700">
+                  <div className="mt-3 rounded-theme-sm border border-purple-300 bg-purple-50 p-3 dark:bg-purple-900/20 dark:border-purple-700">
+                    <div className="mb-1 text-xs font-bold text-purple-700 dark:text-purple-300">修改明細：</div>
+                    <div className="whitespace-pre-line text-sm text-foreground">
                       {formatModifications(timeline.modifications)}
                     </div>
                   </div>
                 )}
 
-                <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
+                <div className="mt-2 flex items-center gap-1 text-xs text-text-muted">
                   <User className="h-3 w-3" />
                   {timeline.actor_role === 'admin' ? '管理員' : '客戶'}: {timeline.actor_name}
                 </div>
