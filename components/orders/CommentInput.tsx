@@ -57,7 +57,7 @@ export function CommentInput({
           rows={3}
           disabled={disabled || isSubmitting}
           className="resize-none rounded-theme-sm border-theme bg-surface p-3
-                     focus:outline-none focus:ring-2 focus:ring-black
+                     focus:outline-none focus:ring-2 focus:ring-border
                      disabled:opacity-50 disabled:cursor-not-allowed"
         />
       </div>

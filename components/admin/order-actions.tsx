@@ -120,7 +120,7 @@ export function OrderActions({ orderId, orderNumber, currentStatus, compact = fa
   }
 
   return (
-    <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
+    <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
       <h2 className="mb-4 text-xl font-bold">訂單操作</h2>
       <div className="flex flex-wrap gap-4">{buttons}</div>
     </div>

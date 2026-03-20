@@ -87,7 +87,7 @@ export function OrderDeleteButton({
           }}
         >
           <div
-            className="w-full max-w-md rounded-theme-sm border-theme bg-white p-6 shadow-neo"
+            className="w-full max-w-md rounded-theme-sm border-theme bg-surface p-6 shadow-neo"
             onClick={(e) => {
               e.stopPropagation() // 防止事件冒泡到背景
             }}
@@ -96,7 +96,7 @@ export function OrderDeleteButton({
               <AlertTriangle className="h-6 w-6 flex-shrink-0 text-red-600" />
               <div>
                 <h3 className="mb-2 text-xl font-bold">確認刪除訂單</h3>
-                <p className="mb-2 text-gray-700">
+                <p className="mb-2 text-foreground">
                   您確定要刪除訂單 <span className="font-mono font-bold">{orderNumber}</span> 嗎?
                 </p>
                 <p className="text-sm text-red-600">此操作無法撤銷，訂單資料將永久刪除。</p>
@@ -107,7 +107,7 @@ export function OrderDeleteButton({
                 onClick={() => setShowDialog(false)}
                 disabled={isPending}
                 type="button"
-                className="flex-1 rounded-theme-sm border-theme bg-gray-200 px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:opacity-50"
+                className="flex-1 rounded-theme-sm border-theme bg-surface-secondary px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:opacity-50"
               >
                 返回
               </button>

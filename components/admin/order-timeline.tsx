@@ -30,32 +30,32 @@ const ACTION_TYPE_CONFIG: Record<
   created: {
     label: '建立訂單',
     emoji: '📝',
-    colorClass: 'bg-green-200 border-green-600',
+    colorClass: 'bg-green-200 border-green-600 dark:bg-green-900/40 dark:border-green-400',
   },
   confirmed: {
     label: '確認訂單',
     emoji: '✅',
-    colorClass: 'bg-blue-200 border-blue-600',
+    colorClass: 'bg-blue-200 border-blue-600 dark:bg-blue-900/40 dark:border-blue-400',
   },
   status_updated: {
     label: '狀態變更',
     emoji: '🔄',
-    colorClass: 'bg-blue-200 border-blue-600',
+    colorClass: 'bg-blue-200 border-blue-600 dark:bg-blue-900/40 dark:border-blue-400',
   },
   cancelled: {
     label: '取消訂單',
     emoji: '❌',
-    colorClass: 'bg-red-200 border-red-600',
+    colorClass: 'bg-red-200 border-red-600 dark:bg-red-900/40 dark:border-red-400',
   },
   comment: {
     label: '留言',
     emoji: '💬',
-    colorClass: 'bg-yellow-200 border-yellow-600',
+    colorClass: 'bg-yellow-200 border-yellow-600 dark:bg-yellow-900/40 dark:border-yellow-400',
   },
   order_modified: {
     label: '訂單已修改',
     emoji: '✏️',
-    colorClass: 'bg-purple-200 border-purple-600',
+    colorClass: 'bg-purple-200 border-purple-600 dark:bg-purple-900/40 dark:border-purple-400',
   },
 }
 
@@ -161,7 +161,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
         const config = ACTION_TYPE_CONFIG[timeline.action_type] || {
           label: '其他操作',
           emoji: '📌',
-          colorClass: 'bg-gray-200 border-gray-600',
+          colorClass: 'bg-gray-200 border-gray-600 dark:bg-gray-700 dark:border-gray-400',
         }
 
         // 留言採用氣泡式設計
@@ -211,7 +211,7 @@ export function OrderTimeline({ timelines }: OrderTimelineProps) {
               >
                 {config.emoji}
               </div>
-              {index < timelines.length - 1 && <div className="h-full w-0.5 bg-black" />}
+              {index < timelines.length - 1 && <div className="h-full w-0.5 bg-border" />}
             </div>
 
             {/* 內容 */}
