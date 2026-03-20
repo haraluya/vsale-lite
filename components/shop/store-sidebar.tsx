@@ -211,7 +211,7 @@ export function StoreSidebar({
       {/* 遮罩 */}
       <div
         className={cn(
-          'fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 transition-opacity duration-300',
+          'fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[60] transition-opacity duration-300',
           open ? 'opacity-100' : 'opacity-0 pointer-events-none'
         )}
         onClick={onClose}
@@ -222,7 +222,7 @@ export function StoreSidebar({
       <aside
         ref={panelRef}
         className={cn(
-          'fixed top-0 right-0 h-full z-50',
+          'fixed top-0 right-0 h-full z-[60]',
           'w-[62vw] md:w-80',
           'bg-surface border-l',
           'transform transition-transform duration-300 ease-out',
