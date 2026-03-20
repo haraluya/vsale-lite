@@ -417,7 +417,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
             type="button"
             onClick={handleCancel}
             disabled={isPending}
-            className="flex-1 rounded-theme-sm border-theme bg-gray-100 px-6 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex-1 rounded-theme-sm border-theme bg-surface-secondary px-6 py-3 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="mr-2 inline-block h-5 w-5" />
             取消

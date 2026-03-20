@@ -137,7 +137,7 @@ export function ClientFilter({
 
       {/* 篩選結果數量提示 */}
       {hasActiveFilters && (
-        <div className="mt-4 pt-4 border-t-2 border-gray-200 flex items-center gap-2 text-sm text-text-secondary">
+        <div className="mt-4 pt-4 border-t-2 border-border flex items-center gap-2 text-sm text-text-secondary">
           <span>
             找到 <span className="font-bold text-blue-600">{totalCount}</span> 位客戶
           </span>

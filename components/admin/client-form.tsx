@@ -117,7 +117,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
             {/* 範本選擇器 */}
             {templates.length > 0 && (
               <div>
-                <Label htmlFor="template-select" className="text-sm font-medium text-gray-700 mb-2">
+                <Label htmlFor="template-select" className="text-sm font-medium text-text-secondary mb-2">
                   選擇通知範本
                 </Label>
                 <select
@@ -137,18 +137,18 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
             )}
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">
+              <p className="text-sm font-medium text-text-secondary mb-2">
                 請將以下登入資訊提供給客戶:
               </p>
-              <div className="bg-white border border-green-500 p-4 space-y-3">
+              <div className="bg-surface border border-green-500 p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">客戶名稱:</span>
+                  <span className="text-sm text-text-secondary">客戶名稱:</span>
                   <span className="font-bold text-lg">
                     {displayName}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">前台網址:</span>
+                  <span className="text-sm text-text-secondary">前台網址:</span>
                   <a
                     href={loginUrl}
                     target="_blank"
@@ -159,13 +159,13 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
                   </a>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">登入電話:</span>
+                  <span className="text-sm text-text-secondary">登入電話:</span>
                   <code className="font-mono font-bold text-lg">
                     {phone}
                   </code>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">登入密碼:</span>
+                  <span className="text-sm text-text-secondary">登入密碼:</span>
                   <code className="font-mono font-bold text-lg text-green-700">
                     {password}
                   </code>
@@ -191,7 +191,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
               )}
             </Button>
 
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-text-secondary">
               ⚠️ 此密碼僅顯示一次,請務必記錄或立即提供給客戶
             </p>
           </div>
@@ -239,7 +239,7 @@ export function ClientForm({ client, tiers, mode }: ClientFormProps) {
               className="mt-2"
             />
             {isEdit && (
-              <p className="mt-2 text-xs text-gray-500">手機號碼無法修改</p>
+              <p className="mt-2 text-xs text-muted">手機號碼無法修改</p>
             )}
             {state && 'errors' in state && state.errors?.phone && (
               <p className="mt-2 text-sm text-red-500">{state.errors.phone[0]}</p>

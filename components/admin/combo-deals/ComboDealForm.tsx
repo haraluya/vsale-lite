@@ -398,7 +398,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
             />
             <span className="font-bold text-lg">無限期（推薦）</span>
           </label>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-text-secondary">
             勾選後，組合優惠將永久有效，不會過期
           </p>
         </div>
