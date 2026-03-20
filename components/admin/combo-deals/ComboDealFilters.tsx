@@ -65,7 +65,7 @@ export function ComboDealFilters({
   const hasActiveFilters = currentStatus || currentTierId
 
   return (
-    <div className="rounded-theme-sm border-theme bg-white p-4 shadow-neo-sm">
+    <div className="rounded-theme-sm border-theme bg-surface p-4 shadow-neo-sm">
       <div className="flex flex-wrap items-center gap-4">
         {/* 狀態篩選 */}
         <div className="flex items-center gap-2">
@@ -76,7 +76,7 @@ export function ComboDealFilters({
             id="status-filter"
             value={currentStatus || ''}
             onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="rounded-theme-sm border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            className="rounded-theme-sm border bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">全部</option>
             <option value="active">啟用中</option>
@@ -94,7 +94,7 @@ export function ComboDealFilters({
             id="tier-filter"
             value={currentTierId || ''}
             onChange={(e) => handleFilterChange('tier_id', e.target.value)}
-            className="rounded-theme-sm border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+            className="rounded-theme-sm border bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">全部</option>
             {tiers.map((tier) => (
@@ -109,7 +109,7 @@ export function ComboDealFilters({
         {hasActiveFilters && (
           <button
             onClick={handleClearFilters}
-            className="rounded-theme-sm border border-gray-400 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400"
+            className="rounded-theme-sm border border-border bg-surface px-3 py-2 text-sm hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-border"
           >
             清除篩選
           </button>
@@ -118,7 +118,7 @@ export function ComboDealFilters({
 
       {/* 篩選狀態提示 */}
       {hasActiveFilters && (
-        <div className="mt-3 text-sm text-gray-600">
+        <div className="mt-3 text-sm text-text-secondary">
           {currentStatus && (
             <span className="mr-2">
               狀態:{' '}

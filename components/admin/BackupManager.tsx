@@ -194,7 +194,7 @@ export function BackupManager() {
           <button
             onClick={loadJobs}
             disabled={loading}
-            className="rounded-theme-sm border bg-white px-4 py-2 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm md:border md:shadow-neo"
+            className="rounded-theme-sm border bg-surface px-4 py-2 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm md:border md:shadow-neo"
           >
             <RefreshCw className="h-4 w-4" />
           </button>
@@ -212,7 +212,7 @@ export function BackupManager() {
       </div>
 
       {/* 備份選項 */}
-      <div className="rounded-theme-sm border bg-white p-4 shadow-neo-sm md:border md:shadow-neo">
+      <div className="rounded-theme-sm border bg-surface p-4 shadow-neo-sm md:border md:shadow-neo">
         <label className="flex cursor-pointer items-center gap-3">
           <input
             type="checkbox"
@@ -223,7 +223,7 @@ export function BackupManager() {
           />
           <div>
             <span className="font-bold">備份包含商品圖片與系統圖片</span>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-text-secondary">
               包含 Supabase Storage 中的所有圖片檔案（商品圖、系統 Logo、公告圖片等）
             </p>
           </div>
@@ -232,14 +232,14 @@ export function BackupManager() {
 
       {/* 備份進度條 */}
       {backupProgress && (
-        <div className="rounded-theme-sm border bg-white p-4 shadow-neo-sm md:border md:shadow-neo">
+        <div className="rounded-theme-sm border bg-surface p-4 shadow-neo-sm md:border md:shadow-neo">
           <div className="mb-2 flex items-center justify-between">
             <span className="font-bold">{backupProgress.message}</span>
-            <span className="text-sm font-bold text-gray-600">
+            <span className="text-sm font-bold text-text-secondary">
               {backupProgress.percentage}%
             </span>
           </div>
-          <div className="h-4 w-full rounded-theme-sm border bg-gray-100">
+          <div className="h-4 w-full rounded-theme-sm border bg-surface-secondary">
             <div
               className="h-full bg-blue-400 transition-all duration-300"
               style={{ width: `${backupProgress.percentage}%` }}
@@ -251,8 +251,8 @@ export function BackupManager() {
 
       {/* 備份列表 - 桌面表格視圖 */}
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full rounded-theme-sm border bg-white shadow-neo md:border">
-          <thead className="border-b bg-gray-50 md:border-b">
+        <table className="w-full rounded-theme-sm border bg-surface shadow-neo md:border">
+          <thead className="border-b bg-surface-secondary md:border-b">
             <tr>
               <th className="border-r-2 px-4 py-3 text-left font-bold md:border-r">
                 檔案名稱
@@ -278,13 +278,13 @@ export function BackupManager() {
           <tbody>
             {loading && jobs.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-600">
+                <td colSpan={7} className="px-4 py-8 text-center text-text-secondary">
                   載入中...
                 </td>
               </tr>
             ) : jobs.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-600">
+                <td colSpan={7} className="px-4 py-8 text-center text-text-secondary">
                   尚無備份記錄
                 </td>
               </tr>
@@ -323,16 +323,16 @@ export function BackupManager() {
                               <Download className="h-4 w-4" />
                             </button>
                             {showDownloadMenu === job.id && (
-                              <div className="absolute right-0 top-full mt-2 z-10 rounded-theme-sm border bg-white shadow-neo-sm">
+                              <div className="absolute right-0 top-full mt-2 z-10 rounded-theme-sm border bg-surface shadow-neo-sm">
                                 <button
                                   onClick={() => handleDownloadBackup(job, 'database')}
-                                  className="block w-full whitespace-nowrap px-4 py-2 text-left text-sm hover:bg-gray-100"
+                                  className="block w-full whitespace-nowrap px-4 py-2 text-left text-sm hover:bg-surface-secondary"
                                 >
                                   📊 下載資料庫
                                 </button>
                                 <button
                                   onClick={() => handleDownloadBackup(job, 'storage')}
-                                  className="block w-full whitespace-nowrap border-t px-4 py-2 text-left text-sm hover:bg-gray-100"
+                                  className="block w-full whitespace-nowrap border-t px-4 py-2 text-left text-sm hover:bg-surface-secondary"
                                 >
                                   🖼️ 下載圖片
                                 </button>
@@ -369,29 +369,29 @@ export function BackupManager() {
       {/* 備份列表 - 手機卡片視圖 */}
       <div className="space-y-3 md:hidden">
         {loading && jobs.length === 0 ? (
-          <div className="rounded-theme-sm border bg-white p-4 text-center shadow-neo-sm">
+          <div className="rounded-theme-sm border bg-surface p-4 text-center shadow-neo-sm">
             載入中...
           </div>
         ) : jobs.length === 0 ? (
-          <div className="rounded-theme-sm border bg-white p-4 text-center shadow-neo-sm">
+          <div className="rounded-theme-sm border bg-surface p-4 text-center shadow-neo-sm">
             尚無備份記錄
           </div>
         ) : (
           jobs.map((job) => (
             <div
               key={job.id}
-              className="rounded-theme-sm border bg-white p-4 shadow-neo-sm"
+              className="rounded-theme-sm border bg-surface p-4 shadow-neo-sm"
             >
               <div className="mb-3 flex items-start justify-between">
                 <div className="min-w-0 flex-1">
                   <p className="break-words font-mono text-sm font-bold">{job.filename}</p>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-1 text-sm text-text-secondary">
                     {formatFileSize(job.file_size)}
                   </p>
                 </div>
                 <BackupStatusBadge status={job.status} />
               </div>
-              <div className="mb-3 flex items-center gap-2 text-sm text-gray-600">
+              <div className="mb-3 flex items-center gap-2 text-sm text-text-secondary">
                 <BackupTypeBadge type={job.backup_type} />
                 <span>•</span>
                 <span>{formatBackupTime(job.started_at)}</span>
@@ -510,7 +510,7 @@ function BackupContentBadge({ includesStorage }: { includesStorage: boolean }) {
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-theme-sm border px-2 py-1 text-xs font-bold ${
-        includesStorage ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+        includesStorage ? 'bg-green-100 text-green-700' : 'bg-surface-secondary text-text-secondary'
       }`}
     >
       {includesStorage ? '✓ 含圖片' : '僅資料庫'}

@@ -67,7 +67,7 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
             className="mt-2"
           />
           {state && 'errors' in state && state.errors?.name && (
-            <p className="mt-2 text-sm text-red-500">{state.errors.name[0]}</p>
+            <p className="mt-2 text-sm text-error">{state.errors.name[0]}</p>
           )}
         </div>
 
@@ -86,7 +86,7 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
           />
           <p className="mt-1 text-sm text-gray-500">提示: 商品編號會使用此代碼 (如 DRK-0001)</p>
           {state && 'errors' in state && state.errors?.code && (
-            <p className="mt-2 text-sm text-red-500">{state.errors.code[0]}</p>
+            <p className="mt-2 text-sm text-error">{state.errors.code[0]}</p>
           )}
         </div>
 
@@ -102,7 +102,7 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
             className="mt-2"
           />
           {state && 'errors' in state && state.errors?.description && (
-            <p className="mt-2 text-sm text-red-500">{state.errors.description[0]}</p>
+            <p className="mt-2 text-sm text-error">{state.errors.description[0]}</p>
           )}
         </div>
       </FormSection>

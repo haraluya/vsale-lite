@@ -140,7 +140,7 @@ export function ExcelImport({ className = '' }: ExcelImportProps) {
               {selectedFile && (
                 <button
                   onClick={handleClearFile}
-                  className="text-sm text-text-secondary hover:text-gray-900 flex items-center gap-1"
+                  className="text-sm text-text-secondary hover:text-foreground flex items-center gap-1"
                 >
                   <X className="h-4 w-4" />
                   清除

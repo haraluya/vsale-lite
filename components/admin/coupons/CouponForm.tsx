@@ -217,7 +217,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   if (loadingData) {
     return (
       <div className="flex items-center justify-center p-12">
-        <div className="text-gray-500">載入中...</div>
+        <div className="text-muted">載入中...</div>
       </div>
     )
   }
@@ -255,7 +255,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
             pattern="[A-Z0-9]+"
             disabled={loading}
           />
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-text-secondary">
             4-20 字元,僅允許英數字,自動轉大寫
           </p>
           {code && (
@@ -322,7 +322,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               <span className="text-2xl font-black">%</span>
             )}
           </div>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-text-secondary">
             {discountType === 'fixed'
               ? '固定折扣金額（例如: 100 表示折扣 $100）'
               : '百分比折扣（例如: 20 表示打 8 折）'}
@@ -350,7 +350,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               disabled={loading}
             />
           </div>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-text-secondary">
             不填寫表示無最低金額限制
           </p>
         </div>
@@ -374,7 +374,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               step={1}
               disabled={loading}
             />
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-text-secondary">
               客戶可領取的張數上限（預設 1 張）
             </p>
           </div>
@@ -394,7 +394,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               step={1}
               disabled={loading}
             />
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-text-secondary">
               所有客戶合計可領取的總張數（選填）
             </p>
           </div>
@@ -415,7 +415,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
             />
             <span className="font-bold text-lg">無限期（推薦）</span>
           </label>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-text-secondary">
             勾選後，優惠券將永久有效，不會過期
           </p>
         </div>
@@ -434,7 +434,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               required
               disabled={loading}
             />
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-text-secondary">
               預設為現在時間
             </p>
           </div>
@@ -448,11 +448,11 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               id="valid_until"
               value={validUntil}
               onChange={(e) => setValidUntil(e.target.value)}
-              className="w-full border p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:bg-gray-100"
+              className="w-full border p-3 font-bold focus:outline-none focus:ring-2 focus:ring-black disabled:opacity-50 disabled:bg-surface-secondary"
               required={!isUnlimitedPeriod}
               disabled={loading || isUnlimitedPeriod}
             />
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-text-secondary">
               {isUnlimitedPeriod ? '已設定為無限期' : '預設為 30 天後（建議設定較長期限避免過期）'}
             </p>
           </div>
@@ -476,7 +476,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       >
 
         {tiers.length === 0 ? (
-          <p className="text-gray-500">無可用等級</p>
+          <p className="text-muted">無可用等級</p>
         ) : (
           <div className="space-y-2">
             {tiers.map((tier) => (
@@ -514,7 +514,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
       >
 
         {series.length === 0 ? (
-          <p className="text-gray-500">無可用系列</p>
+          <p className="text-muted">無可用系列</p>
         ) : (
           <div className="grid gap-2 md:grid-cols-2 lg:grid-cols-3">
             {series
@@ -610,7 +610,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
               <label className="mb-2 block font-bold">選擇組合優惠</label>
 
               {comboDeals.length === 0 ? (
-                <p className="text-gray-500">目前沒有可用的組合優惠</p>
+                <p className="text-muted">目前沒有可用的組合優惠</p>
               ) : (
                 <div className="grid gap-2 md:grid-cols-2">
                   {comboDeals.map((combo) => (
@@ -701,7 +701,7 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
           type="button"
           onClick={() => router.back()}
           disabled={loading}
-          className="border-theme bg-white px-8 py-4 font-black text-black shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover"
+          className="border-theme bg-surface px-8 py-4 font-black text-foreground shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover"
         >
           取消
         </Button>

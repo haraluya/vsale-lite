@@ -64,15 +64,15 @@ async function CouponsContent({ searchParams }: PageProps) {
           <p className="text-sm text-text-secondary">總優惠券數</p>
           <p className="text-3xl font-black">{allCoupons.length}</p>
         </div>
-        <div className="border-theme bg-green-100 p-4 shadow-neo">
+        <div className="border-theme bg-success-bg p-4 shadow-neo">
           <p className="text-sm text-text-secondary">有效中</p>
           <p className="text-3xl font-black">{activeCoupons.length}</p>
         </div>
-        <div className="border-theme bg-orange-100 p-4 shadow-neo">
+        <div className="border-theme bg-warning-bg p-4 shadow-neo">
           <p className="text-sm text-text-secondary">已過期</p>
           <p className="text-3xl font-black">{expiredCoupons.length}</p>
         </div>
-        <div className="border-theme bg-red-100 p-4 shadow-neo">
+        <div className="border-theme bg-error-bg p-4 shadow-neo">
           <p className="text-sm text-text-secondary">已刪除</p>
           <p className="text-3xl font-black">{deletedCoupons.length}</p>
         </div>

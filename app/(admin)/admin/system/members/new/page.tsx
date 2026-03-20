@@ -68,7 +68,7 @@ export default async function NewMemberPage() {
 
       {/* 提示說明 */}
       <div className="rounded-theme-sm border border-info bg-info-bg p-4">
-        <p className="text-xs font-bold text-blue-900">
+        <p className="text-xs font-bold text-info">
           💡 <strong>提示</strong>：帳號建立後即可使用帳號 + 密碼登入後台。暱稱會顯示於訂單留言、操作日誌等客戶互動場景。
         </p>
       </div>

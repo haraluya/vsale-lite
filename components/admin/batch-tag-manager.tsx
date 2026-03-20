@@ -153,15 +153,15 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
 
   if (selectedProductIds.length === 0) {
     return (
-      <div className="rounded-theme-sm border border-border bg-gray-50 p-6 text-center">
-        <Tags className="mx-auto mb-2 h-12 w-12 text-gray-400" />
-        <p className="text-gray-600">請先選擇商品以進行批次標籤設定</p>
+      <div className="rounded-theme-sm border border-border bg-surface-secondary p-6 text-center">
+        <Tags className="mx-auto mb-2 h-12 w-12 text-muted" />
+        <p className="text-text-secondary">請先選擇商品以進行批次標籤設定</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
+    <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
       <h3 className="mb-4 text-lg font-bold">批次標籤設定</h3>
 
       {/* 選擇操作類型 */}
@@ -171,7 +171,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
           <button
             onClick={() => setOperation('add')}
             className={`flex-1 rounded-theme-sm border-theme px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
-              operation === 'add' ? 'bg-green-400' : 'bg-white'
+              operation === 'add' ? 'bg-green-400' : 'bg-surface'
             }`}
           >
             <span className="flex items-center justify-center gap-2">
@@ -182,7 +182,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
           <button
             onClick={() => setOperation('remove')}
             className={`flex-1 rounded-theme-sm border-theme px-4 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
-              operation === 'remove' ? 'bg-red-400' : 'bg-white'
+              operation === 'remove' ? 'bg-red-400' : 'bg-surface'
             }`}
           >
             <span className="flex items-center justify-center gap-2">
@@ -214,7 +214,7 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
                   className={`inline-flex items-center gap-1 rounded-theme-sm border px-3 py-2 font-medium shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
                     selectedTags.includes(tag)
                       ? 'bg-red-100 border-red-600'
-                      : 'bg-white hover:bg-red-50'
+                      : 'bg-surface hover:bg-red-50'
                   }`}
                 >
                   <TagBadge tag={tag} size="sm" className="border-0" />
@@ -225,11 +225,11 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
               ))}
             </div>
           ) : (
-            <div className="rounded-theme-sm border border-border bg-gray-50 p-4 text-center">
-              <p className="text-sm text-gray-600">
+            <div className="rounded-theme-sm border border-border bg-surface-secondary p-4 text-center">
+              <p className="text-sm text-text-secondary">
                 所選商品沒有共同標籤
               </p>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-muted">
                 提示：你可以使用下方輸入框手動輸入要移除的標籤
               </p>
             </div>
@@ -249,11 +249,11 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
                 key={tag}
                 onClick={() => handleRemoveFromSelection(tag)}
                 className={`group inline-flex items-center gap-1 rounded-theme-sm border px-3 py-1 shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover ${
-                  operation === 'add' ? 'bg-white hover:bg-red-50' : 'bg-red-100 hover:bg-red-200'
+                  operation === 'add' ? 'bg-surface hover:bg-red-50' : 'bg-red-100 hover:bg-red-200'
                 }`}
               >
                 <TagBadge tag={tag} size="sm" className="border-0" />
-                <span className={`text-xs ${operation === 'add' ? 'text-gray-500 group-hover:text-red-600' : 'text-red-600'}`}>×</span>
+                <span className={`text-xs ${operation === 'add' ? 'text-muted group-hover:text-red-600' : 'text-red-600'}`}>×</span>
               </button>
             ))}
           </div>
@@ -289,17 +289,17 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
 
         {/* 建議標籤 */}
         {showSuggestions && suggestedTags.length > 0 && (
-          <div className="absolute z-10 mt-2 w-full rounded-theme-sm border bg-white shadow-neo">
+          <div className="absolute z-10 mt-2 w-full rounded-theme-sm border bg-surface shadow-neo">
             <div className="p-2">
-              <p className="mb-2 text-xs font-bold text-gray-600">常用標籤</p>
+              <p className="mb-2 text-xs font-bold text-text-secondary">常用標籤</p>
               <div className="space-y-1">
                 {suggestedTags.map(tag => (
                   <button
                     key={tag}
                     onClick={() => handleAddToSelection(tag)}
-                    className="flex w-full items-center gap-2 rounded-theme-sm border border-transparent px-3 py-2 text-left hover:hover:bg-gray-50"
+                    className="flex w-full items-center gap-2 rounded-theme-sm border border-transparent px-3 py-2 text-left hover:hover:bg-surface-secondary"
                   >
-                    <Tags className="h-4 w-4 text-gray-400" />
+                    <Tags className="h-4 w-4 text-muted" />
                     <span className="font-medium">{tag}</span>
                   </button>
                 ))}
@@ -311,8 +311,8 @@ export function BatchTagManager({ selectedProductIds, onComplete }: BatchTagMana
       )}
 
       {/* 執行按鈕 */}
-      <div className="flex items-center justify-between border-t-2 border-gray-200 pt-4">
-        <p className="text-sm text-gray-600">
+      <div className="flex items-center justify-between border-t-2 border-border pt-4">
+        <p className="text-sm text-text-secondary">
           將{operation === 'add' ? '新增' : '移除'}標籤到 {selectedProductIds.length} 個商品
         </p>
         <button

@@ -432,7 +432,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             <div
               key={item.id}
               className={`border p-4 space-y-3 ${
-                item.is_removed ? 'bg-red-50 opacity-60' : 'bg-white'
+                item.is_removed ? 'bg-error-bg opacity-60' : 'bg-white'
               }`}
             >
               {/* 商品名稱與移除按鈕 */}
@@ -474,7 +474,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                       disabled={loading}
                     />
                     {priceChanged && (
-                      <span className="text-red-600 font-bold text-sm">已修改</span>
+                      <span className="text-error font-bold text-sm">已修改</span>
                     )}
                   </div>
 
@@ -516,7 +516,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                       </Button>
                     </div>
                     {quantityChanged && (
-                      <span className="text-red-600 font-bold text-sm">已修改</span>
+                      <span className="text-error font-bold text-sm">已修改</span>
                     )}
                   </div>
 
@@ -556,15 +556,15 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
               <div
                 key={fee.id}
                 className={`flex justify-between items-center p-3 border ${
-                  fee.is_new ? 'bg-green-50' : 'bg-white'
+                  fee.is_new ? 'bg-success-bg' : 'bg-white'
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  {fee.is_new && <span className="text-green-600 font-bold text-sm">新增</span>}
+                  {fee.is_new && <span className="text-success font-bold text-sm">新增</span>}
                   <span>{fee.fee_name}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className={fee.amount >= 0 ? '' : 'text-red-600'}>
+                  <span className={fee.amount >= 0 ? '' : 'text-error'}>
                     {fee.amount >= 0 ? '+' : ''}NT${fee.amount.toFixed(0)}
                   </span>
                   <Button
@@ -572,7 +572,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
                     size="sm"
                     onClick={() => handleRemoveFee(fee.id)}
                     disabled={loading}
-                    className="text-red-600"
+                    className="text-error"
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -602,10 +602,10 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             disabled={loading}
           />
           {editedShippingFee !== (order.shipping_fee || 0) && (
-            <span className="text-red-600 font-bold text-sm">已修改</span>
+            <span className="text-error font-bold text-sm">已修改</span>
           )}
           {editedShippingFee === 0 && (
-            <span className="text-green-600 font-bold">免運</span>
+            <span className="text-success font-bold">免運</span>
           )}
         </div>
       </div>
@@ -627,7 +627,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
             {editedNotes.length} / 500 字
           </span>
           {editedNotes !== (order.notes || '') && (
-            <span className="text-red-600 font-bold">已修改</span>
+            <span className="text-error font-bold">已修改</span>
           )}
         </div>
       </div>
@@ -643,7 +643,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           </div>
 
           {couponDiscount > 0 && (
-            <div className="flex justify-between text-red-600">
+            <div className="flex justify-between text-error">
               <span>優惠券折扣:</span>
               <span>-NT${couponDiscount.toFixed(0)}</span>
             </div>
@@ -657,7 +657,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           {feesTotal !== 0 && (
             <div className="flex justify-between">
               <span>自訂費用:</span>
-              <span className={feesTotal >= 0 ? '' : 'text-red-600'}>
+              <span className={feesTotal >= 0 ? '' : 'text-error'}>
                 {feesTotal >= 0 ? '+' : ''}NT${feesTotal.toFixed(0)}
               </span>
             </div>
@@ -668,7 +668,7 @@ export function OrderEditor({ order, onSave, onCancel }: OrderEditorProps) {
           <span>訂單總額:</span>
           <span
             className={
-              newTotalAmount !== order.total_amount ? 'text-red-600' : ''
+              newTotalAmount !== order.total_amount ? 'text-error' : ''
             }
           >
             NT${newTotalAmount.toFixed(0)}

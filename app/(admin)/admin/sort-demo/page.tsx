@@ -53,7 +53,7 @@ export default function SortDemoPage() {
     <div className="min-h-screen bg-surface-secondary p-4 md:p-8">
       <div className="mx-auto max-w-7xl">
         {/* 成功提示 */}
-        <div className="mb-6 rounded-theme-sm border border-green-600 bg-success-bg p-6">
+        <div className="mb-6 rounded-theme-sm border border-success-border bg-success-bg p-6">
           <h2 className="mb-2 flex items-center gap-2 text-xl font-bold text-success">
             ✅ 整合版已上線！
           </h2>
@@ -89,7 +89,7 @@ export default function SortDemoPage() {
                   最直覺的操作方式 - 按住項目拖曳到想要的位置
                 </p>
               </div>
-              <span className="rounded-theme-sm border border-green-600 bg-green-100 px-3 py-1 text-sm font-bold text-success">
+              <span className="rounded-theme-sm border border-success-border bg-success-bg px-3 py-1 text-sm font-bold text-success">
                 推薦
               </span>
             </div>
@@ -124,9 +124,9 @@ export default function SortDemoPage() {
         </div>
 
         {/* 說明 */}
-        <div className="mt-8 rounded-lg border border-blue-600 bg-info-bg p-6">
-          <h3 className="mb-3 text-lg font-bold text-blue-900">💡 操作說明</h3>
-          <div className="space-y-2 text-sm text-blue-800">
+        <div className="mt-8 rounded-lg border border-info-border bg-info-bg p-6">
+          <h3 className="mb-3 text-lg font-bold text-info">💡 操作說明</h3>
+          <div className="space-y-2 text-sm text-info">
             <p>
               <strong>方案一（拖曳）：</strong>
               直接用滑鼠按住任一項目，拖曳到想要的位置後放開。修改完成後點擊「儲存順序」。

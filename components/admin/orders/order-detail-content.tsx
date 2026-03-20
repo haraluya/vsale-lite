@@ -263,7 +263,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
             {/* 客戶訂單備註 - 統一設計系統版本 */}
             {order.notes && (
-              <div className="border-b bg-blue-50 dark:bg-blue-900/20 p-4 md:p-5">
+              <div className="border-b bg-info-bg dark:bg-blue-900/20 p-4 md:p-5">
                 <NoteField icon={FileText} label="客戶訂單備註" content={order.notes} variant="info" />
               </div>
             )}
@@ -281,15 +281,15 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                       : `${Math.round(snapshot.discount_value / 10)} 折`
 
                     return (
-                      <div key={comboDealItem.id} className="bg-yellow-50 dark:bg-yellow-900/20 p-3 md:p-4">
+                      <div key={comboDealItem.id} className="bg-warning-bg dark:bg-yellow-900/20 p-3 md:p-4">
                         {/* 組合優惠標題 */}
                         <div className="flex items-start gap-2 mb-3">
-                          <Package className="w-5 h-5 text-yellow-700 flex-shrink-0 mt-1" />
+                          <Package className="w-5 h-5 text-warning flex-shrink-0 mt-1" />
                           <div className="flex-1">
-                            <h3 className={cn(designTokens.typography.body.large, "font-bold text-yellow-900")}>
+                            <h3 className={cn(designTokens.typography.body.large, "font-bold text-warning")}>
                               📦 {snapshot.name}
                             </h3>
-                            <p className={cn(designTokens.typography.caption, "text-yellow-700")}>
+                            <p className={cn(designTokens.typography.caption, "text-warning")}>
                               ({discountText})
                             </p>
                           </div>
@@ -301,7 +301,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                             series.products.map((product, idx) => (
                               <div key={`${series.series_id}-${idx}`} className="grid grid-cols-12 gap-2">
                                 <div className="col-span-6 text-sm">
-                                  <span className="text-yellow-800 font-bold">【{series.series_name}】</span>
+                                  <span className="text-warning font-bold">【{series.series_name}】</span>
                                   <span className="text-foreground">{product.product_name}</span>
                                 </div>
                                 <div className="col-span-2 text-right text-sm text-text-secondary">
@@ -323,7 +323,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                           <div className="col-span-6 text-sm text-text-secondary">組合優惠小計</div>
                           <div className="col-span-2"></div>
                           <div className="col-span-2"></div>
-                          <div className="col-span-2 text-right text-base font-bold text-green-600">
+                          <div className="col-span-2 text-right text-base font-bold text-success">
                             {formatAmount(comboDealItem.discounted_price)}
                           </div>
                         </div>
@@ -371,7 +371,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
               {/* 運費 (Feature 011) */}
               {order.shipping_fee > 0 && (
-                <div className="grid grid-cols-12 gap-2 md:gap-4 bg-blue-50 dark:bg-blue-900/20 p-3 md:p-4">
+                <div className="grid grid-cols-12 gap-2 md:gap-4 bg-info-bg dark:bg-blue-900/20 p-3 md:p-4">
                   <div className={cn('col-span-6 md:col-span-8 text-right font-bold', designTokens.typography.body.base)}>
                     🚚 運費
                   </div>
@@ -398,7 +398,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                         className={cn(
                           'col-span-6 md:col-span-4 text-right font-bold',
                           designTokens.typography.body.large,
-                          fee.amount >= 0 ? '' : 'text-red-600'
+                          fee.amount >= 0 ? '' : 'text-error'
                         )}
                       >
                         {fee.amount >= 0 ? '+' : ''} {formatAmount(fee.amount)}
@@ -412,13 +412,13 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
               {order.combo_deal_items && order.combo_deal_items.length > 0 && (
                 <>
                   {order.combo_deal_items.map((comboDealItem) => (
-                    <div key={comboDealItem.id} className="grid grid-cols-12 gap-2 md:gap-4 bg-orange-50 dark:bg-orange-900/20 p-3 md:p-4">
-                      <div className={cn('col-span-6 md:col-span-8 text-right font-bold text-orange-700 dark:text-orange-300', designTokens.typography.body.base)}>
+                    <div key={comboDealItem.id} className="grid grid-cols-12 gap-2 md:gap-4 bg-warning-bg dark:bg-orange-900/20 p-3 md:p-4">
+                      <div className={cn('col-span-6 md:col-span-8 text-right font-bold text-warning dark:text-orange-300', designTokens.typography.body.base)}>
                         🎁 組合優惠折扣 - {comboDealItem.combo_deal_snapshot.name}
                       </div>
                       <div
                         className={cn(
-                          'col-span-6 md:col-span-4 text-right font-bold text-orange-700 dark:text-orange-300',
+                          'col-span-6 md:col-span-4 text-right font-bold text-warning dark:text-orange-300',
                           designTokens.typography.body.large
                         )}
                       >
@@ -431,13 +431,13 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
 
               {/* 優惠券折扣 (Feature 009) */}
               {order.coupon && (
-                <div className="grid grid-cols-12 gap-2 md:gap-4 bg-orange-50 dark:bg-orange-900/20 border-t p-3 md:p-4">
-                  <div className={cn('col-span-12 md:col-span-6 font-bold text-orange-700 dark:text-orange-300', designTokens.typography.body.base)}>
+                <div className="grid grid-cols-12 gap-2 md:gap-4 bg-warning-bg dark:bg-orange-900/20 border-t p-3 md:p-4">
+                  <div className={cn('col-span-12 md:col-span-6 font-bold text-warning dark:text-orange-300', designTokens.typography.body.base)}>
                     🎫 優惠券折扣 ({order.coupon.coupon_code})
                   </div>
                   <div
                     className={cn(
-                      'col-span-12 md:col-span-6 text-left md:text-right text-orange-700 dark:text-orange-300',
+                      'col-span-12 md:col-span-6 text-left md:text-right text-warning dark:text-orange-300',
                       designTokens.typography.caption
                     )}
                   >
@@ -447,7 +447,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                   </div>
                   <div
                     className={cn(
-                      'col-span-6 md:col-span-8 text-right font-bold text-orange-700 dark:text-orange-300',
+                      'col-span-6 md:col-span-8 text-right font-bold text-warning dark:text-orange-300',
                       designTokens.typography.body.base
                     )}
                   >
@@ -455,7 +455,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                   </div>
                   <div
                     className={cn(
-                      'col-span-6 md:col-span-4 text-right font-bold text-orange-700 dark:text-orange-300',
+                      'col-span-6 md:col-span-4 text-right font-bold text-warning dark:text-orange-300',
                       designTokens.typography.body.large
                     )}
                   >
@@ -464,7 +464,7 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                 </div>
               )}
 
-              <div className="grid grid-cols-12 gap-2 md:gap-4 bg-yellow-100 dark:bg-yellow-900/30 p-3 md:p-4">
+              <div className="grid grid-cols-12 gap-2 md:gap-4 bg-warning-bg dark:bg-yellow-900/30 p-3 md:p-4">
                 <div className={cn('col-span-6 md:col-span-8 text-right font-bold', designTokens.typography.body.base)}>
                   訂單總金額
                 </div>

@@ -142,7 +142,7 @@ export function ProductStockStatusToggle({
                 className={cn(
                   'w-full px-3 py-2 text-left font-bold transition-colors',
                   'border-b last:border-b-0',
-                  'hover:bg-gray-100',
+                  'hover:bg-surface-secondary',
                   isSelected && 'bg-surface-secondary',
                   designTokens.typography.caption,
                   config.color.replace('bg-', 'text-')

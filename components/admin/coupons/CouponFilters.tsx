@@ -90,7 +90,7 @@ export function CouponFilters() {
     status !== 'all' || discountType !== 'all' || search.trim() !== ''
 
   return (
-    <div className="border-theme bg-white p-4 shadow-neo-sm md:p-6">
+    <div className="border-theme bg-surface p-4 shadow-neo-sm md:p-6">
       <div className="mb-4 flex items-center gap-2">
         <Filter className="h-5 w-5" />
         <h2 className="font-black text-lg">篩選條件</h2>
@@ -111,16 +111,16 @@ export function CouponFilters() {
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-surface-secondary rounded"
               >
-                <X className="h-5 w-5 text-gray-400" />
+                <X className="h-5 w-5 text-muted" />
               </button>
             )}
           </div>
           <button
             type="submit"
             className={cn(
-              'inline-flex items-center gap-2 bg-black font-bold text-white transition-all',
+              'inline-flex items-center gap-2 bg-foreground font-bold text-text-inverse transition-all',
               designTokens.cleanCommerce.border.full,
               designTokens.cleanCommerce.shadow.base,
               designTokens.cleanCommerce.hover,
@@ -168,7 +168,7 @@ export function CouponFilters() {
             type="button"
             onClick={handleClearFilters}
             className={cn(
-              'inline-flex items-center gap-2 bg-white font-bold transition-all',
+              'inline-flex items-center gap-2 bg-surface font-bold transition-all',
               designTokens.cleanCommerce.border.full,
               designTokens.cleanCommerce.shadow.base,
               designTokens.cleanCommerce.hover,

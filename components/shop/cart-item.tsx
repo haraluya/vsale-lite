@@ -124,10 +124,10 @@ export const CartItem = memo(function CartItem({ item }: CartItemProps) {
           <div>
             {/* 系列名稱標籤 */}
             <div className={cn(
-              "inline-block rounded-theme-sm bg-yellow-100 px-2 py-1 mb-1",
+              "inline-block rounded-theme-sm bg-yellow-100 dark:bg-yellow-900 px-2 py-1 mb-1",
               designTokens.cleanCommerce.border.base,
-              "border-yellow-400",
-              "text-xs font-bold text-yellow-800"
+              "border-yellow-400 dark:border-yellow-600",
+              "text-xs font-bold text-yellow-800 dark:text-yellow-200"
             )}>
               【{item.seriesName}】
             </div>

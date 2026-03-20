@@ -72,7 +72,7 @@ export function CommentInput({
         <Button
           type="submit"
           disabled={!isValid || disabled || isSubmitting}
-          className="rounded-theme-sm border-theme bg-yellow-400 px-6 py-2
+          className="rounded-theme-sm border-theme bg-yellow-400 dark:bg-yellow-600 dark:text-yellow-100 px-6 py-2
                      font-bold shadow-neo
                      hover:-translate-y-0.5 hover:shadow-theme-hover
                      active:translate-x-[4px] active:translate-y-[4px] active:shadow-none

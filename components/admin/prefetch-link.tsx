@@ -104,9 +104,9 @@ export function PrefetchButton({
     'disabled:opacity-50 disabled:cursor-not-allowed',
     // Variant 樣式
     variant === 'primary' && 'bg-primary hover:bg-primary-dark text-white',
-    variant === 'secondary' && 'bg-gray-200 hover:bg-gray-300 text-black',
+    variant === 'secondary' && 'bg-surface-secondary hover:bg-surface-secondary text-foreground',
     variant === 'danger' && 'bg-red-500 hover:bg-red-600 text-white',
-    variant === 'outline' && 'bg-white hover:bg-gray-50 text-black',
+    variant === 'outline' && 'bg-surface hover:bg-surface-secondary text-foreground',
     // Size 樣式
     size === 'sm' && 'px-3 py-1.5 text-xs md:px-4 md:py-2 md:text-sm',
     size === 'default' && 'px-4 py-2 text-sm md:px-6 md:py-3 md:text-base',

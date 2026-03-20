@@ -70,7 +70,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
             </div>
             <Link
               href="/admin/announcements/new"
-              className="inline-flex items-center gap-2 rounded-theme-sm border-theme bg-green-400 px-6 py-3 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
+              className="inline-flex items-center gap-2 rounded-theme-sm border-theme bg-green-400 dark:bg-green-600 px-6 py-3 font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
             >
               <Plus className="h-5 w-5" />
               新增廣告
@@ -83,7 +83,7 @@ export default async function AnnouncementsPage({ searchParams }: AnnouncementsP
               <p className="text-lg text-text-secondary">目前沒有任何廣告</p>
               <Link
                 href="/admin/announcements/new"
-                className="mt-4 inline-flex items-center gap-2 rounded-theme-sm border bg-green-400 px-4 py-2 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
+                className="mt-4 inline-flex items-center gap-2 rounded-theme-sm border bg-green-400 dark:bg-green-600 px-4 py-2 font-bold transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
               >
                 <Plus className="h-4 w-4" />
                 新增第一個廣告

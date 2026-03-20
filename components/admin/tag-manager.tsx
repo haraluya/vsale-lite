@@ -137,7 +137,7 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
             {tags.map(tag => (
               <div
                 key={tag}
-                className="group relative inline-flex items-center gap-1 rounded-theme-sm border bg-white px-3 py-1 shadow-neo"
+                className="group relative inline-flex items-center gap-1 rounded-theme-sm border bg-surface px-3 py-1 shadow-neo"
               >
                 <TagBadge tag={tag} size="sm" className="border-0" />
                 <button
@@ -146,13 +146,13 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
                   className="rounded-full p-0.5 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={`移除標籤 ${tag}`}
                 >
-                  <X className="h-3 w-3 text-gray-600 hover:text-red-600" />
+                  <X className="h-3 w-3 text-text-secondary hover:text-red-600" />
                 </button>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-gray-500">尚未設定標籤</p>
+          <p className="text-sm text-muted">尚未設定標籤</p>
         )}
       </div>
 
@@ -185,17 +185,17 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
 
           {/* 建議標籤 */}
           {showSuggestions && suggestedTags.length > 0 && (
-            <div className="absolute z-10 mt-2 w-full rounded-theme-sm border bg-white shadow-neo">
+            <div className="absolute z-10 mt-2 w-full rounded-theme-sm border bg-surface shadow-neo">
               <div className="p-2">
-                <p className="mb-2 text-xs font-bold text-gray-600">常用標籤</p>
+                <p className="mb-2 text-xs font-bold text-text-secondary">常用標籤</p>
                 <div className="space-y-1">
                   {suggestedTags.map(tag => (
                     <button
                       key={tag}
                       onClick={() => handleAddTag(tag)}
-                      className="flex w-full items-center gap-2 rounded-theme-sm border border-transparent px-3 py-2 text-left hover:hover:bg-gray-50"
+                      className="flex w-full items-center gap-2 rounded-theme-sm border border-transparent px-3 py-2 text-left hover:hover:bg-surface-secondary"
                     >
-                      <TagIcon className="h-4 w-4 text-gray-400" />
+                      <TagIcon className="h-4 w-4 text-muted" />
                       <span className="font-medium">{tag}</span>
                     </button>
                   ))}
@@ -207,7 +207,7 @@ export function TagManager({ productId, initialTags = [], onUpdate }: TagManager
       )}
 
       {/* 提示文字 */}
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted">
         標籤可用於商品分類與篩選，最多 5 個，每個 2-8 字元。
       </p>
     </div>

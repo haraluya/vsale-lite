@@ -51,21 +51,21 @@ async function AccountPageContent() {
       href: '/store/promotions',
       icon: Tag,
       label: '優惠活動',
-      color: 'bg-purple-400',
+      color: 'bg-purple-400 dark:bg-purple-600',
       badge: null,
     },
     {
       href: '/store/coupons',
       icon: Ticket,
       label: '優惠券',
-      color: 'bg-orange-400',
+      color: 'bg-orange-400 dark:bg-orange-600',
       badge: unusedCouponCount > 0 ? unusedCouponCount : null,
     },
     {
       href: '/store/orders',
       icon: ShoppingBag,
       label: '我的訂單',
-      color: 'bg-blue-400',
+      color: 'bg-blue-400 dark:bg-blue-600',
       badge: null,
     },
   ]
@@ -74,7 +74,7 @@ async function AccountPageContent() {
     <div className="space-y-6">
       {/* 頁面標題 */}
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-green-400 border-theme shadow-neo-sm">
+        <div className="p-3 bg-green-400 dark:bg-green-600 border-theme shadow-neo-sm">
           <User className="w-6 h-6 md:w-8 md:h-8" />
         </div>
         <div>
@@ -98,7 +98,7 @@ async function AccountPageContent() {
           <div className="border-t border-border" />
           <div className="flex items-center justify-between">
             <span className="text-sm md:text-base text-muted-foreground">會員等級</span>
-            <span className="text-sm md:text-base font-bold px-3 py-1 bg-yellow-300 border">
+            <span className="text-sm md:text-base font-bold px-3 py-1 bg-accent text-accent-text border">
               {tierName}
             </span>
           </div>
@@ -121,7 +121,7 @@ async function AccountPageContent() {
             </div>
             <div className="flex items-center gap-2">
               {link.badge !== null && (
-                <span className="px-2 py-0.5 text-xs font-bold bg-red-400 border text-black">
+                <span className="px-2 py-0.5 text-xs font-bold bg-red-400 dark:bg-red-600 border text-black dark:text-white">
                   {link.badge}
                 </span>
               )}

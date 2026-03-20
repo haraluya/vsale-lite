@@ -55,15 +55,15 @@ export function CompactCardLayout({ order }: Props) {
                 return (
                   <div
                     key={comboDealItem.id}
-                    className="border border-yellow-500 bg-yellow-50 p-4"
+                    className="border border-yellow-500 bg-yellow-50 dark:bg-yellow-950 p-4"
                   >
                     {/* 組合優惠標題 - 單行緊湊 */}
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-black text-yellow-900 flex items-center gap-2">
+                      <h3 className="font-black text-yellow-900 dark:text-yellow-100 flex items-center gap-2">
                         <Package className="w-4 h-4" />
                         {snapshot.name}
                       </h3>
-                      <span className="text-xs font-bold bg-yellow-200 border border-yellow-600 px-2 py-0.5">
+                      <span className="text-xs font-bold bg-yellow-200 dark:bg-yellow-800 border border-yellow-600 px-2 py-0.5">
                         {discountText}
                       </span>
                     </div>
@@ -73,7 +73,7 @@ export function CompactCardLayout({ order }: Props) {
                       {snapshot.series.flatMap(series =>
                         series.products.map((product, idx) => (
                           <div key={`${series.series_id}-${idx}`} className="flex items-center text-xs">
-                            <span className="inline-block bg-yellow-200 border border-yellow-500 px-1.5 py-0.5 font-bold text-yellow-900 mr-2 shrink-0">
+                            <span className="inline-block bg-yellow-200 dark:bg-yellow-800 border border-yellow-500 px-1.5 py-0.5 font-bold text-yellow-900 dark:text-yellow-100 mr-2 shrink-0">
                               {series.series_name}
                             </span>
                             <span className="flex-1 truncate text-foreground">{product.product_name}</span>
@@ -104,7 +104,7 @@ export function CompactCardLayout({ order }: Props) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       {seriesName && (
-                        <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900 shrink-0">
+                        <span className="inline-block bg-blue-100 dark:bg-blue-900 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900 dark:text-blue-100 shrink-0">
                           {seriesName}
                         </span>
                       )}

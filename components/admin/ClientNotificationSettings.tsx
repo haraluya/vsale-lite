@@ -266,8 +266,8 @@ export function ClientNotificationSettings() {
 
   if (pageLoading) {
     return (
-      <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo-sm">
-        <p className="text-sm text-gray-600">載入中...</p>
+      <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo-sm">
+        <p className="text-sm text-text-secondary">載入中...</p>
       </div>
     )
   }
@@ -277,11 +277,11 @@ export function ClientNotificationSettings() {
   return (
     <div className="space-y-6">
       {/* 範本列表 */}
-      <div className="rounded-theme-sm border-theme bg-white p-4 md:p-6 shadow-neo-sm">
+      <div className="rounded-theme-sm border-theme bg-surface p-4 md:p-6 shadow-neo-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-black">範本管理</h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-text-secondary mt-1">
               建立多個自訂範本，在複製登入資訊時選擇使用
             </p>
           </div>
@@ -304,7 +304,7 @@ export function ClientNotificationSettings() {
                 rounded-theme-sm border p-4 cursor-pointer transition-all
                 ${selectedTemplateId === template.id
                   ? 'bg-yellow-50 shadow-neo-sm'
-                  : 'border-border bg-white hover:border-gray-400'
+                  : 'border-border bg-surface hover:border-border'
                 }
               `}
               onClick={() => handleSelectTemplate(template)}
@@ -319,7 +319,7 @@ export function ClientNotificationSettings() {
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-muted mt-1">
                     {new Date(template.created_at).toLocaleDateString('zh-TW')}
                   </p>
                 </div>
@@ -331,11 +331,11 @@ export function ClientNotificationSettings() {
                         e.stopPropagation()
                         handleSetDefault(template)
                       }}
-                      className="p-1 hover:bg-gray-200 rounded transition-colors"
+                      className="p-1 hover:bg-surface-secondary rounded transition-colors"
                       title="設為預設"
                       disabled={loading}
                     >
-                      <Star className="w-4 h-4 text-gray-400" />
+                      <Star className="w-4 h-4 text-muted" />
                     </button>
                   )}
                   <button
@@ -343,11 +343,11 @@ export function ClientNotificationSettings() {
                       e.stopPropagation()
                       handleRenameTemplate(template)
                     }}
-                    className="p-1 hover:bg-gray-200 rounded transition-colors"
+                    className="p-1 hover:bg-surface-secondary rounded transition-colors"
                     title="重新命名"
                     disabled={loading}
                   >
-                    <Pencil className="w-4 h-4 text-gray-600" />
+                    <Pencil className="w-4 h-4 text-text-secondary" />
                   </button>
                   {!template.is_default && (
                     <button
@@ -371,27 +371,27 @@ export function ClientNotificationSettings() {
 
       {/* 範本編輯器 */}
       {selectedTemplate && (
-        <div className="rounded-theme-sm border-theme bg-white p-4 md:p-6 shadow-neo-sm">
+        <div className="rounded-theme-sm border-theme bg-surface p-4 md:p-6 shadow-neo-sm">
           <Label htmlFor="template" className="text-lg font-black mb-2 block">
             編輯範本：{selectedTemplate.name}
           </Label>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-text-secondary mb-4">
             支援以下變數（將自動替換為實際值）：
           </p>
           <div className="flex flex-wrap gap-2 mb-4">
-            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
+            <code className="px-2 py-1 bg-surface-secondary rounded border border-border text-xs md:text-sm">
               {'{公司名稱}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
+            <code className="px-2 py-1 bg-surface-secondary rounded border border-border text-xs md:text-sm">
               {'{客戶名稱}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
+            <code className="px-2 py-1 bg-surface-secondary rounded border border-border text-xs md:text-sm">
               {'{前台網址}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
+            <code className="px-2 py-1 bg-surface-secondary rounded border border-border text-xs md:text-sm">
               {'{登入電話}'}
             </code>
-            <code className="px-2 py-1 bg-gray-100 rounded border border-border text-xs md:text-sm">
+            <code className="px-2 py-1 bg-surface-secondary rounded border border-border text-xs md:text-sm">
               {'{登入密碼}'}
             </code>
           </div>
@@ -418,12 +418,12 @@ export function ClientNotificationSettings() {
 
       {/* 預覽區塊 */}
       {selectedTemplate && (
-        <div className="rounded-theme-sm border-theme border-border bg-gray-50 p-4 md:p-6">
+        <div className="rounded-theme-sm border-theme border-border bg-surface-secondary p-4 md:p-6">
           <h3 className="text-lg font-black mb-3">範本預覽</h3>
-          <p className="text-xs text-gray-500 mb-3">
+          <p className="text-xs text-muted mb-3">
             以下是範本套用變數後的預覽效果
           </p>
-          <div className="bg-white border border-gray-400 p-4 font-mono text-sm whitespace-pre-wrap break-words">
+          <div className="bg-surface border border-border p-4 font-mono text-sm whitespace-pre-wrap break-words">
             {editingTemplate
               .replace(/\{公司名稱\}/g, companyName)
               .replace(/\{客戶名稱\}/g, '王小明')

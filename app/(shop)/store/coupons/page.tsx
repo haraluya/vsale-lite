@@ -25,7 +25,7 @@ async function CouponsPageContent() {
     <div className="space-y-6">
       {/* 頁面標題 */}
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-orange-400 border-theme shadow-neo-sm">
+        <div className="p-3 bg-orange-400 dark:bg-orange-600 border-theme shadow-neo-sm">
           <Ticket className="w-6 h-6 md:w-8 md:h-8" />
         </div>
         <div>

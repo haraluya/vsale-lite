@@ -125,12 +125,12 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50">
       <div className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-theme-sm border bg-surface shadow-neo-lg m-4">
         {/* 標題列 */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-yellow-300 px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-accent text-accent-text px-6 py-4">
           <h2 className="text-xl font-black">批次匯入客戶資料</h2>
           <button
             onClick={handleClose}
             disabled={isImporting}
-            className="rounded-theme-sm border bg-surface p-2 hover:bg-gray-100 disabled:opacity-50"
+            className="rounded-theme-sm border bg-surface p-2 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -145,7 +145,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
               {selectedFile && (
                 <button
                   onClick={handleClearFile}
-                  className="text-sm text-text-secondary hover:text-gray-900 flex items-center gap-1"
+                  className="text-sm text-text-secondary hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-1"
                 >
                   <X className="h-4 w-4" />
                   清除
@@ -187,14 +187,14 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
                 <button
                   onClick={() => handleImport(true)}
                   disabled={isImporting}
-                  className="flex-1 px-4 py-3 font-bold rounded-theme-sm border bg-yellow-300 hover:bg-yellow-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 font-bold rounded-theme-sm border bg-accent text-accent-text hover:bg-accent-hover shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isImporting ? '驗證中...' : '試算驗證'}
                 </button>
                 <button
                   onClick={() => handleImport(false)}
                   disabled={isImporting}
-                  className="flex-1 px-4 py-3 font-bold rounded-theme-sm border bg-green-300 hover:bg-green-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-4 py-3 font-bold rounded-theme-sm border bg-green-300 dark:bg-green-600 hover:bg-green-400 shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isImporting ? '匯入中...' : '正式匯入'}
                 </button>

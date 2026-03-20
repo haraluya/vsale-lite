@@ -226,8 +226,8 @@ export function CartSummary({
 
         {/* 免運提示 */}
         {freeShippingMessage && shippingFee !== null && shippingFee > 0 && (
-          <div className="rounded-theme-sm border border-orange-500 bg-orange-50 px-3 py-2">
-            <p className="text-sm text-orange-700">
+          <div className="rounded-theme-sm border border-orange-500 bg-orange-50 dark:bg-orange-950 px-3 py-2">
+            <p className="text-sm text-orange-700 dark:text-orange-300">
               💡 <strong>{freeShippingMessage}</strong>
             </p>
           </div>
@@ -237,8 +237,8 @@ export function CartSummary({
         {!isEmpty && onOpenCouponSelector && (
           <button
             onClick={onOpenCouponSelector}
-            className="w-full rounded-theme-sm border bg-orange-50
-                       hover:bg-orange-100 px-4 py-3 text-sm font-bold
+            className="w-full rounded-theme-sm border bg-orange-50 dark:bg-orange-950
+                       hover:bg-orange-100 dark:hover:bg-orange-900 px-4 py-3 text-sm font-bold
                        transition-colors flex items-center justify-center gap-2"
           >
             <Ticket className="w-4 h-4" />
@@ -265,7 +265,7 @@ export function CartSummary({
         ) : (
           <Link
             href="/store/checkout"
-            className="flex w-full items-center justify-center gap-2 rounded-theme-sm border-theme bg-green-400 px-6 py-4 text-lg font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
+            className="flex w-full items-center justify-center gap-2 rounded-theme-sm border-theme bg-green-400 dark:bg-green-600 px-6 py-4 text-lg font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
           >
             <ShoppingCart className="h-6 w-6" />
             前往結帳
@@ -282,7 +282,7 @@ export function CartSummary({
       </div>
 
       {/* 提示訊息 */}
-      <div className="mt-6 rounded-theme-sm border bg-yellow-100 p-4">
+      <div className="mt-6 rounded-theme-sm border bg-yellow-100 dark:bg-yellow-900 p-4">
         <p className="text-sm text-foreground">
           💡 <strong>提示:</strong> 商品價格為您的會員等級專屬價格,結帳前請確認購物車內容。
         </p>

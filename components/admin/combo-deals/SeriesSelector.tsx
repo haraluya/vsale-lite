@@ -184,7 +184,7 @@ export function SeriesSelector({
                     type="button"
                     onClick={() => handleMoveUp(index)}
                     disabled={index === 0 || disabled}
-                    className="p-1 border rounded-theme-sm hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1 border rounded-theme-sm hover:bg-surface-secondary disabled:opacity-30 disabled:cursor-not-allowed"
                     title="上移"
                   >
                     <ChevronUp className="h-3 w-3" />
@@ -193,7 +193,7 @@ export function SeriesSelector({
                     type="button"
                     onClick={() => handleMoveDown(index)}
                     disabled={index === selectedSeries.length - 1 || disabled}
-                    className="p-1 border rounded-theme-sm hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="p-1 border rounded-theme-sm hover:bg-surface-secondary disabled:opacity-30 disabled:cursor-not-allowed"
                     title="下移"
                   >
                     <ChevronDown className="h-3 w-3" />
@@ -250,7 +250,7 @@ export function SeriesSelector({
         </p>
 
         {selectedSeries.length >= 5 ? (
-          <p className="text-sm text-gray-600 py-4 text-center border border-dashed border-border rounded-theme-sm">
+          <p className="text-sm text-text-secondary py-4 text-center border border-dashed border-border rounded-theme-sm">
             已達最大系列數量 (5 個)
           </p>
         ) : (() => {
@@ -258,7 +258,7 @@ export function SeriesSelector({
 
           if (sortedCategories.length === 0 && uncategorizedSeries.length === 0) {
             return (
-              <p className="text-sm text-gray-600 py-4 text-center border border-dashed border-border rounded-theme-sm">
+              <p className="text-sm text-text-secondary py-4 text-center border border-dashed border-border rounded-theme-sm">
                 沒有可用的系列，請先建立系列
               </p>
             )
@@ -274,7 +274,7 @@ export function SeriesSelector({
                 return (
                   <div key={category.id}>
                     {/* 分類標題 */}
-                    <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-border">
+                    <h4 className="text-sm font-bold text-text-secondary mb-2 pb-1 border-b-2 border-border">
                       {category.name}
                     </h4>
 
@@ -302,7 +302,7 @@ export function SeriesSelector({
               {/* 未分類的系列 */}
               {uncategorizedSeries.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-bold text-gray-700 mb-2 pb-1 border-b-2 border-border">
+                  <h4 className="text-sm font-bold text-text-secondary mb-2 pb-1 border-b-2 border-border">
                     未分類
                   </h4>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -330,7 +330,7 @@ export function SeriesSelector({
 
       {/* 提示訊息 */}
       {selectedSeries.length === 0 && (
-        <p className="text-sm text-gray-600">請至少選擇一個系列</p>
+        <p className="text-sm text-text-secondary">請至少選擇一個系列</p>
       )}
     </div>
   )

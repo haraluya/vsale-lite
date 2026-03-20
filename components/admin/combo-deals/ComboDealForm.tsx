@@ -233,7 +233,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
               className={`p-4 border-theme rounded-theme-sm cursor-pointer transition ${
                 comboMode === 'each'
                   ? 'bg-purple-100 shadow-neo'
-                  : 'bg-white hover:bg-gray-50'
+                  : 'bg-surface hover:bg-surface-secondary'
               }`}
             >
               <input
@@ -245,7 +245,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
                 className="mr-2"
               />
               <span className="font-bold">各選模式</span>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-text-secondary mt-1">
                 每個系列需選擇指定數量的商品（例：上衣 1 件 + 褲子 1 件）
               </p>
             </label>
@@ -255,7 +255,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
               className={`p-4 border-theme rounded-theme-sm cursor-pointer transition ${
                 comboMode === 'mix_match'
                   ? 'bg-purple-100 shadow-neo'
-                  : 'bg-white hover:bg-gray-50'
+                  : 'bg-surface hover:bg-surface-secondary'
               }`}
             >
               <input
@@ -267,7 +267,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
                 className="mr-2"
               />
               <span className="font-bold">任選模式</span>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-text-secondary mt-1">
                 從所有系列中任選指定總數量的商品（例：任選 3 件）
               </p>
             </label>
@@ -375,7 +375,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
               <span className="font-bold">{discountType === 'fixed' ? '元' : '%'}</span>
             </div>
             {discountType === 'percentage' && (
-              <p className="mt-1 text-sm text-gray-600">請輸入 1-99 之間的數字</p>
+              <p className="mt-1 text-sm text-text-secondary">請輸入 1-99 之間的數字</p>
             )}
             {fieldErrors.discount_value && (
               <p className="mt-1 text-sm text-red-600">{fieldErrors.discount_value[0]}</p>
@@ -432,12 +432,12 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
               id="end_date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className={`${designTokens.input.base} ${isUnlimitedPeriod ? 'opacity-50 bg-gray-100' : ''}`}
+              className={`${designTokens.input.base} ${isUnlimitedPeriod ? 'opacity-50 bg-surface-secondary' : ''}`}
               required={!isUnlimitedPeriod}
               disabled={loading || isUnlimitedPeriod}
             />
             {isUnlimitedPeriod ? (
-              <p className="mt-1 text-sm text-gray-600">已設定為無限期</p>
+              <p className="mt-1 text-sm text-text-secondary">已設定為無限期</p>
             ) : (
               fieldErrors.end_date && (
                 <p className="mt-1 text-sm text-red-600">{fieldErrors.end_date[0]}</p>
@@ -469,7 +469,7 @@ export function ComboDealForm({ comboDeal, series, tiers, categories, mode }: Co
                 className={`p-3 border rounded-theme-sm cursor-pointer transition ${
                   selectedTierIds.includes(tier.id)
                     ? 'bg-blue-100 shadow-neo-sm'
-                    : 'bg-white hover:bg-gray-50'
+                    : 'bg-surface hover:bg-surface-secondary'
                 }`}
               >
                 <input

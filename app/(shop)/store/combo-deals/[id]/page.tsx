@@ -86,8 +86,8 @@ export default async function ComboDealDetailPage({
       )}>
         {/* 🆕 Phase 7: 編輯模式標示 */}
         {editMode && (
-          <div className="mb-4 rounded-theme-sm border-theme border-blue-600 bg-info-bg p-4 shadow-neo-sm">
-            <p className="text-sm md:text-base font-bold text-blue-800">
+          <div className="mb-4 rounded-theme-sm border-theme border-info-border bg-info-bg p-4 shadow-neo-sm">
+            <p className="text-sm md:text-base font-bold text-info">
               ✏️ 編輯模式：您正在編輯購物車中的組合優惠
             </p>
           </div>
@@ -107,7 +107,7 @@ export default async function ComboDealDetailPage({
             />
 
             {/* 折扣標籤（絕對定位在海報右上角） */}
-            <div className="absolute top-4 right-4 bg-red-600 text-white px-4 py-2 border-theme shadow-neo">
+            <div className="absolute top-4 right-4 bg-red-600 dark:bg-red-700 text-white px-4 py-2 border-theme shadow-neo">
               <span className="text-base md:text-xl font-black">
                 {discountLabel}
               </span>
@@ -121,7 +121,7 @@ export default async function ComboDealDetailPage({
             </h1>
 
             <div className="flex flex-wrap items-center gap-3 mb-4">
-              <span className="inline-block px-3 py-1 bg-yellow-100 border border-yellow-600 text-yellow-800 text-sm md:text-base font-bold">
+              <span className="inline-block px-3 py-1 bg-warning-bg border border-warning-border text-warning text-sm md:text-base font-bold">
                 {modeText}
               </span>
               <span className="text-sm md:text-base text-text-secondary">

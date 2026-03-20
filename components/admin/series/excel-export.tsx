@@ -67,7 +67,7 @@ export function ExcelExport({ filters, buttonText = '匯出 Excel', className = 
       className={`
         inline-flex items-center gap-2 px-4 py-2
         rounded-theme-sm border-theme
-        bg-white hover:bg-gray-50
+        bg-surface hover:bg-surface-secondary
         shadow-neo-sm hover:-translate-y-0.5 hover:shadow-theme-hover
         transition-all duration-150
         disabled:opacity-50 disabled:cursor-not-allowed

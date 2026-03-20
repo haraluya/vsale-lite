@@ -246,12 +246,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             {/* 提示訊息 */}
             <div className={cn(
               "rounded-theme-sm bg-info-bg",
-              "border border-blue-600",
+              "border border-info-border",
               "p-3 md:p-4"
             )}>
               <p className={cn(
                 designTokens.typography.caption,
-                "text-blue-800"
+                "text-info"
               )}>
                 💡 如需下單,請聯絡您的業務人員或使用購物車功能
               </p>

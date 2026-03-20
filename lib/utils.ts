@@ -36,12 +36,12 @@ export function formatDate(date: string): string {
  * 根據等級 ID 產生一致的顏色（Neo-Brutalism 風格 - 鮮豔飽和）
  */
 const TIER_COLORS = [
-  'bg-blue-300',
-  'bg-purple-300',
-  'bg-green-300',
-  'bg-yellow-300',
-  'bg-pink-300',
-  'bg-orange-300',
+  'bg-blue-300 dark:bg-blue-700',
+  'bg-purple-300 dark:bg-purple-700',
+  'bg-green-300 dark:bg-green-700',
+  'bg-yellow-300 dark:bg-yellow-700',
+  'bg-pink-300 dark:bg-pink-700',
+  'bg-orange-300 dark:bg-orange-700',
 ] as const
 
 /**

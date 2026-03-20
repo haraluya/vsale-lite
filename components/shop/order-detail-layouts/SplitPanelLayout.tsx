@@ -23,17 +23,17 @@ interface Props {
 function getStatusGradient(status: string): string {
   switch (status) {
     case 'pending':
-      return 'bg-gradient-to-r from-yellow-400 to-orange-400' // 待確認：黃→橙
+      return 'bg-gradient-to-r from-yellow-400 to-orange-400 dark:from-yellow-600 dark:to-orange-600' // 待確認：黃→橙
     case 'confirmed':
-      return 'bg-gradient-to-r from-blue-400 to-cyan-400' // 已確認：藍→青
+      return 'bg-gradient-to-r from-blue-400 to-cyan-400 dark:from-blue-600 dark:to-cyan-600' // 已確認：藍→青
     case 'shipping':
-      return 'bg-gradient-to-r from-purple-400 to-pink-400' // 出貨中：紫→粉
+      return 'bg-gradient-to-r from-purple-400 to-pink-400 dark:from-purple-600 dark:to-pink-600' // 出貨中：紫→粉
     case 'completed':
-      return 'bg-gradient-to-r from-green-400 to-emerald-400' // 已完成：綠→翠
+      return 'bg-gradient-to-r from-green-400 to-emerald-400 dark:from-green-600 dark:to-emerald-600' // 已完成：綠→翠
     case 'cancelled':
-      return 'bg-gradient-to-r from-gray-400 to-slate-400' // 已取消：灰→石板
+      return 'bg-gradient-to-r from-gray-400 to-slate-400 dark:from-gray-600 dark:to-slate-600' // 已取消：灰→石板
     default:
-      return 'bg-gradient-to-r from-blue-400 to-cyan-400' // 預設：藍→青
+      return 'bg-gradient-to-r from-blue-400 to-cyan-400 dark:from-blue-600 dark:to-cyan-600' // 預設：藍→青
   }
 }
 
@@ -82,14 +82,14 @@ export function SplitPanelLayout({ order }: Props) {
                     return (
                       <div
                         key={comboDealItem.id}
-                        className="border border-yellow-500 bg-yellow-50 p-4 rounded-theme-sm"
+                        className="border border-yellow-500 bg-yellow-50 dark:bg-yellow-950 p-4 rounded-theme-sm"
                       >
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-2">
-                            <Package className="w-4 h-4 text-yellow-700" />
-                            <h3 className="font-black text-yellow-900">{snapshot.name}</h3>
+                            <Package className="w-4 h-4 text-yellow-700 dark:text-yellow-300" />
+                            <h3 className="font-black text-yellow-900 dark:text-yellow-100">{snapshot.name}</h3>
                           </div>
-                          <span className="text-xs font-bold bg-yellow-200 border border-yellow-600 px-2 py-1">
+                          <span className="text-xs font-bold bg-yellow-200 dark:bg-yellow-800 border border-yellow-600 px-2 py-1">
                             {discountText}
                           </span>
                         </div>
@@ -98,7 +98,7 @@ export function SplitPanelLayout({ order }: Props) {
                           {snapshot.series.flatMap(series =>
                             series.products.map((product, idx) => (
                               <div key={`${series.series_id}-${idx}`} className="flex items-center gap-2">
-                                <span className="bg-yellow-200 border border-yellow-500 px-1.5 py-0.5 text-xs font-bold shrink-0">
+                                <span className="bg-yellow-200 dark:bg-yellow-800 border border-yellow-500 px-1.5 py-0.5 text-xs font-bold shrink-0">
                                   {series.series_name}
                                 </span>
                                 <span className="flex-1 truncate">{product.product_name}</span>
@@ -128,7 +128,7 @@ export function SplitPanelLayout({ order }: Props) {
                       <div className="flex-1">
                         {seriesName && (
                           <div className="mb-1.5">
-                            <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
+                            <span className="inline-block bg-blue-100 dark:bg-blue-900 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900 dark:text-blue-100">
                               {seriesName}
                             </span>
                           </div>

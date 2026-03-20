@@ -109,10 +109,10 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
 
       {/* 統計資訊卡片 */}
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="border-theme bg-blue-100 p-4 shadow-neo">
+        <div className="border-theme bg-info-bg p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
-            <Users className="h-5 w-5 text-blue-600" />
-            <p className="text-sm font-bold text-blue-600">發放張數</p>
+            <Users className="h-5 w-5 text-info" />
+            <p className="text-sm font-bold text-info">發放張數</p>
           </div>
           <p className="text-3xl font-black">{claimCount}</p>
           <p className="text-sm text-text-secondary mt-1">
@@ -120,7 +120,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
           </p>
         </div>
 
-        <div className="border-theme bg-green-100 p-4 shadow-neo">
+        <div className="border-theme bg-success-bg p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
             <Tag className="h-5 w-5 text-success" />
             <p className="text-sm font-bold text-success">使用張數</p>
@@ -131,10 +131,10 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
           </p>
         </div>
 
-        <div className="border-theme bg-orange-100 p-4 shadow-neo">
+        <div className="border-theme bg-warning-bg p-4 shadow-neo">
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-5 w-5 text-orange-600" />
-            <p className="text-sm font-bold text-orange-600">總折扣金額</p>
+            <TrendingUp className="h-5 w-5 text-warning" />
+            <p className="text-sm font-bold text-warning">總折扣金額</p>
           </div>
           <p className="text-3xl font-black">NT$ {stats.totalDiscountAmount.toLocaleString()}</p>
         </div>
@@ -148,7 +148,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
 
       {/* 領取用戶列表 */}
       <div className="border-theme bg-surface shadow-neo">
-        <div className="border-b bg-yellow-300 p-4">
+        <div className="border-b bg-accent text-accent-text p-4">
           <h2 className="text-2xl font-black flex items-center gap-2">
             <Users className="h-6 w-6" />
             領取用戶名單 ({total} 位用戶)
@@ -178,7 +178,7 @@ export default async function CouponDetailPage({ params, searchParams }: PagePro
                     <div className="flex flex-col md:items-end gap-2">
                       {/* 領取統計 */}
                       <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded border border-green-400 bg-green-100 px-2 py-1 text-xs font-bold text-success">
+                        <span className="inline-flex items-center gap-1 rounded border border-success-border bg-success-bg px-2 py-1 text-xs font-bold text-success">
                           已使用 {user.total_used} 張
                         </span>
                         <span className="inline-flex items-center gap-1 rounded border border-gray-400 bg-surface-secondary px-2 py-1 text-xs font-bold text-text-secondary">

@@ -15,6 +15,13 @@ const config: Config = {
     'bg-yellow-300',
     'bg-pink-300',
     'bg-orange-300',
+    // 等級標籤 dark 變體
+    'dark:bg-blue-700',
+    'dark:bg-purple-700',
+    'dark:bg-green-700',
+    'dark:bg-yellow-700',
+    'dark:bg-pink-700',
+    'dark:bg-orange-700',
     // 主題感知工具類別
     'rounded-theme',
     'rounded-theme-sm',
@@ -73,6 +80,13 @@ const config: Config = {
           bg: 'var(--color-info-bg)',
           border: 'var(--color-info-border)',
         },
+        accent: {
+          DEFAULT: 'var(--color-accent)',
+          text: 'var(--color-accent-text)',
+          hover: 'var(--color-accent-hover)',
+        },
+        'chart-grid': 'var(--color-chart-grid)',
+        'chart-text': 'var(--color-chart-text)',
         brand: {
           primary: '#1E40AF',
           secondary: '#F97316',

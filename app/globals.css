@@ -63,6 +63,14 @@
     --color-tag-sale-border: #D97706;
     --color-tag-sale-text: #713F12;
 
+    /* 主題強調色 — 表頭、色塊按鈕、模組品牌色 */
+    --color-accent: #FDE047;
+    --color-accent-text: #422006;
+    --color-accent-hover: #FACC15;
+    /* 圖表色 */
+    --color-chart-grid: #E2E8F0;
+    --color-chart-text: #64748B;
+
     /* 主題形狀 Token */
     --theme-border-width: 1px;
     --theme-radius: 12px;
@@ -121,6 +129,11 @@
     --color-tag-sale-bg: #422006;
     --color-tag-sale-border: #FACC15;
     --color-tag-sale-text: #FDE68A;
+    --color-accent: #854D0E;
+    --color-accent-text: #FEF9C3;
+    --color-accent-hover: #A16207;
+    --color-chart-grid: #334155;
+    --color-chart-text: #94A3B8;
     --theme-shadow-hover: 0 4px 6px -1px rgba(0,0,0,0.3), 0 2px 4px -2px rgba(0,0,0,0.3);
   }
 

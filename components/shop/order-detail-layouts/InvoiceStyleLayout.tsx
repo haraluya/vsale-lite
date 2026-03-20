@@ -85,10 +85,10 @@ export function InvoiceStyleLayout({ order }: Props) {
                     return (
                       <tr key={comboDealItem.id} className="border-b-2 border-gray-200">
                         <td className="px-6 py-4" colSpan={4}>
-                          <div className="bg-yellow-50 border border-yellow-500 p-4">
+                          <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-500 p-4">
                             <div className="flex items-center justify-between mb-3">
-                              <span className="font-black text-yellow-900">📦 {snapshot.name}</span>
-                              <span className="text-xs font-bold bg-yellow-200 border border-yellow-600 px-2 py-1">
+                              <span className="font-black text-yellow-900 dark:text-yellow-100">📦 {snapshot.name}</span>
+                              <span className="text-xs font-bold bg-yellow-200 dark:bg-yellow-800 border border-yellow-600 px-2 py-1">
                                 {discountText}
                               </span>
                             </div>
@@ -97,7 +97,7 @@ export function InvoiceStyleLayout({ order }: Props) {
                                 series.products.map((product, idx) => (
                                   <div key={`${series.series_id}-${idx}`} className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
-                                      <span className="bg-yellow-200 border border-yellow-500 px-2 py-0.5 text-xs font-bold">
+                                      <span className="bg-yellow-200 dark:bg-yellow-800 border border-yellow-500 px-2 py-0.5 text-xs font-bold">
                                         {series.series_name}
                                       </span>
                                       <span>{product.product_name}</span>
@@ -127,7 +127,7 @@ export function InvoiceStyleLayout({ order }: Props) {
                       <div className="font-bold">{item.product_name_snapshot}</div>
                       {seriesName && (
                         <div className="mt-1">
-                          <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
+                          <span className="inline-block bg-blue-100 dark:bg-blue-900 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900 dark:text-blue-100">
                             {seriesName}
                           </span>
                         </div>
@@ -157,10 +157,10 @@ export function InvoiceStyleLayout({ order }: Props) {
 
                   return (
                     <div key={comboDealItem.id} className="p-5">
-                      <div className="bg-yellow-50 border border-yellow-500 p-4">
+                      <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-500 p-4">
                         <div className="flex items-start justify-between mb-3">
                           <span className="font-black text-yellow-900 flex-1">📦 {snapshot.name}</span>
-                          <span className="text-xs font-bold bg-yellow-200 border border-yellow-600 px-2 py-1 ml-2">
+                          <span className="text-xs font-bold bg-yellow-200 dark:bg-yellow-800 border border-yellow-600 px-2 py-1 ml-2">
                             {discountText}
                           </span>
                         </div>
@@ -169,7 +169,7 @@ export function InvoiceStyleLayout({ order }: Props) {
                             series.products.map((product, idx) => (
                               <div key={`${series.series_id}-${idx}`}>
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="bg-yellow-200 border border-yellow-500 px-1.5 py-0.5 text-xs font-bold">
+                                  <span className="bg-yellow-200 dark:bg-yellow-800 border border-yellow-500 px-1.5 py-0.5 text-xs font-bold">
                                     {series.series_name}
                                   </span>
                                   <span className="flex-1">{product.product_name}</span>
@@ -198,7 +198,7 @@ export function InvoiceStyleLayout({ order }: Props) {
                     <div className="flex-1">
                       <div className="font-bold mb-1">{item.product_name_snapshot}</div>
                       {seriesName && (
-                        <span className="inline-block bg-blue-100 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900">
+                        <span className="inline-block bg-blue-100 dark:bg-blue-900 border border-blue-500 px-2 py-0.5 text-xs font-bold text-blue-900 dark:text-blue-100">
                           {seriesName}
                         </span>
                       )}
@@ -292,7 +292,7 @@ export function InvoiceStyleLayout({ order }: Props) {
 
         {/* 訂單備註 */}
         {order.notes && (
-          <div className="px-6 md:px-8 py-5 border-t bg-yellow-50">
+          <div className="px-6 md:px-8 py-5 border-t bg-yellow-50 dark:bg-yellow-950">
             <div className="font-black text-sm mb-2">訂單備註</div>
             <div className="text-sm text-foreground">{order.notes}</div>
           </div>

@@ -154,7 +154,7 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
             </div>
           </div>
 
-          <div className="border-t-2 border-gray-200 my-4" />
+          <div className="border-t-2 border-border my-4" />
 
           {/* 可編輯欄位 */}
           <div className="space-y-4">
@@ -215,7 +215,7 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
           </div>
 
           {/* 操作按鈕 */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t-2 border-gray-200">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t-2 border-border">
             {editMode ? (
               <>
                 <Button
@@ -241,7 +241,7 @@ export function ClientQuickViewDialog({ open, onOpenChange, client, onUpdate }: 
                   onClick={handleCancel}
                   disabled={isSaving}
                   className={cn(
-                    'flex-1 bg-surface-secondary hover:bg-gray-300 text-foreground font-bold',
+                    'flex-1 bg-surface-secondary hover:bg-surface-secondary text-foreground font-bold',
                     'border shadow-neo-sm',
                     'active:scale-[0.98]',
                     designTokens.button.md

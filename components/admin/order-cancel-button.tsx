@@ -56,7 +56,7 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
     <>
       <button
         onClick={() => setShowConfirmDialog(true)}
-        className="rounded-theme-sm border-theme bg-red-400 px-6 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98]"
+        className="rounded-theme-sm border-theme bg-red-400 dark:bg-red-600 px-6 py-3 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98]"
       >
         <div className="flex items-center gap-2">
           <Trash2 className="h-5 w-5" />
@@ -94,7 +94,7 @@ export function OrderCancelButton({ orderId, currentStatus, orderNumber }: Order
                 onClick={handleCancel}
                 disabled={isPending}
                 type="button"
-                className="flex-1 rounded-theme-sm border-theme bg-red-400 px-4 py-2 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:opacity-50"
+                className="flex-1 rounded-theme-sm border-theme bg-red-400 dark:bg-red-600 px-4 py-2 font-bold shadow-neo-sm transition-transform hover:-translate-y-0.5 hover:shadow-theme-hover active:scale-[0.98] disabled:opacity-50"
               >
                 {isPending ? '處理中...' : '確認取消'}
               </button>

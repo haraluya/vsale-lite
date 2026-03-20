@@ -54,7 +54,7 @@ export default async function AdminOrdersPage({
           designTokens.spacing.card.padding
         )}
       >
-        <div className="rounded-theme-sm border bg-blue-400 p-2 md:p-3">
+        <div className="rounded-theme-sm border bg-blue-400 dark:bg-blue-600 p-2 md:p-3">
           <Package className="h-6 w-6 md:h-8 md:w-8" />
         </div>
         <div>

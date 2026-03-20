@@ -134,13 +134,13 @@ export function ExcelImport({ className = '' }: ExcelImportProps) {
       {isExpanded && (
         <div className="space-y-4">
           {/* 檔案選擇區 */}
-          <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
+          <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">選擇要匯入的 Excel 檔案</h3>
               {selectedFile && (
                 <button
                   onClick={handleClearFile}
-                  className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                  className="text-sm text-text-secondary hover:text-foreground flex items-center gap-1"
                 >
                   <X className="h-4 w-4" />
                   清除
@@ -159,17 +159,17 @@ export function ExcelImport({ className = '' }: ExcelImportProps) {
               className="hidden"
             />
             <div className="border-theme border-dashed border-border rounded-theme-sm p-8 text-center hover:transition-colors">
-              <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <Upload className="h-12 w-12 mx-auto mb-4 text-muted" />
               <p className="text-sm font-medium mb-2">點擊上傳 Excel 檔案</p>
-              <p className="text-xs text-gray-500">僅支援 .xlsx 格式，最大 5MB</p>
+              <p className="text-xs text-muted">僅支援 .xlsx 格式，最大 5MB</p>
             </div>
           </label>
         ) : (
-          <div className="flex items-center gap-3 p-4 border-theme bg-gray-50">
+          <div className="flex items-center gap-3 p-4 border-theme bg-surface-secondary">
             <FileSpreadsheet className="h-8 w-8 text-green-600" />
             <div className="flex-1">
               <p className="font-medium">{selectedFile.name}</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted">
                 {(selectedFile.size / 1024).toFixed(2)} KB
               </p>
             </div>
@@ -196,14 +196,14 @@ export function ExcelImport({ className = '' }: ExcelImportProps) {
           </div>
         )}
 
-            <p className="text-xs text-gray-500 mt-4">
+            <p className="text-xs text-muted mt-4">
               提示：建議先執行「試算驗證」檢查資料格式，確認無誤後再執行「正式匯入」
             </p>
           </div>
 
           {/* 匯入結果顯示 */}
           {showResults && importResult && (
-            <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
+            <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
               <div className="flex items-center gap-2 mb-4">
                 {importResult.error_count === 0 ? (
                   <CheckCircle className="h-6 w-6 text-green-600" />
@@ -217,16 +217,16 @@ export function ExcelImport({ className = '' }: ExcelImportProps) {
 
               {/* 統計資訊 */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="border-theme p-4 bg-gray-50">
-                  <p className="text-sm text-gray-600 mb-1">總筆數</p>
+                <div className="border-theme p-4 bg-surface-secondary">
+                  <p className="text-sm text-text-secondary mb-1">總筆數</p>
                   <p className="text-2xl font-bold">{importResult.total_rows}</p>
                 </div>
                 <div className="border-theme p-4 bg-green-50">
-                  <p className="text-sm text-gray-600 mb-1">成功筆數</p>
+                  <p className="text-sm text-text-secondary mb-1">成功筆數</p>
                   <p className="text-2xl font-bold text-green-600">{importResult.success_count}</p>
                 </div>
                 <div className="border-theme p-4 bg-red-50">
-                  <p className="text-sm text-gray-600 mb-1">錯誤筆數</p>
+                  <p className="text-sm text-text-secondary mb-1">錯誤筆數</p>
                   <p className="text-2xl font-bold text-red-600">{importResult.error_count}</p>
                 </div>
               </div>
@@ -242,9 +242,9 @@ export function ExcelImport({ className = '' }: ExcelImportProps) {
                           {error.row_number > 0 ? `第 ${error.row_number} 列` : '資料庫寫入'}：
                           {error.field}
                         </p>
-                        <p className="text-gray-700 mt-1">{error.message}</p>
+                        <p className="text-text-secondary mt-1">{error.message}</p>
                         {error.value && (
-                          <p className="text-xs text-gray-500 mt-1">值：{error.value}</p>
+                          <p className="text-xs text-text-secondary mt-1">值：{error.value}</p>
                         )}
                       </div>
                     ))}
