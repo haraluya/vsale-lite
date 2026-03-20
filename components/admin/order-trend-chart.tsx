@@ -30,12 +30,12 @@ export function OrderTrendChart({ data }: OrderTrendChartProps) {
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={formattedData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
           {/* 格線 */}
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--color-chart-grid)" />
 
           {/* X 軸 - 日期 */}
           <XAxis
             dataKey="dateDisplay"
-            stroke="#6b7280"
+            stroke="var(--color-chart-text)"
             style={{
               fontSize: '12px',
               fontFamily: 'inherit',
@@ -45,7 +45,7 @@ export function OrderTrendChart({ data }: OrderTrendChartProps) {
           {/* Y 軸 - 訂單數 */}
           <YAxis
             yAxisId="left"
-            stroke="#3b82f6"
+            stroke="var(--color-info)"
             style={{
               fontSize: '12px',
               fontFamily: 'inherit',
@@ -57,7 +57,7 @@ export function OrderTrendChart({ data }: OrderTrendChartProps) {
           <YAxis
             yAxisId="right"
             orientation="right"
-            stroke="#10b981"
+            stroke="var(--color-success)"
             style={{
               fontSize: '12px',
               fontFamily: 'inherit',
@@ -103,9 +103,9 @@ export function OrderTrendChart({ data }: OrderTrendChartProps) {
             yAxisId="left"
             type="monotone"
             dataKey="orders"
-            stroke="#3b82f6"
+            stroke="var(--color-info)"
             strokeWidth={3}
-            dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+            dot={{ fill: 'var(--color-info)', strokeWidth: 2, r: 4 }}
             activeDot={{ r: 6 }}
           />
 
@@ -114,9 +114,9 @@ export function OrderTrendChart({ data }: OrderTrendChartProps) {
             yAxisId="right"
             type="monotone"
             dataKey="revenue"
-            stroke="#10b981"
+            stroke="var(--color-success)"
             strokeWidth={3}
-            dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+            dot={{ fill: 'var(--color-success)', strokeWidth: 2, r: 4 }}
             activeDot={{ r: 6 }}
           />
         </LineChart>
