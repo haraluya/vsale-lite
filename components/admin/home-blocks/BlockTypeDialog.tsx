@@ -35,7 +35,7 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           className={`
-            relative w-full max-w-lg bg-white
+            relative w-full max-w-lg bg-surface
             ${designTokens.cleanCommerce.border.full}
             ${designTokens.cleanCommerce.shadow.full}
            
@@ -49,7 +49,7 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
           {/* 關閉按鈕 */}
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 p-2 hover:bg-gray-100 rounded-theme-sm"
+            className="absolute right-4 top-4 p-2 hover:bg-surface-secondary rounded-theme-sm"
             aria-label="關閉對話框"
           >
             <X className="h-5 w-5" />
@@ -62,7 +62,7 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
           >
             選擇區塊類型
           </h2>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-text-secondary mb-6">
             請選擇您要建立的首頁廣告區塊類型，建立後將無法變更類型。
           </p>
 
@@ -169,7 +169,7 @@ export function BlockTypeDialog({ open, onClose, onSelect }: BlockTypeDialogProp
           <button
             onClick={onClose}
             className={`
-              mt-6 w-full p-3 bg-white text-black
+              mt-6 w-full p-3 bg-surface text-foreground
               ${designTokens.cleanCommerce.border.full}
               ${designTokens.cleanCommerce.shadow.full}
               rounded-theme-sm

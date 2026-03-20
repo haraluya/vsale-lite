@@ -161,8 +161,8 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
     <div className="space-y-4">
       {/* 錯誤訊息 */}
       {error && (
-        <div className="rounded-theme-sm border border-red-600 bg-red-50 p-4">
-          <p className="font-bold text-red-800">{error}</p>
+        <div className="rounded-theme-sm border border-error bg-error-bg p-4">
+          <p className="font-bold text-error">{error}</p>
         </div>
       )}
 
@@ -191,7 +191,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                   <th key={tier.tier_id} className="border-b px-3 py-2 text-left font-bold">
                     {tier.tier_name}
                     {tier.is_protected && (
-                      <span className="ml-2 rounded-theme-sm border border-yellow-600 bg-yellow-100 px-1 text-xs text-yellow-700">
+                      <span className="ml-2 rounded-theme-sm border border-warning-border bg-warning-bg px-1 text-xs text-warning">
                         自動
                       </span>
                     )}
@@ -245,7 +245,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                             {currentPrice && product.retail_price && (
                               <div className="mt-1 text-xs">
                                 {currentPrice < product.retail_price ? (
-                                  <span className="text-green-600 font-medium">
+                                  <span className="text-success font-medium">
                                     省{' '}
                                     {Math.round(
                                       ((product.retail_price - currentPrice) / product.retail_price) * 100
@@ -255,7 +255,7 @@ export function CategoryPriceTable({ category, products }: CategoryPriceTablePro
                                 ) : currentPrice === product.retail_price ? (
                                   <span className="text-gray-500">原價</span>
                                 ) : (
-                                  <span className="text-red-600 font-medium">
+                                  <span className="text-error font-medium">
                                     +{Math.round(((currentPrice - product.retail_price) / product.retail_price) * 100)}
                                     %
                                   </span>

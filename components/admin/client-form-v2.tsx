@@ -70,9 +70,9 @@ export function ClientFormV2({ client, tiers }: ClientFormV2Props) {
           type="tel"
           value={client.phone}
           disabled
-          className="mt-2 bg-gray-100"
+          className="mt-2 bg-surface-secondary"
         />
-        <p className="mt-2 text-xs text-gray-500">手機號碼無法修改</p>
+        <p className="mt-2 text-xs text-muted">手機號碼無法修改</p>
       </div>
 
       <div>

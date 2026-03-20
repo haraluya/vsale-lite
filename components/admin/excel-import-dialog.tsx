@@ -130,7 +130,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
           <button
             onClick={handleClose}
             disabled={isImporting}
-            className="rounded-theme-sm border bg-surface p-2 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+            className="rounded-theme-sm border bg-surface p-2 hover:bg-surface-secondary disabled:opacity-50"
           >
             <X className="h-5 w-5" />
           </button>
@@ -145,7 +145,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
               {selectedFile && (
                 <button
                   onClick={handleClearFile}
-                  className="text-sm text-text-secondary hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-1"
+                  className="text-sm text-text-secondary hover:text-foreground flex items-center gap-1"
                 >
                   <X className="h-4 w-4" />
                   清除
@@ -260,7 +260,7 @@ export function ExcelImportDialog({ isOpen, onClose }: ExcelImportDialogProps) {
               {/* 下一步提示 */}
               {importResult.dry_run && importResult.error_count === 0 && (
                 <div className="mt-4 p-4 border border-green-600 bg-success-bg">
-                  <p className="text-sm text-green-800">
+                  <p className="text-sm text-green-800 dark:text-green-200">
                     資料驗證通過！請點擊「正式匯入」按鈕完成匯入。
                   </p>
                 </div>

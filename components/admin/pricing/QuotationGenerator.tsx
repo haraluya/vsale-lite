@@ -193,7 +193,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
   return (
     <div className="space-y-6">
       {/* 等級選擇 */}
-      <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
         <label className="mb-3 block font-bold">選擇等級</label>
         <select
           value={selectedTierId}
@@ -210,7 +210,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
       </div>
 
       {/* 系列多選（依分類分組） */}
-      <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
+      <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
         <label className="mb-3 block font-bold">選擇系列 (可複選)</label>
         <div className="space-y-4">
           {sortedCategories.map((categoryName) => (
@@ -223,7 +223,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
                     className={`flex items-center gap-2 rounded-theme-sm border p-3 cursor-pointer transition-all ${
                       selectedSeriesIds.has(series.id)
                         ? 'bg-purple-400 shadow-neo-sm'
-                        : 'bg-white hover:bg-gray-50'
+                        : 'bg-surface hover:bg-surface-secondary'
                     }`}
                   >
                     <input
@@ -245,7 +245,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
 
       {/* 報價文字框與按鈕 */}
       {!isLoading && quotationData.length > 0 && (
-        <div className="rounded-theme-sm border-theme bg-white p-6 shadow-neo">
+        <div className="rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
           <div className="flex items-center justify-between mb-3">
             <label className="font-bold">報價文字</label>
             <div className="flex flex-wrap gap-2">
@@ -283,7 +283,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
           />
           <div className="mt-4 rounded-theme-sm border bg-blue-50 p-4">
             <p className="text-sm font-bold text-blue-700">💡 使用提示</p>
-            <ul className="mt-2 text-xs text-gray-700 space-y-1">
+            <ul className="mt-2 text-xs text-text-secondary space-y-1">
               <li>1. 選擇等級</li>
               <li>2. 勾選要報價的系列</li>
               <li>3. 點擊「產生報價」</li>
@@ -296,7 +296,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
       {/* 載入中 */}
       {isLoading && (
         <div className="rounded-theme-sm border-theme bg-white p-12 text-center shadow-neo">
-          <p className="text-lg text-gray-500">載入中...</p>
+          <p className="text-lg text-muted">載入中...</p>
         </div>
       )}
 
@@ -304,7 +304,7 @@ export function QuotationGenerator({ tiers }: QuotationGeneratorProps) {
       {!selectedTierId && (
         <div className="rounded-theme-sm border-theme bg-purple-50 p-8 text-center shadow-neo">
           <p className="text-lg font-bold">請選擇等級</p>
-          <p className="mt-4 text-sm text-gray-600">選擇等級與系列後,可快速產生文字報價單</p>
+          <p className="mt-4 text-sm text-text-secondary">選擇等級與系列後,可快速產生文字報價單</p>
         </div>
       )}
     </div>

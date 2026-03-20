@@ -175,7 +175,7 @@ export function SeriesSelector({
           {selectedSeries.map((series, index) => (
             <div
               key={series.series_id}
-              className="border rounded-theme-sm p-3 bg-white shadow-neo-sm"
+              className="border rounded-theme-sm p-3 bg-surface shadow-neo-sm"
             >
               <div className="flex items-center gap-3">
                 {/* 順位調整按鈕 */}
@@ -246,7 +246,7 @@ export function SeriesSelector({
       {/* 可選擇的系列 */}
       <div>
         <p className={`${designTokens.typography.label} mb-2`}>
-          選擇系列 <span className="text-gray-500 text-sm">(最多 5 個)</span>
+          選擇系列 <span className="text-muted text-sm">(最多 5 個)</span>
         </p>
 
         {selectedSeries.length >= 5 ? (
@@ -286,11 +286,11 @@ export function SeriesSelector({
                           type="button"
                           onClick={() => handleAddSeries(series.id)}
                           disabled={disabled}
-                          className="p-3 border rounded-theme-sm bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
+                          className="p-3 border rounded-theme-sm bg-surface hover:bg-surface-secondary hover:shadow-neo-sm transition text-left disabled:opacity-50"
                         >
                           <span className="font-bold text-sm">{series.name}</span>
                           {series.code && (
-                            <span className="block text-xs text-gray-600 mt-1">{series.code}</span>
+                            <span className="block text-xs text-text-secondary mt-1">{series.code}</span>
                           )}
                         </button>
                       ))}
@@ -312,11 +312,11 @@ export function SeriesSelector({
                         type="button"
                         onClick={() => handleAddSeries(series.id)}
                         disabled={disabled}
-                        className="p-3 border rounded-theme-sm bg-white hover:bg-gray-50 hover:shadow-neo-sm transition text-left disabled:opacity-50"
+                        className="p-3 border rounded-theme-sm bg-surface hover:bg-surface-secondary hover:shadow-neo-sm transition text-left disabled:opacity-50"
                       >
                         <span className="font-bold text-sm">{series.name}</span>
                         {series.code && (
-                          <span className="block text-xs text-gray-600 mt-1">{series.code}</span>
+                          <span className="block text-xs text-text-secondary mt-1">{series.code}</span>
                         )}
                       </button>
                     ))}

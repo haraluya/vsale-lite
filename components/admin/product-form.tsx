@@ -130,9 +130,9 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                 name="code"
                 defaultValue={product?.code}
                 disabled
-                className="cursor-not-allowed bg-gray-100"
+                className="cursor-not-allowed bg-surface-secondary"
               />
-              <p className="mt-1 text-xs text-gray-600">
+              <p className="mt-1 text-xs text-text-secondary">
                 商品編號由系統自動產生，建立後不可修改
               </p>
             </div>
@@ -201,7 +201,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                 ))}
                 <ErrorInline message={state?.errors?.name?.[0]} />
                 {productNames.length > 1 && (
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-text-secondary">
                     💡 將建立 {productNames.filter(n => n.trim()).length} 個商品,其他欄位(系列、價格、庫存等)相同
                   </p>
                 )}
@@ -236,7 +236,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
         <FormSection variant="info" title="商品詳情">
           <div>
             <label htmlFor="description" className="mb-2 block font-bold">
-              商品描述 <span className="text-gray-500">(選填)</span>
+              商品描述 <span className="text-muted">(選填)</span>
             </label>
             <textarea
               id="description"
@@ -268,7 +268,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
               onChange={(e) => setFormData({ ...formData, retail_price: e.target.value })}
               placeholder="0"
             />
-            <p className="mt-1 text-xs text-gray-600">
+            <p className="mt-1 text-xs text-text-secondary">
               零售價格是商品的基準價格,用於顯示折扣力度與自動建立零售等級價格
             </p>
             <ErrorInline message={state?.errors?.retail_price?.[0]} />
@@ -289,7 +289,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                 onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                 placeholder="0"
               />
-              <p className="mt-1 text-xs text-gray-600">可輸入負數 (欠貨/預購)</p>
+              <p className="mt-1 text-xs text-text-secondary">可輸入負數 (欠貨/預購)</p>
               <ErrorInline message={state?.errors?.stock?.[0]} />
             </div>
 
@@ -354,7 +354,7 @@ export function ProductForm({ product, series, mode }: ProductFormProps) {
                 <option value="active">啟用</option>
                 <option value="inactive">停用</option>
               </select>
-              <p className="mt-1 text-xs text-gray-600">停用的商品不會顯示在前台</p>
+              <p className="mt-1 text-xs text-text-secondary">停用的商品不會顯示在前台</p>
               <ErrorInline message={state?.errors?.status?.[0]} />
             </div>
 

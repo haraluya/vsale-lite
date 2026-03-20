@@ -84,7 +84,7 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
             maxLength={10}
             className="mt-2"
           />
-          <p className="mt-1 text-sm text-gray-500">提示: 商品編號會使用此代碼 (如 DRK-0001)</p>
+          <p className="mt-1 text-sm text-muted">提示: 商品編號會使用此代碼 (如 DRK-0001)</p>
           {state && 'errors' in state && state.errors?.code && (
             <p className="mt-2 text-sm text-error">{state.errors.code[0]}</p>
           )}

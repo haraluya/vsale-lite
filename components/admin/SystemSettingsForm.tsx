@@ -88,18 +88,18 @@ export function SystemSettingsForm({ settings, updateAction, fieldHints }: Syste
           <div
             key={setting.key}
             className={`rounded-theme-sm border-theme bg-surface p-4 shadow-neo-sm ${
-              isChanged ? 'border-blue-500' : 'border-border'
+              isChanged ? 'border-info-border' : 'border-border'
             }`}
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <label className="block text-sm font-bold text-text-secondary mb-1">
                   {setting.description || setting.key}
-                  {isChanged && <span className="ml-2 text-xs text-blue-600">(已修改)</span>}
+                  {isChanged && <span className="ml-2 text-xs text-info">(已修改)</span>}
                 </label>
                 <p className="text-xs text-text-secondary mb-2">{setting.key}</p>
                 {fieldHints?.[setting.key] && (
-                  <p className="text-xs text-blue-600 mb-2 bg-info-bg p-2 rounded border border-blue-200">
+                  <p className="text-xs text-info mb-2 bg-info-bg p-2 rounded border border-info-border">
                     💡 {fieldHints[setting.key]}
                   </p>
                 )}
