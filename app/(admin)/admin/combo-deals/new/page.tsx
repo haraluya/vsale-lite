@@ -31,7 +31,7 @@ export default async function NewComboDealPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold">新增組合優惠</h1>
-        <p className="mt-2 text-gray-600">建立新的組合優惠活動</p>
+        <p className="mt-2 text-text-secondary">建立新的組合優惠活動</p>
       </div>
 
       <ComboDealForm series={series} tiers={tiers} categories={categories} mode="create" />

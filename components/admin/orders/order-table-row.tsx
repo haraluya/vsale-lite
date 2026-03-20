@@ -35,7 +35,7 @@ export const OrderTableRow = memo(
         {/* 客戶資訊 */}
         <div>
           <div className="font-bold">{order.user_name}</div>
-          <div className="text-sm text-gray-600">{order.user_phone}</div>
+          <div className="text-sm text-text-secondary">{order.user_phone}</div>
         </div>
 
         {/* 等級 */}
@@ -50,7 +50,7 @@ export const OrderTableRow = memo(
         <div className="text-right font-bold">{formatAmount(order.total_amount)}</div>
 
         {/* 建立時間 */}
-        <div className="text-sm text-gray-600">{formatDateTW(order.created_at)}</div>
+        <div className="text-sm text-text-secondary">{formatDateTW(order.created_at)}</div>
       </PrefetchLink>
     )
   },

@@ -35,7 +35,7 @@ export function SmartOrderList({
     return (
       <div>
         {/* 提示訊息 */}
-        <div className="mb-4 text-sm text-gray-600 bg-blue-50 border p-3">
+        <div className="mb-4 text-sm text-text-secondary bg-blue-50 border p-3">
           ⚡ 虛擬滾動模式已啟用（{orders.length} 筆訂單）- 提升大列表渲染性能
         </div>
 

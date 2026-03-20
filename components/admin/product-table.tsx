@@ -106,7 +106,7 @@ export function ProductTable({
 
   return (
     <div className={cn(
-      "rounded-theme-sm bg-white",
+      "rounded-theme-sm bg-surface",
       designTokens.cleanCommerce.border.full,
       designTokens.cleanCommerce.shadow.full,
       designTokens.spacing.card.padding,
@@ -125,7 +125,7 @@ export function ProductTable({
 
         <select
           className={cn(
-            "rounded-theme-sm border bg-white font-bold",
+            "rounded-theme-sm border bg-surface font-bold",
             designTokens.input.base,
             designTokens.cleanCommerce.shadow.base
           )}
@@ -169,7 +169,7 @@ export function ProductTable({
           <tbody>
             {products.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={7} className="px-4 py-8 text-center text-muted">
                   {searchQuery || selectedSeries
                     ? '找不到符合條件的商品'
                     : '尚未建立任何商品'}
@@ -177,10 +177,10 @@ export function ProductTable({
               </tr>
             ) : (
               products.map((product) => (
-                <tr key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
+                <tr key={product.id} className="border-b border-border hover:bg-surface-secondary">
                   <td className="px-4 py-3 font-mono text-sm">{product.code}</td>
                   <td className="px-4 py-3 font-medium">{product.name}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{product.series_name}</td>
+                  <td className="px-4 py-3 text-sm text-text-secondary">{product.series_name}</td>
                   <td className="px-4 py-3 text-right">
                     {editingStockId === product.id ? (
                       <div className="flex items-center justify-end gap-2">
@@ -200,7 +200,7 @@ export function ProductTable({
                         </button>
                         <button
                           onClick={handleCancelEditStock}
-                          className="rounded-theme-sm border bg-gray-100 p-1 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm transition-all"
+                          className="rounded-theme-sm border bg-surface-secondary p-1 hover:-translate-y-0.5 hover:shadow-theme-hover shadow-neo-sm transition-all"
                           title="取消"
                         >
                           <X className="h-4 w-4" />
@@ -213,7 +213,7 @@ export function ProductTable({
                           product.stock < 0
                             ? 'text-orange-600'
                             : product.stock === 0
-                              ? 'text-gray-500'
+                              ? 'text-muted'
                               : 'text-green-600'
                         }`}
                         title="點擊快速編輯庫存"
@@ -228,7 +228,7 @@ export function ProductTable({
                       className={`rounded-theme-sm border px-2 py-1 text-xs font-bold ${
                         product.status === 'active'
                           ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
+                          : 'bg-surface-secondary text-foreground'
                       }`}
                     >
                       {product.status === 'active' ? '啟用' : '停用'}
@@ -259,7 +259,7 @@ export function ProductTable({
       {/* 手機版: 卡片視圖 */}
       <div className="lg:hidden space-y-3 md:space-y-4">
         {products.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-muted">
             {searchQuery || selectedSeries
               ? '找不到符合條件的商品'
               : '尚未建立任何商品'}
@@ -269,7 +269,7 @@ export function ProductTable({
             <div
               key={product.id}
               className={cn(
-                "rounded-theme-sm bg-gray-50",
+                "rounded-theme-sm bg-surface-secondary",
                 "border",
                 "shadow-neo-sm",
                 designTokens.spacing.card.padding,
@@ -278,14 +278,14 @@ export function ProductTable({
             >
               {/* 商品編號與狀態 */}
               <div className="flex items-start justify-between gap-3">
-                <div className={cn("font-mono text-gray-600", designTokens.typography.caption)}>
+                <div className={cn("font-mono text-text-secondary", designTokens.typography.caption)}>
                   {product.code}
                 </div>
                 <span
                   className={`rounded-theme-sm border px-2 py-1 text-xs font-bold whitespace-nowrap ${
                     product.status === 'active'
                       ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
+                      : 'bg-surface-secondary text-foreground'
                   }`}
                 >
                   {product.status === 'active' ? '啟用' : '停用'}
@@ -297,14 +297,14 @@ export function ProductTable({
                 <div className={cn("font-bold", designTokens.typography.body.base)}>
                   {product.name}
                 </div>
-                <div className={cn("text-gray-600", designTokens.typography.caption)}>
+                <div className={cn("text-text-secondary", designTokens.typography.caption)}>
                   {product.series_name}
                 </div>
               </div>
 
               {/* 庫存資訊 */}
               <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className={cn("text-gray-600", designTokens.typography.caption)}>
+                <span className={cn("text-text-secondary", designTokens.typography.caption)}>
                   庫存
                 </span>
                 {editingStockId === product.id ? (
@@ -324,7 +324,7 @@ export function ProductTable({
                     </button>
                     <button
                       onClick={handleCancelEditStock}
-                      className="rounded-theme-sm border bg-gray-100 p-1.5 shadow-neo-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
+                      className="rounded-theme-sm border bg-surface-secondary p-1.5 shadow-neo-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -338,7 +338,7 @@ export function ProductTable({
                       product.stock < 0
                         ? 'text-orange-600'
                         : product.stock === 0
-                          ? 'text-gray-500'
+                          ? 'text-muted'
                           : 'text-green-600'
                     )}
                   >

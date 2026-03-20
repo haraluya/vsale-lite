@@ -45,7 +45,7 @@ export default async function UpdateClientPasswordPage({
     <div className="space-y-6">
       <Link
         href="/admin/clients"
-        className="inline-flex items-center gap-2 text-gray-600 hover:text-black transition-colors"
+        className="inline-flex items-center gap-2 text-text-secondary hover:text-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         返回客戶列表
@@ -53,7 +53,7 @@ export default async function UpdateClientPasswordPage({
 
       <div>
         <h1 className="text-3xl font-bold">修改客戶密碼</h1>
-        <p className="mt-2 text-gray-600">
+        <p className="mt-2 text-text-secondary">
           客戶: {client.display_name || client.phone} ({client.phone})
         </p>
       </div>

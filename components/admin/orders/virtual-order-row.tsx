@@ -32,7 +32,7 @@ export const VirtualOrderRow = memo(
           ref={ref}
           href={`/admin/orders/${order.id}`}
           data-index={index}
-          className="absolute top-0 left-0 w-full grid grid-cols-6 gap-4 p-4 border-b border-gray-200 items-center hover:bg-yellow-50 transition-colors"
+          className="absolute top-0 left-0 w-full grid grid-cols-6 gap-4 p-4 border-b border-border items-center hover:bg-yellow-50 transition-colors"
           style={{
             transform: `translateY(${start}px)`,
           }}
@@ -45,7 +45,7 @@ export const VirtualOrderRow = memo(
           {/* 客戶 */}
           <div>
             <div className="font-bold">{order.user_name}</div>
-            <div className="text-sm text-gray-600">{order.user_phone}</div>
+            <div className="text-sm text-text-secondary">{order.user_phone}</div>
           </div>
 
           {/* 等級 */}
@@ -62,7 +62,7 @@ export const VirtualOrderRow = memo(
           </div>
 
           {/* 建立時間 */}
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-text-secondary">
             {formatDateTW(order.created_at)}
           </div>
         </Link>

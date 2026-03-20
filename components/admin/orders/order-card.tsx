@@ -29,7 +29,7 @@ export const OrderCard = memo(
       <PrefetchLink
         href={`/admin/orders/${order.id}`}
         className={cn(
-          'block rounded-theme-sm bg-white',
+          'block rounded-theme-sm bg-surface',
           getThemeClasses({ active: true }),
           designTokens.spacing.card.padding,
           designTokens.spacing.card.gap
@@ -47,14 +47,14 @@ export const OrderCard = memo(
         {/* 客戶資訊 */}
         <div className={designTokens.spacing.card.gap}>
           <div className={cn('font-bold', designTokens.typography.body.base)}>{order.user_name}</div>
-          <div className={cn('text-gray-600', designTokens.typography.caption)}>
+          <div className={cn('text-text-secondary', designTokens.typography.caption)}>
             {order.user_phone} • {order.tier_name}
           </div>
         </div>
 
         {/* 金額與時間 */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-          <div className={cn('text-gray-600', designTokens.typography.caption)}>{formatDateTW(order.created_at)}</div>
+        <div className="flex items-center justify-between pt-2 border-t border-border">
+          <div className={cn('text-text-secondary', designTokens.typography.caption)}>{formatDateTW(order.created_at)}</div>
           <div className={cn('font-bold', designTokens.typography.body.base)}>{formatAmount(order.total_amount)}</div>
         </div>
       </PrefetchLink>

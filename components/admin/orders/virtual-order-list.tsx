@@ -44,13 +44,13 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
       <div className="hidden lg:block">
         <div
           className={cn(
-            'rounded-theme-sm bg-white overflow-hidden',
+            'rounded-theme-sm bg-surface overflow-hidden',
             designTokens.cleanCommerce.border.full,
             designTokens.cleanCommerce.shadow.full
           )}
         >
           {/* 表頭（固定） */}
-          <div className="grid grid-cols-6 gap-4 border-b bg-gray-100 p-4 font-bold sticky top-0 z-10">
+          <div className="grid grid-cols-6 gap-4 border-b bg-surface-secondary p-4 font-bold sticky top-0 z-10">
             <div>訂單編號</div>
             <div>客戶</div>
             <div>等級</div>
@@ -91,7 +91,7 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
         </div>
 
         {/* 顯示總數 */}
-        <div className="text-sm text-gray-600 mt-4">
+        <div className="text-sm text-text-secondary mt-4">
           顯示 {orders.length} 筆訂單（虛擬滾動模式）
         </div>
       </div>
@@ -103,7 +103,7 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
             key={order.id}
             href={`/admin/orders/${order.id}`}
             className={cn(
-              'block rounded-theme-sm bg-white',
+              'block rounded-theme-sm bg-surface',
               getThemeClasses({ active: true }),
               designTokens.spacing.card.padding
             )}
@@ -114,7 +114,7 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
                 <div className="font-mono font-bold text-blue-600 text-sm md:text-base">
                   {order.order_number}
                 </div>
-                <div className="text-xs md:text-sm text-gray-600 mt-1">
+                <div className="text-xs md:text-sm text-text-secondary mt-1">
                   {formatDateTW(order.created_at)}
                 </div>
               </div>
@@ -124,14 +124,14 @@ export function VirtualOrderList({ orders }: VirtualOrderListProps) {
             {/* 客戶資訊 */}
             <div className="mb-3">
               <div className="font-bold text-sm md:text-base">{order.user_name}</div>
-              <div className="text-xs md:text-sm text-gray-600">{order.user_phone}</div>
-              <div className="text-xs md:text-sm text-gray-600">等級: {order.tier_name}</div>
+              <div className="text-xs md:text-sm text-text-secondary">{order.user_phone}</div>
+              <div className="text-xs md:text-sm text-text-secondary">等級: {order.tier_name}</div>
             </div>
 
             {/* 金額 */}
             <div className="pt-3 border-t">
               <div className="flex items-center justify-between">
-                <span className="text-sm md:text-base font-medium text-gray-700">訂單金額</span>
+                <span className="text-sm md:text-base font-medium text-text-secondary">訂單金額</span>
                 <span className="font-mono font-bold text-base md:text-lg text-blue-600">
                   {formatAmount(order.total_amount)}
                 </span>

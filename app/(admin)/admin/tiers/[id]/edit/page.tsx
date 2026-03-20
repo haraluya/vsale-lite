@@ -60,7 +60,7 @@ export default async function EditTierPage({
 
       <div>
         <h1 className="text-3xl font-bold">編輯會員等級</h1>
-        <p className="mt-2 text-gray-600">修改「{tier.name}」等級資訊</p>
+        <p className="mt-2 text-text-secondary">修改「{tier.name}」等級資訊</p>
       </div>
 
       <div className="card-neo max-w-2xl">

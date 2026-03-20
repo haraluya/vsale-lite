@@ -135,7 +135,7 @@ export function TierPriceTable({ product, tiersWithPrices }: TierPriceTableProps
                     : 0
 
                 return (
-                  <tr key={tier.tier_id} className="border-b border-gray-200 hover:bg-gray-50">
+                  <tr key={tier.tier_id} className="border-b border-border hover:bg-surface-secondary">
                     <td className="px-4 py-3 font-medium">{tier.tier_name}</td>
                     <td className="px-4 py-3 text-sm text-text-secondary">{tier.tier_rank}</td>
                     <td className="px-4 py-3">

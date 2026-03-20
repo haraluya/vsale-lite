@@ -44,7 +44,7 @@ export default async function EditComboDealPage({ params }: { params: Promise<{ 
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold">編輯組合優惠</h1>
-        <p className="mt-2 text-gray-600">{comboDeal.name}</p>
+        <p className="mt-2 text-text-secondary">{comboDeal.name}</p>
       </div>
 
       <ComboDealForm comboDeal={comboDeal} series={series} tiers={tiers} categories={categories} mode="edit" />

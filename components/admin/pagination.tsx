@@ -73,18 +73,18 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {/* 每頁筆數選擇器 */}
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-700">每頁顯示:</span>
+        <span className="text-sm font-medium text-text-secondary">每頁顯示:</span>
         <select
           value={pageSize}
           onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
-          className="rounded-theme-sm border px-3 py-1 text-sm font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-black"
+          className="rounded-theme-sm border px-3 py-1 text-sm font-bold shadow-neo-sm focus:outline-none focus:ring-2 focus:ring-border"
         >
           <option value="20">20 筆</option>
           <option value="50">50 筆</option>
           <option value="100">100 筆</option>
         </select>
 
-        <span className="ml-4 text-sm text-gray-600">
+        <span className="ml-4 text-sm text-text-secondary">
           共 {total} 筆,顯示第 {Math.min((currentPage - 1) * pageSize + 1, total)} -{' '}
           {Math.min(currentPage * pageSize, total)} 筆
         </span>
@@ -96,7 +96,7 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
         <button
           onClick={() => router.push(createPageUrl(currentPage - 1))}
           disabled={currentPage === 1}
-          className="rounded-theme-sm border bg-white p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
+          className="rounded-theme-sm border bg-surface p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
           aria-label="上一頁"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -106,7 +106,7 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
         {pageNumbers.map((page, index) => {
           if (page === '...') {
             return (
-              <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+              <span key={`ellipsis-${index}`} className="px-2 text-muted">
                 ...
               </span>
             )
@@ -121,8 +121,8 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
               onClick={() => router.push(createPageUrl(pageNumber))}
               className={`min-w-[2.5rem] rounded-theme-sm border px-3 py-1 text-sm font-bold shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover ${
                 isActive
-                  ? 'bg-black text-white'
-                  : 'bg-white text-black hover:bg-gray-100'
+                  ? 'bg-foreground text-text-inverse'
+                  : 'bg-surface text-foreground hover:bg-surface-secondary'
               }`}
             >
               {pageNumber}
@@ -134,7 +134,7 @@ export function Pagination({ total, currentPage, pageSize, onPageSizeChange }: P
         <button
           onClick={() => router.push(createPageUrl(currentPage + 1))}
           disabled={currentPage === totalPages}
-          className="rounded-theme-sm border bg-white p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
+          className="rounded-theme-sm border bg-surface p-2 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-neo-sm"
           aria-label="下一頁"
         >
           <ChevronRight className="h-4 w-4" />

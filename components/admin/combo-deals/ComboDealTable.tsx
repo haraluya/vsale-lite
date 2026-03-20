@@ -127,7 +127,7 @@ export function ComboDealTable({
   const getStatusBadge = (status: string) => {
     const badges = {
       active: 'bg-green-100 text-green-800 border-green-300',
-      inactive: 'bg-gray-100 text-gray-800 border-border',
+      inactive: 'bg-surface-secondary text-foreground border-border',
       ended: 'bg-red-100 text-red-800 border-red-300',
     }
     const labels = {
@@ -156,7 +156,7 @@ export function ComboDealTable({
       {/* Desktop Table */}
       <div className={cn("hidden lg:block card-neo overflow-hidden p-0")}>
         <table className="w-full">
-          <thead className="border-b bg-gray-50">
+          <thead className="border-b bg-surface-secondary">
             <tr>
               <th className="px-4 py-3 text-left text-sm font-bold">海報</th>
               <th className="px-4 py-3 text-left text-sm font-bold">名稱</th>
@@ -172,7 +172,7 @@ export function ComboDealTable({
             {items.map((item) => (
               <tr
                 key={item.id}
-                className="border-b border-gray-200 hover:bg-gray-50"
+                className="border-b border-border hover:bg-surface-secondary"
               >
                 <td className="px-4 py-3">
                   <Image
@@ -185,7 +185,7 @@ export function ComboDealTable({
                 </td>
                 <td className="px-4 py-3">
                   <div className="font-semibold">{item.name}</div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted">
                     排序: {item.display_order ?? '-'}
                   </div>
                 </td>
@@ -195,7 +195,7 @@ export function ComboDealTable({
                 <td className="px-4 py-3 text-sm font-semibold text-red-600">
                   {formatDiscount(item.discount_type, item.discount_value)}
                 </td>
-                <td className="px-4 py-3 text-xs text-gray-600">
+                <td className="px-4 py-3 text-xs text-text-secondary">
                   <div>{formatDate(item.start_date)}</div>
                   <div>至 {formatDate(item.end_date)}</div>
                 </td>
@@ -251,7 +251,7 @@ export function ComboDealTable({
           <div
             key={item.id}
             className={cn(
-              "rounded-theme-sm bg-white",
+              "rounded-theme-sm bg-surface",
               getThemeClasses(),
               designTokens.spacing.card.padding
             )}
@@ -269,7 +269,7 @@ export function ComboDealTable({
               <h3 className="font-bold">{item.name}</h3>
               {getStatusBadge(item.status)}
             </div>
-            <div className="mb-3 space-y-1 text-sm text-gray-600">
+            <div className="mb-3 space-y-1 text-sm text-text-secondary">
               <div>模式: {item.combo_mode === 'each' ? '各選' : '任選'}</div>
               <div className="font-semibold text-red-600">
                 {formatDiscount(item.discount_type, item.discount_value)}
@@ -319,7 +319,7 @@ export function ComboDealTable({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between border-t px-4 py-3">
-          <div className={cn("text-gray-600", designTokens.typography.caption)}>
+          <div className={cn("text-text-secondary", designTokens.typography.caption)}>
             第 {page} / {totalPages} 頁
           </div>
           <div className="flex gap-2">

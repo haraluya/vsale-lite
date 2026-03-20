@@ -159,10 +159,10 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
       )}
 
       {/* 系列資訊 */}
-      <div className={cn("rounded-theme-sm bg-white", getThemeClasses(), designTokens.spacing.card.padding)}>
+      <div className={cn("rounded-theme-sm bg-surface", getThemeClasses(), designTokens.spacing.card.padding)}>
         <h3 className={designTokens.typography.h3}>{series.name}</h3>
         {series.description && (
-          <p className={cn("mt-1 text-gray-600", designTokens.typography.caption)}>{series.description}</p>
+          <p className={cn("mt-1 text-text-secondary", designTokens.typography.caption)}>{series.description}</p>
         )}
         <p className={cn("mt-2 font-medium", designTokens.typography.caption)}>
           共 {products.length} 個商品 × {tiers.length} 個等級
@@ -171,14 +171,14 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
 
       {/* 價格表格 */}
       <form onSubmit={handleSubmit}>
-        <p className="lg:hidden text-center py-2 text-xs text-gray-500">
+        <p className="lg:hidden text-center py-2 text-xs text-muted">
           ← 左右滑動查看更多等級 →
         </p>
-        <div className={cn("overflow-x-auto rounded-theme-sm bg-white", getThemeClasses())}>
+        <div className={cn("overflow-x-auto rounded-theme-sm bg-surface", getThemeClasses())}>
           <table className="w-full">
-            <thead className="bg-gray-100">
+            <thead className="bg-surface-secondary">
               <tr>
-                <th className="sticky left-0 z-10 border-b-2 border-r-2 bg-gray-100 px-4 py-3 text-left font-bold">
+                <th className="sticky left-0 z-10 border-b-2 border-r-2 bg-surface-secondary px-4 py-3 text-left font-bold">
                   商品編號 / 名稱
                 </th>
                 {tiers.map((tier) => (
@@ -209,7 +209,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                             }))
                           }
                           placeholder="金額"
-                          className="w-16 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="w-16 rounded-theme-sm border border-border px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                         <button
                           type="button"
@@ -231,14 +231,14 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
               {products.map((product, idx) => (
                 <tr
                   key={product.id}
-                  className={`border-b border-gray-200 hover:bg-gray-50 ${
-                    idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                  className={`border-b border-border hover:bg-surface-secondary ${
+                    idx % 2 === 0 ? 'bg-surface' : 'bg-surface-secondary'
                   }`}
                 >
                   {/* 商品資訊 */}
-                  <td className="sticky left-0 z-10 border-r-2 bg-white px-4 py-3">
+                  <td className="sticky left-0 z-10 border-r-2 bg-surface px-4 py-3">
                     <div className="font-bold">{product.name}</div>
-                    <div className="text-sm text-gray-600">{product.code}</div>
+                    <div className="text-sm text-text-secondary">{product.code}</div>
                   </td>
 
                   {/* 各等級價格 */}
@@ -283,7 +283,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
                                     )}%
                                   </span>
                                 ) : currentPrice === product.retail_price ? (
-                                  <span className="text-gray-500">原價</span>
+                                  <span className="text-muted">原價</span>
                                 ) : (
                                   <span className="text-red-600 font-medium">
                                     +{Math.round(
@@ -308,7 +308,7 @@ export function SeriesPriceTable({ series, products }: SeriesPriceTableProps) {
 
         {/* 說明與儲存按鈕 */}
         <div className="mt-4 flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-text-secondary">
             <p>💡 提示:</p>
             <ul className="ml-4 mt-1 list-disc space-y-1">
               <li>使用「快速填入」功能可一鍵將該等級所有商品設定為相同價格</li>

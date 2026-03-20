@@ -23,8 +23,8 @@ export function MemberList({
 }: MemberListProps) {
   if (admins.length === 0) {
     return (
-      <div className={cn("rounded-theme-sm border-border bg-gray-50 p-12 text-center", designTokens.cleanCommerce.border.full)}>
-        <p className={cn("font-bold text-gray-500", designTokens.typography.h3)}>尚無成員帳號</p>
+      <div className={cn("rounded-theme-sm border-border bg-surface-secondary p-12 text-center", designTokens.cleanCommerce.border.full)}>
+        <p className={cn("font-bold text-muted", designTokens.typography.h3)}>尚無成員帳號</p>
       </div>
     )
   }
@@ -33,7 +33,7 @@ export function MemberList({
     <div className="space-y-4">
       {/* 桌面版表格 */}
       <div className="hidden lg:block overflow-x-auto">
-        <table className={cn("w-full rounded-theme-sm bg-white", getThemeClasses())}>
+        <table className={cn("w-full rounded-theme-sm bg-surface", getThemeClasses())}>
           <thead className="border-b bg-yellow-400">
             <tr>
               <th className={cn("px-6 py-4 text-left font-black uppercase tracking-wider", designTokens.typography.body.base)}>
@@ -54,11 +54,11 @@ export function MemberList({
             {admins.map((admin) => (
               <tr
                 key={admin.id}
-                className="hover:bg-gray-50 transition-colors"
+                className="hover:bg-surface-secondary transition-colors"
               >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-900">
+                    <span className="font-bold text-foreground">
                       {admin.username}
                     </span>
                     {admin.id === currentUserId && (
@@ -69,12 +69,12 @@ export function MemberList({
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-sm text-gray-700">
+                  <span className="text-sm text-text-secondary">
                     {admin.display_name || '-'}
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-muted">
                     {formatDistanceToNow(new Date(admin.created_at), {
                       addSuffix: true,
                       locale: zhTW,
@@ -86,7 +86,7 @@ export function MemberList({
                     <Link
                       href={`/admin/system/members/${admin.id}`}
                       className={cn(
-                        "inline-flex items-center gap-1 rounded-theme-sm bg-white font-bold transition-all",
+                        "inline-flex items-center gap-1 rounded-theme-sm bg-surface font-bold transition-all",
                         designTokens.cleanCommerce.border.full,
                         designTokens.cleanCommerce.shadow.base,
                         designTokens.cleanCommerce.hover,
@@ -138,7 +138,7 @@ export function MemberList({
           <div
             key={admin.id}
             className={cn(
-              "rounded-theme-sm bg-white",
+              "rounded-theme-sm bg-surface",
               getThemeClasses(),
               designTokens.spacing.card.padding
             )}
@@ -153,9 +153,9 @@ export function MemberList({
                 )}
               </div>
               {admin.display_name && (
-                <p className={cn("text-gray-700 mb-1", designTokens.typography.caption)}>{admin.display_name}</p>
+                <p className={cn("text-text-secondary mb-1", designTokens.typography.caption)}>{admin.display_name}</p>
               )}
-              <p className={cn("text-gray-400", designTokens.typography.caption)}>
+              <p className={cn("text-muted", designTokens.typography.caption)}>
                 {formatDistanceToNow(new Date(admin.created_at), {
                   addSuffix: true,
                   locale: zhTW,
@@ -167,7 +167,7 @@ export function MemberList({
               <Link
                 href={`/admin/system/members/${admin.id}`}
                 className={cn(
-                  "inline-flex items-center justify-center gap-1 bg-white font-bold transition-all",
+                  "inline-flex items-center justify-center gap-1 bg-surface font-bold transition-all",
                   getThemeClasses({ active: true }),
                   designTokens.button.md
                 )}

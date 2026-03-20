@@ -14,7 +14,7 @@ export default async function NewProductPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold">新增商品</h1>
-        <p className="mt-2 text-gray-600">建立新的商品資料</p>
+        <p className="mt-2 text-text-secondary">建立新的商品資料</p>
       </div>
 
       <ProductForm series={series} mode="create" />

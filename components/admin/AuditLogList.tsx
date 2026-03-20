@@ -14,8 +14,8 @@ interface AuditLogListProps {
 export function AuditLogList({ logs }: AuditLogListProps) {
   if (logs.length === 0) {
     return (
-      <div className={cn("rounded-theme-sm border-border bg-gray-50 p-12 text-center", designTokens.cleanCommerce.border.full)}>
-        <p className={cn("font-bold text-gray-500", designTokens.typography.h3)}>尚無操作記錄</p>
+      <div className={cn("rounded-theme-sm border-border bg-surface-secondary p-12 text-center", designTokens.cleanCommerce.border.full)}>
+        <p className={cn("font-bold text-muted", designTokens.typography.h3)}>尚無操作記錄</p>
       </div>
     )
   }
@@ -36,7 +36,7 @@ export function AuditLogList({ logs }: AuditLogListProps) {
             {/* 頂部：操作類型與時間 */}
             <div className="flex items-center justify-between">
               <ActionTypeBadge actionType={log.action_type} />
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted">
                 {formatDistanceToNow(new Date(log.created_at), {
                   addSuffix: true,
                   locale: zhTW,
@@ -46,28 +46,28 @@ export function AuditLogList({ logs }: AuditLogListProps) {
 
             {/* 目標資訊 */}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-gray-700">
+              <span className="text-sm font-bold text-text-secondary">
                 {log.target_type}
               </span>
-              <span className="text-xs text-gray-500">#{log.target_id.slice(0, 8)}</span>
+              <span className="text-xs text-muted">#{log.target_id.slice(0, 8)}</span>
             </div>
 
             {/* 操作者 */}
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-text-secondary">
               <span className="font-bold">{log.actor_display_name || '未知'}</span>
               {' '}執行操作
             </p>
 
             {/* 變更內容 */}
             {log.old_values && log.new_values && (
-              <div className="text-xs bg-gray-50 p-2 rounded-theme-sm border border-border">
+              <div className="text-xs bg-surface-secondary p-2 rounded-theme-sm border border-border">
                 <p className="font-bold mb-1">變更內容：</p>
                 {Object.keys(log.new_values).map((key) => (
                   <p key={key} className="break-all">
                     <span className="font-bold">{key}:</span>{' '}
-                    <span className="text-gray-600">{JSON.stringify(log.old_values?.[key])}</span>
+                    <span className="text-text-secondary">{JSON.stringify(log.old_values?.[key])}</span>
                     {' → '}
-                    <span className="text-gray-900">{JSON.stringify(log.new_values?.[key])}</span>
+                    <span className="text-foreground">{JSON.stringify(log.new_values?.[key])}</span>
                   </p>
                 ))}
               </div>
@@ -75,7 +75,7 @@ export function AuditLogList({ logs }: AuditLogListProps) {
 
             {/* 備註 */}
             {log.notes && (
-              <p className="text-xs text-gray-500 italic">備註：{log.notes}</p>
+              <p className="text-xs text-muted italic">備註：{log.notes}</p>
             )}
           </div>
 
@@ -84,20 +84,20 @@ export function AuditLogList({ logs }: AuditLogListProps) {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <ActionTypeBadge actionType={log.action_type} />
-                <span className="text-sm font-bold text-gray-700">
+                <span className="text-sm font-bold text-text-secondary">
                   {log.target_type}
                 </span>
-                <span className="text-sm text-gray-500">#{log.target_id.slice(0, 8)}</span>
+                <span className="text-sm text-muted">#{log.target_id.slice(0, 8)}</span>
               </div>
 
-              <div className="text-sm text-gray-600 space-y-1">
+              <div className="text-sm text-text-secondary space-y-1">
                 <p>
                   <span className="font-bold">{log.actor_display_name || '未知'}</span>
                   {' '}執行操作
                 </p>
 
                 {log.old_values && log.new_values && (
-                  <div className="text-xs bg-gray-50 p-2 rounded border border-gray-200 mt-2">
+                  <div className="text-xs bg-surface-secondary p-2 rounded border border-border mt-2">
                     <p className="font-bold mb-1">變更內容：</p>
                     {Object.keys(log.new_values).map((key) => (
                       <p key={key}>
@@ -108,12 +108,12 @@ export function AuditLogList({ logs }: AuditLogListProps) {
                 )}
 
                 {log.notes && (
-                  <p className="text-xs text-gray-500 italic">備註：{log.notes}</p>
+                  <p className="text-xs text-muted italic">備註：{log.notes}</p>
                 )}
               </div>
             </div>
 
-            <div className="text-right text-xs text-gray-500 whitespace-nowrap">
+            <div className="text-right text-xs text-muted whitespace-nowrap">
               {formatDistanceToNow(new Date(log.created_at), {
                 addSuffix: true,
                 locale: zhTW,

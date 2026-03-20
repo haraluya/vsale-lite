@@ -45,7 +45,7 @@ export default function Error({
           <button
             onClick={reset}
             className={cn(
-              'rounded-theme-sm bg-black px-6 py-3 font-bold text-white transition-all',
+              'rounded-theme-sm bg-foreground px-6 py-3 font-bold text-text-inverse transition-all',
               designTokens.cleanCommerce.border.full,
               'border-border',
               designTokens.cleanCommerce.shadow.full,

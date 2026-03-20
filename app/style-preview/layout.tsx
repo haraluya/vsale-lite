@@ -17,12 +17,12 @@ export default function StylePreviewLayout({
   const pathname = usePathname()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-secondary">
       {/* 頂部切換 Tab */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <div className="sticky top-0 z-50 bg-surface border-b border-border shadow-sm">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-2 h-14 overflow-x-auto scrollbar-hide">
-            <span className="text-sm font-semibold text-gray-500 shrink-0 mr-2">
+            <span className="text-sm font-semibold text-muted shrink-0 mr-2">
               風格預覽
             </span>
             {themes.map((theme) => {
@@ -34,7 +34,7 @@ export default function StylePreviewLayout({
                   className={`shrink-0 px-4 py-2 text-sm font-medium rounded-full transition-all ${
                     isActive
                       ? 'text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-text-secondary hover:bg-surface-secondary'
                   }`}
                   style={
                     isActive

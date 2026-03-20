@@ -74,7 +74,7 @@ export function OrderFilters() {
       {/* 搜尋框 */}
       <div
         className={cn(
-          'flex flex-1 items-center gap-2 rounded-theme-sm border bg-white',
+          'flex flex-1 items-center gap-2 rounded-theme-sm border bg-surface',
           designTokens.cleanCommerce.shadow.full,
           designTokens.input.base
         )}
@@ -94,7 +94,7 @@ export function OrderFilters() {
       {/* 狀態快篩按鈕列 */}
       <div
         className={cn(
-          'flex flex-wrap gap-2 rounded-theme-sm bg-white',
+          'flex flex-wrap gap-2 rounded-theme-sm bg-surface',
           designTokens.cleanCommerce.border.full,
           designTokens.cleanCommerce.shadow.full,
           designTokens.spacing.card.padding
@@ -112,7 +112,7 @@ export function OrderFilters() {
           )
 
           // 根據狀態設定不同顏色
-          let bgColor = 'bg-white'
+          let bgColor = 'bg-surface'
           let activeBgColor = 'bg-gray-800 text-white'
 
           if (option.value === 'pending') {

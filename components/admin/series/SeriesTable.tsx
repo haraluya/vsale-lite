@@ -159,7 +159,7 @@ export function SeriesTable({
             <tbody>
               {series.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className={cn('px-4 py-8 text-center text-gray-500', designTokens.typography.body.base)}>
+                  <td colSpan={5} className={cn('px-4 py-8 text-center text-muted', designTokens.typography.body.base)}>
                     {searchQuery || selectedCategory
                       ? '找不到符合條件的系列'
                       : '尚未建立任何系列'}
@@ -167,7 +167,7 @@ export function SeriesTable({
                 </tr>
               ) : (
                 series.map((s) => (
-                  <tr key={s.id} className="border-b border-gray-200 hover:bg-gray-50">
+                  <tr key={s.id} className="border-b border-border hover:bg-surface-secondary">
                     {/* 縮圖 */}
                     <td className="px-4 py-3">
                       <SeriesThumbnail
@@ -202,7 +202,7 @@ export function SeriesTable({
                           designTokens.typography.caption,
                           s.status === 'active'
                             ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
+                            : 'bg-surface-secondary text-foreground'
                         )}
                         title={s.status === 'active' ? '點擊下架' : '點擊上架'}
                       >
@@ -239,7 +239,7 @@ export function SeriesTable({
         {/* 手機版: 卡片視圖 */}
         <div className="lg:hidden space-y-3 md:space-y-4">
           {series.length === 0 ? (
-            <div className={cn('text-center py-8 text-gray-500', designTokens.typography.body.base)}>
+            <div className={cn('text-center py-8 text-muted', designTokens.typography.body.base)}>
               {searchQuery || selectedCategory
                 ? '找不到符合條件的系列'
                 : '尚未建立任何系列'}
@@ -249,7 +249,7 @@ export function SeriesTable({
               <div
                 key={s.id}
                 className={cn(
-                  'rounded-theme-sm bg-white',
+                  'rounded-theme-sm bg-surface',
                   getThemeClasses(),
                   designTokens.spacing.card.padding
                 )}
@@ -266,7 +266,7 @@ export function SeriesTable({
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className={cn('font-mono text-gray-600 mb-2', designTokens.typography.caption)}>
+                    <div className={cn('font-mono text-text-secondary mb-2', designTokens.typography.caption)}>
                       {s.code}
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
@@ -289,7 +289,7 @@ export function SeriesTable({
                       designTokens.typography.caption,
                       s.status === 'active'
                         ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
+                        : 'bg-surface-secondary text-foreground'
                     )}
                     title={s.status === 'active' ? '點擊停用' : '點擊啟用'}
                   >

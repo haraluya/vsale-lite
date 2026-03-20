@@ -58,7 +58,7 @@ function SortableTierCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "rounded-theme-sm bg-white",
+        "rounded-theme-sm bg-surface",
         getThemeClasses(),
         designTokens.spacing.card.padding
       )}
@@ -68,9 +68,9 @@ function SortableTierCard({
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing touch-none p-1 hover:bg-gray-100 rounded min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
+          className="cursor-grab active:cursor-grabbing touch-none p-1 hover:bg-surface-secondary rounded min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
         >
-          <GripVertical className="h-5 w-5 text-gray-400" />
+          <GripVertical className="h-5 w-5 text-muted" />
         </button>
         <div className="flex-1">
           <h3 className={cn(designTokens.typography.h3, "mb-1")}>{tier.name}</h3>
@@ -78,8 +78,8 @@ function SortableTierCard({
       </div>
 
       {/* 建立時間 */}
-      <div className="mb-3 pb-3 border-b border-gray-200">
-        <span className={cn(designTokens.typography.caption, "text-gray-500")}>
+      <div className="mb-3 pb-3 border-b border-border">
+        <span className={cn(designTokens.typography.caption, "text-muted")}>
           建立於 {formatDateTW(tier.created_at)}
         </span>
       </div>
@@ -89,7 +89,7 @@ function SortableTierCard({
         <Link
           href={`/admin/tiers/${tier.id}/edit`}
           className={cn(
-            "flex-1 inline-flex items-center justify-center gap-2 bg-white font-bold transition-all",
+            "flex-1 inline-flex items-center justify-center gap-2 bg-surface font-bold transition-all",
             getThemeClasses({ active: true }),
             designTokens.button.md
           )}
@@ -131,18 +131,18 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
   }
 
   return (
-    <tr ref={setNodeRef} style={style} className="border-b last:border-b-0 bg-white">
+    <tr ref={setNodeRef} style={style} className="border-b last:border-b-0 bg-surface">
       <td className={cn("px-3 py-3 md:px-4 md:py-4")}>
         <button
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
+          className="cursor-grab active:cursor-grabbing p-1 hover:bg-surface-secondary rounded min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
         >
-          <GripVertical className="h-5 w-5 text-gray-400" />
+          <GripVertical className="h-5 w-5 text-muted" />
         </button>
       </td>
       <td className={cn("px-4 py-3 font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>{tier.name}</td>
-      <td className={cn("px-4 py-3 text-gray-600 md:px-6 md:py-4", designTokens.typography.caption)}>
+      <td className={cn("px-4 py-3 text-text-secondary md:px-6 md:py-4", designTokens.typography.caption)}>
         {formatDateTW(tier.created_at)}
       </td>
       <td className={cn("px-4 py-3 md:px-6 md:py-4")}>
@@ -150,7 +150,7 @@ function SortableRow({ tier, onDelete, loading }: { tier: Tier; onDelete: (id: s
           <Link
             href={`/admin/tiers/${tier.id}/edit`}
             className={cn(
-              "inline-flex items-center gap-2 bg-white font-bold transition-all",
+              "inline-flex items-center gap-2 bg-surface font-bold transition-all",
               designTokens.cleanCommerce.border.full,
               designTokens.cleanCommerce.shadow.base,
               designTokens.cleanCommerce.hover,
@@ -253,7 +253,7 @@ export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
   if (tiers.length === 0) {
     return (
       <div className={cn("card-neo text-center", designTokens.spacing.card.padding)}>
-        <p className={cn("text-gray-600", designTokens.typography.body.base)}>尚無會員等級資料</p>
+        <p className={cn("text-text-secondary", designTokens.typography.body.base)}>尚無會員等級資料</p>
       </div>
     )
   }
@@ -276,7 +276,7 @@ export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
         {/* 桌面版: 完整表格 */}
         <div className="hidden lg:block card-neo overflow-hidden p-0">
           <table className="w-full">
-            <thead className="border-b bg-gray-100">
+            <thead className="border-b bg-surface-secondary">
               <tr>
                 <th className={cn("px-3 py-3 text-left font-bold w-16 md:px-4 md:py-4", designTokens.typography.body.base)}>拖曳</th>
                 <th className={cn("px-4 py-3 text-left font-bold md:px-6 md:py-4", designTokens.typography.body.base)}>等級名稱</th>
@@ -323,7 +323,7 @@ export function TierTable({ tiers: initialTiers }: { tiers: Tier[] }) {
         "card-neo bg-blue-50 border-blue-500",
         designTokens.spacing.card.padding
       )}>
-        <p className={cn("text-gray-700", designTokens.typography.caption)}>
+        <p className={cn("text-text-secondary", designTokens.typography.caption)}>
           <strong>提示：</strong>拖曳左側的 <GripVertical className="inline h-4 w-4" /> 圖示來調整等級排序
         </p>
       </div>

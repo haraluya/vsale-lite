@@ -20,7 +20,7 @@ export default function NewTierPage() {
 
       <div>
         <h1 className="text-3xl font-bold">新增會員等級</h1>
-        <p className="mt-2 text-gray-600">建立新的會員等級分類</p>
+        <p className="mt-2 text-text-secondary">建立新的會員等級分類</p>
       </div>
 
       <div className="card-neo max-w-2xl">

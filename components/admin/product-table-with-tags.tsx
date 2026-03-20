@@ -353,7 +353,7 @@ export function ProductTableWithTags({
                     <button
                       onClick={() => setSelectedProductIds([])}
                       className={cn(
-                        "flex-1 md:flex-none rounded-theme-sm bg-gray-200 font-bold",
+                        "flex-1 md:flex-none rounded-theme-sm bg-surface-secondary font-bold",
                         designTokens.cleanCommerce.border.full,
                         designTokens.cleanCommerce.shadow.base,
                         designTokens.cleanCommerce.hover,
@@ -381,7 +381,7 @@ export function ProductTableWithTags({
                     <button
                       onClick={handleCancelBatchEdit}
                       className={cn(
-                        "flex-1 md:flex-none rounded-theme-sm bg-gray-200 font-bold",
+                        "flex-1 md:flex-none rounded-theme-sm bg-surface-secondary font-bold",
                         designTokens.cleanCommerce.border.full,
                         designTokens.cleanCommerce.shadow.base,
                         designTokens.cleanCommerce.hover,
@@ -423,7 +423,7 @@ export function ProductTableWithTags({
                         value={quickFillValues.namePrefix}
                         onChange={(e) => setQuickFillValues(prev => ({ ...prev, namePrefix: e.target.value }))}
                         placeholder="前方插入文字"
-                        className="w-32 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
+                        className="w-32 rounded-theme-sm border border-border px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
                       />
                       <button
                         type="button"
@@ -451,7 +451,7 @@ export function ProductTableWithTags({
                         value={quickFillValues.retail_price}
                         onChange={(e) => setQuickFillValues(prev => ({ ...prev, retail_price: e.target.value }))}
                         placeholder="金額"
-                        className="w-20 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        className="w-20 rounded-theme-sm border border-border px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       />
                       <button
                         type="button"
@@ -481,7 +481,7 @@ export function ProductTableWithTags({
                         value={quickFillValues.unit}
                         onChange={(e) => setQuickFillValues(prev => ({ ...prev, unit: e.target.value }))}
                         placeholder="單位"
-                        className="w-16 rounded-theme-sm border border-gray-400 px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
+                        className="w-16 rounded-theme-sm border border-border px-1.5 py-0.5 text-xs focus:border-blue-500 focus:outline-none font-normal"
                       />
                       <button
                         type="button"
@@ -502,7 +502,7 @@ export function ProductTableWithTags({
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className={cn("px-4 py-8 text-center text-gray-500", designTokens.typography.body.base)}>
+                  <td colSpan={8} className={cn("px-4 py-8 text-center text-muted", designTokens.typography.body.base)}>
                     {searchQuery || selectedSeries
                       ? '找不到符合條件的商品'
                       : '尚未建立任何商品'}
@@ -516,8 +516,8 @@ export function ProductTableWithTags({
 
                   return (
                     <tr key={product.id} className={cn(
-                      "border-b border-gray-200",
-                      isInBatchEdit ? "bg-green-50" : "hover:bg-gray-50"
+                      "border-b border-border",
+                      isInBatchEdit ? "bg-green-50" : "hover:bg-surface-secondary"
                     )}>
                       {/* 勾選框 */}
                       <td className="px-4 py-3">
@@ -556,7 +556,7 @@ export function ProductTableWithTags({
                               )}
                               placeholder="商品名稱"
                             />
-                            <span className={cn("text-xs text-gray-500")}>
+                            <span className={cn("text-xs text-muted")}>
                               系列：{product.series_name}
                             </span>
                           </div>
@@ -630,7 +630,7 @@ export function ProductTableWithTags({
                             </button>
                             <button
                               onClick={handleCancelEditStock}
-                              className="rounded-theme-sm border bg-gray-100 p-1 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
+                              className="rounded-theme-sm border bg-surface-secondary p-1 shadow-neo-sm transition-all hover:-translate-y-0.5 hover:shadow-theme-hover"
                               title="取消"
                             >
                               <X className="h-4 w-4" />
@@ -646,7 +646,7 @@ export function ProductTableWithTags({
                               product.stock < 0
                                 ? 'text-orange-600'
                                 : product.stock === 0
-                                  ? 'text-gray-500'
+                                  ? 'text-muted'
                                   : 'text-green-600'
                             )}
                             title={batchEditMode ? "批次編輯模式下無法快速編輯" : "點擊快速編輯庫存"}
@@ -679,7 +679,7 @@ export function ProductTableWithTags({
                               className="w-20 rounded-theme-sm border px-2 py-1"
                             />
                           ) : (
-                            <span className={cn("text-gray-600", designTokens.typography.caption)}>
+                            <span className={cn("text-text-secondary", designTokens.typography.caption)}>
                               {product.unit}
                             </span>
                           )}
@@ -730,7 +730,7 @@ export function ProductTableWithTags({
         {/* 手機版: 卡片視圖 */}
         <div className="lg:hidden space-y-3 md:space-y-4">
           {products.length === 0 ? (
-            <div className={cn("text-center py-8 text-gray-500", designTokens.typography.body.base)}>
+            <div className={cn("text-center py-8 text-muted", designTokens.typography.body.base)}>
               {searchQuery || selectedSeries
                 ? '找不到符合條件的商品'
                 : '尚未建立任何商品'}
@@ -740,7 +740,7 @@ export function ProductTableWithTags({
               <div
                 key={product.id}
                 className={cn(
-                  "rounded-theme-sm bg-white",
+                  "rounded-theme-sm bg-surface",
                   getThemeClasses(),
                   designTokens.spacing.card.padding
                 )}
@@ -760,7 +760,7 @@ export function ProductTableWithTags({
                     onUploadSuccess={() => router.refresh()}
                   />
                   <div className="flex-1">
-                    <div className={cn("font-mono text-gray-600 mb-1", designTokens.typography.caption)}>
+                    <div className={cn("font-mono text-text-secondary mb-1", designTokens.typography.caption)}>
                       {product.code}
                     </div>
                     {/* 使用 ProductNameWithSeries 元件顯示商品名稱與彩色系列 Badge */}
@@ -774,14 +774,14 @@ export function ProductTableWithTags({
 
                 {/* 狀態與庫存狀態（快速切換開關 - 樂觀更新） */}
                 <div className="flex items-center gap-2 mb-3">
-                  <div className={cn("text-gray-600", designTokens.typography.caption)}>上架:</div>
+                  <div className={cn("text-text-secondary", designTokens.typography.caption)}>上架:</div>
                   <ProductStatusToggle
                     productId={product.id}
                     initialStatus={product.status as 'active' | 'inactive'}
                     productName={product.name}
                     onStatusChanged={() => router.refresh()}
                   />
-                  <div className={cn("text-gray-600 ml-2", designTokens.typography.caption)}>庫存狀態:</div>
+                  <div className={cn("text-text-secondary ml-2", designTokens.typography.caption)}>庫存狀態:</div>
                   <ProductStockStatusToggle
                     productId={product.id}
                     initialStockStatus={product.stock_status as 'sufficient' | 'low' | 'out_of_stock'}
@@ -800,16 +800,16 @@ export function ProductTableWithTags({
                 </div>
 
                 {/* 零售價格 */}
-                <div className="mb-3 pb-3 border-b border-gray-200">
-                  <div className={cn("text-gray-600 mb-2", designTokens.typography.caption)}>零售價格:</div>
+                <div className="mb-3 pb-3 border-b border-border">
+                  <div className={cn("text-text-secondary mb-2", designTokens.typography.caption)}>零售價格:</div>
                   <div className={cn("font-mono font-bold text-brand-primary", designTokens.typography.body.large)}>
                     {product.retail_price !== null ? `$${Math.round(product.retail_price)}` : 'N/A'}
                   </div>
                 </div>
 
                 {/* 庫存編輯 */}
-                <div className="mb-3 pb-3 border-b border-gray-200">
-                  <div className={cn("text-gray-600 mb-2", designTokens.typography.caption)}>庫存數量:</div>
+                <div className="mb-3 pb-3 border-b border-border">
+                  <div className={cn("text-text-secondary mb-2", designTokens.typography.caption)}>庫存數量:</div>
                   {editingStockId === product.id ? (
                     <div className="flex items-center gap-2">
                       <input
@@ -836,7 +836,7 @@ export function ProductTableWithTags({
                       <button
                         onClick={handleCancelEditStock}
                         className={cn(
-                          "min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-theme-sm border bg-gray-100",
+                          "min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-theme-sm border bg-surface-secondary",
                           designTokens.cleanCommerce.shadow.base,
                           designTokens.cleanCommerce.hover
                         )}
@@ -849,12 +849,12 @@ export function ProductTableWithTags({
                     <button
                       onClick={() => handleEditStock(product.id, product.stock)}
                       className={cn(
-                        "w-full text-left font-mono font-bold py-2 px-3 rounded-theme-sm border hover:bg-gray-50",
+                        "w-full text-left font-mono font-bold py-2 px-3 rounded-theme-sm border hover:bg-surface-secondary",
                         designTokens.typography.body.base,
                         product.stock < 0
                           ? 'text-orange-600 bg-orange-50'
                           : product.stock === 0
-                            ? 'text-gray-500 bg-gray-50'
+                            ? 'text-muted bg-surface-secondary'
                             : 'text-green-600 bg-green-50'
                       )}
                     >
@@ -920,7 +920,7 @@ export function ProductTableWithTags({
         "card-neo bg-blue-50 border-blue-500",
         designTokens.spacing.card.padding
       )}>
-        <p className={cn("text-gray-700", designTokens.typography.caption)}>
+        <p className={cn("text-text-secondary", designTokens.typography.caption)}>
           <strong>提示：</strong>
           <span className="hidden lg:inline">勾選商品後可使用批次標籤管理功能,點擊庫存數字可快速編輯</span>
           <span className="lg:hidden">勾選商品後可使用批次標籤管理,點擊庫存卡片可編輯</span>

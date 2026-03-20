@@ -20,7 +20,7 @@ export default async function NewSeriesPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold">新增系列</h1>
-        <p className="mt-2 text-gray-600">建立新的商品系列</p>
+        <p className="mt-2 text-text-secondary">建立新的商品系列</p>
       </div>
 
       <SeriesForm categories={categories} mode="create" />

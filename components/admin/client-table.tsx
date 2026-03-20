@@ -150,11 +150,11 @@ export function ClientTable({
     <div className={designTokens.spacing.page.gap}>
       {/* 桌面版: 完整表格 */}
       <div className={cn(
-        "hidden lg:block card-neo bg-white overflow-hidden"
+        "hidden lg:block card-neo bg-surface"
       )}>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="border-b bg-gray-50">
+            <thead className="border-b bg-surface-secondary">
               <tr>
                 <th className="px-6 py-3 text-left text-sm font-bold w-[140px]">
                   手機號碼
@@ -173,10 +173,10 @@ export function ClientTable({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y-2 divide-gray-200">
+            <tbody className="divide-y-2 divide-border">
               {clients.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-muted">
                     {searchKeyword || total === 0
                       ? '查無符合條件的客戶'
                       : '尚無客戶資料,點擊「快速開戶」建立第一位客戶'}
@@ -192,20 +192,20 @@ export function ClientTable({
                     : '-'
 
                   return (
-                    <tr key={client.id} className="hover:bg-gray-50">
+                    <tr key={client.id} className="hover:bg-surface-secondary">
                       <td className="px-6 py-4 text-base font-mono font-bold">
                         {highlightKeyword(client.phone)}
                       </td>
                       <td className="px-6 py-4 text-base font-bold">
                         {client.display_name ? highlightKeyword(client.display_name) : '-'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-600" title={client.admin_notes || ''}>
+                      <td className="px-6 py-4 text-sm text-text-secondary" title={client.admin_notes || ''}>
                         <span className="text-yellow-700">{notesPreview}</span>
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span className={cn(
                           "inline-block rounded-theme-sm border px-3 py-1 text-sm font-bold",
-                          client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
+                          client.tier_id ? getTierColor(client.tier_id) : 'bg-surface-secondary'
                         )}>
                           {client.tier_name || '未設定'}
                         </span>
@@ -236,16 +236,16 @@ export function ClientTable({
 
                             {/* 範本選單 */}
                             {templateMenuOpen === client.id && templates.length > 0 && (
-                              <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-theme-sm border bg-white shadow-neo">
+                              <div className="absolute top-full left-0 mt-1 z-50 min-w-[180px] rounded-theme-sm border bg-surface shadow-neo">
                                 {templates.map((template) => (
                                   <button
                                     key={template.id}
                                     onClick={() => handleCopyLoginInfo(client, template.id)}
-                                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 border-b border-gray-200 last:border-b-0 whitespace-nowrap"
+                                    className="w-full px-4 py-2 text-left text-sm hover:bg-surface-secondary border-b border-border last:border-b-0 whitespace-nowrap"
                                   >
                                     {template.name}
                                     {template.is_default && (
-                                      <span className="ml-2 text-xs text-gray-500">(預設)</span>
+                                      <span className="ml-2 text-xs text-muted">(預設)</span>
                                     )}
                                   </button>
                                 ))}
@@ -290,7 +290,7 @@ export function ClientTable({
       <div className="lg:hidden space-y-3 md:space-y-4">
         {clients.length === 0 ? (
           <div className={cn(
-            "rounded-theme-sm bg-white p-8 text-center text-gray-500",
+            "rounded-theme-sm bg-surface p-8 text-center text-muted",
             designTokens.cleanCommerce.border.full,
             designTokens.cleanCommerce.shadow.full
           )}>
@@ -304,7 +304,7 @@ export function ClientTable({
               <div
                 key={client.id}
                 className={cn(
-                  "rounded-theme-sm bg-white",
+                  "rounded-theme-sm bg-surface",
                   designTokens.cleanCommerce.border.full,
                   designTokens.cleanCommerce.shadow.full,
                   designTokens.spacing.card.padding,
@@ -317,13 +317,13 @@ export function ClientTable({
                     <div className={cn("font-bold", designTokens.typography.body.base)}>
                       {client.display_name || '未設定姓名'}
                     </div>
-                    <div className={cn("font-mono text-gray-600", designTokens.typography.caption)}>
+                    <div className={cn("font-mono text-text-secondary", designTokens.typography.caption)}>
                       {highlightKeyword(client.phone)}
                     </div>
                   </div>
                   <span className={cn(
                     "inline-block rounded-theme-sm border px-2 py-1 text-sm font-bold whitespace-nowrap",
-                    client.tier_id ? getTierColor(client.tier_id) : 'bg-gray-100'
+                    client.tier_id ? getTierColor(client.tier_id) : 'bg-surface-secondary'
                   )}>
                     {client.tier_name || '未設定'}
                   </span>
@@ -331,7 +331,7 @@ export function ClientTable({
 
                 {/* 備註 */}
                 {client.admin_notes && (
-                  <div className={cn("text-gray-600", designTokens.typography.caption)}>
+                  <div className={cn("text-text-secondary", designTokens.typography.caption)}>
                     <div className="text-yellow-700" title={client.admin_notes}>
                       備註: {client.admin_notes.length > 20 ? client.admin_notes.substring(0, 20) + '...' : client.admin_notes}
                     </div>
@@ -339,7 +339,7 @@ export function ClientTable({
                 )}
 
                 {/* 操作按鈕 */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-200">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border">
                   {/* 複製帳密按鈕與選單 */}
                   <div className="relative col-span-2">
                     <Button
@@ -363,16 +363,16 @@ export function ClientTable({
 
                     {/* 範本選單 */}
                     {templateMenuOpen === client.id && templates.length > 0 && (
-                      <div className="absolute bottom-full left-0 mb-1 z-50 w-full rounded-theme-sm border bg-white shadow-neo">
+                      <div className="absolute bottom-full left-0 mb-1 z-50 w-full rounded-theme-sm border bg-surface shadow-neo">
                         {templates.map((template) => (
                           <button
                             key={template.id}
                             onClick={() => handleCopyLoginInfo(client, template.id)}
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 border-b border-gray-200 last:border-b-0"
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-surface-secondary border-b border-border last:border-b-0"
                           >
                             {template.name}
                             {template.is_default && (
-                              <span className="ml-2 text-xs text-gray-500">(預設)</span>
+                              <span className="ml-2 text-xs text-muted">(預設)</span>
                             )}
                           </button>
                         ))}
@@ -412,7 +412,7 @@ export function ClientTable({
       {/* 分頁 */}
       {totalPages > 1 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className={cn("text-gray-600", designTokens.typography.caption)}>
+          <p className={cn("text-text-secondary", designTokens.typography.caption)}>
             第 {page} / {totalPages} 頁,共 {total} 筆
           </p>
           <div className="flex gap-2">
