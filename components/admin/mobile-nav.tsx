@@ -11,7 +11,7 @@
  */
 
 import { Menu } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -22,6 +22,16 @@ import { MobileSidebar } from '@/components/admin/mobile-sidebar'
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
+
+  // 視窗拉大到桌面版時自動關閉 Sheet，避免 Radix aria-hidden 殘留鎖住頁面互動
+  useEffect(() => {
+    const mql = window.matchMedia('(min-width: 768px)')
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setIsOpen(false)
+    }
+    mql.addEventListener('change', handleChange)
+    return () => mql.removeEventListener('change', handleChange)
+  }, [])
 
   return (
     <div className="md:hidden">

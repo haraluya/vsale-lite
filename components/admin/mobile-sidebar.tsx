@@ -33,6 +33,7 @@ import {
 import { usePwaInstall } from '@/lib/hooks/use-pwa-install'
 import { Logo } from '@/components/ui/logo'
 import { LogoutButton } from '@/components/admin/logout-button'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 type NavItem = {
   label: string
@@ -144,7 +145,7 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
           ))}
         </nav>
 
-        {/* 安裝按鈕 + Logout Button (底部) */}
+        {/* 安裝按鈕 + 深淺色切換 + Logout Button (底部) */}
         <div className="mt-6 pt-6 border-t-2 border-border flex-shrink-0 space-y-2">
           {canInstall && (
             <button
@@ -155,7 +156,8 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
               <span className="truncate">安裝到手機</span>
             </button>
           )}
-          <LogoutButton />
+          <ThemeToggle className="w-full justify-start gap-3 px-4 py-2.5" />
+          <LogoutButton variant="mobile" />
         </div>
       </div>
     </div>

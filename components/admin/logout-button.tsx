@@ -4,7 +4,11 @@ import { logout } from '@/lib/actions/auth'
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
 
-export function LogoutButton() {
+interface LogoutButtonProps {
+  variant?: 'sidebar' | 'mobile'
+}
+
+export function LogoutButton({ variant = 'sidebar' }: LogoutButtonProps) {
   const [loading, setLoading] = useState(false)
 
   const handleLogout = async () => {
@@ -22,6 +26,20 @@ export function LogoutButton() {
       console.error('登出失敗:', error)
       setLoading(false)
     }
+  }
+
+  if (variant === 'mobile') {
+    return (
+      <button
+        onClick={handleLogout}
+        disabled={loading}
+        title={loading ? '登出中...' : '登出'}
+        className="flex w-full items-center gap-3 rounded-theme-sm border bg-error px-4 py-2.5 text-sm font-bold text-white shadow-neo-sm transition-all active:scale-[0.98] disabled:opacity-50"
+      >
+        <LogOut className="h-5 w-5 flex-shrink-0" />
+        <span>{loading ? '登出中...' : '登出'}</span>
+      </button>
+    )
   }
 
   return (
