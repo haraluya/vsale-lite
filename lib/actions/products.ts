@@ -417,6 +417,32 @@ export async function updateProduct(
       }
     }
 
+    // 6.1 若 retail_price 有變更，同步更新零售等級的 tier_prices 記錄
+    if (data.retail_price !== undefined && data.retail_price !== existingProduct.retail_price) {
+      try {
+        const { data: retailTier } = await adminClient
+          .from('tiers')
+          .select('id')
+          .eq('is_protected', true)
+          .single()
+
+        if (retailTier) {
+          await adminClient
+            .from('tier_prices')
+            .upsert(
+              {
+                product_id: id,
+                tier_id: retailTier.id,
+                price: data.retail_price,
+              },
+              { onConflict: 'tier_id,product_id' }
+            )
+        }
+      } catch (tierPriceError) {
+        console.warn('同步零售等級價格失敗 (非致命錯誤):', tierPriceError)
+      }
+    }
+
     // 7. 記錄操作日誌 (Feature 008)
     await logAudit({
       target_type: 'product',
