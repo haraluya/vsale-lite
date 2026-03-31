@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils'
 import { useConfirm } from '@/lib/contexts/dialog-context'
 import { useAdminOrderDraft, type AdminOrderStep } from '@/hooks/use-admin-order-draft'
 import { StepCustomerSelect } from './step-customer-select'
-// StepProductSelect 和 StepCheckout 將在後續任務中建立
-// 目前步驟 2 和 3 使用佔位元件
+import { StepProductSelect } from './step-product-select'
+import { StepCheckout } from './step-checkout'
 
 const STEPS: { step: AdminOrderStep; label: string }[] = [
   { step: 1, label: '選擇客戶' },
@@ -41,6 +41,11 @@ export function AdminOrderSheet() {
       draft.resetDraft()
     }
     setOpen(newOpen)
+  }
+
+  const handleOrderCreated = () => {
+    draft.resetDraft()
+    setOpen(false)
   }
 
   const handleBack = () => {
@@ -105,10 +110,10 @@ export function AdminOrderSheet() {
               <StepCustomerSelect draft={draft} />
             )}
             {draft.currentStep === 2 && (
-              <div className="text-center text-text-secondary py-8">商品選擇（待實作）</div>
+              <StepProductSelect draft={draft} onNext={() => draft.setCurrentStep(3)} />
             )}
             {draft.currentStep === 3 && (
-              <div className="text-center text-text-secondary py-8">確認結帳（待實作）</div>
+              <StepCheckout draft={draft} onOrderCreated={handleOrderCreated} />
             )}
           </div>
         </SheetContent>

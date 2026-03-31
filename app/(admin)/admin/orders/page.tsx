@@ -3,6 +3,7 @@ import { Package } from 'lucide-react'
 import { OrderFilters } from '@/components/admin/orders/order-filters'
 import { OrderList } from '@/components/admin/orders/order-list'
 import { OrderListSkeleton } from '@/components/admin/orders/order-list-skeleton'
+import { AdminOrderSheet } from '@/components/admin/orders/admin-order-sheet'
 import { cn } from '@/lib/utils'
 import { designTokens, getPageContainerClasses, getThemeClasses } from '@/lib/design-tokens'
 import { generatePageMetadata } from '@/lib/metadata'
@@ -57,10 +58,11 @@ export default async function AdminOrdersPage({
         <div className="rounded-theme-sm border bg-blue-400 dark:bg-blue-600 p-2 md:p-3">
           <Package className="h-6 w-6 md:h-8 md:w-8" />
         </div>
-        <div>
+        <div className="flex-1">
           <h1 className={designTokens.typography.h1}>訂單管理</h1>
           <p className={cn(designTokens.typography.body.base, 'text-text-secondary')}>管理所有客戶訂單</p>
         </div>
+        <AdminOrderSheet />
       </div>
 
       {/* 篩選器 - 立即顯示 */}
