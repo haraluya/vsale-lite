@@ -10,12 +10,14 @@
 
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/stores/cart'
 import { getCartItemsWithPrices, getComboDealProductDetails, validateCartBeforeCheckout } from '@/lib/actions/cart'
 import { createOrder } from '@/lib/actions/orders'
 import type { CartItemWithProduct, ProductDetailInfo } from '@/types'
+import { calculateOrderAmounts, calculateGrandTotal } from '@/lib/pricing/order-calculator'
+import type { RegularItemInput, ComboDealInput } from '@/lib/pricing/order-calculator'
 import { formatCurrency, cn } from '@/lib/utils'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -24,7 +26,7 @@ import { Package } from 'lucide-react'
 
 export function CheckoutContent() {
   const router = useRouter()
-  const { items, comboDeals, clearCartWithCoupon, getTotalItems, removeInvalidItems, appliedCoupon, couponDiscount } = useCartStore()
+  const { items, comboDeals, clearCartWithCoupon, getTotalItems, removeInvalidItems, appliedCoupon } = useCartStore()
 
   const [cartItemsWithPrices, setCartItemsWithPrices] = useState<CartItemWithProduct[]>([])
   const [comboDealProductDetails, setComboDealProductDetails] = useState<Map<string, ProductDetailInfo>>(new Map())
@@ -81,12 +83,43 @@ export function CheckoutContent() {
     loadCartItems()
   }, [items, comboDeals, removeInvalidItems])
 
-  // 計算總金額
-  const normalItemsTotal = cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)
-  const comboDealOriginalTotal = comboDeals.reduce((sum, deal) => sum + deal.original_price, 0)
-  const totalAmount = normalItemsTotal + comboDealOriginalTotal
-  const comboDealTotalDiscount = comboDeals.reduce((sum, deal) => sum + deal.discount_amount, 0)
-  const finalAmount = totalAmount - comboDealTotalDiscount - couponDiscount
+  // 計算總金額（使用統一計算模組）
+  const orderCalcResult = useMemo(() => {
+    const regularItems: RegularItemInput[] = cartItemsWithPrices.map(item => ({
+      retailPrice: item.retailPrice ?? item.price ?? 0,
+      tierPrice: item.price ?? 0,
+      quantity: item.quantity,
+      seriesId: item.series_id,
+    }))
+
+    const comboDealInputs: ComboDealInput[] = comboDeals.map(deal => {
+      const retailTotal = deal.selected_products.reduce((sum, product) => {
+        const detail = comboDealProductDetails.get(product.product_id)
+        return sum + (detail?.retail_price || detail?.unit_price || 0) * product.quantity
+      }, 0)
+
+      return {
+        name: deal.combo_deal_name,
+        retailTotal,
+        originalPrice: deal.original_price,
+        discountedPrice: deal.discounted_price,
+        discountAmount: deal.discount_amount,
+      }
+    })
+
+    return calculateOrderAmounts({
+      regularItems,
+      comboDeals: comboDealInputs,
+      coupon: appliedCoupon ? {
+        code: appliedCoupon.code_normalized,
+        discountType: appliedCoupon.discount_type,
+        discountValue: appliedCoupon.discount_value,
+        minOrderAmount: appliedCoupon.min_order_amount,
+      } : null,
+    })
+  }, [cartItemsWithPrices, comboDeals, comboDealProductDetails, appliedCoupon])
+
+  const finalAmount = calculateGrandTotal(orderCalcResult, 0)
   const totalItems = getTotalItems()
   const isEmpty = items.length === 0 && comboDeals.length === 0
 
@@ -283,11 +316,10 @@ export function CheckoutContent() {
                             </span>
                           </div>
                           <div className="text-text-secondary whitespace-nowrap sm:text-right">
-                            {detail?.unit_price ? (
-                              <>NT$ {detail.unit_price.toLocaleString()} × {product.quantity}</>
-                            ) : (
-                              <>× {product.quantity}</>
-                            )}
+                            {(() => {
+                              const price = detail?.retail_price || detail?.unit_price || 0
+                              return price > 0 ? <>NT$ {price.toLocaleString()} × {product.quantity}</> : <>× {product.quantity}</>
+                            })()}
                           </div>
                         </div>
                       )
@@ -297,16 +329,20 @@ export function CheckoutContent() {
                   {/* 價格資訊 */}
                   <div className="border-t-2 border-yellow-300 pt-2 ml-7 space-y-1 text-sm">
                     <div className="flex justify-between text-text-secondary">
-                      <span>原價</span>
-                      <span className="line-through">NT$ {deal.original_price.toLocaleString()}</span>
+                      <span>零售價</span>
+                      <span className="line-through">
+                        NT$ {(() => {
+                          const rt = deal.selected_products.reduce((sum, product) => {
+                            const detail = comboDealProductDetails.get(product.product_id)
+                            return sum + (detail?.retail_price || detail?.unit_price || 0) * product.quantity
+                          }, 0)
+                          return rt.toLocaleString()
+                        })()}
+                      </span>
                     </div>
                     <div className="flex justify-between text-success font-semibold">
-                      <span>組合優惠折扣</span>
-                      <span>- NT$ {deal.discount_amount.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between font-bold pt-1 border-t border-yellow-300">
-                      <span>優惠價</span>
-                      <span className="text-success text-lg">NT$ {deal.discounted_price.toLocaleString()}</span>
+                      <span>組合優惠價</span>
+                      <span className="text-lg">NT$ {deal.discounted_price.toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -354,57 +390,41 @@ export function CheckoutContent() {
               "border-t-black"
             )}>
               <div className="space-y-2">
-                {/* 普通商品總額 */}
-                {normalItemsTotal > 0 && (
-                  <div className="flex items-center justify-between text-foreground">
-                    <p className={designTokens.typography.body.base}>普通商品總額</p>
-                    <p className="text-base font-semibold">
-                      {formatCurrency(normalItemsTotal)}
-                    </p>
-                  </div>
-                )}
-
-                {/* 組合優惠原價 */}
-                {comboDeals.length > 0 && (
-                  <div className="flex items-center justify-between text-foreground">
-                    <p className={designTokens.typography.body.base}>組合優惠原價</p>
-                    <p className="text-base font-semibold">
-                      {formatCurrency(comboDealOriginalTotal)}
-                    </p>
-                  </div>
-                )}
-
-                {/* 商品總額（小計） */}
-                <div className={cn(
-                  "flex items-center justify-between pt-2 border-t border-border"
-                )}>
-                  <p className={cn(designTokens.typography.body.large, "font-semibold")}>商品總額</p>
-                  <p className="text-lg font-bold">
-                    {formatCurrency(totalAmount)}
+                {/* 商品金額（零售價） */}
+                <div className="flex items-center justify-between">
+                  <p className={designTokens.typography.body.base}>商品金額</p>
+                  <p className="text-base font-semibold">
+                    NT$ {orderCalcResult.retailTotal.toLocaleString()}
                   </p>
                 </div>
 
-                {/* 組合優惠折扣（分項顯示） */}
-                {comboDeals.map((deal) => (
-                  <div key={deal.id} className="flex items-center justify-between text-success">
-                    <p className={cn(designTokens.typography.body.base, "truncate mr-2")}>
-                      組合優惠折扣 - {deal.combo_deal_name}
-                    </p>
-                    <p className="text-base font-bold whitespace-nowrap">
-                      -{formatCurrency(deal.discount_amount)}
+                {/* 會員專屬折扣 */}
+                {orderCalcResult.memberDiscount > 0 && (
+                  <div className="flex items-center justify-between text-blue-600">
+                    <p className={designTokens.typography.body.base}>會員專屬折扣</p>
+                    <p className="text-base font-bold">
+                      - NT$ {orderCalcResult.memberDiscount.toLocaleString()}
                     </p>
                   </div>
-                ))}
+                )}
 
-                {/* 優惠券折扣 */}
-                {appliedCoupon && couponDiscount > 0 && (
-                  <div className="flex items-center justify-between text-orange-600">
-                    <p className={designTokens.typography.body.base}>
-                      優惠券折扣 ({appliedCoupon.code_normalized})
-                    </p>
-                    <p className="text-base font-bold">
-                      -{formatCurrency(couponDiscount)}
-                    </p>
+                {/* 優惠折扣 */}
+                {(orderCalcResult.comboDiscount + orderCalcResult.couponDiscount) > 0 && (
+                  <div>
+                    <div className="flex items-center justify-between text-red-500">
+                      <p className={cn(designTokens.typography.body.base, "font-bold")}>優惠折扣</p>
+                      <p className="text-base font-bold">
+                        - NT$ {(orderCalcResult.comboDiscount + orderCalcResult.couponDiscount).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="pl-3 mt-1 space-y-1 border-l-2 border-red-200">
+                      {orderCalcResult.discountDetails.map((d, i) => (
+                        <div key={i} className="flex justify-between items-center">
+                          <span className="text-xs text-text-secondary">{d.label}</span>
+                          <span className="text-xs text-red-400">- NT$ {d.amount.toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
 
@@ -423,7 +443,7 @@ export function CheckoutContent() {
                 )}>
                   <p className={designTokens.typography.h3}>訂單總金額</p>
                   <p className="text-2xl md:text-3xl font-bold text-success">
-                    {formatCurrency(finalAmount)}
+                    NT$ {finalAmount.toLocaleString()}
                   </p>
                 </div>
               </div>
