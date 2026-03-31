@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Button } from '@/components/ui/button'
 import { Search, Plus, Minus, Package } from 'lucide-react'
 import { getProductsWithTierPrices } from '@/lib/actions/products'
 import { getSeries } from '@/lib/actions/series'
@@ -120,32 +119,19 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
         />
       </div>
 
-      {/* 系列篩選標籤 */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-        <button
-          onClick={() => setSelectedSeriesId(null)}
-          className={`shrink-0 px-3 py-1 text-xs rounded-full border-theme transition-colors ${
-            selectedSeriesId === null
-              ? 'bg-primary text-text-inverse'
-              : 'bg-surface-secondary text-text-secondary hover:bg-surface'
-          }`}
-        >
-          全部
-        </button>
+      {/* 系列篩選下拉選單 */}
+      <select
+        value={selectedSeriesId || ''}
+        onChange={(e) => setSelectedSeriesId(e.target.value || null)}
+        className="w-full px-3 py-2 text-sm border rounded-theme-sm bg-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+      >
+        <option value="">全部系列</option>
         {seriesList.map((series) => (
-          <button
-            key={series.id}
-            onClick={() => setSelectedSeriesId(series.id === selectedSeriesId ? null : series.id)}
-            className={`shrink-0 px-3 py-1 text-xs rounded-full border-theme transition-colors ${
-              selectedSeriesId === series.id
-                ? 'bg-primary text-text-inverse'
-                : 'bg-surface-secondary text-text-secondary hover:bg-surface'
-            }`}
-          >
+          <option key={series.id} value={series.id}>
             {series.name}
-          </button>
+          </option>
         ))}
-      </div>
+      </select>
 
       {/* 商品列表 */}
       <div className="max-h-[40vh] overflow-y-auto space-y-1.5">
@@ -191,33 +177,27 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
                 <div className="shrink-0">
                   {qty > 0 ? (
                     <div className="flex items-center gap-1">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 w-7 p-0"
+                      <button
+                        className="h-7 w-7 flex items-center justify-center rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 active:scale-95 transition-all"
                         onClick={() => handleQuantityChange(product.id, -1)}
                       >
-                        <Minus className="h-3 w-3" />
-                      </Button>
+                        <Minus className="h-3.5 w-3.5" />
+                      </button>
                       <span className="w-8 text-center text-sm font-semibold">{qty}</span>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-7 w-7 p-0"
+                      <button
+                        className="h-7 w-7 flex items-center justify-center rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 active:scale-95 transition-all"
                         onClick={() => handleQuantityChange(product.id, 1)}
                       >
-                        <Plus className="h-3 w-3" />
-                      </Button>
+                        <Plus className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 w-7 p-0"
+                    <button
+                      className="h-7 w-7 flex items-center justify-center rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 active:scale-95 transition-all"
                       onClick={() => handleAdd(product)}
                     >
-                      <Plus className="h-3 w-3" />
-                    </Button>
+                      <Plus className="h-3.5 w-3.5" />
+                    </button>
                   )}
                 </div>
               </div>

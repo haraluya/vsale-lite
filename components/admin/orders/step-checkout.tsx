@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Loader2, Tag, Trash2, ChevronDown, ChevronUp } from 'lucide-react'
+import { Loader2, Tag, Trash2, ChevronDown, ChevronUp, Minus, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAlert } from '@/lib/contexts/dialog-context'
 import { createOrder } from '@/lib/actions/orders'
@@ -147,12 +147,51 @@ export function StepCheckout({ draft, onOrderCreated }: StepCheckoutProps) {
           <h4 className="text-sm font-semibold mb-2">一般商品</h4>
           <div className="divide-y border rounded-theme">
             {regularItems.map((item) => (
-              <div key={item.productId} className="px-3 py-2 flex justify-between text-sm">
-                <div>
-                  <span className="font-medium">{item.productName}</span>
-                  <span className="text-text-secondary ml-1">x{item.quantity}</span>
+              <div key={item.productId} className="px-3 py-2 flex items-center justify-between text-sm">
+                <div className="flex-1 min-w-0">
+                  <span className="font-medium truncate block">{item.productName}</span>
                 </div>
-                <span>${(item.tierPrice * item.quantity).toLocaleString()}</span>
+                {/* 數量調整 */}
+                <div className="flex items-center gap-1.5 mx-2">
+                  <button
+                    className="h-6 w-6 flex items-center justify-center rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                    onClick={() => draft.updateRegularItemQuantity(item.productId, item.quantity - 1)}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </button>
+                  <input
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value) || 0
+                      if (val > 0) draft.updateRegularItemQuantity(item.productId, val)
+                    }}
+                    className="w-10 text-center text-sm border rounded px-1 py-0.5"
+                    min={1}
+                  />
+                  <button
+                    className="h-6 w-6 flex items-center justify-center rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                    onClick={() => draft.updateRegularItemQuantity(item.productId, item.quantity + 1)}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </button>
+                </div>
+                {/* 單價（可編輯） */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <span className="text-xs text-text-secondary">$</span>
+                  <input
+                    type="number"
+                    value={item.tierPrice}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value)
+                      if (!isNaN(val) && val >= 0) {
+                        draft.updateRegularItemPrice(item.productId, val)
+                      }
+                    }}
+                    className="w-16 text-right text-sm border rounded px-1 py-0.5"
+                    min={0}
+                  />
+                </div>
               </div>
             ))}
           </div>

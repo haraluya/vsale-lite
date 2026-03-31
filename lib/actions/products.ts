@@ -2172,7 +2172,20 @@ export async function getProductsWithTierPrices(
       .order('code', { ascending: true })
       .limit(queryLimit)
     if (search) {
-      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`)
+      // 同時搜尋系列名稱
+      const { data: matchingSeries } = await adminClient
+        .from('series')
+        .select('id')
+        .ilike('name', `%${search}%`)
+        .limit(20)
+
+      const matchingSeriesIds = matchingSeries?.map((s: any) => s.id) || []
+
+      if (matchingSeriesIds.length > 0) {
+        query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%,series_id.in.(${matchingSeriesIds.join(',')})`)
+      } else {
+        query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`)
+      }
     }
     if (seriesId) {
       query = query.eq('series_id', seriesId)

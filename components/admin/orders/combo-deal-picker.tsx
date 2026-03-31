@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Gift } from 'lucide-react'
 import { getActiveComboDealsByTierId } from '@/lib/actions/combo-deals'
 import { formatDiscountLabel } from '@/lib/pricing/combo-deals'
-import { useAlert } from '@/lib/contexts/dialog-context'
 import type { AdminOrderDraftReturn } from '@/hooks/use-admin-order-draft'
 
 interface ComboDealPickerProps {
@@ -29,7 +28,6 @@ type ComboDealItem = {
 export function ComboDealPicker({ draft, tierId }: ComboDealPickerProps) {
   const [deals, setDeals] = useState<ComboDealItem[]>([])
   const [loading, setLoading] = useState(false)
-  const alert = useAlert()
 
   useEffect(() => {
     async function loadDeals() {
@@ -42,14 +40,6 @@ export function ComboDealPicker({ draft, tierId }: ComboDealPickerProps) {
     }
     loadDeals()
   }, [tierId])
-
-  const handleSelectDeal = async () => {
-    await alert({
-      title: '即將推出',
-      message: '組合優惠選購功能將在後續版本完善，目前僅顯示可用的組合優惠列表。',
-      variant: 'info',
-    })
-  }
 
   if (loading) {
     return (
@@ -89,9 +79,10 @@ export function ComboDealPicker({ draft, tierId }: ComboDealPickerProps) {
           <Button
             size="sm"
             variant="outline"
-            onClick={handleSelectDeal}
+            disabled
+            title="組合優惠選購功能即將推出"
           >
-            選購
+            即將推出
           </Button>
         </div>
       ))}

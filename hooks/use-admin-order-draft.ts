@@ -114,6 +114,12 @@ export function useAdminOrderDraft() {
     )
   }, [])
 
+  const updateRegularItemPrice = useCallback((productId: string, tierPrice: number) => {
+    setRegularItems(prev =>
+      prev.map(i => i.productId === productId ? { ...i, tierPrice } : i)
+    )
+  }, [])
+
   // 組合優惠操作
   const addComboDeal = useCallback((deal: ComboDealCartItem) => {
     setComboDeals(prev => [...prev, deal])
@@ -156,7 +162,7 @@ export function useAdminOrderDraft() {
     selectedCustomer, regularItems, comboDeals, appliedCoupon, notes, currentStep,
     calculation, totalItemCount, hasItems,
     setSelectedCustomer, setNotes, setCurrentStep,
-    addRegularItem, removeRegularItem, updateRegularItemQuantity,
+    addRegularItem, removeRegularItem, updateRegularItemQuantity, updateRegularItemPrice,
     addComboDeal, removeComboDeal,
     applyCoupon: applyCouponFn, removeCoupon,
     resetDraft, resetItemsAndCoupon,
