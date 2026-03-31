@@ -12,13 +12,10 @@ interface DraftItemsSummaryProps {
 export function DraftItemsSummary({ draft, onNext }: DraftItemsSummaryProps) {
   if (!draft.hasItems) return null
 
-  const regularTotal = draft.regularItems.reduce(
-    (sum, item) => sum + item.tierPrice * item.quantity, 0
-  )
-  const comboTotal = draft.comboDeals.reduce(
-    (sum, deal) => sum + deal.discounted_price, 0
-  )
-  const total = regularTotal + comboTotal
+  const { calculation } = draft
+  if (!calculation) return null
+
+  const total = calculation.retailTotal - calculation.memberDiscount - calculation.comboDiscount
 
   return (
     <div className="sticky bottom-0 left-0 right-0 bg-surface border-t px-4 py-3 flex items-center justify-between shadow-neo-sm">

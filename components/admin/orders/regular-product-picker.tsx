@@ -30,6 +30,7 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
   const [seriesList, setSeriesList] = useState<Series[]>([])
   const [products, setProducts] = useState<ProductItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [debouncedSearch, setDebouncedSearch] = useState('')
 
@@ -57,6 +58,7 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
 
   // 載入商品
   const loadProducts = useCallback(async () => {
+    setError(null)
     setLoading(true)
     const result = await getProductsWithTierPrices(tierId, {
       search: debouncedSearch || undefined,
@@ -65,6 +67,8 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
     })
     if (result.success && result.data) {
       setProducts(result.data)
+    } else {
+      setError(result.message || '載入商品失敗')
     }
     setLoading(false)
   }, [tierId, debouncedSearch, selectedSeriesId])
@@ -133,6 +137,14 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
         ))}
       </select>
 
+      {/* 錯誤提示 */}
+      {error && (
+        <div className="py-4 text-center text-sm text-red-500">
+          {error}
+          <button onClick={loadProducts} className="ml-2 underline">重試</button>
+        </div>
+      )}
+
       {/* 商品列表 */}
       <div className="max-h-[40vh] overflow-y-auto space-y-1.5">
         {loading ? (
@@ -155,7 +167,7 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs text-text-secondary font-mono">{product.code}</span>
                     <span className="text-xs text-text-secondary">·</span>
-                    <span className="text-xs text-text-secondary">{product.series_name}</span>
+                    <span className="text-xs text-text-secondary">{product.series_name || '未分類'}</span>
                   </div>
                   <div className="text-sm font-medium truncate">{product.name}</div>
                   <div className="flex items-center gap-2 mt-0.5">
@@ -167,9 +179,6 @@ export function RegularProductPicker({ draft, tierId }: RegularProductPickerProp
                         ${product.retail_price.toLocaleString()}
                       </span>
                     )}
-                    <span className="text-xs text-text-secondary">
-                      庫存: {product.stock}
-                    </span>
                   </div>
                 </div>
 
