@@ -18,7 +18,7 @@ import type { ActionResult, Series, ProductWithPrice, CurrentUser } from '@/type
 export async function getActiveSeries(category_id?: string): Promise<ActionResult<Series[]>> {
   try {
     const supabase = await createClient()
-    await checkAuth() // 驗證登入
+    const auth = await checkAuth() // 驗證登入
 
     // 先查詢系列資料（包含分類排序）
     let seriesQuery = supabase
@@ -47,20 +47,30 @@ export async function getActiveSeries(category_id?: string): Promise<ActionResul
     // 取得所有系列的 ID
     const seriesIds = (seriesData || []).map((s: any) => s.id)
 
-    // 查詢每個系列的最低售價
+    // 查詢每個系列的最低售價（考慮會員等級價格）
     const { data: minPricesData } = await supabase
       .from('products')
-      .select('series_id, retail_price')
+      .select(`
+        series_id,
+        retail_price,
+        tier_prices!left (
+          price
+        )
+      `)
       .in('series_id', seriesIds)
       .eq('status', 'active')
       .not('retail_price', 'is', null)
+      .eq('tier_prices.tier_id', auth.tierId || '')
 
-    // 計算每個系列的最低售價
+    // 計算每個系列的最低售價（等級價格優先，回退零售價）
     const minPricesBySeries = new Map<string, number>()
     ;(minPricesData || []).forEach((product: any) => {
+      const tierPrice = product.tier_prices?.[0]
+      const effectivePrice = tierPrice?.price ?? product.retail_price
+      if (effectivePrice == null) return
       const currentMin = minPricesBySeries.get(product.series_id)
-      if (currentMin === undefined || product.retail_price < currentMin) {
-        minPricesBySeries.set(product.series_id, product.retail_price)
+      if (currentMin === undefined || effectivePrice < currentMin) {
+        minPricesBySeries.set(product.series_id, effectivePrice)
       }
     })
 

@@ -5,7 +5,7 @@
  * Feature: 007-system-enhancement (US5 - 價格管理優化)
  */
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { createAdminClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
 import type { ActionResult } from '@/types'
@@ -88,35 +88,57 @@ export async function batchSetProductPrices(
     // 1. 驗證管理員權限
     await checkAuth('admin')
 
-    // 2. 組裝 UPSERT 資料
+    // 2. 分類：有價格的 UPSERT，null 的 DELETE
     const adminClient = createAdminClient()
 
-    const upsertData = Object.entries(prices)
-      .filter(([, price]) => price !== null) // 排除 null 價格
+    const toUpsert = Object.entries(prices)
+      .filter(([, price]) => price !== null)
       .map(([tierId, price]) => ({
         product_id: productId,
         tier_id: tierId,
         price: price as number,
       }))
 
-    if (upsertData.length === 0) {
+    const toDelete = Object.entries(prices)
+      .filter(([, price]) => price === null)
+      .map(([tierId]) => tierId)
+
+    if (toUpsert.length === 0 && toDelete.length === 0) {
       return { success: false, message: '請至少設定一個價格' }
     }
 
-    // 3. UPSERT 價格資料
-    const { error } = await adminClient
-      .from('tier_prices')
-      .upsert(upsertData, {
-        onConflict: 'tier_id,product_id',
-      })
+    // 3. UPSERT 有價格的記錄
+    if (toUpsert.length > 0) {
+      const { error } = await adminClient
+        .from('tier_prices')
+        .upsert(toUpsert, {
+          onConflict: 'tier_id,product_id',
+        })
 
-    if (error) {
-      console.error('batchSetProductPrices 錯誤:', error)
-      return { success: false, message: '價格設定失敗' }
+      if (error) {
+        console.error('batchSetProductPrices UPSERT 錯誤:', error)
+        return { success: false, message: '價格設定失敗' }
+      }
     }
 
-    // 4. 更新快取
+    // 4. DELETE 價格為 null 的記錄（清空價格，回退到零售價）
+    if (toDelete.length > 0) {
+      const { error } = await adminClient
+        .from('tier_prices')
+        .delete()
+        .eq('product_id', productId)
+        .in('tier_id', toDelete)
+
+      if (error) {
+        console.error('batchSetProductPrices DELETE 錯誤:', error)
+        return { success: false, message: '清空價格失敗' }
+      }
+    }
+
+    // 5. 更新快取
     revalidatePath('/admin/pricing')
+    revalidateTag('tier-prices')
+    revalidateTag('products')
 
     return { success: true, message: '價格設定成功' }
   } catch (error) {

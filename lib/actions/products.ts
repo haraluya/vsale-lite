@@ -1945,6 +1945,18 @@ export async function batchUpdateProducts(
     const { products } = validation.data
     const adminClient = createAdminClient()
 
+    // 預先查詢零售等級 ID（用於同步 tier_prices）
+    let retailTierId: string | null = null
+    const hasRetailPriceUpdate = products.some(p => p.retail_price !== undefined)
+    if (hasRetailPriceUpdate) {
+      const { data: retailTier } = await adminClient
+        .from('tiers')
+        .select('id')
+        .eq('is_protected', true)
+        .single()
+      retailTierId = retailTier?.id ?? null
+    }
+
     // 3. 批次更新商品（逐一更新以支援 RLS 與 Trigger）
     let updated_count = 0
     const errors: string[] = []
@@ -1974,6 +1986,24 @@ export async function batchUpdateProducts(
           }
         } else {
           updated_count++
+
+          // 同步零售等級 tier_prices
+          if (product.retail_price !== undefined && retailTierId) {
+            try {
+              await adminClient
+                .from('tier_prices')
+                .upsert(
+                  {
+                    product_id: product.id,
+                    tier_id: retailTierId,
+                    price: product.retail_price,
+                  },
+                  { onConflict: 'tier_id,product_id' }
+                )
+            } catch (tierPriceError) {
+              console.warn(`批量編輯：同步商品 ${product.id} 零售等級價格失敗 (非致命):`, tierPriceError)
+            }
+          }
         }
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : "更新失敗"
