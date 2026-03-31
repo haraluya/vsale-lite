@@ -17,12 +17,12 @@ import { useRouter } from 'next/navigation'
 import { createCoupon, updateCoupon } from '@/lib/actions/coupons'
 import { getTiers } from '@/lib/actions/tiers'
 import { getSeries } from '@/lib/actions/series'
-import { getComboDealsList } from '@/lib/actions/combo-deals'
+
 import type { Coupon } from '@/specs/009-coupon-system/contracts/coupons'
 import type { Tier, Series } from '@/types'
 import { Button } from '@/components/ui/button'
 import { FormSection } from '@/components/ui/form-section'
-import { AlertCircle, X } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 interface CouponFormProps {
   coupon?: Coupon
@@ -35,7 +35,6 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [tiers, setTiers] = useState<Tier[]>([])
   const [series, setSeries] = useState<Series[]>([])
-  const [comboDeals, setComboDeals] = useState<Array<{ id: string; name: string }>>([])
   const [loadingData, setLoadingData] = useState(true)
 
   // 表單狀態
@@ -78,21 +77,6 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   const [selectedSeries, setSelectedSeries] = useState<string[]>(
     coupon?.series_restrictions || []
   )
-  // 🆕 Feature 021: 組合優惠限制狀態
-  const [comboRestrictionMode, setComboRestrictionMode] = useState<'none' | 'exclude' | 'all' | 'specific'>(() => {
-    // 如果是編輯模式，根據現有資料判斷
-    if (coupon) {
-      if ((coupon as any).exclude_combo_deals) return 'exclude'
-      if (coupon.combo_apply_all) return 'all'
-      if (coupon.combo_restrictions && coupon.combo_restrictions.length > 0) return 'specific'
-      return 'none'
-    }
-    // 新建模式預設為「排除組合優惠」
-    return 'exclude'
-  })
-  const [selectedComboDeals, setSelectedComboDeals] = useState<string[]>(
-    coupon?.combo_restrictions || []
-  )
   const [claimLimit, setClaimLimit] = useState<number>(
     coupon?.claim_limit || 1
   )
@@ -104,10 +88,9 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
   useEffect(() => {
     async function loadData() {
       try {
-        const [tiersResult, seriesResult, comboDealsResult] = await Promise.all([
+        const [tiersResult, seriesResult] = await Promise.all([
           getTiers(),
           getSeries(),
-          getComboDealsList({ status: 'active' }), // 🆕 Feature 021
         ])
 
         // 處理 getTiers() 的 ActionResult
@@ -117,11 +100,6 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
 
         if (seriesResult.success && seriesResult.data) {
           setSeries(seriesResult.data)
-        }
-
-        // 🆕 Feature 021: 處理組合優惠資料
-        if (comboDealsResult.success && comboDealsResult.data) {
-          setComboDeals(comboDealsResult.data.items.map(cd => ({ id: cd.id, name: cd.name })))
         }
       } catch (err) {
         console.error('載入資料失敗:', err)
@@ -155,15 +133,6 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
     )
   }
 
-  // 🆕 Feature 021: 組合優惠選擇處理
-  const handleComboDealToggle = (comboDealId: string) => {
-    setSelectedComboDeals((prev) =>
-      prev.includes(comboDealId)
-        ? prev.filter((id) => id !== comboDealId)
-        : [...prev, comboDealId]
-    )
-  }
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
@@ -184,10 +153,6 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
         total_limit: totalLimit ? Number(totalLimit) : null,
         tier_restrictions: selectedTiers,
         series_restrictions: selectedSeries,
-        // 🆕 Feature 021: 組合優惠限制
-        exclude_combo_deals: comboRestrictionMode === 'exclude',
-        combo_apply_all: comboRestrictionMode === 'all',
-        combo_restrictions: comboRestrictionMode === 'specific' ? selectedComboDeals : [],
       }
 
       let result
@@ -544,116 +509,6 @@ export function CouponForm({ coupon, mode }: CouponFormProps) {
             </p>
           </div>
         )}
-      </FormSection>
-
-      {/* 🆕 Feature 021: 組合優惠限制 */}
-      <FormSection
-        variant="warning"
-        title="組合優惠限制（選填）"
-        description="設定此優惠券是否可用於組合優惠訂單"
-      >
-        <div className="space-y-4">
-          {/* 限制模式選擇 */}
-          <div className="space-y-2">
-            <label className="flex items-center gap-2 cursor-pointer rounded border border-border p-3 hover:border-primary">
-              <input
-                type="radio"
-                value="none"
-                checked={comboRestrictionMode === 'none'}
-                onChange={(e) => setComboRestrictionMode('none')}
-                className="h-4 w-4"
-                disabled={loading}
-              />
-              <span className="font-bold">無限制（優惠券可用於所有訂單，包含組合優惠）</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer rounded border border-red-400 bg-red-50 p-3 hover:border-red-600">
-              <input
-                type="radio"
-                value="exclude"
-                checked={comboRestrictionMode === 'exclude'}
-                onChange={(e) => setComboRestrictionMode('exclude')}
-                className="h-4 w-4"
-                disabled={loading}
-              />
-              <span className="font-bold text-red-800">❌ 排除組合優惠（優惠券不可用於包含組合優惠的訂單，推薦）</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer rounded border border-border p-3 hover:border-primary">
-              <input
-                type="radio"
-                value="all"
-                checked={comboRestrictionMode === 'all'}
-                onChange={(e) => setComboRestrictionMode('all')}
-                className="h-4 w-4"
-                disabled={loading}
-              />
-              <span className="font-bold">適用所有組合優惠（僅當購物車包含組合優惠時可用）</span>
-            </label>
-
-            <label className="flex items-center gap-2 cursor-pointer rounded border border-border p-3 hover:border-primary">
-              <input
-                type="radio"
-                value="specific"
-                checked={comboRestrictionMode === 'specific'}
-                onChange={(e) => setComboRestrictionMode('specific')}
-                className="h-4 w-4"
-                disabled={loading}
-              />
-              <span className="font-bold">僅適用指定組合優惠</span>
-            </label>
-          </div>
-
-          {/* 當選擇「僅適用指定組合優惠」時顯示選擇器 */}
-          {comboRestrictionMode === 'specific' && (
-            <div className="mt-4 border-t-2 border-border pt-4">
-              <label className="mb-2 block font-bold">選擇組合優惠</label>
-
-              {comboDeals.length === 0 ? (
-                <p className="text-muted">目前沒有可用的組合優惠</p>
-              ) : (
-                <div className="grid gap-2 md:grid-cols-2">
-                  {comboDeals.map((combo) => (
-                    <label
-                      key={combo.id}
-                      className="flex items-center gap-3 cursor-pointer rounded border border-border p-3 hover:border-primary"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedComboDeals.includes(combo.id)}
-                        onChange={() => handleComboDealToggle(combo.id)}
-                        className="h-5 w-5"
-                        disabled={loading}
-                      />
-                      <span className="font-bold">{combo.name}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {selectedComboDeals.length > 0 && (
-                <div className="mt-4 border-t-2 border-border pt-4">
-                  <p className="font-bold text-green-600">
-                    ✓ 已選擇 {selectedComboDeals.length} 個組合優惠限制
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* 說明提示 */}
-          <div className="rounded-theme-sm border border-blue-500 bg-blue-50 p-4">
-            <p className="text-sm font-bold text-blue-800">
-              💡 組合優惠限制說明：
-            </p>
-            <ul className="mt-2 text-sm text-blue-800 space-y-1">
-              <li>• <strong>無限制</strong>：優惠券可用於任何訂單（包含普通商品與組合優惠）</li>
-              <li>• <strong>❌ 排除組合優惠（推薦）</strong>：優惠券僅適用於普通商品訂單，不可用於包含組合優惠的訂單</li>
-              <li>• <strong>適用所有組合優惠</strong>：僅當購物車包含組合優惠時可用</li>
-              <li>• <strong>僅適用指定組合優惠</strong>：僅當購物車包含指定的組合優惠時可用</li>
-            </ul>
-          </div>
-        </div>
       </FormSection>
 
       {/* 狀態設定（僅編輯模式） */}
