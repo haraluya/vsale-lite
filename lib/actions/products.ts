@@ -439,7 +439,11 @@ export async function updateProduct(
             )
         }
       } catch (tierPriceError) {
-        console.warn('同步零售等級價格失敗 (非致命錯誤):', tierPriceError)
+        console.error('同步零售等級價格失敗:', tierPriceError)
+        return {
+          success: false,
+          message: '商品已更新，但零售等級價格同步失敗，請手動檢查價格設定',
+        }
       }
     }
 
@@ -1820,7 +1824,40 @@ export async function importProducts(
         }
       }
 
-      // 10. 更新快取
+      // 10. 自動建立零售等級的 tier_prices 記錄
+      try {
+        const { data: retailTier } = await adminClient
+          .from('tiers')
+          .select('id')
+          .eq('is_protected', true)
+          .single()
+
+        if (retailTier) {
+          // 查詢剛插入的商品 ID（用名稱 + series_id 比對）
+          const insertedNames = validProducts.map(p => p.name)
+          const { data: insertedProducts } = await adminClient
+            .from('products')
+            .select('id, retail_price')
+            .in('name', insertedNames)
+            .not('retail_price', 'is', null)
+
+          if (insertedProducts && insertedProducts.length > 0) {
+            const tierPriceRecords = insertedProducts.map(p => ({
+              product_id: p.id,
+              tier_id: retailTier.id,
+              price: p.retail_price,
+            }))
+
+            await adminClient
+              .from('tier_prices')
+              .upsert(tierPriceRecords, { onConflict: 'tier_id,product_id' })
+          }
+        }
+      } catch (tierPriceError) {
+        console.warn('匯入商品：建立零售等級價格失敗 (非致命):', tierPriceError)
+      }
+
+      // 11. 更新快取
       revalidateTag('products')
       revalidateTag('dashboard-stats')  // 批次匯入影響庫存統計
 

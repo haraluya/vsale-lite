@@ -285,6 +285,24 @@ export async function batchSetTierPrices(
       }
     }
 
+    // 3. 同步零售等級價格到 products.retail_price
+    // 當修改零售等級（is_protected=true）的 tier_prices 時，反向同步到 products 表
+    const { data: retailTier } = await adminClient
+      .from('tiers')
+      .select('id')
+      .eq('is_protected', true)
+      .single()
+
+    if (retailTier) {
+      const retailPriceUpdates = toUpsert.filter(p => p.tier_id === retailTier.id && p.price !== null)
+      for (const update of retailPriceUpdates) {
+        await adminClient
+          .from('products')
+          .update({ retail_price: update.price })
+          .eq('id', update.product_id)
+      }
+    }
+
     // 更新快取（修復空白Bug的關鍵）
     revalidatePath('/admin/pricing')  // 立即刷新價格管理頁
     revalidateTag('tier-prices')  // 失效價格標籤

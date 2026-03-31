@@ -135,7 +135,24 @@ export async function batchSetProductPrices(
       }
     }
 
-    // 5. 更新快取
+    // 5. 同步零售等級價格到 products.retail_price
+    const { data: retailTier } = await adminClient
+      .from('tiers')
+      .select('id')
+      .eq('is_protected', true)
+      .single()
+
+    if (retailTier) {
+      const retailEntry = toUpsert.find(p => p.tier_id === retailTier.id)
+      if (retailEntry) {
+        await adminClient
+          .from('products')
+          .update({ retail_price: retailEntry.price })
+          .eq('id', productId)
+      }
+    }
+
+    // 6. 更新快取
     revalidatePath('/admin/pricing')
     revalidateTag('tier-prices')
     revalidateTag('products')
