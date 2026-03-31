@@ -1619,3 +1619,102 @@ export async function getPromotionSeriesIds(): Promise<ActionResult<string[]>> {
     }
   }
 }
+
+/**
+ * 代客下單：查詢指定等級可用的組合優惠（管理員專用）
+ */
+export async function getActiveComboDealsByTierId(tierId: string): Promise<
+  ActionResult<
+    Array<{
+      id: string
+      name: string
+      poster_url: string | null
+      combo_mode: 'each' | 'mix_match'
+      discount_type: 'fixed' | 'percentage'
+      discount_value: number
+      start_date: string
+      end_date: string
+      series_count: number
+      mix_match_total_quantity?: number
+    }>
+  >
+> {
+  try {
+    await checkAuth('admin')
+    const adminClient = createAdminClient()
+
+    // 查詢符合等級的組合優惠 ID
+    const { data: comboDealTiers, error: tiersError } = await adminClient
+      .from('combo_deal_tiers')
+      .select('combo_deal_id')
+      .eq('tier_id', tierId)
+
+    if (tiersError) return { success: false, message: '查詢組合優惠失敗' }
+    if (!comboDealTiers || comboDealTiers.length === 0) return { success: true, data: [] }
+
+    const comboDealIds = comboDealTiers.map((item) => item.combo_deal_id)
+    const now = new Date().toISOString()
+
+    // 查詢有效的組合優惠
+    const { data: comboDeals, error: comboDealsError } = await adminClient
+      .from('combo_deals')
+      .select('id, name, poster_url, combo_mode, discount_type, discount_value, start_date, end_date')
+      .in('id', comboDealIds)
+      .eq('status', 'active')
+      .lte('start_date', now)
+      .gte('end_date', now)
+      .order('display_order', { ascending: true, nullsFirst: false })
+      .order('created_at', { ascending: false })
+
+    if (comboDealsError) return { success: false, message: '查詢組合優惠失敗' }
+    if (!comboDeals || comboDeals.length === 0) return { success: true, data: [] }
+
+    const dealIds = comboDeals.map((d) => d.id)
+
+    // 查詢系列數量
+    const { data: seriesCounts } = await adminClient
+      .from('combo_deal_series')
+      .select('combo_deal_id')
+      .in('combo_deal_id', dealIds)
+
+    const seriesCountMap = new Map<string, number>()
+    if (seriesCounts) {
+      seriesCounts.forEach((item) => {
+        seriesCountMap.set(item.combo_deal_id, (seriesCountMap.get(item.combo_deal_id) || 0) + 1)
+      })
+    }
+
+    // 查詢任選模式的總數量配置
+    const { data: mixMatchConfigs } = await adminClient
+      .from('combo_deal_mix_match_config')
+      .select('combo_deal_id, total_quantity')
+      .in('combo_deal_id', dealIds)
+
+    const mixMatchQuantityMap = new Map<string, number>()
+    if (mixMatchConfigs) {
+      mixMatchConfigs.forEach((config) => {
+        mixMatchQuantityMap.set(config.combo_deal_id, config.total_quantity)
+      })
+    }
+
+    const result = comboDeals.map((cd) => ({
+      id: cd.id,
+      name: cd.name,
+      poster_url: cd.poster_url,
+      combo_mode: cd.combo_mode as 'each' | 'mix_match',
+      discount_type: cd.discount_type as 'fixed' | 'percentage',
+      discount_value: cd.discount_value,
+      start_date: cd.start_date,
+      end_date: cd.end_date,
+      series_count: seriesCountMap.get(cd.id) || 0,
+      mix_match_total_quantity: cd.combo_mode === 'mix_match' ? mixMatchQuantityMap.get(cd.id) : undefined,
+    }))
+
+    return { success: true, data: result }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢組合優惠時發生錯誤',
+    }
+  }
+}
