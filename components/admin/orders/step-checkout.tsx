@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Loader2, Tag, Trash2, ChevronDown, ChevronUp, Minus, Plus } from 'lucide-react'
+import { Loader2, Tag, Trash2, ChevronDown, ChevronUp, Minus, Plus, Package } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { useAlert } from '@/lib/contexts/dialog-context'
 import { createOrder } from '@/lib/actions/orders'
 import { getCustomerCoupons } from '@/lib/actions/coupons'
 import { calculateCouponDiscount, formatDiscountDisplay } from '@/lib/utils/coupon-helpers'
@@ -19,11 +18,12 @@ interface StepCheckoutProps {
 }
 
 export function StepCheckout({ draft, onOrderCreated }: StepCheckoutProps) {
-  const alert = useAlert()
   const [submitting, setSubmitting] = useState(false)
   const [coupons, setCoupons] = useState<UserCoupon[]>([])
   const [loadingCoupons, setLoadingCoupons] = useState(false)
   const [couponExpanded, setCouponExpanded] = useState(false)
+  const [submitResult, setSubmitResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [couponError, setCouponError] = useState<string | null>(null)
 
   const { selectedCustomer, regularItems, comboDeals, appliedCoupon, notes, calculation } = draft
 
@@ -60,17 +60,18 @@ export function StepCheckout({ draft, onOrderCreated }: StepCheckoutProps) {
     })
 
     if (!result.valid) {
-      alert({ title: '無法套用', message: result.error || '優惠券不適用', variant: 'warning' })
+      setCouponError(result.error || '優惠券不適用')
       return
     }
 
+    setCouponError(null)
     draft.applyCoupon({
       userCouponId: userCoupon.id,
       coupon: userCoupon.coupon,
       discountAmount: result.discountAmount ?? 0,
     })
     setCouponExpanded(false)
-  }, [regularItems, selectedCustomer, draft, alert])
+  }, [regularItems, selectedCustomer, draft])
 
   // 送出訂單
   const handleSubmit = async () => {
@@ -101,31 +102,34 @@ export function StepCheckout({ draft, onOrderCreated }: StepCheckoutProps) {
       })
 
       if (result.success) {
-        await alert({
-          title: '下單成功',
-          message: `訂單 ${result.data?.orderNumber} 已建立`,
-          variant: 'success',
-        })
-        onOrderCreated()
+        setSubmitResult({ type: 'success', message: `訂單 ${result.data?.orderNumber || ''} 已建立` })
+        setTimeout(() => onOrderCreated(), 1500)
       } else {
-        await alert({
-          title: '下單失敗',
-          message: result.message || '建立訂單時發生錯誤',
-          variant: 'error',
-        })
+        const errorDetail = result.errors ? `\n${JSON.stringify(result.errors)}` : ''
+        console.error('代客下單失敗:', result.message, result.errors)
+        setSubmitResult({ type: 'error', message: (result.message || '建立訂單時發生錯誤') + errorDetail })
+        setSubmitting(false)
       }
-    } catch {
-      await alert({
-        title: '系統錯誤',
-        message: '建立訂單時發生未預期的錯誤',
-        variant: 'error',
-      })
-    } finally {
+    } catch (err) {
+      console.error('代客下單例外:', err)
+      setSubmitResult({ type: 'error', message: '建立訂單時發生未預期的錯誤' })
       setSubmitting(false)
     }
   }
 
-  if (!selectedCustomer || !calculation) return null
+  if (!selectedCustomer) return null
+
+  if (!calculation) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 gap-4">
+        <Package className="h-12 w-12 text-text-secondary opacity-40" />
+        <p className="text-sm text-text-secondary">尚未選擇任何商品</p>
+        <Button variant="outline" onClick={() => draft.setCurrentStep(2)}>
+          返回選擇商品
+        </Button>
+      </div>
+    )
+  }
 
   const grandTotal = calculateGrandTotal(calculation, 0)
 
@@ -320,6 +324,11 @@ export function StepCheckout({ draft, onOrderCreated }: StepCheckoutProps) {
                   )}
                 </div>
               )}
+              {couponError && (
+                <div className="mt-2 text-xs text-red-500 bg-red-50 rounded-theme-sm px-3 py-2">
+                  {couponError}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -349,6 +358,16 @@ export function StepCheckout({ draft, onOrderCreated }: StepCheckoutProps) {
           className="w-full border rounded-theme p-2 text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
       </section>
+
+      {/* 送出結果訊息 */}
+      {submitResult && (
+        <div className={cn(
+          'rounded-theme-sm px-4 py-3 text-sm',
+          submitResult.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+        )}>
+          {submitResult.message}
+        </div>
+      )}
 
       {/* 送出按鈕 */}
       <Button

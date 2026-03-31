@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { checkAuth } from './helpers'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import {
@@ -46,7 +46,7 @@ export async function createOrder(
   input: CreateOrderInput
 ): Promise<ActionResult<{ orderId: string; orderNumber: string }>> {
   try {
-    const supabase = await createClient()
+    let supabase = await createClient()
     const { userId: authUserId, role, tierId: authTierId } = await checkAuth()
 
     // 驗證輸入（提前，因為需要讀取 onBehalfOfUserId）
@@ -108,6 +108,16 @@ export async function createOrder(
 
       userId = targetProfile.id
       tierId = targetProfile.tier_id || undefined
+
+      if (!tierId) {
+        return {
+          success: false,
+          message: '目標客戶未設定等級，無法建立訂單',
+        }
+      }
+
+      // 代客下單使用 adminClient 繞過 RLS（管理員可能無法通過 RLS 查詢商品等資料）
+      supabase = createAdminClient()
     } else {
       userId = authUserId
       tierId = authTierId

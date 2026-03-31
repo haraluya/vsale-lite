@@ -59,7 +59,7 @@ export const OrderCard = memo(
 
         {/* 金額與時間 */}
         <div className="flex items-center justify-between pt-2 border-t border-border">
-          <div className={cn('text-text-secondary', designTokens.typography.caption)}>{formatDateTW(order.created_at)}</div>
+          <div className={cn('text-text-secondary', designTokens.typography.caption)} suppressHydrationWarning>{formatDateTW(order.created_at)}</div>
           <div className={cn('font-bold', designTokens.typography.body.base)}>{formatAmount(order.total_amount)}</div>
         </div>
       </PrefetchLink>
