@@ -352,6 +352,7 @@ export function CartContent() {
                 quantity: item.quantity,
                 series_id: item.series_id,
               }))}
+              regularItemsTotal={cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)}
               onClose={() => setShowCouponSelector(false)}
             />
           </div>

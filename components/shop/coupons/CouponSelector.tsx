@@ -12,12 +12,13 @@ import { getUserCoupons, validateCoupon } from '@/lib/actions/coupons'
 import { useCartStore } from '@/stores/cart'
 import type { UserCoupon, CartItem as BaseCartItem, CouponDiscountResult } from '@/types'
 import { toast } from 'sonner'
-import { X } from 'lucide-react'
+import { X, Info } from 'lucide-react'
 import { designTokens } from '@/lib/design-tokens'
 import { cn } from '@/lib/utils'
 
 interface CouponSelectorProps {
   cartItems: (BaseCartItem & { price: number; series_id?: string })[]
+  regularItemsTotal: number  // 普通商品等級價合計
   onClose?: () => void
 }
 
@@ -30,7 +31,7 @@ interface CouponSelectorProps {
  * - 顯示可用 / 不可用狀態與原因
  * - 支援應用 / 移除優惠券
  */
-export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
+export function CouponSelector({ cartItems, regularItemsTotal, onClose }: CouponSelectorProps) {
   const { appliedCoupon, applyCoupon, removeCoupon } = useCartStore()
   const [availableCoupons, setAvailableCoupons] = useState<UserCoupon[]>([])
   const [validationResults, setValidationResults] = useState<Record<string, CouponDiscountResult>>({})
@@ -237,6 +238,12 @@ export function CouponSelector({ cartItems, onClose }: CouponSelectorProps) {
                       滿 ${coupon.min_order_amount} 可用
                     </div>
                   )}
+
+                  {/* 組合優惠排除提示 */}
+                  <div className="text-xs text-text-secondary mt-1 flex items-center gap-1">
+                    <Info className="w-3 h-3 flex-shrink-0" />
+                    僅適用於一般商品，組合優惠不列入計算
+                  </div>
                 </div>
 
                 <div>
