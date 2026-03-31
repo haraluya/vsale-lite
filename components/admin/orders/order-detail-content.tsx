@@ -112,7 +112,14 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
         <>
           <div className={cn('rounded-theme-sm bg-surface', getThemeClasses(), designTokens.spacing.card.padding)}>
             <div className="mb-4">
-              <h1 className={cn(designTokens.typography.h1, 'mb-2 font-mono')}>{order.order_number}</h1>
+              <h1 className={cn(designTokens.typography.h1, 'mb-2 font-mono')}>
+                {order.order_number}
+                {order.is_admin_order && (
+                  <span className="text-sm px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 ml-2 font-sans font-medium">
+                    代客下單
+                  </span>
+                )}
+              </h1>
               <OrderStatusBadge status={order.status} size="lg" />
             </div>
           </div>
@@ -167,7 +174,16 @@ export function OrderDetailContent({ order, timelines }: OrderDetailContentProps
                   icon={Hash}
                   iconColor="orange"
                   label="訂單編號"
-                  value={<span className="font-mono">{order.order_number}</span>}
+                  value={
+                    <span className="font-mono">
+                      {order.order_number}
+                      {order.is_admin_order && (
+                        <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 ml-1.5 font-sans font-medium">
+                          代客下單
+                        </span>
+                      )}
+                    </span>
+                  }
                   valueSize="base"
                   valueColor="black"
                 />

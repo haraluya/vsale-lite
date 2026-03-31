@@ -695,6 +695,19 @@ export async function getOrders(
       (profiles || []).map((profile: any) => [profile.id, profile])
     )
 
+    // 查詢代客下單標記
+    const orderIds = orders.map((order: any) => order.id)
+    const { data: adminCreatedTimelines } = await supabase
+      .from('order_timelines')
+      .select('order_id')
+      .in('order_id', orderIds)
+      .eq('action_type', 'created')
+      .eq('actor_role', 'admin')
+
+    const adminCreatedOrderIds = new Set(
+      (adminCreatedTimelines || []).map((t: any) => t.order_id)
+    )
+
     // 轉換資料格式
     let formattedOrders: OrderWithUser[] = orders.map((order: any) => {
       const profile = profileMap.get(order.user_id)
@@ -711,6 +724,7 @@ export async function getOrders(
         user_name: profile?.display_name || profile?.phone || '未知客戶',
         user_phone: profile?.phone || '',
         tier_name: profile?.tiers?.name || '未設定',
+        is_admin_order: adminCreatedOrderIds.has(order.id),
       }
     })
 
@@ -940,6 +954,10 @@ export async function getOrderById(
         discount_amount: item.discount_amount,
         created_at: item.created_at,
       })),
+      // 代客下單標記（從 timeline 判斷）
+      is_admin_order: (orderTimelines || []).some(
+        (t: any) => t.action_type === 'created' && t.actor_role === 'admin'
+      ),
     }
 
     return {

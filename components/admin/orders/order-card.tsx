@@ -40,6 +40,11 @@ export const OrderCard = memo(
         <div className="flex items-start justify-between gap-3">
           <div className={cn('font-mono font-bold text-blue-600', designTokens.typography.body.base)}>
             {order.order_number}
+            {order.is_admin_order && (
+              <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 ml-1.5 font-sans">
+                代客下單
+              </span>
+            )}
           </div>
           <OrderStatusBadge status={order.status} size="sm" />
         </div>
@@ -74,7 +79,8 @@ export const OrderCard = memo(
       prev.user_name === next.user_name &&
       prev.user_phone === next.user_phone &&
       prev.tier_name === next.tier_name &&
-      prev.created_at === next.created_at
+      prev.created_at === next.created_at &&
+      prev.is_admin_order === next.is_admin_order
     )
   }
 )

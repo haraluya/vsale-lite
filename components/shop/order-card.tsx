@@ -36,7 +36,14 @@ export function OrderCard({ order, showCustomerInfo = false }: OrderCardProps) {
         {/* 訂單編號與狀態 */}
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-xl font-bold">{order.order_number}</h3>
+            <h3 className="text-xl font-bold">
+              {order.order_number}
+              {order.is_admin_order && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 ml-1.5 font-normal">
+                  代客下單
+                </span>
+              )}
+            </h3>
             <p className="mt-1 text-sm text-text-secondary">{createdDate}</p>
           </div>
           <OrderStatusBadge status={order.status} />

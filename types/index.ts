@@ -260,6 +260,7 @@ export type OrderWithUser = Order & {
   user_name: string | null
   user_phone: string | null
   tier_name: string | null
+  is_admin_order?: boolean  // 代客下單標記
 }
 
 // 訂單明細
@@ -332,6 +333,7 @@ export type OrderDetail = Order & {
   }
   items: OrderItem[]
   timelines?: OrderTimelineWithActor[]
+  is_admin_order?: boolean  // 代客下單標記
   coupon?: OrderCoupon | null  // 🆕 Feature 009: 優惠券快照（選填）
   custom_fees?: OrderCustomFee[]  // 🆕 Feature 011: 自訂費用項目（選填）
   combo_deal_items?: import('@/types/combo-deals').OrderComboDealItem[]  // 🆕 Feature 021: 組合優惠項目（選填）

@@ -51,6 +51,11 @@ export function SplitPanelLayout({ order }: Props) {
           <div>
             <h1 className="text-2xl md:text-4xl font-black text-white drop-shadow-lg">
               {order.order_number}
+              {order.is_admin_order && (
+                <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 ml-2 font-normal font-sans">
+                  代客下單
+                </span>
+              )}
             </h1>
             <p className="text-sm text-white/90 mt-1">{formatDateTW(order.created_at)}</p>
           </div>

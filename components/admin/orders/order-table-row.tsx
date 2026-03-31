@@ -30,7 +30,14 @@ export const OrderTableRow = memo(
         prefetchDelay={150}
       >
         {/* 訂單編號 */}
-        <div className="font-mono font-bold text-blue-600">{order.order_number}</div>
+        <div className="font-mono font-bold text-blue-600">
+          {order.order_number}
+          {order.is_admin_order && (
+            <span className="text-xs px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 ml-1.5 font-sans">
+              代客下單
+            </span>
+          )}
+        </div>
 
         {/* 客戶資訊 */}
         <div>
@@ -68,7 +75,8 @@ export const OrderTableRow = memo(
       prev.user_name === next.user_name &&
       prev.user_phone === next.user_phone &&
       prev.tier_name === next.tier_name &&
-      prev.created_at === next.created_at
+      prev.created_at === next.created_at &&
+      prev.is_admin_order === next.is_admin_order
     )
   }
 )
