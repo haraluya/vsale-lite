@@ -1718,3 +1718,151 @@ export async function getActiveComboDealsByTierId(tierId: string): Promise<
     }
   }
 }
+
+/**
+ * 代客下單：查詢組合優惠完整詳情含系列商品與等級價格（管理員專用）
+ */
+export async function getComboDealDetailWithProducts(
+  comboDealId: string,
+  tierId: string
+): Promise<ActionResult<{
+  id: string
+  name: string
+  combo_mode: 'each' | 'mix_match'
+  discount_type: 'fixed' | 'percentage'
+  discount_value: number
+  mix_match_total_quantity?: number
+  series: Array<{
+    series_id: string
+    series_name: string
+    required_quantity: number | null
+    products: Array<{
+      product_id: string
+      product_name: string
+      product_code: string
+      series_id: string
+      retail_price: number
+      tier_price: number
+    }>
+  }>
+}>> {
+  try {
+    await checkAuth('admin')
+    const adminClient = createAdminClient()
+
+    // 查詢組合優惠基本資料
+    const { data: comboDeal, error: dealError } = await adminClient
+      .from('combo_deals')
+      .select('id, name, combo_mode, discount_type, discount_value')
+      .eq('id', comboDealId)
+      .eq('status', 'active')
+      .single()
+
+    if (dealError || !comboDeal) {
+      return { success: false, message: '組合優惠不存在或已失效' }
+    }
+
+    // 查詢任選模式配置
+    let mixMatchTotalQuantity: number | undefined
+    if (comboDeal.combo_mode === 'mix_match') {
+      const { data: config } = await adminClient
+        .from('combo_deal_mix_match_config')
+        .select('total_quantity')
+        .eq('combo_deal_id', comboDealId)
+        .single()
+      mixMatchTotalQuantity = config?.total_quantity
+    }
+
+    // 查詢系列關聯
+    const { data: seriesData, error: seriesError } = await adminClient
+      .from('combo_deal_series')
+      .select(`
+        series_id,
+        required_quantity,
+        display_order,
+        series:series_id(id, name, status)
+      `)
+      .eq('combo_deal_id', comboDealId)
+      .order('display_order', { ascending: true })
+
+    if (seriesError) {
+      return { success: false, message: '查詢系列資料失敗' }
+    }
+
+    const activeSeries = (seriesData || []).filter(
+      (s: any) => s.series?.status === 'active'
+    )
+
+    // 批次查詢所有系列的商品（含等級價格）
+    const seriesIds = activeSeries.map((s: any) => s.series_id)
+
+    if (seriesIds.length === 0) {
+      return {
+        success: true,
+        data: {
+          ...comboDeal,
+          mix_match_total_quantity: mixMatchTotalQuantity,
+          series: [],
+        },
+      }
+    }
+
+    const { data: products, error: productsError } = await adminClient
+      .from('products')
+      .select(`
+        id, name, code, series_id, retail_price,
+        tier_prices(price, tier_id)
+      `)
+      .in('series_id', seriesIds)
+      .eq('status', 'active')
+      .order('code', { ascending: true })
+
+    if (productsError) {
+      return { success: false, message: '查詢商品資料失敗' }
+    }
+
+    // 按系列分組商品
+    const productsBySeriesId = new Map<string, any[]>()
+    for (const p of products || []) {
+      const list = productsBySeriesId.get(p.series_id) || []
+      list.push(p)
+      productsBySeriesId.set(p.series_id, list)
+    }
+
+    // 組裝結果
+    const series = activeSeries.map((s: any) => ({
+      series_id: s.series_id,
+      series_name: s.series?.name || '',
+      required_quantity: s.required_quantity,
+      products: (productsBySeriesId.get(s.series_id) || []).map((p: any) => {
+        const tierPriceData = p.tier_prices?.find((tp: any) => tp.tier_id === tierId)
+        return {
+          product_id: p.id,
+          product_name: p.name,
+          product_code: p.code || '',
+          series_id: p.series_id,
+          retail_price: p.retail_price,
+          tier_price: tierPriceData?.price ?? p.retail_price,
+        }
+      }),
+    }))
+
+    return {
+      success: true,
+      data: {
+        id: comboDeal.id,
+        name: comboDeal.name,
+        combo_mode: comboDeal.combo_mode,
+        discount_type: comboDeal.discount_type,
+        discount_value: comboDeal.discount_value,
+        mix_match_total_quantity: mixMatchTotalQuantity,
+        series,
+      },
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢組合優惠時發生錯誤',
+    }
+  }
+}
