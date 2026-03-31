@@ -119,38 +119,6 @@ export function calculateComboDealPrice(
   };
 }
 
-/**
- * 計算組合優惠價格（各選模式）
- * 此函式為向後相容，實際使用 calculateComboDealPrice
- */
-export function calculateEachModePricing(
-  selectedProducts: SelectedProduct[],
-  tierPrices: Map<string, number>,
-  discountType: DiscountType,
-  discountValue: number
-): ComboDealPricing {
-  return calculateComboDealPrice(selectedProducts, tierPrices, {
-    discount_type: discountType,
-    discount_value: discountValue,
-  });
-}
-
-/**
- * 計算組合優惠價格（任選模式）
- * 此函式為向後相容，實際使用 calculateComboDealPrice
- */
-export function calculateMixMatchModePricing(
-  selectedProducts: SelectedProduct[],
-  tierPrices: Map<string, number>,
-  discountType: DiscountType,
-  discountValue: number
-): ComboDealPricing {
-  return calculateComboDealPrice(selectedProducts, tierPrices, {
-    discount_type: discountType,
-    discount_value: discountValue,
-  });
-}
-
 // -----------------------------------------------------
 // 折扣計算輔助函式
 // -----------------------------------------------------
@@ -184,64 +152,6 @@ export function applyDiscount(
     discountedPrice: Math.max(0, discountedPrice), // 確保不為負數
     discountAmount: Math.max(0, discountAmount),
   };
-}
-
-// -----------------------------------------------------
-// 優惠券疊加計算
-// -----------------------------------------------------
-
-/**
- * 計算優惠券疊加後的最終價格
- * 計算順序：組合優惠折扣 → 優惠券折扣
- * @param comboDealPrice - 組合優惠折扣後價格
- * @param couponDiscountType - 優惠券折扣類型
- * @param couponDiscountValue - 優惠券折扣值
- * @returns 最終價格和優惠券折扣金額
- */
-export function applyCouponToComboDealprice(
-  comboDealPrice: number,
-  couponDiscountType: DiscountType,
-  couponDiscountValue: number
-): { finalPrice: number; couponDiscountAmount: number } {
-  const { discountedPrice, discountAmount } = applyDiscount(
-    comboDealPrice,
-    couponDiscountType,
-    couponDiscountValue
-  );
-
-  return {
-    finalPrice: Math.round(discountedPrice),
-    couponDiscountAmount: Math.round(discountAmount),
-  };
-}
-
-// -----------------------------------------------------
-// 價格計算驗證
-// -----------------------------------------------------
-
-/**
- * 驗證價格計算結果的合理性
- * @param pricing - 價格計算結果
- * @returns 是否合理
- */
-export function validatePricing(pricing: ComboDealPricing): boolean {
-  // 基本驗證
-  if (pricing.originalPrice < 0 || pricing.discountedPrice < 0 || pricing.discountAmount < 0) {
-    return false;
-  }
-
-  // 折扣金額不應超過原價
-  if (pricing.discountAmount > pricing.originalPrice) {
-    return false;
-  }
-
-  // 折扣後價格應等於原價減折扣金額
-  const expectedDiscountedPrice = pricing.originalPrice - pricing.discountAmount;
-  if (Math.abs(pricing.discountedPrice - expectedDiscountedPrice) > 0.01) {
-    return false;
-  }
-
-  return true;
 }
 
 // -----------------------------------------------------
