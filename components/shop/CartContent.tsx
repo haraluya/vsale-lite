@@ -23,6 +23,8 @@ import { CartItem } from '@/components/shop/cart-item'
 import { CartSummary } from '@/components/shop/cart-summary'
 import { CouponSelector } from '@/components/shop/coupons/CouponSelector'
 import { ComboDealCartItem } from '@/components/shop/combo-deals/ComboDealCartItem' // 🆕 Feature 021
+import { calculateOrderAmounts } from '@/lib/pricing/order-calculator'
+import type { RegularItemInput, ComboDealInput } from '@/lib/pricing/order-calculator'
 import type { CartItemWithProduct, ProductDetailInfo } from '@/types'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -181,20 +183,49 @@ export function CartContent() {
     validateAppliedCoupon()
   }, [cartItemsWithPrices, appliedCoupon, couponDiscount, removeCoupon, applyCoupon])
 
-  // 🆕 Feature 021: 計算總金額（含組合優惠）
-  const normalItemsTotal = cartItemsWithPrices.reduce((sum, item) => sum + item.subtotal, 0)
-  const comboDealOriginalTotal = comboDeals.reduce((sum, item) => sum + item.original_price, 0)
-  const totalAmount = normalItemsTotal + comboDealOriginalTotal // 使用原價計算，折扣在 CartSummary 中分項顯示
+  // 使用統一計算模組
+  const orderCalcResult = useMemo(() => {
+    const regularItems: RegularItemInput[] = cartItemsWithPrices.map(item => ({
+      retailPrice: item.retailPrice ?? item.price ?? 0,
+      tierPrice: item.price ?? 0,
+      quantity: item.quantity,
+      seriesId: item.series_id,
+    }))
 
-  // 🆕 Feature 021: 計算總商品數（含組合優惠商品）
+    const comboDealInputs: ComboDealInput[] = comboDeals.map(deal => {
+      const retailTotal = deal.selected_products.reduce((sum, product) => {
+        const detail = comboDealProductDetails.get(product.product_id)
+        return sum + (detail?.retail_price || detail?.unit_price || 0) * product.quantity
+      }, 0)
+
+      return {
+        name: deal.combo_deal_name,
+        retailTotal,
+        originalPrice: deal.original_price,
+        discountedPrice: deal.discounted_price,
+        discountAmount: deal.discount_amount,
+      }
+    })
+
+    return calculateOrderAmounts({
+      regularItems,
+      comboDeals: comboDealInputs,
+      coupon: appliedCoupon ? {
+        code: appliedCoupon.code_normalized,
+        discountType: appliedCoupon.discount_type,
+        discountValue: appliedCoupon.discount_value,
+        minOrderAmount: appliedCoupon.min_order_amount,
+        seriesRestrictions: [],
+      } : null,
+    })
+  }, [cartItemsWithPrices, comboDeals, comboDealProductDetails, appliedCoupon])
+
   const normalItemsCount = getTotalItems()
   const comboDealItemsCount = comboDeals.reduce(
     (sum, item) => sum + item.selected_products.reduce((s, p) => s + p.quantity, 0),
     0
   )
   const totalItems = normalItemsCount + comboDealItemsCount
-
-  // 🆕 Feature 021: 更新 isEmpty 檢查（包含組合優惠）
   const isEmpty = items.length === 0 && comboDeals.length === 0
 
   return (
@@ -278,7 +309,12 @@ export function CartContent() {
               "lg:col-span-2",
               "space-y-3 md:space-y-4"
             )}>
-              {/* 🆕 Feature 021: 組合優惠項目（先渲染，在上方） */}
+              {/* 一般商品項目 */}
+              {cartItemsWithPrices.map((item) => (
+                <CartItem key={item.productId} item={item} />
+              ))}
+
+              {/* 組合優惠項目 */}
               {comboDeals.map((item) => (
                 <ComboDealCartItem
                   key={item.id}
@@ -286,24 +322,19 @@ export function CartContent() {
                   productDetails={comboDealProductDetails}
                 />
               ))}
-
-              {/* 一般商品項目 */}
-              {cartItemsWithPrices.map((item) => (
-                <CartItem key={item.productId} item={item} />
-              ))}
             </div>
 
             {/* 購物車摘要 */}
             <div className="lg:col-span-1">
               <CartSummary
-                totalAmount={totalAmount} // 🆕 包含一般商品 + 組合優惠原價
+                orderCalcResult={orderCalcResult}
                 totalItems={totalItems}
                 isEmpty={isEmpty}
                 couponDiscount={couponDiscount}
                 couponCode={appliedCoupon?.code_normalized}
-                comboDeals={comboDeals} // 🆕 Feature 021: 傳入組合優惠項目
-                comboDealProductDetails={comboDealProductDetails} // 🆕 組合優惠商品詳情（計算會員折扣）
+                comboDeals={comboDeals}
                 onOpenCouponSelector={() => setShowCouponSelector(true)}
+                hasRegularItems={cartItemsWithPrices.length > 0}
               />
             </div>
           </div>
