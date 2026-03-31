@@ -2,18 +2,16 @@
  * Combo Deal Cart Item Component
  * Feature: 021-combo-deals (Phase 7 - T060 + Enhancement)
  *
- * 組合優惠購物車項目元件（優化版）
- * - 黃色背景標示組合優惠項目
- * - 顯示完整商品資訊（系列 + 名稱 + 單價 × 數量）
- * - 編輯和刪除按鈕並排顯示（節省空間）
- * - 價格資訊移至購物車摘要統一顯示
- * - Neo-Brutalism 設計風格
+ * 組合優惠購物車項目元件（amber 容器設計）
+ * - amber 背景標示組合優惠項目
+ * - 顯示零售原價與已省金額
+ * - 編輯和刪除按鈕並排顯示
  */
 
 'use client'
 
 import Link from 'next/link'
-import { Trash2, Edit2, Package } from 'lucide-react'
+import { Trash2, Edit2 } from 'lucide-react'
 import { useCartStore, type ComboDealCartItem as ComboDealCartItemType } from '@/stores/cart'
 import type { ProductDetailInfo } from '@/types'
 import { useConfirm, useAlert } from '@/lib/contexts/dialog-context'
@@ -30,7 +28,6 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
   const confirm = useConfirm()
   const alert = useAlert()
 
-  // 處理刪除組合優惠
   async function handleDelete() {
     const confirmed = await confirm({
       title: '確認刪除',
@@ -48,45 +45,40 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
     }
   }
 
-  // 計算商品總數
-  const totalQuantity = item.selected_products.reduce((sum, p) => sum + p.quantity, 0)
+  // 計算零售價合計
+  const retailTotal = item.selected_products.reduce((sum, product) => {
+    const detail = productDetails?.get(product.product_id)
+    return sum + (detail?.retail_price || detail?.unit_price || 0) * product.quantity
+  }, 0)
+
+  // 總省下金額
+  const totalSavings = retailTotal - item.discounted_price
 
   return (
-    <div
-      className={cn(
-        'rounded-theme-sm bg-yellow-50',
-        designTokens.cleanCommerce.border.full,
-        'border-yellow-400',
-        designTokens.cleanCommerce.shadow.base,
-        'p-4 md:p-6'
-      )}
-    >
-      {/* 組合標籤與按鈕 */}
-      <div className="flex items-start justify-between gap-2 mb-4">
+    <div className="border-2 border-amber-200 bg-amber-50/30 dark:bg-amber-950/20 rounded-xl overflow-hidden">
+      {/* 標題列 */}
+      <div className="flex items-center justify-between gap-2 bg-amber-50 dark:bg-amber-900/30 px-4 py-3">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <Package className="w-5 h-5 text-yellow-700 flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-bold text-yellow-800 mb-1">
-              📦 組合優惠
-            </div>
-            <h3 className={cn(designTokens.typography.h3, 'text-yellow-900 truncate')}>
-              {item.combo_deal_name}
-            </h3>
-          </div>
+          <span className="text-lg flex-shrink-0">🔥</span>
+          <span className="font-bold text-amber-900 dark:text-amber-100 truncate">
+            {item.combo_deal_name}
+          </span>
+          {totalSavings > 0 && (
+            <span className="text-sm font-bold text-green-600 dark:text-green-400 whitespace-nowrap">
+              已省 NT$ {totalSavings.toLocaleString()}
+            </span>
+          )}
         </div>
 
-        {/* 編輯與刪除按鈕 */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <Link
             href={`/store/combo-deals/${item.combo_deal_id}?edit=true&cart_item_id=${item.id}`}
             className={cn(
-              'flex items-center gap-2 rounded-theme-sm bg-blue-400 font-bold transition-all',
+              'flex items-center gap-1 rounded-theme-sm bg-blue-400 font-bold transition-all',
               designTokens.cleanCommerce.border.full,
-              'border-border',
-              'shadow-neo-sm',
+              'border-border shadow-neo-sm',
               'hover:-translate-y-0.5 hover:shadow-theme-hover',
-              'px-3 py-2 text-sm',
-              'min-h-[44px]'  // WCAG 2.1 AA 觸控目標
+              'px-3 py-2 text-sm min-h-[44px]'
             )}
           >
             <Edit2 className="w-4 h-4" />
@@ -95,90 +87,57 @@ export function ComboDealCartItem({ item, productDetails }: ComboDealCartItemPro
 
           <button
             onClick={handleDelete}
-            className={cn(
-              'flex items-center justify-center rounded-theme-sm bg-red-100 font-bold transition-all',
-              designTokens.cleanCommerce.border.full,
-              'border-red-400',
-              'shadow-neo-sm',
-              'hover:-translate-y-0.5 hover:shadow-theme-hover',
-              'hover:bg-red-200',
-              'p-2 text-red-700',
-              'min-h-[44px] min-w-[44px]'  // WCAG 2.1 AA 觸控目標
-            )}
-            aria-label="刪除組合優惠"
+            className="flex items-center gap-1 rounded-theme-sm text-red-500 font-bold
+                       text-sm px-3 py-2 min-h-[44px] hover:bg-red-50 dark:hover:bg-red-950
+                       transition-colors"
           >
             <Trash2 className="w-4 h-4" />
+            <span className="hidden sm:inline">移除整組</span>
           </button>
         </div>
       </div>
 
-      {/* 商品清單 */}
-      <div className="space-y-2">
-        <div className="text-sm font-semibold text-foreground mb-2">
-          包含商品 ({totalQuantity} 件):
-        </div>
+      {/* 商品列表 */}
+      <div className="p-3 space-y-2">
         {item.selected_products.map((product, index) => {
           const detail = productDetails?.get(product.product_id)
           return (
             <div
               key={`${product.product_id}-${index}`}
-              className={cn(
-                'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2',
-                'rounded-theme-sm bg-surface',
-                'border border-yellow-300',
-                'px-3 py-2'
-              )}
+              className="flex items-center justify-between gap-2 text-sm"
             >
               <div className="flex-1 min-w-0">
-                {/* 系列名稱標籤 */}
                 {detail?.series_name && (
-                  <div className={cn(
-                    "inline-block rounded-theme-sm bg-yellow-100 px-2 py-0.5 mb-1",
-                    "border border-yellow-400",
-                    "text-xs font-bold text-yellow-800"
-                  )}>
-                    【{detail.series_name}】
-                  </div>
+                  <span className="inline-block rounded bg-amber-100 dark:bg-amber-800 border border-amber-300
+                                   px-1.5 py-0.5 mr-1.5 text-xs font-bold text-amber-800 dark:text-amber-200">
+                    {detail.series_name}
+                  </span>
                 )}
-
-                {/* 商品名稱 */}
-                <div className="font-medium text-foreground">
+                <span className="text-foreground">
                   {detail?.product_name || product.product_id}
-                </div>
-
-                {/* 商品編號（如果有） */}
-                {detail?.product_code && (
-                  <div className="text-xs text-text-secondary">
-                    品號: {detail.product_code}
-                  </div>
-                )}
+                </span>
               </div>
-
-              {/* 🔧 顯示零售價 × 數量 */}
-              <div className="text-sm text-text-secondary whitespace-nowrap sm:text-right">
-                {detail?.retail_price ? (
-                  <>
-                    <span className="text-text-secondary font-semibold">
-                      NT$ {detail.retail_price.toLocaleString()}
-                    </span>
-                    {' × '}
-                    <span className="font-semibold">{product.quantity}</span>
-                  </>
-                ) : detail?.unit_price ? (
-                  <>
-                    <span className="text-success font-semibold">
-                      NT$ {detail.unit_price.toLocaleString()}
-                    </span>
-                    {' × '}
-                    <span className="font-semibold">{product.quantity}</span>
-                  </>
-                ) : (
-                  <span className="text-text-secondary">× {product.quantity}</span>
-                )}
-              </div>
+              <span className="text-text-secondary whitespace-nowrap">
+                NT$ {(detail?.retail_price || detail?.unit_price || 0).toLocaleString()} × {product.quantity}
+              </span>
             </div>
           )
         })}
+      </div>
+
+      {/* 小計 */}
+      <div className="border-t border-amber-200 px-4 py-2 flex items-center justify-between">
+        <span className="text-sm text-text-secondary">小計</span>
+        <div className="flex items-center gap-2">
+          {retailTotal !== item.discounted_price && (
+            <span className="text-sm text-text-secondary line-through">
+              NT$ {retailTotal.toLocaleString()}
+            </span>
+          )}
+          <span className="text-lg font-bold text-success">
+            NT$ {item.discounted_price.toLocaleString()}
+          </span>
+        </div>
       </div>
     </div>
   )
