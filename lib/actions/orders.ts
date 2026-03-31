@@ -25,6 +25,8 @@ import type {
 import { logAudit } from './audit'
 import { createComboDealSnapshot } from '@/lib/utils/combo-deal-snapshot'
 import type { ComboDealSnapshot } from '@/types/combo-deals'
+import { calculateOrderAmounts } from '@/lib/pricing/order-calculator'
+import type { RegularItemInput, ComboDealInput } from '@/lib/pricing/order-calculator'
 
 /**
  * 訂單管理 Server Actions
@@ -73,6 +75,8 @@ export async function createOrder(
       discount_type: string
       discount_value: number
       discount_amount: number
+      min_order_amount: number | null
+      series_restrictions: string[]
       userCouponId: string
     } | null = null
 
@@ -83,7 +87,7 @@ export async function createOrder(
         .select(`
           id,
           used_at,
-          coupon:coupons(id, code_normalized, discount_type, discount_value, status)
+          coupon:coupons(id, code_normalized, discount_type, discount_value, min_order_amount, status, coupon_series_restrictions(series_id))
         `)
         .eq('id', userCouponId)
         .eq('user_id', userId)
@@ -119,6 +123,8 @@ export async function createOrder(
         discount_type: coupon.discount_type,
         discount_value: coupon.discount_value,
         discount_amount: 0, // 稍後計算
+        min_order_amount: coupon.min_order_amount ?? null,
+        series_restrictions: coupon.coupon_series_restrictions?.map((r: any) => r.series_id) || [],
         userCouponId: userCoupon.id,
       }
     }
@@ -155,6 +161,7 @@ export async function createOrder(
     }
 
     // 4. 計算訂單總金額與建立訂單明細資料
+    const regularItemInputs: RegularItemInput[] = []
     let totalAmount = 0
     const orderItemsData: Array<{
       product_id: string
@@ -191,6 +198,13 @@ export async function createOrder(
 
       const subtotal = price * item.quantity
       totalAmount += subtotal
+
+      regularItemInputs.push({
+        retailPrice: product.retail_price ?? price,
+        tierPrice: price,
+        quantity: item.quantity,
+        seriesId: (product as any).series_id || undefined,
+      })
 
       orderItemsData.push({
         product_id: product.id,
@@ -338,21 +352,28 @@ export async function createOrder(
       })
     }
 
-    // 5. 計算優惠券折扣（如果有）
+    // 5. 計算優惠券折扣（使用統一計算模組）
     if (couponData) {
-      if (couponData.discount_type === 'fixed') {
-        // 現金折扣：取優惠券金額與訂單總額的較小值
-        couponData.discount_amount = Math.min(couponData.discount_value, totalAmount)
-      } else if (couponData.discount_type === 'percentage') {
-        // 百分比折扣：計算百分比
-        couponData.discount_amount = Math.round(totalAmount * (couponData.discount_value / 100))
-      }
+      const comboDealInputs: ComboDealInput[] = comboDealSnapshotsData.map(d => ({
+        name: '',
+        retailTotal: 0,
+        originalPrice: d.originalPrice,
+        discountedPrice: d.discountedPrice,
+        discountAmount: d.discountAmount,
+      }))
 
-      // 確保折扣後金額不為負數
-      const finalAmount = totalAmount - couponData.discount_amount
-      if (finalAmount < 0) {
-        couponData.discount_amount = totalAmount
-      }
+      const calcResult = calculateOrderAmounts({
+        regularItems: regularItemInputs,
+        comboDeals: comboDealInputs,
+        coupon: {
+          code: couponData.code || '',
+          discountType: couponData.discount_type as 'fixed' | 'percentage',
+          discountValue: couponData.discount_value,
+          minOrderAmount: couponData.min_order_amount,
+          seriesRestrictions: couponData.series_restrictions || [],
+        },
+      })
+      couponData.discount_amount = calcResult.couponDiscount
     }
 
     // 6. 產生訂單編號 (呼叫 PostgreSQL Function)
