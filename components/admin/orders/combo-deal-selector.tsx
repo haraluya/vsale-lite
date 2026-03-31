@@ -227,14 +227,14 @@ export function ComboDealSelector({
       {/* 系列商品列表 */}
       {seriesList.map(series => {
         const seriesCount = seriesSelectedCounts.get(series.series_id) || 0
-        const required = series.required_quantity ?? 0
+        const required = series.required_quantity ?? 1
 
         return (
           <div key={series.series_id} className="space-y-1.5">
             {/* 系列標題 */}
             <div className="flex items-center justify-between text-xs font-medium text-text-secondary px-1">
               <span>{series.series_name}</span>
-              {comboMode === 'each' && required > 0 && (
+              {comboMode === 'each' && (
                 <span className={seriesCount >= required ? 'text-green-600' : 'text-amber-600'}>
                   {seriesCount} / {required}
                 </span>

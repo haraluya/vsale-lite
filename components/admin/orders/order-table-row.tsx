@@ -57,7 +57,7 @@ export const OrderTableRow = memo(
         <div className="text-right font-bold">{formatAmount(order.total_amount)}</div>
 
         {/* 建立時間 */}
-        <div className="text-sm text-text-secondary">{formatDateTW(order.created_at)}</div>
+        <div className="text-sm text-text-secondary" suppressHydrationWarning>{formatDateTW(order.created_at)}</div>
       </PrefetchLink>
     )
   },
