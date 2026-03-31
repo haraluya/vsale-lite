@@ -30,75 +30,6 @@ import type {
   CouponDiscountResult,
   CouponStats,
 } from '@/types'
-import type { ComboDealCartItem } from '@/stores/cart'
-
-// ============================================================================
-// 輔助函式：組合優惠限制檢查
-// ============================================================================
-
-/**
- * 檢查優惠券是否適用於購物車中的組合優惠
- *
- * @param couponId - 優惠券 ID
- * @param comboDeals - 購物車中的組合優惠項目
- * @returns Promise<{ valid: boolean, error?: string }>
- *
- * @feature 021-combo-deals
- */
-async function checkCouponComboRestrictions(
-  couponId: string,
-  comboDeals: ComboDealCartItem[]
-): Promise<{ valid: boolean; error?: string }> {
-  // 如果購物車沒有組合優惠，直接通過
-  if (comboDeals.length === 0) {
-    return { valid: true }
-  }
-
-  const supabase = await createClient()
-
-  // 查詢優惠券的組合優惠限制
-  const { data: restrictions, error } = await supabase
-    .from('coupon_combo_restrictions')
-    .select('combo_deal_id')
-    .eq('coupon_id', couponId)
-
-  if (error) {
-    console.error('查詢組合優惠限制失敗:', error)
-    return {
-      valid: false,
-      error: '無法驗證優惠券限制',
-    }
-  }
-
-  // 如果沒有限制，適用所有組合優惠
-  if (!restrictions || restrictions.length === 0) {
-    return { valid: true }
-  }
-
-  // 檢查是否有 combo_deal_id = NULL 的記錄（表示適用所有組合優惠）
-  const hasAllRestriction = restrictions.some((r: any) => r.combo_deal_id === null)
-  if (hasAllRestriction) {
-    return { valid: true }
-  }
-
-  // 檢查所有組合優惠是否在允許清單中
-  const allowedComboDealIds = restrictions
-    .map((r: any) => r.combo_deal_id)
-    .filter((id): id is string => id !== null)
-
-  const invalidCombo = comboDeals.find(
-    (item) => !allowedComboDealIds.includes(item.combo_deal_id)
-  )
-
-  if (invalidCombo) {
-    return {
-      valid: false,
-      error: `此優惠券不適用於組合優惠「${invalidCombo.combo_deal_name}」`,
-    }
-  }
-
-  return { valid: true }
-}
 
 // ============================================================================
 // 管理員功能：優惠券 CRUD
@@ -160,7 +91,6 @@ export async function createCoupon(
         claim_limit: data.claim_limit,
         valid_from: data.valid_from,
         valid_until: data.valid_until,
-        exclude_combo_deals: data.exclude_combo_deals, // 🆕 排除組合優惠
       })
       .select()
       .single()
@@ -208,41 +138,6 @@ export async function createCoupon(
       }
     }
 
-    // 7. 🆕 Feature 021: 建立組合優惠限制
-    if (data.combo_apply_all) {
-      // 適用所有組合優惠：插入 combo_deal_id = NULL
-      const { error: comboError } = await supabase
-        .from('coupon_combo_restrictions')
-        .insert({
-          coupon_id: coupon.id,
-          combo_deal_id: null,
-        })
-
-      if (comboError) {
-        console.error('建立組合優惠限制失敗:', comboError)
-        // 清理已建立的優惠券
-        await supabase.from('coupons').delete().eq('id', coupon.id)
-        return { success: false, message: '建立組合優惠限制失敗' }
-      }
-    } else if (data.combo_restrictions && data.combo_restrictions.length > 0) {
-      // 僅適用指定組合優惠
-      const comboRestrictions = data.combo_restrictions.map((combo_deal_id) => ({
-        coupon_id: coupon.id,
-        combo_deal_id,
-      }))
-
-      const { error: comboError } = await supabase
-        .from('coupon_combo_restrictions')
-        .insert(comboRestrictions)
-
-      if (comboError) {
-        console.error('建立組合優惠限制失敗:', comboError)
-        // 清理已建立的優惠券
-        await supabase.from('coupons').delete().eq('id', coupon.id)
-        return { success: false, message: '建立組合優惠限制失敗' }
-      }
-    }
-
     revalidatePath('/admin/coupons')
     return {
       success: true,
@@ -281,8 +176,7 @@ export async function getCoupons(filters?: {
       .select(`
         *,
         tier_restrictions:coupon_tier_restrictions(tier_id),
-        series_restrictions:coupon_series_restrictions(series_id),
-        combo_restrictions:coupon_combo_restrictions(combo_deal_id)
+        series_restrictions:coupon_series_restrictions(series_id)
       `)
       .order('created_at', { ascending: false })
 
@@ -313,12 +207,6 @@ export async function getCoupons(filters?: {
       tier_restrictions: coupon.tier_restrictions?.map((r: any) => r.tier_id) || [],
       series_restrictions:
         coupon.series_restrictions?.map((r: any) => r.series_id) || [],
-      // 🆕 Feature 021: 組合優惠限制
-      combo_restrictions:
-        coupon.combo_restrictions
-          ?.filter((r: any) => r.combo_deal_id !== null)
-          .map((r: any) => r.combo_deal_id) || [],
-      combo_apply_all: coupon.combo_restrictions?.some((r: any) => r.combo_deal_id === null) || false,
     }))
 
     return { success: true, data: transformedCoupons }
@@ -352,8 +240,7 @@ export async function getCouponById(
       .select(`
         *,
         tier_restrictions:coupon_tier_restrictions(tier_id),
-        series_restrictions:coupon_series_restrictions(series_id),
-        combo_restrictions:coupon_combo_restrictions(combo_deal_id)
+        series_restrictions:coupon_series_restrictions(series_id)
       `)
       .eq('id', couponId)
       .single()
@@ -368,12 +255,6 @@ export async function getCouponById(
       tier_restrictions: coupon.tier_restrictions?.map((r: any) => r.tier_id) || [],
       series_restrictions:
         coupon.series_restrictions?.map((r: any) => r.series_id) || [],
-      // 🆕 Feature 021: 組合優惠限制
-      combo_restrictions:
-        coupon.combo_restrictions
-          ?.filter((r: any) => r.combo_deal_id !== null)
-          .map((r: any) => r.combo_deal_id) || [],
-      combo_apply_all: coupon.combo_restrictions?.some((r: any) => r.combo_deal_id === null) || false,
     }
 
     return { success: true, data: transformedCoupon }
@@ -475,10 +356,6 @@ export async function updateCoupon(
     if (data.status) {
       updateData.status = data.status
     }
-    if (data.exclude_combo_deals !== undefined) {
-      updateData.exclude_combo_deals = data.exclude_combo_deals
-    }
-
     // 6. 更新優惠券
     const { data: coupon, error } = await supabase
       .from('coupons')
@@ -529,36 +406,6 @@ export async function updateCoupon(
         await supabase
           .from('coupon_series_restrictions')
           .insert(seriesRestrictions)
-      }
-    }
-
-    // 9. 🆕 Feature 021: 更新組合優惠限制（如果有提供）
-    if (data.combo_restrictions !== undefined || data.combo_apply_all !== undefined) {
-      // 刪除舊的限制
-      await supabase
-        .from('coupon_combo_restrictions')
-        .delete()
-        .eq('coupon_id', couponId)
-
-      // 建立新的限制
-      if (data.combo_apply_all) {
-        // 適用所有組合優惠：插入 combo_deal_id = NULL
-        await supabase
-          .from('coupon_combo_restrictions')
-          .insert({
-            coupon_id: couponId,
-            combo_deal_id: null,
-          })
-      } else if (data.combo_restrictions && data.combo_restrictions.length > 0) {
-        // 僅適用指定組合優惠
-        const comboRestrictions = data.combo_restrictions.map((combo_deal_id) => ({
-          coupon_id: couponId,
-          combo_deal_id,
-        }))
-
-        await supabase
-          .from('coupon_combo_restrictions')
-          .insert(comboRestrictions)
       }
     }
 
@@ -837,10 +684,8 @@ export async function getUserCoupons(filters?: {
 /**
  * 驗證優惠券是否可使用（含購物車資料）
  *
- * @param input - 優惠券代碼 + 購物車商品 + 組合優惠
+ * @param input - 優惠券代碼 + 購物車商品
  * @returns ActionResult<CouponDiscountResult>
- *
- * @feature 021-combo-deals: 新增組合優惠限制檢查
  */
 export async function validateCoupon(
   input: unknown
@@ -909,47 +754,13 @@ export async function validateCoupon(
       }
     }
 
-    // 5. 🆕 檢查排除組合優惠
-    const comboDeals = data.comboDeals || []
-    if (coupon.exclude_combo_deals && comboDeals.length > 0) {
-      return {
-        success: true,
-        data: {
-          valid: false,
-          error: '此優惠券不可用於包含組合優惠的訂單',
-        },
-      }
-    }
-
-    // 6. 🆕 Feature 021: 檢查組合優惠限制
-    const comboRestrictionCheck = await checkCouponComboRestrictions(
-      coupon.id,
-      comboDeals
-    )
-
-    if (!comboRestrictionCheck.valid) {
-      return {
-        success: true,
-        data: {
-          valid: false,
-          error: comboRestrictionCheck.error || '此優惠券不適用於組合優惠',
-        },
-      }
-    }
-
-    // 7. 轉換關聯資料為 ID 陣列
+    // 5. 轉換關聯資料為 ID 陣列
     const tierRestrictions =
       coupon.tier_restrictions?.map((r: any) => r.tier_id) || []
     const seriesRestrictions =
       coupon.series_restrictions?.map((r: any) => r.series_id) || []
 
-    // 8. 🆕 Feature 021: 計算組合優惠總金額（優惠後價格）
-    const comboDealsTotal = comboDeals.reduce(
-      (sum, combo) => sum + combo.discounted_price,
-      0
-    )
-
-    // 9. 計算折扣（包含組合優惠金額）
+    // 6. 計算折扣（僅普通商品）
     const result = calculateCouponDiscount({
       coupon: {
         ...coupon,
@@ -958,7 +769,6 @@ export async function validateCoupon(
       },
       cartItems: data.cartItems as CartItemForCoupon[],
       userTierId: tierId,
-      comboDealsTotal, // 🆕 傳入組合優惠總金額
     })
 
     return {
