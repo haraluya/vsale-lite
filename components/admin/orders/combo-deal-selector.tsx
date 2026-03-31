@@ -114,14 +114,17 @@ export function ComboDealSelector({
 
   // 是否滿足條件
   const isValid = useMemo(() => {
+    if (totalSelected === 0) return false
     if (comboMode === 'each') {
       return seriesList.every(s => {
-        const required = s.required_quantity ?? 0
+        // required_quantity 為 null 時視為至少需要 1 件
+        const required = s.required_quantity ?? 1
         const selected = seriesSelectedCounts.get(s.series_id) || 0
         return selected >= required
       })
     } else {
-      return totalSelected >= (mixMatchTotalQuantity ?? 0)
+      const required = mixMatchTotalQuantity ?? 1
+      return totalSelected >= required
     }
   }, [comboMode, seriesList, seriesSelectedCounts, totalSelected, mixMatchTotalQuantity])
 
@@ -302,6 +305,20 @@ export function ComboDealSelector({
             <span>合計</span>
             <span>{formatPrice(pricing.discountedPrice)}</span>
           </div>
+        </div>
+      )}
+
+      {/* 驗證提示 */}
+      {!isValid && totalSelected > 0 && comboMode === 'each' && (
+        <div className="px-1 text-xs text-amber-600">
+          {seriesList
+            .filter(s => {
+              const required = s.required_quantity ?? 1
+              const selected = seriesSelectedCounts.get(s.series_id) || 0
+              return selected < required
+            })
+            .map(s => `「${s.series_name}」還需選 ${(s.required_quantity ?? 1) - (seriesSelectedCounts.get(s.series_id) || 0)} 件`)
+            .join('、')}
         </div>
       )}
 
