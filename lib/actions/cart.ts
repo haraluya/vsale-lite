@@ -162,6 +162,7 @@ export async function getCartItemsWithPrices(
         imageUrl: product.image_url,
         quantity,
         price,
+        retailPrice: product.retail_price ?? null,
         subtotal: price ? price * quantity : 0,
         series_id: product.series_id, // 新增 series_id 欄位（優惠券系列限制驗證需要）
       }
