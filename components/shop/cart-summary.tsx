@@ -9,16 +9,16 @@
  *
  * 購物車摘要元件
  * - 顯示總金額、總數量
- * - 顯示組合優惠折扣（分項顯示）
- * - 顯示優惠券折扣（如果有）
+ * - 使用統一計算模組顯示折扣明細
+ * - 會員專屬折扣（藍色）
+ * - 優惠折扣加總 + 展開明細（紅色）
  * - 顯示運費預覽（自動計算）
  * - 提供結帳按鈕
- * - Neo-Brutalism 設計風格
  */
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Ticket, Truck, Package } from 'lucide-react'
+import { ShoppingCart, Ticket, Truck, ChevronDown } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import {
   getShippingFeeStatusText,
@@ -26,61 +26,56 @@ import {
   calculateFreeShippingGap,
   formatFreeShippingMessage,
 } from '@/lib/utils/shipping-calculator'
+import { calculateGrandTotal } from '@/lib/pricing/order-calculator'
+import type { OrderCalculationResult } from '@/lib/pricing/order-calculator'
 import type { ComboDealCartItem } from '@/stores/cart'
-import type { ProductDetailInfo } from '@/types'
 
 interface CartSummaryProps {
-  totalAmount: number
+  orderCalcResult: OrderCalculationResult
   totalItems: number
   isEmpty: boolean
   couponDiscount?: number
   couponCode?: string
-  comboDeals?: ComboDealCartItem[] // 🆕 Feature 021: 組合優惠項目
-  comboDealProductDetails?: Map<string, ProductDetailInfo> // 🆕 組合優惠商品詳情（計算會員折扣）
+  comboDeals?: ComboDealCartItem[]
   onOpenCouponSelector?: () => void
+  hasRegularItems?: boolean
 }
 
 export function CartSummary({
-  totalAmount,
+  orderCalcResult,
   totalItems,
   isEmpty,
   couponDiscount = 0,
   couponCode,
-  comboDeals = [], // 🆕 Feature 021
-  comboDealProductDetails, // 🆕 組合優惠商品詳情
+  comboDeals = [],
   onOpenCouponSelector,
+  hasRegularItems = true,
 }: CartSummaryProps) {
   const [shippingFee, setShippingFee] = useState<number | null>(null)
   const [freeShippingThreshold, setFreeShippingThreshold] = useState<number | null>(null)
   const [isLoadingShipping, setIsLoadingShipping] = useState(true)
+  const [discountExpanded, setDiscountExpanded] = useState(false)
 
-  // 🔧 計算組合優惠的會員折扣（零售價 - 等級價格）
-  const comboMemberDiscount = comboDeals.reduce((sum, item) => {
-    const retailTotal = item.selected_products.reduce((productSum, product) => {
-      const detail = comboDealProductDetails?.get(product.product_id)
-      const retailPrice = detail?.retail_price || detail?.unit_price || 0
-      return productSum + retailPrice * product.quantity
-    }, 0)
-    const tierTotal = item.original_price
-    return sum + (retailTotal - tierTotal)
-  }, 0)
+  const {
+    retailTotal,
+    memberDiscount,
+    comboDiscount,
+    couponDiscount: calcCouponDiscount,
+    shippingSubtotal,
+    discountDetails,
+  } = orderCalcResult
 
-  // 🔧 計算組合優惠總折扣
-  const totalComboDiscount = comboDeals.reduce(
-    (sum, item) => sum + item.discount_amount,
-    0
-  )
+  const totalPromoDiscount = comboDiscount + calcCouponDiscount
+  const hasMultipleDiscounts = discountDetails.length > 1
+  const canExpand = totalPromoDiscount > 0 && hasMultipleDiscounts
 
-  // 🔧 計算零售價總計（用於顯示）
-  const retailPriceTotal = totalAmount + comboMemberDiscount
+  const finalAmount = calculateGrandTotal(orderCalcResult, shippingFee ?? 0)
 
   // 計算運費（優化：並行查詢）
   useEffect(() => {
     async function fetchShippingFee() {
       const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) {
         setShippingFee(0)
@@ -90,27 +85,18 @@ export function CartSummary({
       }
 
       try {
-        // 🚀 優化：並行執行 RPC 和查詢，減少總等待時間
         const [shippingResult, profileResult] = await Promise.all([
-          // 查詢 1: 呼叫 calculate_shipping_fee RPC
           supabase.rpc('calculate_shipping_fee', {
             p_user_id: user.id,
-            p_subtotal: totalAmount, // 依原始商品金額計算（不含優惠券折扣）
+            p_subtotal: shippingSubtotal, // 修正：使用普通等級價 + 組合折後價
           }),
-          // 查詢 2: 同時取得用戶等級資訊（含免運門檻）
           supabase
             .from('profiles')
-            .select(`
-              tier_id,
-              tiers!inner (
-                free_shipping_threshold
-              )
-            `)
+            .select(`tier_id, tiers!inner (free_shipping_threshold)`)
             .eq('id', user.id)
             .single(),
         ])
 
-        // 處理運費結果
         if (shippingResult.error) {
           console.error('計算運費失敗:', shippingResult.error)
           setShippingFee(0)
@@ -118,7 +104,6 @@ export function CartSummary({
           setShippingFee(shippingResult.data ?? 0)
         }
 
-        // 處理免運門檻結果
         if (profileResult.data?.tiers) {
           setFreeShippingThreshold(
             (profileResult.data.tiers as any).free_shipping_threshold ?? null
@@ -142,14 +127,10 @@ export function CartSummary({
       setFreeShippingThreshold(null)
       setIsLoadingShipping(false)
     }
-  }, [totalAmount, isEmpty])
+  }, [shippingSubtotal, isEmpty])
 
-  // 計算距離免運門檻的差額
-  const freeShippingGap = calculateFreeShippingGap(totalAmount, freeShippingThreshold)
+  const freeShippingGap = calculateFreeShippingGap(shippingSubtotal, freeShippingThreshold)
   const freeShippingMessage = formatFreeShippingMessage(freeShippingGap)
-
-  // 🔧 計算最終總金額（零售價 - 會員折扣 - 組合折扣 - 優惠券折扣 + 運費）
-  const finalAmount = retailPriceTotal - comboMemberDiscount - totalComboDiscount - couponDiscount + (shippingFee ?? 0)
 
   return (
     <div className="sticky top-24 rounded-theme-sm border-theme bg-surface p-6 shadow-neo">
@@ -162,49 +143,62 @@ export function CartSummary({
           <span className="text-xl font-bold">{totalItems} 件</span>
         </div>
 
-        {/* 🔧 商品金額（零售價總計） */}
+        {/* 商品金額（零售價） */}
         <div className="flex items-center justify-between pb-2">
           <span className="text-text-secondary">商品金額</span>
           <span className="text-lg font-bold">
-            NT$ {retailPriceTotal.toLocaleString()}
+            NT$ {retailTotal.toLocaleString()}
           </span>
         </div>
 
-        {/* 🆕 會員專屬折扣（若有） */}
-        {comboMemberDiscount > 0 && (
+        {/* 會員專屬折扣 */}
+        {memberDiscount > 0 && (
           <div className="flex items-center justify-between pb-2">
-            <span className="text-sm text-blue-600 font-bold">
-              會員專屬折扣
-            </span>
+            <span className="text-sm text-blue-600 font-bold">會員專屬折扣</span>
             <span className="text-lg font-bold text-blue-600">
-              - NT$ {comboMemberDiscount.toLocaleString()}
+              - NT$ {memberDiscount.toLocaleString()}
             </span>
           </div>
         )}
 
-        {/* 🔧 組合優惠折扣（若有） */}
-        {comboDeals.length > 0 && comboDeals.map((item) => (
-          <div key={item.id} className="flex items-center justify-between pb-2">
-            <span className="text-sm text-success font-bold flex items-center gap-1">
-              <Package className="inline w-4 h-4" />
-              組合優惠 ({item.combo_deal_name})
-            </span>
-            <span className="text-lg font-bold text-success">
-              - NT$ {item.discount_amount.toLocaleString()}
-            </span>
-          </div>
-        ))}
+        {/* 優惠折扣（加總 + 展開明細） */}
+        {totalPromoDiscount > 0 && (
+          <div className="pb-2">
+            <div
+              className={`flex justify-between items-center ${canExpand ? 'cursor-pointer' : ''}`}
+              onClick={canExpand ? () => setDiscountExpanded(!discountExpanded) : undefined}
+            >
+              <span className="text-sm text-red-500 font-bold flex items-center gap-1">
+                優惠折扣
+                {canExpand && (
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      discountExpanded ? 'rotate-180' : ''
+                    }`}
+                  />
+                )}
+              </span>
+              <span className="text-lg font-bold text-red-500">
+                - NT$ {totalPromoDiscount.toLocaleString()}
+              </span>
+            </div>
 
-        {/* 優惠券折扣 */}
-        {couponDiscount > 0 && couponCode && (
-          <div className="flex items-center justify-between pb-2">
-            <span className="text-sm text-orange-600 font-bold">
-              <Ticket className="inline w-4 h-4 mr-1" />
-              優惠券折扣 ({couponCode})
-            </span>
-            <span className="text-lg font-bold text-orange-600">
-              - NT$ {couponDiscount.toLocaleString()}
-            </span>
+            {discountExpanded && discountDetails.length > 0 && (
+              <div className="pl-3 mt-2 space-y-1 border-l-2 border-red-200">
+                {discountDetails.map((d, i) => (
+                  <div key={i} className="flex justify-between items-center">
+                    <span className="text-xs text-text-secondary">{d.label}</span>
+                    <span className="text-xs text-red-400">- NT$ {d.amount.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!canExpand && discountDetails.length === 1 && (
+              <div className="pl-3 mt-1 border-l-2 border-red-200">
+                <span className="text-xs text-text-secondary">{discountDetails[0].label}</span>
+              </div>
+            )}
           </div>
         )}
 
@@ -214,12 +208,7 @@ export function CartSummary({
             <Truck className="w-4 h-4" />
             運費
           </span>
-          <span
-            className={`text-lg font-bold ${getShippingFeeColorClass(
-              isLoadingShipping,
-              shippingFee
-            )}`}
-          >
+          <span className={`text-lg font-bold ${getShippingFeeColorClass(isLoadingShipping, shippingFee)}`}>
             {getShippingFeeStatusText(isLoadingShipping, shippingFee)}
           </span>
         </div>
@@ -228,22 +217,35 @@ export function CartSummary({
         {freeShippingMessage && shippingFee !== null && shippingFee > 0 && (
           <div className="rounded-theme-sm border border-orange-500 bg-orange-50 dark:bg-orange-950 px-3 py-2">
             <p className="text-sm text-orange-700 dark:text-orange-300">
-              💡 <strong>{freeShippingMessage}</strong>
+              <strong>{freeShippingMessage}</strong>
             </p>
           </div>
         )}
 
         {/* 優惠券按鈕 */}
         {!isEmpty && onOpenCouponSelector && (
-          <button
-            onClick={onOpenCouponSelector}
-            className="w-full rounded-theme-sm border bg-orange-50 dark:bg-orange-950
-                       hover:bg-orange-100 dark:hover:bg-orange-900 px-4 py-3 text-sm font-bold
-                       transition-colors flex items-center justify-center gap-2"
-          >
-            <Ticket className="w-4 h-4" />
-            {couponDiscount > 0 ? '更換優惠券' : '選擇優惠券'}
-          </button>
+          hasRegularItems ? (
+            <button
+              onClick={onOpenCouponSelector}
+              className="w-full rounded-theme-sm border bg-orange-50 dark:bg-orange-950
+                         hover:bg-orange-100 dark:hover:bg-orange-900 px-4 py-3 text-sm font-bold
+                         transition-colors flex items-center justify-center gap-2"
+            >
+              <Ticket className="w-4 h-4" />
+              {couponDiscount > 0 ? '更換優惠券' : '選擇優惠券'}
+            </button>
+          ) : (
+            <div className="w-full rounded-theme-sm border bg-gray-100 dark:bg-gray-800
+                            px-4 py-3 text-sm opacity-60">
+              <div className="flex items-center justify-center gap-2 font-bold text-text-secondary">
+                <Ticket className="w-4 h-4" />
+                選擇優惠券
+              </div>
+              <p className="text-xs text-center text-text-secondary mt-1">
+                購物車內無適用商品（組合優惠不列入計算）
+              </p>
+            </div>
+          )
         )}
 
         {/* 最終總金額 */}
@@ -256,10 +258,7 @@ export function CartSummary({
 
         {/* 結帳按鈕 */}
         {isEmpty ? (
-          <button
-            disabled
-            className="w-full cursor-not-allowed rounded-theme-sm border-theme bg-gray-200 px-6 py-4 text-lg font-bold text-text-secondary opacity-50"
-          >
+          <button disabled className="w-full cursor-not-allowed rounded-theme-sm border-theme bg-gray-200 px-6 py-4 text-lg font-bold text-text-secondary opacity-50">
             購物車是空的
           </button>
         ) : (
@@ -284,7 +283,7 @@ export function CartSummary({
       {/* 提示訊息 */}
       <div className="mt-6 rounded-theme-sm border bg-yellow-100 dark:bg-yellow-900 p-4">
         <p className="text-sm text-foreground">
-          💡 <strong>提示:</strong> 商品價格為您的會員等級專屬價格,結帳前請確認購物車內容。
+          <strong>提示:</strong> 商品價格為您的會員等級專屬價格,結帳前請確認購物車內容。
         </p>
       </div>
     </div>
