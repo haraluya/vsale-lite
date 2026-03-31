@@ -1317,3 +1317,46 @@ export async function updateClientQuickInfo(
     }
   }
 }
+
+/**
+ * 代客下單：搜尋客戶（管理員專用）
+ */
+export async function searchCustomersForOrder(query: string): Promise<ActionResult<Array<{
+  id: string
+  phone: string
+  display_name: string | null
+  tier_id: string | null
+  tier_name: string | null
+}>>> {
+  try {
+    await checkAuth('admin')
+    if (!query || query.trim().length < 1) {
+      return { success: true, data: [] }
+    }
+    const adminClient = createAdminClient()
+    const trimmed = query.trim()
+    const { data, error } = await adminClient
+      .from('profiles')
+      .select('id, phone, display_name, tier_id, tiers(name)')
+      .eq('role', 'client')
+      .or(`phone.ilike.%${trimmed}%,display_name.ilike.%${trimmed}%`)
+      .order('display_name', { ascending: true })
+      .limit(20)
+    if (error) {
+      return { success: false, message: '搜尋客戶失敗' }
+    }
+    const clients = (data || []).map((p: any) => ({
+      id: p.id,
+      phone: p.phone,
+      display_name: p.display_name,
+      tier_id: p.tier_id,
+      tier_name: p.tiers?.name || null,
+    }))
+    return { success: true, data: clients }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '搜尋客戶時發生錯誤',
+    }
+  }
+}

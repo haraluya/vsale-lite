@@ -2135,3 +2135,72 @@ export async function resetAllStock(): Promise<ActionResult<{ updated_count: num
     }
   }
 }
+
+/**
+ * 代客下單：查詢商品含指定等級價格（管理員專用）
+ */
+export async function getProductsWithTierPrices(
+  tierId: string,
+  options?: {
+    search?: string
+    seriesId?: string
+    limit?: number
+  }
+): Promise<ActionResult<Array<{
+  id: string
+  name: string
+  code: string
+  series_id: string
+  series_name: string
+  retail_price: number
+  tier_price: number
+  stock: number
+  image_url: string | null
+}>>> {
+  try {
+    await checkAuth('admin')
+    const adminClient = createAdminClient()
+    const { search, seriesId, limit: queryLimit = 50 } = options || {}
+    let query = adminClient
+      .from('products')
+      .select(`
+        id, name, code, series_id, retail_price, stock, image_url,
+        series:series_id(name),
+        tier_prices(price, tier_id)
+      `)
+      .eq('status', 'active')
+      .order('code', { ascending: true })
+      .limit(queryLimit)
+    if (search) {
+      query = query.or(`name.ilike.%${search}%,code.ilike.%${search}%`)
+    }
+    if (seriesId) {
+      query = query.eq('series_id', seriesId)
+    }
+    const { data, error } = await query
+    if (error) {
+      return { success: false, message: '查詢商品失敗' }
+    }
+    const products = (data || []).map((p: any) => {
+      const tierPriceData = p.tier_prices?.find((tp: any) => tp.tier_id === tierId)
+      const tierPrice = tierPriceData?.price ?? p.retail_price
+      return {
+        id: p.id,
+        name: p.name,
+        code: p.code || '',
+        series_id: p.series_id,
+        series_name: p.series?.name || '',
+        retail_price: p.retail_price,
+        tier_price: tierPrice,
+        stock: p.stock ?? 0,
+        image_url: p.image_url || null,
+      }
+    })
+    return { success: true, data: products }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢商品時發生錯誤',
+    }
+  }
+}

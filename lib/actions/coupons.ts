@@ -996,3 +996,59 @@ export async function getCouponStats(
     return { success: false, message: '查詢優惠券統計時發生錯誤' }
   }
 }
+
+/**
+ * 代客下單：查詢指定客戶的可用優惠券（管理員專用）
+ */
+export async function getCustomerCoupons(
+  customerId: string
+): Promise<ActionResult<UserCoupon[]>> {
+  try {
+    await checkAuth('admin')
+    const supabase = await createClient()
+    const { data: userCoupons, error } = await supabase
+      .from('user_coupons')
+      .select(`*, coupon:coupons!inner(*)`)
+      .eq('user_id', customerId)
+      .is('used_at', null)
+      .eq('coupon.status', 'active')
+      .order('claimed_at', { ascending: false })
+    if (error) {
+      return { success: false, message: '查詢客戶優惠券失敗' }
+    }
+    const now = new Date()
+    const validCoupons = (userCoupons || [])
+      .map((uc: any) => {
+        const coupon = uc.coupon
+        if (!coupon) return null
+        if (coupon.valid_until && new Date(coupon.valid_until) < now) return null
+        if (coupon.valid_from && new Date(coupon.valid_from) > now) return null
+        return {
+          id: uc.id,
+          user_id: uc.user_id,
+          coupon_id: uc.coupon_id,
+          claimed_at: uc.claimed_at,
+          used_at: uc.used_at,
+          order_id: uc.order_id,
+          coupon: {
+            id: coupon.id,
+            code: coupon.code,
+            code_normalized: coupon.code_normalized,
+            discount_type: coupon.discount_type,
+            discount_value: coupon.discount_value,
+            min_order_amount: coupon.min_order_amount,
+            valid_from: coupon.valid_from,
+            valid_until: coupon.valid_until,
+            status: coupon.status,
+          },
+        } as UserCoupon
+      })
+      .filter(Boolean) as UserCoupon[]
+    return { success: true, data: validCoupons }
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : '查詢優惠券時發生錯誤',
+    }
+  }
+}
