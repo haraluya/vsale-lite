@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Minus, Plus, ChevronUp, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import { getComboDealDetailWithProducts } from '@/lib/actions/combo-deals'
 import { calculateComboDealPrice, formatPrice } from '@/lib/pricing/combo-deals'
 import type { SelectedProduct } from '@/types/combo-deals'
@@ -244,11 +245,21 @@ export function ComboDealSelector({
         return (
           <div key={series.series_id} className="space-y-1.5">
             {/* 系列標題 */}
-            <div className="flex items-center justify-between text-xs font-medium text-text-secondary px-1">
-              <span>{series.series_name}</span>
+            <div className={cn(
+              'flex items-center justify-between px-3 py-2 rounded-theme-sm border',
+              seriesCount === required
+                ? 'bg-green-50 border-green-200'
+                : 'bg-amber-50 border-amber-200'
+            )}>
+              <span className="text-sm font-bold text-foreground">{series.series_name}</span>
               {comboMode === 'each' && (
-                <span className={seriesCount >= required ? 'text-green-600' : 'text-amber-600'}>
-                  {seriesCount} / {required}
+                <span className={cn(
+                  'text-sm font-bold px-2 py-0.5 rounded',
+                  seriesCount === required
+                    ? 'bg-green-100 text-green-700'
+                    : 'bg-amber-100 text-amber-700'
+                )}>
+                  {seriesCount === required ? '✓' : `需選 ${required} 件`} {seriesCount}/{required}
                 </span>
               )}
             </div>
