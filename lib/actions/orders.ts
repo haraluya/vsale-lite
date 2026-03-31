@@ -47,17 +47,9 @@ export async function createOrder(
 ): Promise<ActionResult<{ orderId: string; orderNumber: string }>> {
   try {
     const supabase = await createClient()
-    const { userId, role, tierId } = await checkAuth()
+    const { userId: authUserId, role, tierId: authTierId } = await checkAuth()
 
-    // 管理員無法建立訂單
-    if (role === 'admin') {
-      return {
-        success: false,
-        message: '管理員帳號無法建立訂單',
-      }
-    }
-
-    // 驗證輸入
+    // 驗證輸入（提前，因為需要讀取 onBehalfOfUserId）
     const validated = createOrderSchema.safeParse(input)
     if (!validated.success) {
       return {
@@ -65,6 +57,60 @@ export async function createOrder(
         message: '訂單資料驗證失敗',
         errors: validated.error.flatten().fieldErrors,
       }
+    }
+
+    // 判斷是否為代客下單
+    const isOnBehalf = !!validated.data.onBehalfOfUserId
+
+    if (isOnBehalf) {
+      // 代客下單：必須是管理員
+      if (role !== 'admin') {
+        return {
+          success: false,
+          message: '只有管理員可以代客下單',
+        }
+      }
+    } else {
+      // 一般下單：管理員不可下單
+      if (role === 'admin') {
+        return {
+          success: false,
+          message: '管理員帳號無法建立訂單',
+        }
+      }
+    }
+
+    // 決定訂單歸屬的客戶
+    let userId: string
+    let tierId: string | undefined
+
+    if (isOnBehalf) {
+      // 代客下單：查詢目標客戶的等級
+      const { data: targetProfile, error: targetError } = await supabase
+        .from('profiles')
+        .select('id, role, tier_id')
+        .eq('id', validated.data.onBehalfOfUserId!)
+        .single()
+
+      if (targetError || !targetProfile) {
+        return {
+          success: false,
+          message: '目標客戶不存在',
+        }
+      }
+
+      if (targetProfile.role !== 'client') {
+        return {
+          success: false,
+          message: '只能為客戶身份的使用者代客下單',
+        }
+      }
+
+      userId = targetProfile.id
+      tierId = targetProfile.tier_id || undefined
+    } else {
+      userId = authUserId
+      tierId = authTierId
     }
 
     const { items, notes, userCouponId, comboDealItems = [] } = validated.data
@@ -535,8 +581,9 @@ export async function createOrder(
       .insert({
         order_id: order.id,
         action_type: 'created',
-        actor_id: userId,
-        actor_role: 'client',
+        actor_id: isOnBehalf ? authUserId : userId,
+        actor_role: isOnBehalf ? 'admin' : 'client',
+        content: isOnBehalf ? '管理員代客建立訂單' : null,
         new_status: 'pending',
       })
 

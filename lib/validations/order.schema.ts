@@ -57,6 +57,11 @@ export const createOrderSchema = z.object({
   userCouponId: z.string().uuid('無效的優惠券 ID')
     .optional()
     .nullable(),
+
+  // 代客下單：目標客戶 ID（管理員專用）
+  onBehalfOfUserId: z.string().uuid('無效的客戶 ID')
+    .optional()
+    .nullable(),
 }).refine(
   // 🆕 確保至少有一般商品或組合優惠項目
   (data) => data.items.length > 0 || data.comboDealItems.length > 0,
