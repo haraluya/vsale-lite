@@ -18,6 +18,21 @@ export function StepProductSelect({ draft, onNext }: StepProductSelectProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto space-y-6 pb-20">
+        {/* 客戶資訊 */}
+        {draft.selectedCustomer && (
+          <div className="bg-blue-50 rounded-theme-sm p-3 flex items-center justify-between text-sm">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{draft.selectedCustomer.displayName || draft.selectedCustomer.phone}</span>
+              <span className="text-xs text-text-secondary">{draft.selectedCustomer.phone}</span>
+            </div>
+            {draft.selectedCustomer.tierName && (
+              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                {draft.selectedCustomer.tierName}
+              </span>
+            )}
+          </div>
+        )}
+
         {/* 普通商品 */}
         <section>
           <h3 className="text-sm font-semibold mb-2">商品選擇</h3>

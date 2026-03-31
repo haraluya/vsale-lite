@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useConfirm } from '@/lib/contexts/dialog-context'
@@ -18,22 +18,42 @@ export function StepCustomerSelect({ draft }: StepCustomerSelectProps) {
     tier_id: string | null; tier_name: string | null;
   }>>([])
   const [loading, setLoading] = useState(false)
+  const [noTierCustomerId, setNoTierCustomerId] = useState<string | null>(null)
   const confirm = useConfirm()
 
-  const handleSearch = useCallback(async (searchQuery: string) => {
-    setQuery(searchQuery)
-    if (searchQuery.trim().length < 1) {
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const doSearch = useCallback(async (trimmed: string) => {
+    if (trimmed.length < 2) {
       setResults([])
+      setLoading(false)
       return
     }
     setLoading(true)
     try {
-      const result = await searchCustomersForOrder(searchQuery.trim())
+      const result = await searchCustomersForOrder(trimmed)
       if (result.success && result.data) {
         setResults(result.data)
       }
     } finally {
       setLoading(false)
+    }
+  }, [])
+
+  const handleSearch = useCallback((searchQuery: string) => {
+    setQuery(searchQuery)
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
+    const trimmed = searchQuery.trim()
+    if (trimmed.length < 2) {
+      setResults([])
+      return
+    }
+    searchTimerRef.current = setTimeout(() => doSearch(trimmed), 500)
+  }, [doSearch])
+
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
     }
   }, [])
 
@@ -48,7 +68,11 @@ export function StepCustomerSelect({ draft }: StepCustomerSelectProps) {
       if (!confirmed) return
       draft.resetItemsAndCoupon()
     }
-    if (!customer.tier_id) return // 未設定等級無法下單
+    if (!customer.tier_id) {
+      setNoTierCustomerId(customer.id)
+      return
+    }
+    setNoTierCustomerId(null)
 
     const selected: SelectedCustomer = {
       id: customer.id,
@@ -69,7 +93,7 @@ export function StepCustomerSelect({ draft }: StepCustomerSelectProps) {
           type="text"
           value={query}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder="搜尋客戶手機號碼或名稱..."
+          placeholder="輸入手機號碼或名稱搜尋（至少 2 字元）..."
           className="w-full pl-10 pr-4 py-3 border rounded-theme-sm bg-surface focus:outline-none focus:ring-2 focus:ring-blue-500"
           autoFocus
         />
@@ -80,29 +104,35 @@ export function StepCustomerSelect({ draft }: StepCustomerSelectProps) {
       {!loading && results.length > 0 && (
         <div className="border rounded-theme-sm overflow-hidden divide-y">
           {results.map((customer) => (
-            <button
-              key={customer.id}
-              onClick={() => handleSelect(customer)}
-              className={cn(
-                'w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors text-left',
-                draft.selectedCustomer?.id === customer.id && 'bg-blue-50'
+            <div key={customer.id}>
+              <button
+                onClick={() => handleSelect(customer)}
+                className={cn(
+                  'w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors text-left',
+                  draft.selectedCustomer?.id === customer.id && 'bg-blue-50'
+                )}
+              >
+                <div>
+                  <div className="font-medium">{customer.display_name || customer.phone}</div>
+                  <div className="text-sm text-text-secondary">{customer.phone}</div>
+                </div>
+                {customer.tier_name ? (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{customer.tier_name}</span>
+                ) : (
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">未設定等級</span>
+                )}
+              </button>
+              {noTierCustomerId === customer.id && (
+                <div className="px-4 py-2 text-xs text-red-500 bg-red-50 border-t">
+                  此客戶未設定等級，無法代客下單
+                </div>
               )}
-            >
-              <div>
-                <div className="font-medium">{customer.display_name || customer.phone}</div>
-                <div className="text-sm text-text-secondary">{customer.phone}</div>
-              </div>
-              {customer.tier_name ? (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">{customer.tier_name}</span>
-              ) : (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">未設定等級</span>
-              )}
-            </button>
+            </div>
           ))}
         </div>
       )}
 
-      {!loading && query.length >= 1 && results.length === 0 && (
+      {!loading && query.trim().length >= 2 && results.length === 0 && (
         <div className="text-center text-text-secondary py-8">找不到符合的客戶</div>
       )}
 

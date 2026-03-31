@@ -112,19 +112,31 @@ export function ComboDealSelector({
     return sum
   }, [selections])
 
-  // 是否滿足條件
+  // 各選模式：該系列是否還能增加
+  const canIncreaseInSeries = useCallback((seriesId: string) => {
+    if (comboMode === 'each') {
+      const series = seriesList.find(s => s.series_id === seriesId)
+      const required = series?.required_quantity ?? 1
+      const selected = seriesSelectedCounts.get(seriesId) || 0
+      return selected < required
+    } else {
+      const required = mixMatchTotalQuantity ?? 1
+      return totalSelected < required
+    }
+  }, [comboMode, seriesList, seriesSelectedCounts, totalSelected, mixMatchTotalQuantity])
+
+  // 是否滿足條件（精確匹配數量）
   const isValid = useMemo(() => {
     if (totalSelected === 0) return false
     if (comboMode === 'each') {
       return seriesList.every(s => {
-        // required_quantity 為 null 時視為至少需要 1 件
         const required = s.required_quantity ?? 1
         const selected = seriesSelectedCounts.get(s.series_id) || 0
-        return selected >= required
+        return selected === required
       })
     } else {
       const required = mixMatchTotalQuantity ?? 1
-      return totalSelected >= required
+      return totalSelected === required
     }
   }, [comboMode, seriesList, seriesSelectedCounts, totalSelected, mixMatchTotalQuantity])
 
@@ -244,6 +256,7 @@ export function ComboDealSelector({
             {/* 商品列表 */}
             {series.products.map(product => {
               const qty = selections.get(product.product_id) || 0
+              const canIncrease = canIncreaseInSeries(series.series_id)
               return (
                 <div
                   key={product.product_id}
@@ -275,7 +288,8 @@ export function ComboDealSelector({
                     <span className="w-6 text-center text-sm tabular-nums">{qty}</span>
                     <button
                       type="button"
-                      className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 text-gray-700 hover:bg-gray-100"
+                      className="w-7 h-7 flex items-center justify-center rounded border border-gray-300 text-gray-700 hover:bg-gray-100 disabled:opacity-30"
+                      disabled={!canIncrease}
                       onClick={() => setQuantity(product.product_id, qty + 1)}
                     >
                       <Plus className="h-3.5 w-3.5" />
