@@ -48,39 +48,10 @@ export function optimizeImage(
     return url
   }
 
-  // 2. 非 Supabase 圖片 - 直接返回
-  if (!url.includes('supabase.co/storage/v1/object/public/')) {
-    return url
-  }
-
-  // 3. Supabase Storage URL - 添加 Image Transformation 參數
-
-  // 預設選項
-  const {
-    width,
-    height,
-    quality = 80,
-    format = 'webp',
-    resize = 'cover'
-  } = options
-
-  // 建構查詢參數
-  const params = new URLSearchParams()
-
-  if (width) params.append('width', width.toString())
-  if (height) params.append('height', height.toString())
-  if (quality && quality !== 100) params.append('quality', quality.toString())
-  if (format && format !== 'origin') params.append('format', format)
-  if (resize && resize !== 'cover') params.append('resize', resize)
-
-  // 如果沒有任何轉換參數，直接返回原始 URL
-  if (params.toString() === '') {
-    return url
-  }
-
-  // 添加查詢參數（保留原有參數）
-  const separator = url.includes('?') ? '&' : '?'
-  return `${url}${separator}${params.toString()}`
+  // 2. Supabase Storage URL - 直接返回原始 URL
+  // Image Transformation 為 Pro Plan 功能，Free Plan 加參數會回傳 400
+  // Next.js Image 元件已內建圖片優化（格式轉換、尺寸調整）
+  return url
 }
 
 /**
